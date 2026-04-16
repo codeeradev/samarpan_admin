@@ -1,0 +1,24 @@
+{
+  "overview": "Samarpan Hospital Admin Panel — a professional hospital management dashboard with gold branding, role-based access control, and full CRUD for doctors, patients, appointments, services, content, and enquiries.",
+  "features": [
+    "Gold/amber color palette matching Samarpan Hospital branding",
+    "Role-based permission system (Super Admin, Doctor, Receptionist, Nurse)",
+    "Dynamic sidebar filtered by user role",
+    "Role Management page for Super Admin",
+    "Multi-role login with mock test credentials",
+    "9 management pages with full CRUD operations",
+    "Responsive design for web and mobile",
+    "Charts, loading skeletons, and toast notifications"
+  ],
+  "category": "healthcare",
+  "tags": [
+    "hospital",
+    "admin-panel",
+    "healthcare",
+    "role-based-access",
+    "dashboard",
+    "react",
+    "tailwind"
+  ],
+  "last_updated": "2026-04-14T10:43:20.000Z"
+}
