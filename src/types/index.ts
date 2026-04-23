@@ -117,6 +117,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/patients",
     "/appointments",
     "/service-management",
+    "/reviews-shorts",
     "/content",
     "/enquiries",
     "/settings",

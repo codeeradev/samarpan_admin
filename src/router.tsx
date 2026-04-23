@@ -6,6 +6,7 @@ import DoctorsPage from "@/pages/DoctorsPage";
 import EnquiriesPage from "@/pages/EnquiriesPage";
 import LoginPage from "@/pages/LoginPage";
 import PatientsPage from "@/pages/PatientsPage";
+import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
 import RoleManagementPage from "@/pages/RoleManagementPage";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import SettingsPage from "@/pages/SettingsPage";
@@ -123,6 +124,13 @@ const serviceManagementRoute = createRoute({
   component: ServiceManagementPage,
 });
 
+const reviewsAndShortsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/reviews-shorts",
+  beforeLoad: () => checkPermission("/reviews-shorts"),
+  component: ReviewsAndShortsPage,
+});
+
 const contentRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/content",
@@ -161,6 +169,7 @@ const routeTree = rootRoute.addChildren([
     patientsRoute,
     appointmentsRoute,
     serviceManagementRoute,
+    reviewsAndShortsRoute,
     contentRoute,
     enquiriesRoute,
     settingsRoute,

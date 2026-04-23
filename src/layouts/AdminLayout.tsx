@@ -26,6 +26,7 @@ import {
   Search,
   Settings,
   Shield,
+  Star,
   User,
   UserRound,
   Users,
@@ -73,6 +74,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: HeartPulse,
     path: "/service-management",
     permissionPath: "/service-management",
+  },
+  {
+    label: "Reviews & Shorts",
+    icon: Star,
+    path: "/reviews-shorts",
+    permissionPath: "/reviews-shorts",
   },
   {
     label: "Content",
