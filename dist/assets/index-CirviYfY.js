@@ -66287,7 +66287,7 @@ function ShortPreviewCard({
     ] });
   }
   const thumbnail = getShortThumbnail(short);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_25px_70px_-42px_rgba(15,23,42,0.5)]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative aspect-[9/16] overflow-hidden bg-slate-950", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_25px_70px_-42px_rgba(15,23,42,0.5)]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-[340px] bg-slate-950", children: [
     thumbnail ? /* @__PURE__ */ jsxRuntimeExports.jsx(
       "img",
       {
@@ -66393,8 +66393,8 @@ function ReviewsAndShortsPage() {
       (item) => [item.title, item.shortUrl, item.thumbnail, item.sortOrder].filter(Boolean).some((value) => String(value).toLowerCase().includes(query))
     );
   }, [shortSearch, shorts]);
-  const featuredReview = filteredReviews[0] ?? reviews[0];
-  const featuredShort = filteredShorts[0] ?? shorts[0];
+  filteredReviews[0] ?? reviews[0];
+  filteredShorts[0] ?? shorts[0];
   const reviewCount = reviews.length;
   const activeReviewCount = reviews.filter((item) => item.isActive !== false).length;
   const shortCount = shorts.length;
@@ -66689,320 +66689,282 @@ function ReviewsAndShortsPage() {
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "reviews", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-6 xl:grid-cols-[1.35fr_0.9fr]", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Review Library" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm text-slate-500", children: "Search, reorder, edit, and hide testimonials in seconds." })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Search,
-                    {
-                      size: 15,
-                      className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      value: reviewSearch,
-                      onChange: (event) => setReviewSearch(event.target.value),
-                      placeholder: "Search by name, review, location...",
-                      className: "rounded-xl border-slate-200 pl-9",
-                      "data-ocid": "reviews_shorts.review_search_input"
-                    }
-                  )
-                ] })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isReviewsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: [1, 2, 3].map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "rounded-2xl border border-slate-200 p-5",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-full" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20" })
-                        ] })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-20 rounded-full" })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-4 h-4 w-full" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-11/12" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-9/12" })
-                  ]
-                },
-                `review-skeleton-${item}`
-              )) }) : isReviewsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (reviewsError == null ? void 0 : reviewsError.message) || "Unable to load reviews." }) : filteredReviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No reviews found" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Try another search or add the first patient testimonial." })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: filteredReviews.map((review, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-amber-200 hover:shadow-sm",
-                  "data-ocid": `reviews_shorts.review_item.${index2 + 1}`,
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 text-sm font-semibold text-white", children: getInitials(review.name) }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900", children: review.name }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-slate-100 text-slate-700", children: [
-                              "#",
-                              review.sortOrder ?? 0
-                            ] }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Badge,
-                              {
-                                className: review.isActive === false ? "bg-slate-100 text-slate-600" : "bg-emerald-50 text-emerald-700",
-                                children: review.isActive === false ? "Hidden" : "Visible"
-                              }
-                            )
-                          ] }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: Number(review.rating ?? 5) }),
-                            review.location ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Badge,
-                              {
-                                variant: "outline",
-                                className: "border-slate-200 text-slate-600",
-                                children: review.location
-                              }
-                            ) : null,
-                            review.treatment ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Badge,
-                              {
-                                variant: "outline",
-                                className: "border-slate-200 text-slate-600",
-                                children: review.treatment
-                              }
-                            ) : null
-                          ] })
-                        ] })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 self-start", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Button,
-                          {
-                            type: "button",
-                            size: "icon",
-                            variant: "ghost",
-                            className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
-                            onClick: () => openEditReview(review),
-                            "data-ocid": `reviews_shorts.review_edit_button.${index2 + 1}`,
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Button,
-                          {
-                            type: "button",
-                            size: "icon",
-                            variant: "ghost",
-                            className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
-                            onClick: () => setReviewDeleteTarget(review),
-                            "data-ocid": `reviews_shorts.review_delete_button.${index2 + 1}`,
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
-                          }
-                        )
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "reviews", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Review Library" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm text-slate-500", children: "Search, reorder, edit, and hide testimonials in seconds." })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Search,
+                  {
+                    size: 15,
+                    className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: reviewSearch,
+                    onChange: (event) => setReviewSearch(event.target.value),
+                    placeholder: "Search by name, review, location...",
+                    className: "rounded-xl border-slate-200 pl-9",
+                    "data-ocid": "reviews_shorts.review_search_input"
+                  }
+                )
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isReviewsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: [1, 2, 3].map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "rounded-2xl border border-slate-200 p-5",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-full" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20" })
                       ] })
                     ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-sm leading-7 text-slate-600", children: review.review }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Use sort order to control how testimonials appear on the website." }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-slate-500", children: "Live on website" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Switch,
-                          {
-                            checked: review.isActive !== false,
-                            onCheckedChange: (checked) => handleReviewVisibilityChange(review, checked),
-                            disabled: updateReviewMutation.isPending
-                          }
-                        )
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-20 rounded-full" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-4 h-4 w-full" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-11/12" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-9/12" })
+                ]
+              },
+              `review-skeleton-${item}`
+            )) }) : isReviewsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (reviewsError == null ? void 0 : reviewsError.message) || "Unable to load reviews." }) : filteredReviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No reviews found" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Try another search or add the first patient testimonial." })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: filteredReviews.map((review, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-amber-200 hover:shadow-sm",
+                "data-ocid": `reviews_shorts.review_item.${index2 + 1}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 text-sm font-semibold text-white", children: getInitials(review.name) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900", children: review.name }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-slate-100 text-slate-700", children: [
+                            "#",
+                            review.sortOrder ?? 0
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Badge,
+                            {
+                              className: review.isActive === false ? "bg-slate-100 text-slate-600" : "bg-emerald-50 text-emerald-700",
+                              children: review.isActive === false ? "Hidden" : "Visible"
+                            }
+                          )
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: Number(review.rating ?? 5) }),
+                          review.location ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Badge,
+                            {
+                              variant: "outline",
+                              className: "border-slate-200 text-slate-600",
+                              children: review.location
+                            }
+                          ) : null,
+                          review.treatment ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Badge,
+                            {
+                              variant: "outline",
+                              className: "border-slate-200 text-slate-600",
+                              children: review.treatment
+                            }
+                          ) : null
+                        ] })
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 self-start", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Button,
+                        {
+                          type: "button",
+                          size: "icon",
+                          variant: "ghost",
+                          className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
+                          onClick: () => openEditReview(review),
+                          "data-ocid": `reviews_shorts.review_edit_button.${index2 + 1}`,
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Button,
+                        {
+                          type: "button",
+                          size: "icon",
+                          variant: "ghost",
+                          className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
+                          onClick: () => setReviewDeleteTarget(review),
+                          "data-ocid": `reviews_shorts.review_delete_button.${index2 + 1}`,
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
+                        }
+                      )
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-sm leading-7 text-slate-600", children: review.review }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Use sort order to control how testimonials appear on the website." }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-slate-500", children: "Live on website" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Switch,
+                        {
+                          checked: review.isActive !== false,
+                          onCheckedChange: (checked) => handleReviewVisibilityChange(review, checked),
+                          disabled: updateReviewMutation.isPending
+                        }
+                      )
+                    ] })
+                  ] })
+                ]
+              },
+              review._id
+            )) }) })
+          ] }) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "shorts", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Shorts Library" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm text-slate-500", children: "Manage video snippets with thumbnail preview and instant publish controls." })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Search,
+                  {
+                    size: 15,
+                    className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: shortSearch,
+                    onChange: (event) => setShortSearch(event.target.value),
+                    placeholder: "Search by title or link...",
+                    className: "rounded-xl border-slate-200 pl-9",
+                    "data-ocid": "reviews_shorts.short_search_input"
+                  }
+                )
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isShortsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: [1, 2, 3, 4].map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "rounded-3xl border border-slate-200 p-4",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "aspect-[9/16] w-full rounded-2xl" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-4 h-4 w-3/4" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-1/2" })
+                ]
+              },
+              `short-skeleton-${item}`
+            )) }) : isShortsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (shortsError == null ? void 0 : shortsError.message) || "Unable to load shorts." }) : filteredShorts.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No shorts found" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Paste your first short URL to start building the video showcase." })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: filteredShorts.map((short, index2) => {
+              const thumbnail = getShortThumbnail(short);
+              return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  className: "overflow-hidden rounded-3xl border border-slate-200 bg-white transition hover:border-rose-200 hover:shadow-sm",
+                  "data-ocid": `reviews_shorts.short_item.${index2 + 1}`,
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-[340px] bg-slate-950", children: [
+                      thumbnail ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "img",
+                        {
+                          src: thumbnail,
+                          alt: short.title,
+                          className: "h-full w-full object-cover"
+                        }
+                      ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-500 via-orange-500 to-amber-400" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-slate-950/15" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { className: "ml-1 text-rose-500", size: 24 }) }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute right-4 top-4 flex gap-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-white/15 text-white backdrop-blur-sm", children: [
+                          "#",
+                          short.sortOrder ?? 0
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-white/15 text-white backdrop-blur-sm", children: short.isActive === false ? "Hidden" : "Live" })
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 p-4", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "line-clamp-2 text-sm font-semibold text-slate-900", children: short.title }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-slate-500", children: getShortHost(short.shortUrl) })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-slate-500", children: "Live" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Switch,
+                            {
+                              checked: short.isActive !== false,
+                              onCheckedChange: (checked) => handleShortVisibilityChange(short, checked),
+                              disabled: updateShortMutation.isPending
+                            }
+                          )
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Button,
+                            {
+                              type: "button",
+                              size: "icon",
+                              variant: "ghost",
+                              className: "rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700",
+                              onClick: () => window.open(
+                                short.shortUrl,
+                                "_blank",
+                                "noopener,noreferrer"
+                              ),
+                              "data-ocid": `reviews_shorts.short_open_button.${index2 + 1}`,
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { size: 15 })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Button,
+                            {
+                              type: "button",
+                              size: "icon",
+                              variant: "ghost",
+                              className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
+                              onClick: () => openEditShort(short),
+                              "data-ocid": `reviews_shorts.short_edit_button.${index2 + 1}`,
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Button,
+                            {
+                              type: "button",
+                              size: "icon",
+                              variant: "ghost",
+                              className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
+                              onClick: () => setShortDeleteTarget(short),
+                              "data-ocid": `reviews_shorts.short_delete_button.${index2 + 1}`,
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
+                            }
+                          )
+                        ] })
                       ] })
                     ] })
                   ]
                 },
-                review._id
-              )) }) })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6 xl:sticky xl:top-24", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Featured Preview" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "A quick visual check for how the highlighted testimonial will feel on the homepage." })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ReviewPreviewCard, { review: featuredReview }) })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Publishing Tips" }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3 text-sm leading-6 text-slate-600", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl bg-amber-50 p-4", children: "Keep reviews concise, human, and specific so cards stay readable in the website carousel." }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl bg-slate-50 p-4", children: "Use sort order `0`, `1`, `2` to curate the first few testimonials visitors see." }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl bg-emerald-50 p-4", children: "Hide older reviews instead of deleting them when you may want to reuse them later." })
-                ] })
-              ] })
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "shorts", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-6 xl:grid-cols-[1.2fr_0.85fr]", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Shorts Library" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm text-slate-500", children: "Manage video snippets with thumbnail preview and instant publish controls." })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Search,
-                    {
-                      size: 15,
-                      className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      value: shortSearch,
-                      onChange: (event) => setShortSearch(event.target.value),
-                      placeholder: "Search by title or link...",
-                      className: "rounded-xl border-slate-200 pl-9",
-                      "data-ocid": "reviews_shorts.short_search_input"
-                    }
-                  )
-                ] })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isShortsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: [1, 2, 3, 4].map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "rounded-3xl border border-slate-200 p-4",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "aspect-[9/16] w-full rounded-2xl" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-4 h-4 w-3/4" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-1/2" })
-                  ]
-                },
-                `short-skeleton-${item}`
-              )) }) : isShortsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (shortsError == null ? void 0 : shortsError.message) || "Unable to load shorts." }) : filteredShorts.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No shorts found" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Paste your first short URL to start building the video showcase." })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: filteredShorts.map((short, index2) => {
-                const thumbnail = getShortThumbnail(short);
-                return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  "div",
-                  {
-                    className: "overflow-hidden rounded-3xl border border-slate-200 bg-white transition hover:border-rose-200 hover:shadow-sm",
-                    "data-ocid": `reviews_shorts.short_item.${index2 + 1}`,
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative aspect-[9/16] bg-slate-950", children: [
-                        thumbnail ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "img",
-                          {
-                            src: thumbnail,
-                            alt: short.title,
-                            className: "h-full w-full object-cover"
-                          }
-                        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-500 via-orange-500 to-amber-400" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-slate-950/15" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { className: "ml-1 text-rose-500", size: 24 }) }) }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute right-4 top-4 flex gap-2", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-white/15 text-white backdrop-blur-sm", children: [
-                            "#",
-                            short.sortOrder ?? 0
-                          ] }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-white/15 text-white backdrop-blur-sm", children: short.isActive === false ? "Hidden" : "Live" })
-                        ] })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 p-4", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "line-clamp-2 text-sm font-semibold text-slate-900", children: short.title }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-slate-500", children: getShortHost(short.shortUrl) })
-                        ] }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-slate-500", children: "Live" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Switch,
-                              {
-                                checked: short.isActive !== false,
-                                onCheckedChange: (checked) => handleShortVisibilityChange(short, checked),
-                                disabled: updateShortMutation.isPending
-                              }
-                            )
-                          ] }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Button,
-                              {
-                                type: "button",
-                                size: "icon",
-                                variant: "ghost",
-                                className: "rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700",
-                                onClick: () => window.open(
-                                  short.shortUrl,
-                                  "_blank",
-                                  "noopener,noreferrer"
-                                ),
-                                "data-ocid": `reviews_shorts.short_open_button.${index2 + 1}`,
-                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { size: 15 })
-                              }
-                            ),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Button,
-                              {
-                                type: "button",
-                                size: "icon",
-                                variant: "ghost",
-                                className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
-                                onClick: () => openEditShort(short),
-                                "data-ocid": `reviews_shorts.short_edit_button.${index2 + 1}`,
-                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
-                              }
-                            ),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Button,
-                              {
-                                type: "button",
-                                size: "icon",
-                                variant: "ghost",
-                                className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
-                                onClick: () => setShortDeleteTarget(short),
-                                "data-ocid": `reviews_shorts.short_delete_button.${index2 + 1}`,
-                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
-                              }
-                            )
-                          ] })
-                        ] })
-                      ] })
-                    ]
-                  },
-                  short._id
-                );
-              }) }) })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6 xl:sticky xl:top-24", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Featured Preview" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "A vertical card preview to sanity-check title, thumbnail, and publish state." })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ShortPreviewCard, { short: featuredShort }) })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Workflow Notes" }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3 text-sm leading-6 text-slate-600", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl bg-rose-50 p-4", children: "Paste a YouTube Shorts URL and let the panel auto-generate a thumbnail when possible." }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl bg-slate-50 p-4", children: "Keep titles short so mobile cards stay crisp and readable." }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl bg-amber-50 p-4", children: "Use the visibility toggle to stage videos before they go live on the website." })
-                ] })
-              ] })
-            ] })
-          ] }) })
+                short._id
+              );
+            }) }) })
+          ] }) }) })
         ]
       }
     ),

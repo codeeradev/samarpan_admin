@@ -409,7 +409,7 @@ function ShortPreviewCard({
 
   return (
     <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_25px_70px_-42px_rgba(15,23,42,0.5)]">
-      <div className="relative aspect-[9/16] overflow-hidden bg-slate-950">
+      <div className="relative h-[340px] bg-slate-950">
         {thumbnail ? (
           <img
             src={thumbnail}
@@ -879,7 +879,7 @@ export default function ReviewsAndShortsPage() {
         </div>
 
         <TabsContent value="reviews" className="mt-0">
-          <div className="grid gap-6 xl:grid-cols-[1.35fr_0.9fr]">
+          <div className="grid gap-6">
             <Card className="border-slate-200 shadow-sm">
               <CardHeader className="gap-4 border-b border-slate-100 pb-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -1050,7 +1050,7 @@ export default function ReviewsAndShortsPage() {
               </CardContent>
             </Card>
 
-            <div className="space-y-6 xl:sticky xl:top-24">
+            {/* <div className="space-y-6 xl:sticky xl:top-24">
               <Card className="border-slate-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-lg text-slate-900">
@@ -1087,12 +1087,12 @@ export default function ReviewsAndShortsPage() {
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </div> */}
           </div>
         </TabsContent>
 
         <TabsContent value="shorts" className="mt-0">
-          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.85fr]">
+          <div className="grid gap-6">
             <Card className="border-slate-200 shadow-sm">
               <CardHeader className="gap-4 border-b border-slate-100 pb-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -1160,7 +1160,7 @@ export default function ReviewsAndShortsPage() {
                           className="overflow-hidden rounded-3xl border border-slate-200 bg-white transition hover:border-rose-200 hover:shadow-sm"
                           data-ocid={`reviews_shorts.short_item.${index + 1}`}
                         >
-                          <div className="relative aspect-[9/16] bg-slate-950">
+                          <div className="relative h-[340px] bg-slate-950">
                             {thumbnail ? (
                               <img
                                 src={thumbnail}
@@ -1258,7 +1258,7 @@ export default function ReviewsAndShortsPage() {
               </CardContent>
             </Card>
 
-            <div className="space-y-6 xl:sticky xl:top-24">
+            {/* <div className="space-y-6 xl:sticky xl:top-24">
               <Card className="border-slate-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-lg text-slate-900">
@@ -1294,7 +1294,7 @@ export default function ReviewsAndShortsPage() {
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </div> */}
           </div>
         </TabsContent>
       </Tabs>

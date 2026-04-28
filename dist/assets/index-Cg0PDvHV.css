@@ -1014,6 +1014,9 @@ video {
 .h-\[250px\] {
   height: 250px;
 }
+.h-\[340px\] {
+  height: 340px;
+}
 .h-\[calc\(100\%-1px\)\] {
   height: calc(100% - 1px);
 }
@@ -4934,16 +4937,8 @@ video {
     grid-template-columns: 1.1fr 0.9fr;
   }
 
-  .xl\:grid-cols-\[1\.2fr_0\.85fr\] {
-    grid-template-columns: 1.2fr 0.85fr;
-  }
-
   .xl\:grid-cols-\[1\.2fr_0\.8fr\] {
     grid-template-columns: 1.2fr 0.8fr;
-  }
-
-  .xl\:grid-cols-\[1\.35fr_0\.9fr\] {
-    grid-template-columns: 1.35fr 0.9fr;
   }
 
   .xl\:grid-cols-\[1\.3fr_repeat\(3\2c minmax\(0\2c 1fr\)\)\] {
