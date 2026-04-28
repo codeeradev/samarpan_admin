@@ -25036,38 +25036,6 @@ const cva = (base, config2) => (props) => {
   }, []);
   return cx(base, getVariantClassNames, getCompoundVariantClassNames, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
 };
-const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
-  {
-    variants: {
-      variant: {
-        default: "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary: "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        destructive: "border-transparent bg-destructive text-destructive-foreground [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground"
-      }
-    },
-    defaultVariants: {
-      variant: "default"
-    }
-  }
-);
-function Badge({
-  className,
-  variant,
-  asChild = false,
-  ...props
-}) {
-  const Comp = asChild ? Slot$3 : "span";
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Comp,
-    {
-      "data-slot": "badge",
-      className: cn(badgeVariants({ variant }), className),
-      ...props
-    }
-  );
-}
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
@@ -30547,23 +30515,6 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$I = [
-  ["path", { d: "M10.268 21a2 2 0 0 0 3.464 0", key: "vwvbt9" }],
-  [
-    "path",
-    {
-      d: "M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326",
-      key: "11g9vi"
-    }
-  ]
-];
-const Bell = createLucideIcon("bell", __iconNode$I);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
 const __iconNode$H = [
   ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
@@ -31197,22 +31148,6 @@ function DropdownMenuSeparator({
     {
       "data-slot": "dropdown-menu-separator",
       className: cn("bg-border -mx-1 my-1 h-px", className),
-      ...props
-    }
-  );
-}
-function Input({ className, type, ...props }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    "input",
-    {
-      type,
-      "data-slot": "input",
-      className: cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      ),
       ...props
     }
   );
@@ -36947,7 +36882,7 @@ function SidebarNav({
   onNavigate
 }) {
   const navigate = useNavigate();
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "flex-1 px-3 py-4 space-y-1", children: visibleItems.map((item) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "flex-1 px-3 py-4 space-y-1 overflow-y-auto", children: visibleItems.map((item) => {
     const isActive = currentPath === item.path || currentPath.startsWith(`${item.path}/`);
     return /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "button",
@@ -36973,25 +36908,11 @@ function AdminLayout() {
   const navigate = useNavigate();
   const location2 = useLocation();
   const [mobileOpen, setMobileOpen] = reactExports.useState(false);
-  const [searchOpen, setSearchOpen] = reactExports.useState(false);
-  const searchRef = reactExports.useRef(null);
   const role = admin == null ? void 0 : admin.role;
   const allowedPaths = role ? ROLE_PERMISSIONS[role] ?? [] : [];
   const visibleItems = ALL_NAV_ITEMS.filter(
     (item) => allowedPaths.includes(item.permissionPath)
   );
-  reactExports.useEffect(() => {
-    if (!searchOpen) return;
-    function handleKey(e3) {
-      if (e3.key === "Escape") setSearchOpen(false);
-    }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [searchOpen]);
-  reactExports.useEffect(() => {
-    var _a2;
-    if (searchOpen) (_a2 = searchRef.current) == null ? void 0 : _a2.focus();
-  }, [searchOpen]);
   function handleLogout() {
     logout();
     navigate({ to: "/" });
@@ -37000,10 +36921,14 @@ function AdminLayout() {
   const roleLabel = role === "super-admin" ? "Super Admin" : role === "doctor" ? "Doctor" : role === "receptionist" ? "Receptionist" : role === "nurse" ? "Nurse" : "Admin";
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-screen bg-[#F8FAFC] flex", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("aside", { className: "hidden lg:flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 px-5 py-5 border-b border-slate-100", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-9 h-9 rounded-xl bg-gradient-to-br from-[#D89F00] to-[#A67C00] flex items-center justify-center shadow-sm flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(HeartPulse, { size: 18, className: "text-white" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-bold text-[#1E293B] font-display", children: "Samarpan" })
-      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center items-center px-5 py-6 border-b border-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "img",
+        {
+          src: "/assets/images/samrpanlogo.webp",
+          alt: "Samarpan",
+          className: "h-14 w-auto object-contain"
+        }
+      ) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         SidebarNav,
         {
@@ -37020,195 +36945,108 @@ function AdminLayout() {
       ] }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 flex flex-col lg:ml-64", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "fixed top-0 right-0 left-0 lg:left-64 bg-white border-b border-slate-200 z-20", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center h-14 md:h-16 px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Sheet, { open: mobileOpen, onOpenChange: setMobileOpen, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(SheetTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                className: "lg:hidden flex-shrink-0 h-9 w-9",
-                "data-ocid": "topbar.mobile_menu_button",
-                type: "button",
-                "aria-label": "Open navigation menu",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Menu, { size: 20 })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(SheetContent, { side: "left", className: "p-0 w-72 max-w-[85vw]", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 px-5 py-5 border-b border-slate-100", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-9 h-9 rounded-xl bg-gradient-to-br from-[#D89F00] to-[#A67C00] flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(HeartPulse, { size: 18, className: "text-white" }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-bold text-[#1E293B] font-display", children: "Samarpan" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: () => setMobileOpen(false),
-                    className: "ml-auto text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors",
-                    "aria-label": "Close menu",
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { size: 18 })
-                  }
-                )
-              ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "fixed top-0 right-0 left-0 lg:left-64 bg-white border-b border-slate-200 z-20", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center h-14 md:h-16 px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Sheet, { open: mobileOpen, onOpenChange: setMobileOpen, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SheetTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "ghost",
+              size: "icon",
+              className: "lg:hidden flex-shrink-0 h-9 w-9",
+              "data-ocid": "topbar.mobile_menu_button",
+              type: "button",
+              "aria-label": "Open navigation menu",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Menu, { size: 20 })
+            }
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(SheetContent, { side: "left", className: "p-0 w-72 max-w-[85vw]", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 px-5 py-5 border-b border-slate-100", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(
-                SidebarNav,
+                "img",
                 {
-                  currentPath: location2.pathname,
-                  visibleItems,
-                  onNavigate: () => setMobileOpen(false)
+                  src: "/assets/images/samrpanlogo.webp",
+                  alt: "Samarpan",
+                  className: "h-10 w-auto object-contain"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-bold text-[#1E293B] font-display", children: "Samarpan" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => setMobileOpen(false),
+                  className: "ml-auto text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors",
+                  "aria-label": "Close menu",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { size: 18 })
                 }
               )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 max-w-sm hidden sm:block", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "svg",
-              {
-                role: "img",
-                "aria-label": "Search icon",
-                className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400",
-                width: "15",
-                height: "15",
-                fill: "none",
-                viewBox: "0 0 24 24",
-                stroke: "currentColor",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("title", { children: "Search" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "11", cy: "11", r: "8" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M21 21l-4.35-4.35" })
-                ]
-              }
-            ),
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
+              SidebarNav,
               {
-                placeholder: "Search patients, doctors...",
-                className: "pl-9 h-9 bg-[#F8FAFC] border-slate-200 text-sm rounded-xl",
-                "data-ocid": "topbar.search_input"
+                currentPath: location2.pathname,
+                visibleItems,
+                onNavigate: () => setMobileOpen(false)
               }
             )
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 sm:hidden" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1 sm:gap-2 ml-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DropdownMenu, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DropdownMenuTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
             {
+              variant: "ghost",
+              className: "flex items-center gap-1.5 px-1.5 sm:px-2 h-9 min-w-0",
+              "data-ocid": "topbar.profile_dropdown",
               type: "button",
-              className: "sm:hidden flex-shrink-0 h-9 w-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors",
-              onClick: () => setSearchOpen((v2) => !v2),
-              "aria-label": "Toggle search",
-              "data-ocid": "topbar.mobile_search_button",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { size: 18 })
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Avatar, { className: "h-7 w-7 flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "bg-[#D89F00] text-white text-xs font-semibold", children: initials }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:block text-sm font-medium text-[#1E293B] max-w-[100px] truncate", children: admin == null ? void 0 : admin.name }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  ChevronDown,
+                  {
+                    size: 14,
+                    className: "text-slate-400 flex-shrink-0"
+                  }
+                )
+              ]
             }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 sm:hidden" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 sm:gap-2 ml-auto sm:ml-0", children: [
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DropdownMenuContent, { align: "end", className: "w-48", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-2 py-1.5", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium text-[#1E293B] truncate", children: admin == null ? void 0 : admin.name }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B]", children: roleLabel })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DropdownMenuSeparator, {}),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              Button,
+              DropdownMenuItem,
               {
-                variant: "ghost",
-                size: "icon",
-                className: "relative h-9 w-9",
-                "data-ocid": "topbar.notifications_button",
-                type: "button",
-                "aria-label": "Notifications",
+                onClick: () => navigate({ to: "/settings" }),
+                "data-ocid": "topbar.profile_settings_item",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Bell, { size: 18, className: "text-slate-500" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "absolute -top-0.5 -right-0.5 h-4 w-4 p-0 text-[10px] bg-red-500 text-white flex items-center justify-center rounded-full border-0 leading-none", children: "3" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(User, { size: 14, className: "mr-2" }),
+                  "My Profile"
                 ]
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(DropdownMenu, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(DropdownMenuTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Button,
-                {
-                  variant: "ghost",
-                  className: "flex items-center gap-1.5 px-1.5 sm:px-2 h-9 min-w-0",
-                  "data-ocid": "topbar.profile_dropdown",
-                  type: "button",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Avatar, { className: "h-7 w-7 flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "bg-[#D89F00] text-white text-xs font-semibold", children: initials }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:block text-sm font-medium text-[#1E293B] max-w-[100px] truncate", children: admin == null ? void 0 : admin.name }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      ChevronDown,
-                      {
-                        size: 14,
-                        className: "text-slate-400 flex-shrink-0"
-                      }
-                    )
-                  ]
-                }
-              ) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(DropdownMenuContent, { align: "end", className: "w-48", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-2 py-1.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium text-[#1E293B] truncate", children: admin == null ? void 0 : admin.name }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B]", children: roleLabel })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(DropdownMenuSeparator, {}),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  DropdownMenuItem,
-                  {
-                    onClick: () => navigate({ to: "/settings" }),
-                    "data-ocid": "topbar.profile_settings_item",
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(User, { size: 14, className: "mr-2" }),
-                      "My Profile"
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(DropdownMenuSeparator, {}),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  DropdownMenuItem,
-                  {
-                    onClick: handleLogout,
-                    className: "text-red-600 focus:text-red-600",
-                    "data-ocid": "topbar.logout_button",
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 14, className: "mr-2" }),
-                      "Logout"
-                    ]
-                  }
-                )
-              ] })
-            ] })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DropdownMenuSeparator, {}),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              DropdownMenuItem,
+              {
+                onClick: handleLogout,
+                className: "text-red-600 focus:text-red-600",
+                "data-ocid": "topbar.logout_button",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 14, className: "mr-2" }),
+                  "Logout"
+                ]
+              }
+            )
           ] })
-        ] }),
-        searchOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "sm:hidden px-3 pb-3 border-t border-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative mt-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Search,
-            {
-              size: 15,
-              className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              ref: searchRef,
-              placeholder: "Search patients, doctors...",
-              className: "pl-9 h-9 bg-[#F8FAFC] border-slate-200 text-sm rounded-xl w-full",
-              "data-ocid": "topbar.mobile_search_input"
-            }
-          )
         ] }) })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "flex-1 pt-14 md:pt-16", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 sm:p-4 lg:p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "border-t border-slate-100 bg-white py-3 px-4 sm:px-6 text-center text-xs text-[#94A3B8]", children: [
-        "© ",
-        (/* @__PURE__ */ new Date()).getFullYear(),
-        " Samarpan Hospital Admin. Built with love using",
-        " ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "a",
-          {
-            href: `https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
-              typeof window !== "undefined" ? window.location.hostname : ""
-            )}`,
-            className: "text-[#D89F00] hover:underline",
-            target: "_blank",
-            rel: "noopener noreferrer",
-            children: "caffeine.ai"
-          }
-        )
-      ] })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "flex-1 pt-14 md:pt-16", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 sm:p-4 lg:p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) }) })
     ] })
   ] });
 }
@@ -37622,6 +37460,38 @@ function PageHeader({ title, description, action }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Separator, { className: "mt-3 sm:mt-4 bg-slate-100" })
   ] });
 }
+const badgeVariants = cva(
+  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        secondary: "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+        destructive: "border-transparent bg-destructive text-destructive-foreground [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground"
+      }
+    },
+    defaultVariants: {
+      variant: "default"
+    }
+  }
+);
+function Badge({
+  className,
+  variant,
+  asChild = false,
+  ...props
+}) {
+  const Comp = asChild ? Slot$3 : "span";
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Comp,
+    {
+      "data-slot": "badge",
+      className: cn(badgeVariants({ variant }), className),
+      ...props
+    }
+  );
+}
 const STATUS_MAP = {
   pending: {
     label: "Pending",
@@ -37771,6 +37641,22 @@ function DialogTitle({
     {
       "data-slot": "dialog-title",
       className: cn("text-lg leading-none font-semibold", className),
+      ...props
+    }
+  );
+}
+function Input({ className, type, ...props }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "input",
+    {
+      type,
+      "data-slot": "input",
+      className: cn(
+        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        className
+      ),
       ...props
     }
   );
