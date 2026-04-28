@@ -1,3 +1,5 @@
+"use client";
+
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,9 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/useAuth";
-import { mockAdmin } from "@/services/mockData";
-import type { Admin } from "@/types";
+import { Textarea } from "@/components/ui/textarea";
+
 import {
   AlertTriangle,
   Camera,
@@ -25,523 +26,334 @@ import {
   Shield,
   User,
 } from "lucide-react";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
-// ─── Password Strength ────────────────────────────────────────────────────────
-
-function getPasswordStrength(password: string): {
-  level: "weak" | "medium" | "strong";
-  label: string;
-  color: string;
-  width: string;
-} {
-  if (!password) return { level: "weak", label: "", color: "", width: "0%" };
-  const hasUpper = /[A-Z]/.test(password);
-  const hasLower = /[a-z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecial = /[@#$%^&*!]/.test(password);
-  const score = [
-    password.length >= 8,
-    hasUpper && hasLower,
-    hasNumber,
-    hasSpecial,
-  ].filter(Boolean).length;
-
-  if (score <= 1)
-    return { level: "weak", label: "Weak", color: "bg-red-400", width: "33%" };
-  if (score <= 2)
-    return {
-      level: "medium",
-      label: "Medium",
-      color: "bg-amber-400",
-      width: "66%",
-    };
-  return {
-    level: "strong",
-    label: "Strong",
-    color: "bg-emerald-500",
-    width: "100%",
-  };
-}
-
-// ─── Password Field ───────────────────────────────────────────────────────────
-
-interface PasswordFieldProps {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  show: boolean;
-  onToggle: () => void;
-  ocid: string;
-  error?: string;
-}
-
-function PasswordField({
-  label,
-  value,
-  onChange,
-  show,
-  onToggle,
-  ocid,
-  error,
-}: PasswordFieldProps) {
-  return (
-    <div className="space-y-1.5">
-      <Label htmlFor={ocid}>{label}</Label>
-      <div className="relative">
-        <Input
-          id={ocid}
-          type={show ? "text" : "password"}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="rounded-xl pr-10"
-          data-ocid={ocid}
-          autoComplete="off"
-        />
-        <button
-          type="button"
-          onClick={onToggle}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors min-h-[24px] min-w-[24px] flex items-center justify-center"
-          aria-label={show ? "Hide password" : "Show password"}
-        >
-          {show ? <EyeOff size={16} /> : <Eye size={16} />}
-        </button>
-      </div>
-      {error && (
-        <p
-          className="text-xs text-red-500 flex items-start gap-1 break-words"
-          data-ocid={`${ocid}_error`}
-        >
-          <AlertTriangle size={11} className="mt-0.5 shrink-0" /> {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
+import {
+  getSettingsApi,
+  updateSettingsApi,
+  type SettingsItem,
+} from "@/apiCalls/settings";
 
 export default function SettingsPage() {
-  const { admin, logout } = useAuth();
-  const source: Admin = admin ?? mockAdmin;
+  const { logout } = useAuth();
 
-  // Profile form
-  const [profileForm, setProfileForm] = useState({
-    name: source.name,
-    email: source.email,
-    phone: "+91 98765 43200",
-  });
-  const [profileSaving, setProfileSaving] = useState(false);
+  const [settings, setSettings] = useState<SettingsItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  // Password form
   const [passwordForm, setPasswordForm] = useState({
-    current: "",
     newPass: "",
     confirm: "",
   });
+
   const [showPasswords, setShowPasswords] = useState({
-    current: false,
     newPass: false,
     confirm: false,
   });
-  const [passwordErrors, setPasswordErrors] = useState({
-    newPass: "",
-    confirm: "",
-  });
-  const [passwordSaving, setPasswordSaving] = useState(false);
 
-  const initials = source.name
-    .split(" ")
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  async function loadSettings() {
+    try {
+      setLoading(true);
+      const data = await getSettingsApi();
+      setSettings(data);
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function saveSettings(payload?: Partial<SettingsItem>) {
+    try {
+      setSaving(true);
+
+      const body = payload ?? settings;
+
+      const updated = await updateSettingsApi(body!);
+
+      setSettings(updated);
+
+      toast.success("Settings updated successfully");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handlePasswordUpdate() {
+    if (passwordForm.newPass.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (passwordForm.newPass !== passwordForm.confirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    await saveSettings({ password: passwordForm.newPass });
+
+    setPasswordForm({
+      newPass: "",
+      confirm: "",
+    });
+  }
+
+  function updateField(key: keyof SettingsItem, value: any) {
+    setSettings((prev) => ({
+      ...prev!,
+      [key]: value,
+    }));
+  }
+
+  function updateSocial(key: string, value: string) {
+    setSettings((prev) => ({
+      ...prev!,
+      social_links: {
+        ...prev?.social_links,
+        [key]: value,
+      },
+    }));
+  }
+
+  // 👇 Only change: allow UI render even if settings not loaded
+  const safeSettings = settings ?? ({} as SettingsItem);
+
+  const initials = safeSettings.name
+    ?.split(" ")
     .map((n) => n[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
 
-  const strength = getPasswordStrength(passwordForm.newPass);
-
-  // ─── Handlers ──────────────────────────────────────────────────────────────
-
-  async function handleSaveProfile() {
-    if (!profileForm.name.trim()) {
-      toast.error("Full name is required.");
-      return;
-    }
-    setProfileSaving(true);
-    await new Promise((r) => setTimeout(r, 700));
-    setProfileSaving(false);
-    toast.success("Profile updated successfully.");
-  }
-
-  async function handleChangePassword() {
-    const errors = { newPass: "", confirm: "" };
-    let hasError = false;
-
-    if (passwordForm.newPass.length < 8) {
-      errors.newPass = "New password must be at least 8 characters.";
-      hasError = true;
-    }
-    if (passwordForm.newPass !== passwordForm.confirm) {
-      errors.confirm = "Passwords do not match.";
-      hasError = true;
-    }
-    setPasswordErrors(errors);
-    if (hasError) return;
-
-    setPasswordSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setPasswordSaving(false);
-
-    // Mock: always treat current password as incorrect
-    toast.error("Current password is incorrect.");
-    setPasswordForm({ current: "", newPass: "", confirm: "" });
-  }
-
-  function handleLogout() {
-    logout();
-    toast.success("Logged out successfully.");
-  }
-
-  // ─── Render ────────────────────────────────────────────────────────────────
-
   return (
-    <div data-ocid="settings.page">
+    <div>
       <PageHeader
         title="Settings"
-        description="Manage your admin profile and account security."
+        description="Manage admin settings and CMS content."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        {/* ── Section 1: Admin Profile ── */}
-        <Card
-          className="border border-border rounded-2xl shadow-sm"
-          data-ocid="settings.profile_card"
-        >
-          <CardHeader className="p-4 sm:p-6 pb-3 sm:pb-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-                <User size={16} className="text-primary" />
-              </div>
-              <div className="min-w-0">
-                <CardTitle className="text-base font-semibold text-foreground">
-                  Admin Profile
-                </CardTitle>
-                <CardDescription className="text-xs text-muted-foreground mt-0.5">
-                  Update your personal information
-                </CardDescription>
-              </div>
-            </div>
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* PROFILE */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User size={16} />
+              Admin Profile
+            </CardTitle>
+            <CardDescription>Update admin information</CardDescription>
           </CardHeader>
 
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-5">
-            {/* Avatar Row — stacks on mobile */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
-              <div className="relative shrink-0">
-                <Avatar className="h-20 w-20 ring-4 ring-primary/20">
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                <label
-                  htmlFor="avatar-upload"
-                  className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-md hover:bg-secondary transition-colors"
-                  aria-label="Upload avatar"
-                  data-ocid="settings.upload_button"
-                >
-                  <Camera size={14} />
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={() => toast.info("Avatar upload coming soon.")}
-                  />
-                </label>
-              </div>
-              <div className="min-w-0 text-center sm:text-left">
-                <p className="font-semibold text-foreground truncate">
-                  {source.name}
-                </p>
-                <p className="text-sm text-muted-foreground capitalize">
-                  {source.role.replace("-", " ")}
-                </p>
-                <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 border border-emerald-100">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Active
-                </span>
-              </div>
+          <CardContent className="space-y-4">
+            <Avatar className="h-20 w-20">
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+
+            <div>
+              <Label>Full Name</Label>
+              <Input
+                value={safeSettings.name ?? ""}
+                onChange={(e) => updateField("name", e.target.value)}
+              />
             </div>
 
-            <Separator />
-
-            {/* Form — single column always (stacks naturally) */}
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="settings.name_input">Full Name</Label>
-                <Input
-                  id="settings.name_input"
-                  value={profileForm.name}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, name: e.target.value })
-                  }
-                  className="rounded-xl"
-                  placeholder="Enter full name"
-                  data-ocid="settings.name_input"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="settings.email_input">
-                  Email Address{" "}
-                  <span className="text-muted-foreground font-normal text-xs">
-                    (read-only)
-                  </span>
-                </Label>
-                <Input
-                  id="settings.email_input"
-                  type="email"
-                  value={profileForm.email}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, email: e.target.value })
-                  }
-                  className="rounded-xl"
-                  placeholder="admin@hospital.com"
-                  data-ocid="settings.email_input"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="settings.phone_input">Phone Number</Label>
-                <Input
-                  id="settings.phone_input"
-                  type="tel"
-                  value={profileForm.phone}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, phone: e.target.value })
-                  }
-                  className="rounded-xl"
-                  placeholder="+91 98765 43200"
-                  data-ocid="settings.phone_input"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="settings.role_input">Role</Label>
-                <Input
-                  id="settings.role_input"
-                  value="Super Administrator"
-                  readOnly
-                  className="rounded-xl bg-muted/50 cursor-not-allowed text-muted-foreground"
-                  data-ocid="settings.role_input"
-                />
-              </div>
-
-              <Button
-                className="rounded-xl bg-primary hover:bg-secondary text-white gap-2 w-full sm:w-auto"
-                onClick={handleSaveProfile}
-                disabled={profileSaving}
-                data-ocid="settings.save_profile_button"
-              >
-                {profileSaving ? (
-                  <span className="flex items-center gap-2">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Saving…
-                  </span>
-                ) : (
-                  <>
-                    <Save size={14} /> Save Profile
-                  </>
-                )}
-              </Button>
+            <div>
+              <Label>Email</Label>
+              <Input
+                value={safeSettings.email ?? ""}
+                onChange={(e) => updateField("email", e.target.value)}
+              />
             </div>
+
+            <div>
+              <Label>Phone</Label>
+              <Input
+                value={safeSettings.mobile_number ?? ""}
+                onChange={(e) =>
+                  updateField("mobile_number", e.target.value)
+                }
+              />
+            </div>
+
+            <Button disabled={saving} onClick={() => saveSettings()}>
+              {saving ? "Saving..." : "Save Profile"}
+            </Button>
           </CardContent>
         </Card>
 
-        {/* ── Section 2 & 3: Password + Danger Zone ── */}
-        <div className="space-y-6">
-          <Card
-            className="border border-border rounded-2xl shadow-sm"
-            data-ocid="settings.password_card"
-          >
-            <CardHeader className="p-4 sm:p-6 pb-3 sm:pb-4">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-                  <Lock size={16} className="text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <CardTitle className="text-base font-semibold text-foreground">
-                    Change Password
-                  </CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground mt-0.5">
-                    Keep your account secure with a strong password
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
+        {/* PASSWORD */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock size={16} />
+              Password
+            </CardTitle>
+          </CardHeader>
 
-            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4">
-              {/* All password fields are full-width, stacked */}
-              <PasswordField
-                label="Current Password"
-                value={passwordForm.current}
-                onChange={(v) =>
-                  setPasswordForm({ ...passwordForm, current: v })
-                }
-                show={showPasswords.current}
-                onToggle={() =>
-                  setShowPasswords({
-                    ...showPasswords,
-                    current: !showPasswords.current,
-                  })
-                }
-                ocid="settings.current_password_input"
-              />
-
-              <PasswordField
-                label="New Password"
+          <CardContent className="space-y-4">
+            <div>
+              <Label>New Password</Label>
+              <Input
+                type={showPasswords.newPass ? "text" : "password"}
                 value={passwordForm.newPass}
-                onChange={(v) => {
-                  setPasswordForm({ ...passwordForm, newPass: v });
-                  if (passwordErrors.newPass)
-                    setPasswordErrors({ ...passwordErrors, newPass: "" });
-                }}
-                show={showPasswords.newPass}
-                onToggle={() =>
-                  setShowPasswords({
-                    ...showPasswords,
-                    newPass: !showPasswords.newPass,
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    newPass: e.target.value,
                   })
                 }
-                ocid="settings.new_password_input"
-                error={passwordErrors.newPass}
               />
+            </div>
 
-              {/* Password strength bar — full width, no overflow */}
-              {passwordForm.newPass && (
-                <div className="space-y-1.5 w-full">
-                  <div className="flex items-center justify-between gap-2 min-w-0">
-                    <span className="text-xs text-muted-foreground shrink-0">
-                      Password strength
-                    </span>
-                    <span
-                      className={`text-xs font-medium shrink-0 ${
-                        strength.level === "weak"
-                          ? "text-red-500"
-                          : strength.level === "medium"
-                            ? "text-amber-500"
-                            : "text-emerald-600"
-                      }`}
-                    >
-                      {strength.label}
-                    </span>
-                  </div>
-                  <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${strength.color}`}
-                      style={{ width: strength.width }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <PasswordField
-                label="Confirm New Password"
+            <div>
+              <Label>Confirm Password</Label>
+              <Input
+                type={showPasswords.confirm ? "text" : "password"}
                 value={passwordForm.confirm}
-                onChange={(v) => {
-                  setPasswordForm({ ...passwordForm, confirm: v });
-                  if (passwordErrors.confirm)
-                    setPasswordErrors({ ...passwordErrors, confirm: "" });
-                }}
-                show={showPasswords.confirm}
-                onToggle={() =>
-                  setShowPasswords({
-                    ...showPasswords,
-                    confirm: !showPasswords.confirm,
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    confirm: e.target.value,
                   })
                 }
-                ocid="settings.confirm_password_input"
-                error={passwordErrors.confirm}
               />
+            </div>
 
-              <Button
-                className="rounded-xl bg-primary hover:bg-secondary text-white gap-2 w-full sm:w-auto"
-                onClick={handleChangePassword}
-                disabled={passwordSaving}
-                data-ocid="settings.change_password_button"
-              >
-                {passwordSaving ? (
-                  <span className="flex items-center gap-2">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Updating…
-                  </span>
-                ) : (
-                  <>
-                    <Shield size={14} /> Change Password
-                  </>
-                )}
-              </Button>
+            <Button disabled={saving} onClick={handlePasswordUpdate}>
+              <Shield size={14} /> Update Password
+            </Button>
+          </CardContent>
+        </Card>
 
-              <Separator />
+        {/* BUSINESS INFO */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Business Info</CardTitle>
+          </CardHeader>
 
-              {/* Requirements */}
-              <div className="rounded-xl bg-muted/40 border border-border p-3 sm:p-4">
-                <p className="text-xs font-semibold text-foreground mb-2">
-                  Password Requirements
-                </p>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  {[
-                    "At least 8 characters long",
-                    "Include uppercase and lowercase letters",
-                    "Include at least one number",
-                    "Include a special character (@, #, $, etc.)",
-                  ].map((req) => (
-                    <li key={req} className="flex items-start gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground shrink-0 mt-1" />
-                      <span className="leading-relaxed">{req}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
+          <CardContent className="space-y-4">
+            <Input
+              placeholder="Inquiry Email"
+              value={safeSettings.inquiry_email ?? ""}
+              onChange={(e) =>
+                updateField("inquiry_email", e.target.value)
+              }
+            />
 
-          {/* ── Section 3: Danger Zone ── */}
-          <Card
-            className="border border-red-200 rounded-2xl shadow-sm bg-red-50/30"
-            data-ocid="settings.danger_zone_card"
-          >
-            <CardHeader className="p-4 sm:p-6 pb-3">
-              <CardTitle className="text-sm font-semibold text-red-600 flex items-center gap-2">
-                <AlertTriangle size={15} className="text-red-500 shrink-0" />
-                Danger Zone
-              </CardTitle>
-              <CardDescription className="text-xs text-red-400">
-                Actions here cannot be undone. Proceed with caution.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-              {/* Stack on mobile: text above, button below */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground">
-                    Sign out of admin panel
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    You will be redirected to the login page.
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  className="rounded-xl border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 gap-2 w-full sm:w-auto shrink-0"
-                  onClick={handleLogout}
-                  data-ocid="settings.logout_button"
-                >
-                  <LogOut size={14} /> Logout
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            <Input
+              placeholder="Inquiry Mobile"
+              value={safeSettings.inquiry_mobile_number ?? ""}
+              onChange={(e) =>
+                updateField("inquiry_mobile_number", e.target.value)
+              }
+            />
+
+            <Input
+              placeholder="Working Hours"
+              value={safeSettings.working_hours ?? ""}
+              onChange={(e) =>
+                updateField("working_hours", e.target.value)
+              }
+            />
+
+            <Textarea
+              placeholder="Address"
+              value={safeSettings.address ?? ""}
+              onChange={(e) => updateField("address", e.target.value)}
+            />
+          </CardContent>
+        </Card>
+
+        {/* SOCIAL */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Social Links</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            {["facebook", "instagram", "youtube", "whatsapp", "call"].map(
+              (s) => (
+                <Input
+                  key={s}
+                  placeholder={s}
+                  value={safeSettings.social_links?.[s] ?? ""}
+                  onChange={(e) => updateSocial(s, e.target.value)}
+                />
+              ),
+            )}
+          </CardContent>
+        </Card>
+
+        {/* CMS */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>CMS Content</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <Textarea
+              placeholder="About Us"
+              value={safeSettings.about_us ?? ""}
+              onChange={(e) => updateField("about_us", e.target.value)}
+            />
+
+            <Textarea
+              placeholder="Privacy Policy"
+              value={safeSettings.privacy_policy ?? ""}
+              onChange={(e) =>
+                updateField("privacy_policy", e.target.value)
+              }
+            />
+
+            <Textarea
+              placeholder="Terms & Conditions"
+              value={safeSettings.term_and_condition ?? ""}
+              onChange={(e) =>
+                updateField("term_and_condition", e.target.value)
+              }
+            />
+
+            <Textarea
+              placeholder="Contact Us"
+              value={safeSettings.contact_us ?? ""}
+              onChange={(e) =>
+                updateField("contact_us", e.target.value)
+              }
+            />
+
+            <Button disabled={saving} onClick={() => saveSettings()}>
+              <Save size={14} /> Save CMS Content
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* DANGER */}
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-600 flex gap-2">
+              <AlertTriangle size={16} />
+              Danger Zone
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <Button
+              variant="outline"
+              className="border-red-300 text-red-600"
+              onClick={logout}
+            >
+              <LogOut size={14} /> Logout
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

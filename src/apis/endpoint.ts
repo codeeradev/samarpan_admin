@@ -1,5 +1,6 @@
 export const BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
+  import.meta.env.VITE_API_URL || "https://samarpanapi.codeeratech.com/admin";
+// import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
 
 export const ENDPOINT = {
   LOGIN: "/admin-login",
@@ -10,6 +11,8 @@ export const ENDPOINT = {
   GET_ALL_DOCTORS: "/get-all-doctors",
   UPDATE_DOCTOR: "/update-doctor",
   DELETE_DOCTOR: "/delete-doctor",
+  GET_ALL_PATIENTS: "/get-all-patients",
+  UPDATE_PATIENT: "/update-patient",
   ADD_REVIEW: "/add-review",
   GET_ALL_REVIEWS: "/get-all-reviews",
   UPDATE_REVIEW: "/update-review",
@@ -18,4 +21,13 @@ export const ENDPOINT = {
   GET_ALL_SHORTS: "/get-all-shorts",
   UPDATE_SHORT: "/update-short",
   DELETE_SHORT: "/delete-short",
+  GET_ALL_BLOGS: "/get-all-blogs",
+  ADD_BLOG: "/add-blog",
+  UPDATE_BLOG: "/update-blog",
+  DELETE_BLOG: "/delete-blog",
+  GET_ALL_GALLERY: "/get-all-gallery",
+  ADD_GALLERY: "/add-gallery",
+  DELETE_GALLERY: "/delete-gallery",
+  GET_SETTINGS: "/get-settings",
+  UPDATE_SETTINGS: "/update-settings",
 };

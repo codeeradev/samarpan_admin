@@ -10,6 +10,7 @@ import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
 import RoleManagementPage from "@/pages/RoleManagementPage";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import SettingsPage from "@/pages/SettingsPage";
+import GalleryPage from "@/pages/GalleryPage";
 import { loadAuthState } from "@/lib/auth-storage";
 import type { UserRole } from "@/types";
 import { ROLE_PERMISSIONS } from "@/types";
@@ -20,6 +21,7 @@ import {
   createRouter,
   redirect,
 } from "@tanstack/react-router";
+import BlogsPage from "./pages/BlogPage";
 
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
@@ -124,6 +126,20 @@ const serviceManagementRoute = createRoute({
   component: ServiceManagementPage,
 });
 
+const blogsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/blogs",
+  beforeLoad: () => checkPermission("/blogs"),
+  component: BlogsPage,
+});
+
+const galleryRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/gallery",
+  beforeLoad: () => checkPermission("/gallery"),
+  component: GalleryPage,
+});
+
 const reviewsAndShortsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/reviews-shorts",
@@ -169,6 +185,8 @@ const routeTree = rootRoute.addChildren([
     patientsRoute,
     appointmentsRoute,
     serviceManagementRoute,
+    blogsRoute,
+    galleryRoute,
     reviewsAndShortsRoute,
     contentRoute,
     enquiriesRoute,

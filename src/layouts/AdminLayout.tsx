@@ -19,6 +19,7 @@ import {
   ChevronDown,
   FileImage,
   HeartPulse,
+  ImageIcon,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -74,6 +75,18 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: HeartPulse,
     path: "/service-management",
     permissionPath: "/service-management",
+  },
+  {
+    label: "Blogs",
+    icon: FileImage,
+    path: "/blogs",
+    permissionPath: "/blogs",
+  },
+  {
+    label: "Gallery",
+    icon: ImageIcon,
+    path: "/gallery",
+    permissionPath: "/gallery",
   },
   {
     label: "Reviews & Shorts",

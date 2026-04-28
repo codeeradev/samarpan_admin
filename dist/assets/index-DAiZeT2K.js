@@ -19718,7 +19718,7 @@ function isFlatArray(arr) {
 const predicates = utils$1.toFlatObject(utils$1, {}, null, function filter(prop) {
   return /^is[A-Z]/.test(prop);
 });
-function toFormData$3(obj, formData, options) {
+function toFormData$4(obj, formData, options) {
   if (!utils$1.isObject(obj)) {
     throw new TypeError("target must be an object");
   }
@@ -19830,7 +19830,7 @@ function encode$2(str) {
 }
 function AxiosURLSearchParams(params, options) {
   this._pairs = [];
-  params && toFormData$3(params, this, options);
+  params && toFormData$4(params, this, options);
 }
 const prototype = AxiosURLSearchParams.prototype;
 prototype.append = function append(name, value) {
@@ -19972,7 +19972,7 @@ const platform$1 = {
   ...platform$2
 };
 function toURLEncodedForm(data, options) {
-  return toFormData$3(data, new platform$1.classes.URLSearchParams(), {
+  return toFormData$4(data, new platform$1.classes.URLSearchParams(), {
     visitor: function(value, key, path, helpers) {
       if (platform$1.isNode && utils$1.isBuffer(value)) {
         this.append(key, value.toString("base64"));
@@ -20078,7 +20078,7 @@ const defaults$1 = {
         }
         if ((isFileList2 = utils$1.isFileList(data)) || contentType.indexOf("multipart/form-data") > -1) {
           const _FormData = this.env && this.env.FormData;
-          return toFormData$3(
+          return toFormData$4(
             isFileList2 ? { "files[]": data } : data,
             _FormData && new _FormData(),
             this.formSerializer
@@ -21815,7 +21815,7 @@ axios.CanceledError = CanceledError$1;
 axios.CancelToken = CancelToken$1;
 axios.isCancel = isCancel$1;
 axios.VERSION = VERSION$1;
-axios.toFormData = toFormData$3;
+axios.toFormData = toFormData$4;
 axios.AxiosError = AxiosError$1;
 axios.Cancel = axios.CanceledError;
 axios.all = function all(promises) {
@@ -21840,14 +21840,14 @@ const {
   Cancel: Cancel$1,
   isAxiosError,
   spread,
-  toFormData: toFormData$2,
+  toFormData: toFormData$3,
   AxiosHeaders: AxiosHeaders2,
   HttpStatusCode,
   formToJSON,
   getAdapter,
   mergeConfig
 } = axios;
-const BASE_URL = "http://localhost:9010/admin";
+const BASE_URL = "https://samarpanapi.codeeratech.com/admin";
 const ENDPOINT = {
   LOGIN: "/admin-login",
   ADD_SERVICE: "/add-service",
@@ -21857,6 +21857,8 @@ const ENDPOINT = {
   GET_ALL_DOCTORS: "/get-all-doctors",
   UPDATE_DOCTOR: "/update-doctor",
   DELETE_DOCTOR: "/delete-doctor",
+  GET_ALL_PATIENTS: "/get-all-patients",
+  UPDATE_PATIENT: "/update-patient",
   ADD_REVIEW: "/add-review",
   GET_ALL_REVIEWS: "/get-all-reviews",
   UPDATE_REVIEW: "/update-review",
@@ -21864,7 +21866,16 @@ const ENDPOINT = {
   ADD_SHORT: "/add-short",
   GET_ALL_SHORTS: "/get-all-shorts",
   UPDATE_SHORT: "/update-short",
-  DELETE_SHORT: "/delete-short"
+  DELETE_SHORT: "/delete-short",
+  GET_ALL_BLOGS: "/get-all-blogs",
+  ADD_BLOG: "/add-blog",
+  UPDATE_BLOG: "/update-blog",
+  DELETE_BLOG: "/delete-blog",
+  GET_ALL_GALLERY: "/get-all-gallery",
+  ADD_GALLERY: "/add-gallery",
+  DELETE_GALLERY: "/delete-gallery",
+  GET_SETTINGS: "/get-settings",
+  UPDATE_SETTINGS: "/update-settings"
 };
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -30536,7 +30547,7 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$J = [
+const __iconNode$I = [
   ["path", { d: "M10.268 21a2 2 0 0 0 3.464 0", key: "vwvbt9" }],
   [
     "path",
@@ -30546,22 +30557,7 @@ const __iconNode$J = [
     }
   ]
 ];
-const Bell = createLucideIcon("bell", __iconNode$J);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$I = [
-  ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
-  ["path", { d: "M16 2v4", key: "4m81vk" }],
-  ["path", { d: "M8 2v4", key: "1cmpym" }],
-  ["path", { d: "M3 10h5", key: "r794hk" }],
-  ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
-  ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
-];
-const CalendarClock = createLucideIcon("calendar-clock", __iconNode$I);
+const Bell = createLucideIcon("bell", __iconNode$I);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30569,12 +30565,14 @@ const CalendarClock = createLucideIcon("calendar-clock", __iconNode$I);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$H = [
-  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
-  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
-  ["path", { d: "M3 10h18", key: "8toen8" }]
+  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M3 10h5", key: "r794hk" }],
+  ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
+  ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
 ];
-const Calendar = createLucideIcon("calendar", __iconNode$H);
+const CalendarClock = createLucideIcon("calendar-clock", __iconNode$H);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30582,16 +30580,12 @@ const Calendar = createLucideIcon("calendar", __iconNode$H);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$G = [
-  [
-    "path",
-    {
-      d: "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",
-      key: "1tc9qg"
-    }
-  ],
-  ["circle", { cx: "12", cy: "13", r: "3", key: "1vg3eu" }]
+  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M16 2v4", key: "4m81vk" }],
+  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
+  ["path", { d: "M3 10h18", key: "8toen8" }]
 ];
-const Camera = createLucideIcon("camera", __iconNode$G);
+const Calendar = createLucideIcon("calendar", __iconNode$G);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31680,6 +31674,8 @@ const ROLE_PERMISSIONS = {
     "/patients",
     "/appointments",
     "/service-management",
+    "/blogs",
+    "/gallery",
     "/reviews-shorts",
     "/content",
     "/enquiries",
@@ -36903,6 +36899,18 @@ const ALL_NAV_ITEMS = [
     permissionPath: "/service-management"
   },
   {
+    label: "Blogs",
+    icon: FileImage,
+    path: "/blogs",
+    permissionPath: "/blogs"
+  },
+  {
+    label: "Gallery",
+    icon: Image,
+    path: "/gallery",
+    permissionPath: "/gallery"
+  },
+  {
     label: "Reviews & Shorts",
     icon: Star,
     path: "/reviews-shorts",
@@ -39439,145 +39447,6 @@ const mockDoctors = [
     department: "Psychiatry"
   }
 ];
-const mockPatients = [
-  {
-    id: "p1",
-    name: "Arjun Verma",
-    phone: "+91 91234 56789",
-    age: 45,
-    gender: "male",
-    address: "12, MG Road, Bangalore",
-    email: "arjun.v@email.com",
-    bloodGroup: "B+",
-    medicalHistory: "Hypertension, Type 2 Diabetes",
-    registeredAt: "2024-01-15"
-  },
-  {
-    id: "p2",
-    name: "Lakshmi Rajan",
-    phone: "+91 91234 56790",
-    age: 32,
-    gender: "female",
-    address: "45, Anna Nagar, Chennai",
-    email: "lakshmi.r@email.com",
-    bloodGroup: "O+",
-    registeredAt: "2024-02-20"
-  },
-  {
-    id: "p3",
-    name: "Mohit Agarwal",
-    phone: "+91 91234 56791",
-    age: 28,
-    gender: "male",
-    address: "7, Karol Bagh, Delhi",
-    email: "mohit.a@email.com",
-    bloodGroup: "A+",
-    medicalHistory: "Asthma",
-    registeredAt: "2024-03-05"
-  },
-  {
-    id: "p4",
-    name: "Divya Krishnan",
-    phone: "+91 91234 56792",
-    age: 55,
-    gender: "female",
-    address: "23, Banjara Hills, Hyderabad",
-    email: "divya.k@email.com",
-    bloodGroup: "AB-",
-    medicalHistory: "Arthritis",
-    registeredAt: "2024-03-18"
-  },
-  {
-    id: "p5",
-    name: "Rahul Desai",
-    phone: "+91 91234 56793",
-    age: 38,
-    gender: "male",
-    address: "11, Koregaon Park, Pune",
-    email: "rahul.d@email.com",
-    bloodGroup: "O-",
-    registeredAt: "2024-04-01"
-  },
-  {
-    id: "p6",
-    name: "Pooja Sharma",
-    phone: "+91 91234 56794",
-    age: 26,
-    gender: "female",
-    address: "88, Civil Lines, Jaipur",
-    email: "pooja.s@email.com",
-    bloodGroup: "B-",
-    registeredAt: "2024-04-12"
-  },
-  {
-    id: "p7",
-    name: "Sandeep Kumar",
-    phone: "+91 91234 56795",
-    age: 62,
-    gender: "male",
-    address: "3, Salt Lake, Kolkata",
-    email: "sandeep.k@email.com",
-    bloodGroup: "A-",
-    medicalHistory: "Coronary Artery Disease",
-    registeredAt: "2024-05-02"
-  },
-  {
-    id: "p8",
-    name: "Nisha Pillai",
-    phone: "+91 91234 56796",
-    age: 41,
-    gender: "female",
-    address: "60, Fort Kochi, Kerala",
-    email: "nisha.p@email.com",
-    bloodGroup: "O+",
-    registeredAt: "2024-05-14"
-  },
-  {
-    id: "p9",
-    name: "Aakash Tiwari",
-    phone: "+91 91234 56797",
-    age: 19,
-    gender: "male",
-    address: "15, Gomti Nagar, Lucknow",
-    email: "aakash.t@email.com",
-    bloodGroup: "B+",
-    registeredAt: "2024-06-01"
-  },
-  {
-    id: "p10",
-    name: "Shalini Mishra",
-    phone: "+91 91234 56798",
-    age: 35,
-    gender: "female",
-    address: "72, Aundh, Pune",
-    email: "shalini.m@email.com",
-    bloodGroup: "AB+",
-    registeredAt: "2024-06-20"
-  },
-  {
-    id: "p11",
-    name: "Varun Joshi",
-    phone: "+91 91234 56799",
-    age: 50,
-    gender: "male",
-    address: "6, Indiranagar, Bangalore",
-    email: "varun.j@email.com",
-    bloodGroup: "A+",
-    medicalHistory: "Hypertension",
-    registeredAt: "2024-07-08"
-  },
-  {
-    id: "p12",
-    name: "Rekha Nambiar",
-    phone: "+91 91234 56800",
-    age: 44,
-    gender: "female",
-    address: "34, Calicut, Kerala",
-    email: "rekha.n@email.com",
-    bloodGroup: "O+",
-    registeredAt: "2024-08-01"
-  }
-];
 const mockAppointments = [
   {
     id: "a1",
@@ -39930,11 +39799,6 @@ const mockAbout = {
     { label: "Happy Patients", value: "1L+" },
     { label: "Beds", value: "500+" }
   ]
-};
-const mockAdmin = {
-  name: "Suresh Menon",
-  email: "admin@samarpan.com",
-  role: "super-admin"
 };
 const INITIAL_MANAGED_USERS = [
   {
@@ -63908,28 +63772,28 @@ function DashboardPage() {
     )
   ] });
 }
-function appendValue(fd, key, value) {
+function appendValue$1(fd, key, value) {
   if (value === void 0 || value === null) return;
   if (typeof value === "string" && value.trim() === "") return;
   fd.append(key, String(value));
 }
-function normalizePhone(value) {
+function normalizePhone$1(value) {
   const digits = (value == null ? void 0 : value.replace(/\D/g, "")) ?? "";
   return digits || void 0;
 }
-function toFormData$1(payload) {
+function toFormData$2(payload) {
   var _a2, _b2, _c2, _d2, _e2, _f2, _g2;
   const fd = new FormData();
-  appendValue(fd, "name", (_a2 = payload.name) == null ? void 0 : _a2.trim());
-  appendValue(fd, "email", (_b2 = payload.email) == null ? void 0 : _b2.trim());
-  appendValue(fd, "password", (_c2 = payload.password) == null ? void 0 : _c2.trim());
-  appendValue(fd, "phone", normalizePhone(payload.phone));
-  appendValue(fd, "specialization", (_d2 = payload.specialization) == null ? void 0 : _d2.trim());
-  appendValue(fd, "description", (_e2 = payload.description) == null ? void 0 : _e2.trim());
-  appendValue(fd, "experience", (_f2 = payload.experience) == null ? void 0 : _f2.trim());
-  appendValue(fd, "qualification", (_g2 = payload.qualification) == null ? void 0 : _g2.trim());
-  appendValue(fd, "status", payload.status);
-  appendValue(fd, "isActive", payload.isActive);
+  appendValue$1(fd, "name", (_a2 = payload.name) == null ? void 0 : _a2.trim());
+  appendValue$1(fd, "email", (_b2 = payload.email) == null ? void 0 : _b2.trim());
+  appendValue$1(fd, "password", (_c2 = payload.password) == null ? void 0 : _c2.trim());
+  appendValue$1(fd, "phone", normalizePhone$1(payload.phone));
+  appendValue$1(fd, "specialization", (_d2 = payload.specialization) == null ? void 0 : _d2.trim());
+  appendValue$1(fd, "description", (_e2 = payload.description) == null ? void 0 : _e2.trim());
+  appendValue$1(fd, "experience", (_f2 = payload.experience) == null ? void 0 : _f2.trim());
+  appendValue$1(fd, "qualification", (_g2 = payload.qualification) == null ? void 0 : _g2.trim());
+  appendValue$1(fd, "status", payload.status);
+  appendValue$1(fd, "isActive", payload.isActive);
   if (payload.image instanceof File) {
     fd.append("image", payload.image);
   }
@@ -63953,7 +63817,7 @@ const getAllDoctorsApi = async () => {
 const addDoctorApi = async (payload) => {
   var _a2, _b2, _c2;
   try {
-    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$1(payload), {
+    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$2(payload), {
       needAuth: true
     });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
@@ -63966,7 +63830,7 @@ const updateDoctorApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_DOCTOR}/${id}`,
-      toFormData$1(payload),
+      toFormData$2(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
@@ -64051,7 +63915,7 @@ function getDoctorExperience(doctor) {
   const value = (_a2 = doctor.experience) == null ? void 0 : _a2.toString().trim();
   return value ? `${value} yrs` : "Not set";
 }
-function validateForm(form, mode) {
+function validateForm$1(form, mode) {
   const errors = {};
   const experienceValue = Number(form.experience);
   if (!form.name.trim()) errors.name = "Full name is required.";
@@ -64073,7 +63937,7 @@ function validateForm(form, mode) {
     errors.image = "Profile image is required.";
   return errors;
 }
-function buildPayload(form, mode) {
+function buildPayload$1(form, mode) {
   const payload = {
     name: form.name.trim(),
     email: form.email.trim(),
@@ -64199,23 +64063,23 @@ function DoctorsPage() {
     setIsDeleteDialogOpen(true);
   }
   function handleAdd() {
-    const errors = validateForm(formData, "add");
+    const errors = validateForm$1(formData, "add");
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-    addMutation.mutate(buildPayload(formData, "add"));
+    addMutation.mutate(buildPayload$1(formData, "add"));
   }
   function handleUpdate() {
     if (!selectedDoctor) return;
-    const errors = validateForm(formData, "edit");
+    const errors = validateForm$1(formData, "edit");
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
     updateMutation.mutate({
       id: selectedDoctor._id,
-      payload: buildPayload(formData, "edit")
+      payload: buildPayload$1(formData, "edit")
     });
   }
   function handleDelete() {
@@ -65604,6 +65468,34 @@ function LoginPage() {
     }
   );
 }
+function normalizePhone(value) {
+  return value.replace(/\D/g, "");
+}
+const getAllPatientsApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_PATIENTS, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.patients) ?? [];
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch patients");
+  }
+};
+const updatePatientApi = async (id, payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_PATIENT}/${id}`,
+      {
+        ...payload,
+        phone: normalizePhone(payload.phone)
+      },
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.patient;
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update patient");
+  }
+};
 const EMPTY_FORM = {
   name: "",
   phone: "",
@@ -65632,19 +65524,19 @@ function GenderBadge({ gender }) {
 }
 function PatientFormModal({
   open,
-  mode,
   form,
+  isSaving,
   onFormChange,
   onSave,
   onClose
 }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: (v2) => !v2 && onClose(), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: (value) => !value && onClose(), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
     DialogContent,
     {
       className: "rounded-2xl w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto",
-      "data-ocid": mode === "add" ? "patients.add_dialog" : "patients.edit_dialog",
+      "data-ocid": "patients.edit_dialog",
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-[#1E293B] text-lg font-semibold", children: mode === "add" ? "Add New Patient" : "Edit Patient" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-[#1E293B] text-lg font-semibold", children: "Edit Patient" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4 py-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -65730,7 +65622,7 @@ function PatientFormModal({
               Select,
               {
                 value: form.gender,
-                onValueChange: (v2) => onFormChange({ gender: v2 }),
+                onValueChange: (value) => onFormChange({ gender: value }),
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     SelectTrigger,
@@ -65758,7 +65650,7 @@ function PatientFormModal({
               Select,
               {
                 value: form.bloodGroup,
-                onValueChange: (v2) => onFormChange({ bloodGroup: v2 }),
+                onValueChange: (value) => onFormChange({ bloodGroup: value }),
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     SelectTrigger,
@@ -65768,7 +65660,7 @@ function PatientFormModal({
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select blood group" })
                     }
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { className: "rounded-xl", children: BLOOD_GROUPS.map((bg) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: bg, children: bg }, bg)) })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { className: "rounded-xl", children: BLOOD_GROUPS.map((bloodGroup) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: bloodGroup, children: bloodGroup }, bloodGroup)) })
                 ]
               }
             )
@@ -65832,6 +65724,7 @@ function PatientFormModal({
               type: "button",
               variant: "outline",
               onClick: onClose,
+              disabled: isSaving,
               className: "w-full sm:w-auto rounded-xl border-[#E2E8F0] text-[#64748B] hover:bg-amber-50",
               "data-ocid": "patients.form.cancel_button",
               children: "Cancel"
@@ -65842,9 +65735,10 @@ function PatientFormModal({
             {
               type: "button",
               onClick: onSave,
+              disabled: isSaving,
               className: "w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white",
               "data-ocid": "patients.form.submit_button",
-              children: mode === "add" ? "Save Patient" : "Update Patient"
+              children: isSaving ? "Updating..." : "Update Patient"
             }
           )
         ] })
@@ -65852,120 +65746,127 @@ function PatientFormModal({
     }
   ) });
 }
+function getPatientGender(value) {
+  if (value === "male" || value === "female" || value === "other") {
+    return value;
+  }
+  return null;
+}
+function getPatientName(patient) {
+  var _a2;
+  return ((_a2 = patient.name) == null ? void 0 : _a2.trim()) || "Unnamed patient";
+}
+function getPatientPhone(patient) {
+  return patient.phone ? String(patient.phone) : "Not set";
+}
+function getPatientAgeLabel(patient) {
+  return patient.age && patient.age > 0 ? `${patient.age} yrs` : "Not set";
+}
+function getPatientAddress(patient) {
+  var _a2;
+  return ((_a2 = patient.address) == null ? void 0 : _a2.trim()) || "Not provided";
+}
+function getPatientBloodGroup(patient) {
+  var _a2;
+  return ((_a2 = patient.bloodGroup) == null ? void 0 : _a2.trim()) || "Not set";
+}
+function getPatientRegisteredAt(patient) {
+  return patient.createdAt || patient.updatedAt || (/* @__PURE__ */ new Date()).toISOString();
+}
+function validateForm(form) {
+  const errors = {};
+  const age = Number(form.age);
+  if (!form.name.trim()) errors.name = "Patient name is required.";
+  if (!form.phone.trim()) errors.phone = "Phone number is required.";
+  if (!form.age.trim()) errors.age = "Age is required.";
+  else if (Number.isNaN(age) || age < 1 || age > 150)
+    errors.age = "Age must be between 1 and 150.";
+  if (!form.gender) errors.gender = "Gender is required.";
+  if (!form.address.trim()) errors.address = "Address is required.";
+  if (!form.bloodGroup.trim()) errors.bloodGroup = "Blood group is required.";
+  return errors;
+}
+function buildPayload(form) {
+  return {
+    name: form.name.trim(),
+    phone: form.phone.trim(),
+    age: Number(form.age),
+    gender: form.gender,
+    address: form.address.trim(),
+    bloodGroup: form.bloodGroup.trim(),
+    medicalHistory: form.medicalHistory.trim() || void 0
+  };
+}
 function PatientsPage() {
-  const [patients, setPatients] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
+  const queryClient2 = useQueryClient();
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [genderFilter, setGenderFilter] = reactExports.useState(
     "all"
   );
-  const [showAddModal, setShowAddModal] = reactExports.useState(false);
   const [editPatient, setEditPatient] = reactExports.useState(null);
-  const [deletePatient, setDeletePatient] = reactExports.useState(null);
   const [form, setForm] = reactExports.useState(EMPTY_FORM);
-  reactExports.useEffect(() => {
-    const timer = setTimeout(() => {
-      setPatients([...mockPatients]);
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const {
+    data: patients = [],
+    isLoading,
+    isError,
+    error
+  } = useQuery({
+    queryKey: ["patients"],
+    queryFn: getAllPatientsApi
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({
+      id,
+      payload
+    }) => updatePatientApi(id, payload),
+    onSuccess: () => {
+      ue.success("Patient updated successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["patients"] });
+      setEditPatient(null);
+      setForm(EMPTY_FORM);
+    },
+    onError: (mutationError) => ue.error(mutationError.message)
+  });
   const filteredPatients = reactExports.useMemo(() => {
-    const q2 = searchTerm.toLowerCase().trim();
-    return patients.filter((p2) => {
-      const matchesSearch = !q2 || p2.name.toLowerCase().includes(q2) || p2.phone.includes(q2);
-      const matchesGender = genderFilter === "all" || p2.gender === genderFilter;
+    const query = searchTerm.toLowerCase().trim();
+    return patients.filter((patient) => {
+      const gender = getPatientGender(patient.gender);
+      const matchesSearch = !query || getPatientName(patient).toLowerCase().includes(query) || getPatientPhone(patient).toLowerCase().includes(query);
+      const matchesGender = genderFilter === "all" || gender === genderFilter;
       return matchesSearch && matchesGender;
     });
   }, [patients, searchTerm, genderFilter]);
   const updateForm = (updates) => setForm((prev) => ({ ...prev, ...updates }));
-  const openAdd = () => {
-    setForm(EMPTY_FORM);
-    setShowAddModal(true);
-  };
-  const openEdit = (p2) => {
+  const openEdit = (patient) => {
     setForm({
-      name: p2.name,
-      phone: p2.phone,
-      age: String(p2.age),
-      gender: p2.gender,
-      address: p2.address,
-      bloodGroup: p2.bloodGroup,
-      medicalHistory: p2.medicalHistory ?? ""
+      name: patient.name ?? "",
+      phone: patient.phone ? String(patient.phone) : "",
+      age: patient.age ? String(patient.age) : "",
+      gender: getPatientGender(patient.gender) ?? "",
+      address: patient.address ?? "",
+      bloodGroup: patient.bloodGroup ?? "",
+      medicalHistory: patient.medicalHistory ?? ""
     });
-    setEditPatient(p2);
-  };
-  const handleSaveAdd = () => {
-    if (!form.name || !form.phone || !form.age || !form.gender || !form.address || !form.bloodGroup) {
-      ue.error("Please fill in all required fields.");
-      return;
-    }
-    const newPatient = {
-      id: `p${Date.now()}`,
-      name: form.name,
-      phone: form.phone,
-      age: Number(form.age),
-      gender: form.gender,
-      address: form.address,
-      email: "",
-      bloodGroup: form.bloodGroup,
-      medicalHistory: form.medicalHistory || void 0,
-      registeredAt: (/* @__PURE__ */ new Date()).toISOString().split("T")[0]
-    };
-    setPatients((prev) => [newPatient, ...prev]);
-    setShowAddModal(false);
-    setForm(EMPTY_FORM);
-    ue.success("Patient added successfully.");
+    setEditPatient(patient);
   };
   const handleSaveEdit = () => {
     if (!editPatient) return;
-    if (!form.name || !form.phone || !form.age || !form.gender || !form.address || !form.bloodGroup) {
-      ue.error("Please fill in all required fields.");
+    const errors = validateForm(form);
+    if (Object.keys(errors).length > 0) {
+      ue.error(Object.values(errors)[0] ?? "Please fill in all required fields.");
       return;
     }
-    setPatients(
-      (prev) => prev.map(
-        (p2) => p2.id === editPatient.id ? {
-          ...p2,
-          name: form.name,
-          phone: form.phone,
-          age: Number(form.age),
-          gender: form.gender,
-          address: form.address,
-          bloodGroup: form.bloodGroup,
-          medicalHistory: form.medicalHistory || void 0
-        } : p2
-      )
-    );
-    setEditPatient(null);
-    setForm(EMPTY_FORM);
-    ue.success("Patient updated successfully.");
-  };
-  const handleConfirmDelete = () => {
-    if (!deletePatient) return;
-    setPatients((prev) => prev.filter((p2) => p2.id !== deletePatient.id));
-    setDeletePatient(null);
-    ue.success("Patient deleted successfully.");
+    updateMutation.mutate({
+      id: editPatient._id,
+      payload: buildPayload(form)
+    });
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "patients.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
         title: "Patient Management",
-        description: "View, add, and manage all registered patients.",
-        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            type: "button",
-            onClick: openAdd,
-            className: "w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white gap-2",
-            "data-ocid": "patients.add_button",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 16 }),
-              "Add Patient"
-            ]
-          }
-        )
+        description: "View and manage all registered patients."
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -65997,7 +65898,7 @@ function PatientsPage() {
             Select,
             {
               value: genderFilter,
-              onValueChange: (v2) => setGenderFilter(v2),
+              onValueChange: (value) => setGenderFilter(value),
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   SelectTrigger,
@@ -66042,39 +65943,37 @@ function PatientsPage() {
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-16 rounded-lg" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36 rounded-lg" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20 rounded-lg" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-16 rounded-lg ml-auto" }) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-8 rounded-lg ml-auto" }) })
             ] }, key)) : filteredPatients.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               TableCell,
               {
                 colSpan: 7,
                 className: "text-center py-12 text-[#94A3B8] text-sm",
                 "data-ocid": "patients.empty_state",
-                children: "No patients found matching your filters."
+                children: isError ? (error == null ? void 0 : error.message) ?? "Unable to load patients." : "No patients found matching your filters."
               }
-            ) }) : filteredPatients.map((patient, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              TableRow,
-              {
-                className: "hover:bg-[#F8FAFC] transition-colors",
-                "data-ocid": `patients.item.${idx + 1}`,
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pl-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B] text-sm", children: patient.name }) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-[#475569]", children: patient.phone }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: "text-sm text-[#475569]", children: [
-                    patient.age,
-                    " yrs"
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(GenderBadge, { gender: patient.gender }) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "max-w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "p",
-                    {
-                      className: "text-sm text-[#475569] truncate",
-                      title: patient.address,
-                      children: patient.address
-                    }
-                  ) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-[#475569]", children: formatDate(patient.registeredAt) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ) }) : filteredPatients.map((patient, idx) => {
+              const gender = getPatientGender(patient.gender);
+              return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                TableRow,
+                {
+                  className: "hover:bg-[#F8FAFC] transition-colors",
+                  "data-ocid": `patients.item.${idx + 1}`,
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pl-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B] text-sm", children: getPatientName(patient) }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-[#475569]", children: getPatientPhone(patient) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-[#475569]", children: getPatientAgeLabel(patient) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: gender ? /* @__PURE__ */ jsxRuntimeExports.jsx(GenderBadge, { gender }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-[#94A3B8]", children: "Not set" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "max-w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "p",
+                      {
+                        className: "text-sm text-[#475569] truncate",
+                        title: getPatientAddress(patient),
+                        children: getPatientAddress(patient)
+                      }
+                    ) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-[#475569]", children: formatDate(getPatientRegisteredAt(patient)) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end gap-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                       Button,
                       {
                         size: "icon",
@@ -66083,28 +65982,15 @@ function PatientsPage() {
                         className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10",
                         onClick: () => openEdit(patient),
                         "data-ocid": `patients.edit_button.${idx + 1}`,
-                        "aria-label": `Edit ${patient.name}`,
+                        "aria-label": `Edit ${getPatientName(patient)}`,
                         children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
                       }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Button,
-                      {
-                        size: "icon",
-                        variant: "ghost",
-                        type: "button",
-                        className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-red-500 hover:bg-red-50",
-                        onClick: () => setDeletePatient(patient),
-                        "data-ocid": `patients.delete_button.${idx + 1}`,
-                        "aria-label": `Delete ${patient.name}`,
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
-                      }
-                    )
-                  ] }) })
-                ]
-              },
-              patient.id
-            )) })
+                    ) }) })
+                  ]
+                },
+                patient._id
+              );
+            }) })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "block md:hidden", "data-ocid": "patients.list", children: isLoading ? SKELETON_ROWS.map((key) => /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
@@ -66125,47 +66011,52 @@ function PatientsPage() {
             {
               className: "text-center py-12 text-[#94A3B8] text-sm",
               "data-ocid": "patients.empty_state",
-              children: "No patients found matching your filters."
+              children: isError ? (error == null ? void 0 : error.message) ?? "Unable to load patients." : "No patients found matching your filters."
             }
-          ) : filteredPatients.map((patient, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              className: "p-4 border-b border-[#E2E8F0] last:border-0 hover:bg-[#F8FAFC] transition-colors",
-              "data-ocid": `patients.item.${idx + 1}`,
-              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B] text-sm truncate", children: patient.name }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] mt-0.5", children: patient.phone }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mt-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-[#64748B]", children: [
-                      patient.age,
-                      " yrs"
+          ) : filteredPatients.map((patient, idx) => {
+            const gender = getPatientGender(patient.gender);
+            return /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "p-4 border-b border-[#E2E8F0] last:border-0 hover:bg-[#F8FAFC] transition-colors",
+                "data-ocid": `patients.item.${idx + 1}`,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B] text-sm truncate", children: getPatientName(patient) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] mt-0.5", children: getPatientPhone(patient) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mt-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-[#64748B]", children: getPatientAgeLabel(patient) }),
+                      gender ? /* @__PURE__ */ jsxRuntimeExports.jsx(GenderBadge, { gender }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Badge,
+                        {
+                          variant: "outline",
+                          className: "text-xs rounded-lg text-[#94A3B8] border-slate-200",
+                          children: "Gender not set"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Badge,
+                        {
+                          variant: "outline",
+                          className: "text-xs rounded-lg bg-red-50 text-red-600 border-red-200",
+                          children: getPatientBloodGroup(patient)
+                        }
+                      )
                     ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(GenderBadge, { gender: patient.gender }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Badge,
+                      "p",
                       {
-                        variant: "outline",
-                        className: "text-xs rounded-lg bg-red-50 text-red-600 border-red-200",
-                        children: patient.bloodGroup
+                        className: "text-xs text-[#94A3B8] mt-1 truncate",
+                        title: getPatientAddress(patient),
+                        children: getPatientAddress(patient)
                       }
-                    )
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-[#94A3B8] mt-0.5", children: [
+                      "Reg: ",
+                      formatDate(getPatientRegisteredAt(patient))
+                    ] })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "p",
-                    {
-                      className: "text-xs text-[#94A3B8] mt-1 truncate",
-                      title: patient.address,
-                      children: patient.address
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-[#94A3B8] mt-0.5", children: [
-                    "Reg: ",
-                    formatDate(patient.registeredAt)
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 shrink-0", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1 shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Button,
                     {
                       size: "icon",
@@ -66174,28 +66065,15 @@ function PatientsPage() {
                       className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10",
                       onClick: () => openEdit(patient),
                       "data-ocid": `patients.edit_button.${idx + 1}`,
-                      "aria-label": `Edit ${patient.name}`,
+                      "aria-label": `Edit ${getPatientName(patient)}`,
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
                     }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Button,
-                    {
-                      size: "icon",
-                      variant: "ghost",
-                      type: "button",
-                      className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-red-500 hover:bg-red-50",
-                      onClick: () => setDeletePatient(patient),
-                      "data-ocid": `patients.delete_button.${idx + 1}`,
-                      "aria-label": `Delete ${patient.name}`,
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
-                    }
-                  )
+                  ) })
                 ] })
-              ] })
-            },
-            patient.id
-          )) })
+              },
+              patient._id
+            );
+          }) })
         ]
       }
     ),
@@ -66209,42 +66087,15 @@ function PatientsPage() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PatientFormModal,
       {
-        open: showAddModal,
-        mode: "add",
-        form,
-        onFormChange: updateForm,
-        onSave: handleSaveAdd,
-        onClose: () => {
-          setShowAddModal(false);
-          setForm(EMPTY_FORM);
-        }
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      PatientFormModal,
-      {
         open: !!editPatient,
-        mode: "edit",
         form,
+        isSaving: updateMutation.isPending,
         onFormChange: updateForm,
         onSave: handleSaveEdit,
         onClose: () => {
           setEditPatient(null);
           setForm(EMPTY_FORM);
         }
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      ConfirmDialog,
-      {
-        open: !!deletePatient,
-        title: "Delete Patient",
-        message: `Are you sure you want to delete ${(deletePatient == null ? void 0 : deletePatient.name) ?? "this patient"}? This action cannot be undone.`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
-        variant: "destructive",
-        onConfirm: handleConfirmDelete,
-        onCancel: () => setDeletePatient(null)
       }
     )
   ] });
@@ -67945,7 +67796,7 @@ function RoleManagementPage() {
     )
   ] });
 }
-function toFormData(payload) {
+function toFormData$1(payload) {
   const fd = new FormData();
   if (payload.title) fd.append("title", payload.title);
   if (payload.slug) fd.append("slug", payload.slug);
@@ -67973,7 +67824,7 @@ const getAllServicesApi = async () => {
 const addServiceApi = async (payload) => {
   var _a2, _b2, _c2;
   try {
-    const res = await post(ENDPOINT.ADD_SERVICE, toFormData(payload), { needAuth: true });
+    const res = await post(ENDPOINT.ADD_SERVICE, toFormData$1(payload), { needAuth: true });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.service;
   } catch (error) {
     throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add service");
@@ -67984,7 +67835,7 @@ const updateServiceApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_SERVICE}/${id}`,
-      toFormData(payload),
+      toFormData$1(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.service;
@@ -68440,440 +68291,864 @@ function ServiceManagementPage() {
     ] }) })
   ] });
 }
-function getPasswordStrength(password) {
-  if (!password) return { level: "weak", label: "", color: "", width: "0%" };
-  const hasUpper = /[A-Z]/.test(password);
-  const hasLower = /[a-z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecial = /[@#$%^&*!]/.test(password);
-  const score = [
-    password.length >= 8,
-    hasUpper && hasLower,
-    hasNumber,
-    hasSpecial
-  ].filter(Boolean).length;
-  if (score <= 1)
-    return { level: "weak", label: "Weak", color: "bg-red-400", width: "33%" };
-  if (score <= 2)
-    return {
-      level: "medium",
-      label: "Medium",
-      color: "bg-amber-400",
-      width: "66%"
-    };
-  return {
-    level: "strong",
-    label: "Strong",
-    color: "bg-emerald-500",
-    width: "100%"
-  };
-}
-function PasswordField({
-  label,
-  value,
-  onChange,
-  show,
-  onToggle,
-  ocid,
-  error
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: ocid, children: label }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          id: ocid,
-          type: show ? "text" : "password",
-          value,
-          onChange: (e3) => onChange(e3.target.value),
-          className: "rounded-xl pr-10",
-          "data-ocid": ocid,
-          autoComplete: "off"
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          type: "button",
-          onClick: onToggle,
-          className: "absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors min-h-[24px] min-w-[24px] flex items-center justify-center",
-          "aria-label": show ? "Hide password" : "Show password",
-          children: show ? /* @__PURE__ */ jsxRuntimeExports.jsx(EyeOff, { size: 16 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 16 })
-        }
-      )
-    ] }),
-    error && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      "p",
-      {
-        className: "text-xs text-red-500 flex items-start gap-1 break-words",
-        "data-ocid": `${ocid}_error`,
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { size: 11, className: "mt-0.5 shrink-0" }),
-          " ",
-          error
-        ]
-      }
-    )
-  ] });
-}
+const getSettingsApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_SETTINGS, { needAuth: true });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.data;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch settings"
+    );
+  }
+};
+const updateSettingsApi = async (payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const body = { ...payload };
+    if (payload.social_links) {
+      body.social_links = JSON.stringify(payload.social_links);
+    }
+    const res = await post(ENDPOINT.UPDATE_SETTINGS, body, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.data;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update settings"
+    );
+  }
+};
 function SettingsPage() {
-  const { admin, logout } = useAuth();
-  const source = admin ?? mockAdmin;
-  const [profileForm, setProfileForm] = reactExports.useState({
-    name: source.name,
-    email: source.email,
-    phone: "+91 98765 43200"
-  });
-  const [profileSaving, setProfileSaving] = reactExports.useState(false);
+  var _a2;
+  const { logout } = useAuth();
+  const [settings, setSettings] = reactExports.useState(null);
+  const [loading, setLoading] = reactExports.useState(true);
+  const [saving, setSaving] = reactExports.useState(false);
   const [passwordForm, setPasswordForm] = reactExports.useState({
-    current: "",
     newPass: "",
     confirm: ""
   });
   const [showPasswords, setShowPasswords] = reactExports.useState({
-    current: false,
     newPass: false,
     confirm: false
   });
-  const [passwordErrors, setPasswordErrors] = reactExports.useState({
-    newPass: "",
-    confirm: ""
-  });
-  const [passwordSaving, setPasswordSaving] = reactExports.useState(false);
-  const initials = source.name.split(" ").map((n2) => n2[0]).join("").slice(0, 2).toUpperCase();
-  const strength = getPasswordStrength(passwordForm.newPass);
-  async function handleSaveProfile() {
-    if (!profileForm.name.trim()) {
-      ue.error("Full name is required.");
+  reactExports.useEffect(() => {
+    loadSettings();
+  }, []);
+  async function loadSettings() {
+    try {
+      setLoading(true);
+      const data = await getSettingsApi();
+      setSettings(data);
+    } catch (err) {
+      ue.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function saveSettings(payload) {
+    try {
+      setSaving(true);
+      const body = payload ?? settings;
+      const updated = await updateSettingsApi(body);
+      setSettings(updated);
+      ue.success("Settings updated successfully");
+    } catch (err) {
+      ue.error(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  async function handlePasswordUpdate() {
+    if (passwordForm.newPass.length < 8) {
+      ue.error("Password must be at least 8 characters");
       return;
     }
-    setProfileSaving(true);
-    await new Promise((r2) => setTimeout(r2, 700));
-    setProfileSaving(false);
-    ue.success("Profile updated successfully.");
-  }
-  async function handleChangePassword() {
-    const errors = { newPass: "", confirm: "" };
-    let hasError = false;
-    if (passwordForm.newPass.length < 8) {
-      errors.newPass = "New password must be at least 8 characters.";
-      hasError = true;
-    }
     if (passwordForm.newPass !== passwordForm.confirm) {
-      errors.confirm = "Passwords do not match.";
-      hasError = true;
+      ue.error("Passwords do not match");
+      return;
     }
-    setPasswordErrors(errors);
-    if (hasError) return;
-    setPasswordSaving(true);
-    await new Promise((r2) => setTimeout(r2, 800));
-    setPasswordSaving(false);
-    ue.error("Current password is incorrect.");
-    setPasswordForm({ current: "", newPass: "", confirm: "" });
+    await saveSettings({ password: passwordForm.newPass });
+    setPasswordForm({
+      newPass: "",
+      confirm: ""
+    });
   }
-  function handleLogout() {
-    logout();
-    ue.success("Logged out successfully.");
+  function updateField(key, value) {
+    setSettings((prev) => ({
+      ...prev,
+      [key]: value
+    }));
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "settings.page", children: [
+  function updateSocial(key, value) {
+    setSettings((prev) => ({
+      ...prev,
+      social_links: {
+        ...prev == null ? void 0 : prev.social_links,
+        [key]: value
+      }
+    }));
+  }
+  const safeSettings = settings ?? {};
+  const initials = (_a2 = safeSettings.name) == null ? void 0 : _a2.split(" ").map((n2) => n2[0]).join("").slice(0, 2).toUpperCase();
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
         title: "Settings",
-        description: "Manage your admin profile and account security."
+        description: "Manage admin settings and CMS content."
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Card,
-        {
-          className: "border border-border rounded-2xl shadow-sm",
-          "data-ocid": "settings.profile_card",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "p-4 sm:p-6 pb-3 sm:pb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { size: 16, className: "text-primary" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base font-semibold text-foreground", children: "Admin Profile" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-xs text-muted-foreground mt-0.5", children: "Update your personal information" })
-              ] })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "px-4 sm:px-6 pb-4 sm:pb-6 space-y-5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative shrink-0", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Avatar, { className: "h-20 w-20 ring-4 ring-primary/20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold", children: initials }) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    "label",
-                    {
-                      htmlFor: "avatar-upload",
-                      className: "absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-md hover:bg-secondary transition-colors",
-                      "aria-label": "Upload avatar",
-                      "data-ocid": "settings.upload_button",
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Camera, { size: 14 }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "input",
-                          {
-                            id: "avatar-upload",
-                            type: "file",
-                            accept: "image/*",
-                            className: "sr-only",
-                            onChange: () => ue.info("Avatar upload coming soon.")
-                          }
-                        )
-                      ]
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 text-center sm:text-left", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-foreground truncate", children: source.name }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground capitalize", children: source.role.replace("-", " ") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 border border-emerald-100", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "h-1.5 w-1.5 rounded-full bg-emerald-500" }),
-                    "Active"
-                  ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Separator, {}),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "settings.name_input", children: "Full Name" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      id: "settings.name_input",
-                      value: profileForm.name,
-                      onChange: (e3) => setProfileForm({ ...profileForm, name: e3.target.value }),
-                      className: "rounded-xl",
-                      placeholder: "Enter full name",
-                      "data-ocid": "settings.name_input"
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { htmlFor: "settings.email_input", children: [
-                    "Email Address",
-                    " ",
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground font-normal text-xs", children: "(read-only)" })
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      id: "settings.email_input",
-                      type: "email",
-                      value: profileForm.email,
-                      onChange: (e3) => setProfileForm({ ...profileForm, email: e3.target.value }),
-                      className: "rounded-xl",
-                      placeholder: "admin@hospital.com",
-                      "data-ocid": "settings.email_input"
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "settings.phone_input", children: "Phone Number" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      id: "settings.phone_input",
-                      type: "tel",
-                      value: profileForm.phone,
-                      onChange: (e3) => setProfileForm({ ...profileForm, phone: e3.target.value }),
-                      className: "rounded-xl",
-                      placeholder: "+91 98765 43200",
-                      "data-ocid": "settings.phone_input"
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "settings.role_input", children: "Role" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      id: "settings.role_input",
-                      value: "Super Administrator",
-                      readOnly: true,
-                      className: "rounded-xl bg-muted/50 cursor-not-allowed text-muted-foreground",
-                      "data-ocid": "settings.role_input"
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Button,
-                  {
-                    className: "rounded-xl bg-primary hover:bg-secondary text-white gap-2 w-full sm:w-auto",
-                    onClick: handleSaveProfile,
-                    disabled: profileSaving,
-                    "data-ocid": "settings.save_profile_button",
-                    children: profileSaving ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" }),
-                      "Saving…"
-                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
-                      " Save Profile"
-                    ] })
-                  }
-                )
-              ] })
-            ] })
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Card,
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid lg:grid-cols-2 gap-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(User, { size: 16 }),
+            "Admin Profile"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Update admin information" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Avatar, { className: "h-20 w-20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { children: initials }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Full Name" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                value: safeSettings.name ?? "",
+                onChange: (e3) => updateField("name", e3.target.value)
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Email" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                value: safeSettings.email ?? "",
+                onChange: (e3) => updateField("email", e3.target.value)
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Phone" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                value: safeSettings.mobile_number ?? "",
+                onChange: (e3) => updateField("mobile_number", e3.target.value)
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { disabled: saving, onClick: () => saveSettings(), children: saving ? "Saving..." : "Save Profile" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { size: 16 }),
+          "Password"
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "New Password" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                type: showPasswords.newPass ? "text" : "password",
+                value: passwordForm.newPass,
+                onChange: (e3) => setPasswordForm({
+                  ...passwordForm,
+                  newPass: e3.target.value
+                })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Confirm Password" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                type: showPasswords.confirm ? "text" : "password",
+                value: passwordForm.confirm,
+                onChange: (e3) => setPasswordForm({
+                  ...passwordForm,
+                  confirm: e3.target.value
+                })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { disabled: saving, onClick: handlePasswordUpdate, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Shield, { size: 14 }),
+            " Update Password"
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "Business Info" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              placeholder: "Inquiry Email",
+              value: safeSettings.inquiry_email ?? "",
+              onChange: (e3) => updateField("inquiry_email", e3.target.value)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              placeholder: "Inquiry Mobile",
+              value: safeSettings.inquiry_mobile_number ?? "",
+              onChange: (e3) => updateField("inquiry_mobile_number", e3.target.value)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              placeholder: "Working Hours",
+              value: safeSettings.working_hours ?? "",
+              onChange: (e3) => updateField("working_hours", e3.target.value)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "Address",
+              value: safeSettings.address ?? "",
+              onChange: (e3) => updateField("address", e3.target.value)
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "Social Links" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: ["facebook", "instagram", "youtube", "whatsapp", "call"].map(
+          (s2) => {
+            var _a3;
+            return /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                placeholder: s2,
+                value: ((_a3 = safeSettings.social_links) == null ? void 0 : _a3[s2]) ?? "",
+                onChange: (e3) => updateSocial(s2, e3.target.value)
+              },
+              s2
+            );
+          }
+        ) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "lg:col-span-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "CMS Content" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "About Us",
+              value: safeSettings.about_us ?? "",
+              onChange: (e3) => updateField("about_us", e3.target.value)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "Privacy Policy",
+              value: safeSettings.privacy_policy ?? "",
+              onChange: (e3) => updateField("privacy_policy", e3.target.value)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "Terms & Conditions",
+              value: safeSettings.term_and_condition ?? "",
+              onChange: (e3) => updateField("term_and_condition", e3.target.value)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "Contact Us",
+              value: safeSettings.contact_us ?? "",
+              onChange: (e3) => updateField("contact_us", e3.target.value)
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { disabled: saving, onClick: () => saveSettings(), children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
+            " Save CMS Content"
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-red-200 bg-red-50", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-red-600 flex gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { size: 16 }),
+          "Danger Zone"
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
           {
-            className: "border border-border rounded-2xl shadow-sm",
-            "data-ocid": "settings.password_card",
+            variant: "outline",
+            className: "border-red-300 text-red-600",
+            onClick: logout,
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "p-4 sm:p-6 pb-3 sm:pb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { size: 16, className: "text-primary" }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base font-semibold text-foreground", children: "Change Password" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-xs text-muted-foreground mt-0.5", children: "Keep your account secure with a strong password" })
-                ] })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "px-4 sm:px-6 pb-4 sm:pb-6 space-y-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  PasswordField,
-                  {
-                    label: "Current Password",
-                    value: passwordForm.current,
-                    onChange: (v2) => setPasswordForm({ ...passwordForm, current: v2 }),
-                    show: showPasswords.current,
-                    onToggle: () => setShowPasswords({
-                      ...showPasswords,
-                      current: !showPasswords.current
-                    }),
-                    ocid: "settings.current_password_input"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  PasswordField,
-                  {
-                    label: "New Password",
-                    value: passwordForm.newPass,
-                    onChange: (v2) => {
-                      setPasswordForm({ ...passwordForm, newPass: v2 });
-                      if (passwordErrors.newPass)
-                        setPasswordErrors({ ...passwordErrors, newPass: "" });
-                    },
-                    show: showPasswords.newPass,
-                    onToggle: () => setShowPasswords({
-                      ...showPasswords,
-                      newPass: !showPasswords.newPass
-                    }),
-                    ocid: "settings.new_password_input",
-                    error: passwordErrors.newPass
-                  }
-                ),
-                passwordForm.newPass && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5 w-full", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-2 min-w-0", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground shrink-0", children: "Password strength" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "span",
-                      {
-                        className: `text-xs font-medium shrink-0 ${strength.level === "weak" ? "text-red-500" : strength.level === "medium" ? "text-amber-500" : "text-emerald-600"}`,
-                        children: strength.label
-                      }
-                    )
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-2 w-full rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "div",
-                    {
-                      className: `h-full rounded-full transition-all duration-300 ${strength.color}`,
-                      style: { width: strength.width }
-                    }
-                  ) })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  PasswordField,
-                  {
-                    label: "Confirm New Password",
-                    value: passwordForm.confirm,
-                    onChange: (v2) => {
-                      setPasswordForm({ ...passwordForm, confirm: v2 });
-                      if (passwordErrors.confirm)
-                        setPasswordErrors({ ...passwordErrors, confirm: "" });
-                    },
-                    show: showPasswords.confirm,
-                    onToggle: () => setShowPasswords({
-                      ...showPasswords,
-                      confirm: !showPasswords.confirm
-                    }),
-                    ocid: "settings.confirm_password_input",
-                    error: passwordErrors.confirm
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Button,
-                  {
-                    className: "rounded-xl bg-primary hover:bg-secondary text-white gap-2 w-full sm:w-auto",
-                    onClick: handleChangePassword,
-                    disabled: passwordSaving,
-                    "data-ocid": "settings.change_password_button",
-                    children: passwordSaving ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" }),
-                      "Updating…"
-                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Shield, { size: 14 }),
-                      " Change Password"
-                    ] })
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Separator, {}),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl bg-muted/40 border border-border p-3 sm:p-4", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-foreground mb-2", children: "Password Requirements" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "space-y-1.5 text-xs text-muted-foreground", children: [
-                    "At least 8 characters long",
-                    "Include uppercase and lowercase letters",
-                    "Include at least one number",
-                    "Include a special character (@, #, $, etc.)"
-                  ].map((req) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "h-1.5 w-1.5 rounded-full bg-muted-foreground shrink-0 mt-1" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "leading-relaxed", children: req })
-                  ] }, req)) })
-                ] })
-              ] })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 14 }),
+              " Logout"
             ]
           }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Card,
+        ) })
+      ] })
+    ] })
+  ] });
+}
+const getAllGalleryApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_GALLERY, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery) ?? [];
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch gallery items"
+    );
+  }
+};
+const addGalleryApi = async (image) => {
+  var _a2, _b2, _c2;
+  try {
+    const formData = new FormData();
+    formData.append("image", image);
+    const res = await post(ENDPOINT.ADD_GALLERY, formData, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add gallery image"
+    );
+  }
+};
+const deleteGalleryApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_GALLERY}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(
+      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete gallery image"
+    );
+  }
+};
+const GALLERY_QUERY_KEY = ["gallery"];
+function GalleryPage() {
+  const queryClient2 = useQueryClient();
+  const [open, setOpen] = reactExports.useState(false);
+  const [image, setImage] = reactExports.useState(null);
+  const [previewUrl, setPreviewUrl] = reactExports.useState(null);
+  const { data: gallery = [], isLoading } = useQuery({
+    queryKey: GALLERY_QUERY_KEY,
+    queryFn: getAllGalleryApi
+  });
+  const addMutation = useMutation({ mutationFn: addGalleryApi });
+  const deleteMutation = useMutation({ mutationFn: deleteGalleryApi });
+  const handleImageChange = (event) => {
+    var _a2;
+    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
+    setImage(file);
+    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
+  function resolveAssetUrl2(path) {
+    if (!path) return "";
+    if (/^https?:\/\//.test(path)) return path;
+    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+  const handleSave = async () => {
+    if (!image) {
+      ue.error("Please select an image to upload.");
+      return;
+    }
+    try {
+      await addMutation.mutateAsync(image);
+      ue.success("Gallery image added");
+      queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+      setOpen(false);
+      setImage(null);
+      setPreviewUrl(null);
+    } catch (error) {
+      ue.error("Unable to upload image.");
+    }
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this image?")) return;
+    await deleteMutation.mutateAsync(id);
+    queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+    ue.success("Gallery image deleted");
+  };
+  const totalImages = gallery.length;
+  const galleryRows = reactExports.useMemo(() => gallery, [gallery]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-xl font-bold", children: "Gallery" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500", children: "Manage website gallery images." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: () => setOpen(true), children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 14 }),
+        " Add Image"
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border bg-white p-5 shadow-sm", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500", children: "Total Images" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-3xl font-semibold", children: totalImages })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 lg:grid-cols-3", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl border bg-white p-6 text-center text-slate-500", children: "Loading gallery..." }) : galleryRows.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl border bg-white p-6 text-center text-slate-500", children: "No images uploaded yet." }) : galleryRows.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "group overflow-hidden rounded-3xl border bg-white shadow-sm transition hover:shadow-md", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative aspect-[4/3] overflow-hidden bg-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: resolveAssetUrl2(item.image), alt: "Gallery item", className: "h-full w-full object-cover transition duration-200 group-hover:scale-105" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4 p-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Image" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: new Date(item.createdAt ?? "").toLocaleDateString() })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
           {
-            className: "border border-red-200 rounded-2xl shadow-sm bg-red-50/30",
-            "data-ocid": "settings.danger_zone_card",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "p-4 sm:p-6 pb-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-sm font-semibold text-red-600 flex items-center gap-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { size: 15, className: "text-red-500 shrink-0" }),
-                  "Danger Zone"
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-xs text-red-400", children: "Actions here cannot be undone. Proceed with caution." })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "px-4 sm:px-6 pb-4 sm:pb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-foreground", children: "Sign out of admin panel" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground mt-0.5", children: "You will be redirected to the login page." })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  Button,
-                  {
-                    variant: "outline",
-                    className: "rounded-xl border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 gap-2 w-full sm:w-auto shrink-0",
-                    onClick: handleLogout,
-                    "data-ocid": "settings.logout_button",
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 14 }),
-                      " Logout"
-                    ]
-                  }
-                )
-              ] }) })
-            ]
+            size: "icon",
+            variant: "destructive",
+            onClick: () => handleDelete(item._id),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
           }
         )
       ] })
-    ] })
+    ] }, item._id)) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Gallery Image" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "file",
+            accept: "image/*",
+            onChange: handleImageChange
+          }
+        ),
+        previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: previewUrl, alt: "Preview", className: "h-56 w-full object-cover" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save Image" })
+      ] })
+    ] }) })
+  ] });
+}
+function appendValue(fd, key, value) {
+  if (value === void 0 || value === null) return;
+  if (typeof value === "string" && value.trim() === "") return;
+  fd.append(key, String(value));
+}
+function toFormData(payload) {
+  var _a2, _b2, _c2;
+  const fd = new FormData();
+  appendValue(fd, "title", (_a2 = payload.title) == null ? void 0 : _a2.trim());
+  appendValue(fd, "serviceId", payload.serviceId);
+  appendValue(fd, "shortDescription", (_b2 = payload.shortDescription) == null ? void 0 : _b2.trim());
+  appendValue(fd, "content", (_c2 = payload.content) == null ? void 0 : _c2.trim());
+  appendValue(fd, "status", payload.status);
+  if (payload.seo) {
+    fd.append("seo", JSON.stringify(payload.seo));
+  }
+  if (payload.image instanceof File) {
+    fd.append("image", payload.image);
+  }
+  return fd;
+}
+const getAllBlogsApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_BLOGS, {
+      needAuth: true
+    });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.blogs) ?? [];
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch blogs"
+    );
+  }
+};
+const addBlogApi = async (payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(
+      ENDPOINT.ADD_BLOG,
+      toFormData(payload),
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.blog;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add blog"
+    );
+  }
+};
+const updateBlogApi = async (id, payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_BLOG}/${id}`,
+      toFormData(payload),
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.blog;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update blog"
+    );
+  }
+};
+const deleteBlogApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_BLOG}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(
+      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete blog"
+    );
+  }
+};
+const BLOG_QUERY_KEY = ["blogs"];
+const SERVICES_QUERY_KEY = ["services"];
+function BlogsPage() {
+  const queryClient2 = useQueryClient();
+  const [open, setOpen] = reactExports.useState(false);
+  const [mode, setMode] = reactExports.useState("add");
+  const [selected, setSelected] = reactExports.useState(null);
+  const [search, setSearch] = reactExports.useState("");
+  const [imagePreview, setImagePreview] = reactExports.useState(null);
+  const [form, setForm] = reactExports.useState({
+    title: "",
+    shortDescription: "",
+    content: "",
+    metaTitle: "",
+    metaDescription: "",
+    keywords: "",
+    status: "published",
+    serviceId: "",
+    image: null
+  });
+  const { data: blogs = [], isLoading } = useQuery({
+    queryKey: BLOG_QUERY_KEY,
+    queryFn: getAllBlogsApi
+  });
+  const { data: services = [] } = useQuery({
+    queryKey: SERVICES_QUERY_KEY,
+    queryFn: getAllServicesApi
+  });
+  const serviceById = reactExports.useMemo(
+    () => new Map(services.map((s2) => [s2._id, s2.title])),
+    [services]
+  );
+  const filteredBlogs = reactExports.useMemo(() => {
+    if (!search.trim()) return blogs;
+    const q2 = search.toLowerCase();
+    return blogs.filter(
+      (b2) => [b2.title, b2.shortDescription].filter(Boolean).some((v2) => String(v2).toLowerCase().includes(q2))
+    );
+  }, [search, blogs]);
+  const addMutation = useMutation({ mutationFn: addBlogApi });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }) => updateBlogApi(id, payload)
+  });
+  const deleteMutation = useMutation({ mutationFn: deleteBlogApi });
+  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
+  function resolveAssetUrl2(path) {
+    if (!path) return "";
+    if (/^https?:\/\//.test(path)) return path;
+    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+  const openAdd = () => {
+    setMode("add");
+    setSelected(null);
+    setImagePreview(null);
+    setForm({
+      title: "",
+      shortDescription: "",
+      content: "",
+      metaTitle: "",
+      metaDescription: "",
+      keywords: "",
+      status: "published",
+      serviceId: "",
+      image: null
+    });
+    setOpen(true);
+  };
+  const openEdit = (blog) => {
+    var _a2, _b2, _c2, _d2;
+    setMode("edit");
+    setSelected(blog);
+    setImagePreview(blog.image ? resolveAssetUrl2(blog.image) : null);
+    setForm({
+      title: blog.title || "",
+      shortDescription: blog.shortDescription || "",
+      content: blog.content || "",
+      metaTitle: ((_a2 = blog.seo) == null ? void 0 : _a2.metaTitle) || "",
+      metaDescription: ((_b2 = blog.seo) == null ? void 0 : _b2.metaDescription) || "",
+      keywords: ((_d2 = (_c2 = blog.seo) == null ? void 0 : _c2.keywords) == null ? void 0 : _d2.join(", ")) || "",
+      status: blog.status || "published",
+      serviceId: blog.serviceId || "",
+      image: null
+    });
+    setOpen(true);
+  };
+  const handleImage = (file) => {
+    if (!file) return;
+    setForm({ ...form, image: file });
+    setImagePreview(URL.createObjectURL(file));
+  };
+  const handleSave = async () => {
+    if (!form.title.trim() || !form.shortDescription.trim() || !form.content.trim()) {
+      ue.error("Title, description and content are required.");
+      return;
+    }
+    if (!form.serviceId) {
+      ue.error("Please select a service.");
+      return;
+    }
+    if (mode === "add" && !form.image) {
+      ue.error("Please upload image.");
+      return;
+    }
+    const seo = {
+      metaTitle: form.metaTitle,
+      metaDescription: form.metaDescription,
+      keywords: form.keywords.split(",").map((k2) => k2.trim()).filter(Boolean)
+    };
+    const payload = {
+      title: form.title,
+      serviceId: form.serviceId,
+      shortDescription: form.shortDescription,
+      content: form.content,
+      seo,
+      status: form.status,
+      image: form.image || void 0
+    };
+    try {
+      if (mode === "edit" && selected) {
+        await updateMutation.mutateAsync({
+          id: selected._id,
+          payload
+        });
+        ue.success("Blog updated");
+      } else {
+        await addMutation.mutateAsync(payload);
+        ue.success("Blog created");
+      }
+      queryClient2.invalidateQueries({ queryKey: BLOG_QUERY_KEY });
+      setOpen(false);
+    } catch {
+      ue.error("Something went wrong");
+    }
+  };
+  const handleDelete = async (id) => {
+    await deleteMutation.mutateAsync(id);
+    queryClient2.invalidateQueries({ queryKey: BLOG_QUERY_KEY });
+    ue.success("Deleted");
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-semibold", children: "Blog Management" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Manage blog content and SEO" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: openAdd, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
+        "Add Blog"
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative max-w-sm", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-3 h-4 w-4 text-muted-foreground" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          placeholder: "Search blogs...",
+          value: search,
+          onChange: (e3) => setSearch(e3.target.value),
+          className: "pl-9"
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid md:grid-cols-2 xl:grid-cols-3 gap-6", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Loading..." }) : filteredBlogs.map((blog) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Card,
+      {
+        className: "overflow-hidden hover:shadow-md transition",
+        children: [
+          blog.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "img",
+            {
+              src: resolveAssetUrl2(blog.image),
+              className: "h-40 w-full object-cover"
+            }
+          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-40 bg-muted flex items-center justify-center text-sm text-muted-foreground", children: "No Image" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3 p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-muted-foreground uppercase flex gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: blog.status }),
+              serviceById.get(blog.serviceId || "") && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: serviceById.get(blog.serviceId || "") })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold line-clamp-2", children: blog.title }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground line-clamp-2", children: blog.shortDescription }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 pt-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  size: "icon",
+                  variant: "outline",
+                  onClick: () => openEdit(blog),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 16 })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  size: "icon",
+                  variant: "destructive",
+                  onClick: () => handleDelete(blog._id),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+                }
+              )
+            ] })
+          ] })
+        ]
+      },
+      blog._id
+    )) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-3xl overflow-y-auto max-h-[90vh]", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: mode === "edit" ? "Edit Blog" : "Create Blog" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  value: form.title,
+                  onChange: (e3) => setForm({ ...form, title: e3.target.value })
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: form.serviceId,
+                  onValueChange: (v2) => setForm({ ...form, serviceId: v2 }),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Service" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: s2._id, children: s2.title }, s2._id)) })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: form.status,
+                  onValueChange: (v2) => setForm({
+                    ...form,
+                    status: v2
+                  }),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "published", children: "Published" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
+                    ] })
+                  ]
+                }
+              )
+            ] })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "Short Description",
+              value: form.shortDescription,
+              onChange: (e3) => setForm({ ...form, shortDescription: e3.target.value })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "Blog Content",
+              rows: 8,
+              value: form.content,
+              onChange: (e3) => setForm({ ...form, content: e3.target.value })
+            }
+          )
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              placeholder: "Meta Title",
+              value: form.metaTitle,
+              onChange: (e3) => setForm({ ...form, metaTitle: e3.target.value })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              placeholder: "Meta Description",
+              value: form.metaDescription,
+              onChange: (e3) => setForm({
+                ...form,
+                metaDescription: e3.target.value
+              })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              placeholder: "Keywords (comma separated)",
+              value: form.keywords,
+              onChange: (e3) => setForm({ ...form, keywords: e3.target.value })
+            }
+          )
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
+          imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "img",
+            {
+              src: imagePreview,
+              className: "w-full h-48 object-cover rounded-lg"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "file",
+                accept: "image/*",
+                hidden: true,
+                onChange: (e3) => {
+                  var _a2;
+                  return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
+                }
+              }
+            )
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: mode === "edit" ? "Update Blog" : "Create Blog" })
+      ] })
+    ] }) })
   ] });
 }
 function getAuthState() {
@@ -68953,6 +69228,18 @@ const serviceManagementRoute = createRoute({
   beforeLoad: () => checkPermission("/service-management"),
   component: ServiceManagementPage
 });
+const blogsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/blogs",
+  beforeLoad: () => checkPermission("/blogs"),
+  component: BlogsPage
+});
+const galleryRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/gallery",
+  beforeLoad: () => checkPermission("/gallery"),
+  component: GalleryPage
+});
 const reviewsAndShortsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/reviews-shorts",
@@ -68991,6 +69278,8 @@ const routeTree = rootRoute.addChildren([
     patientsRoute,
     appointmentsRoute,
     serviceManagementRoute,
+    blogsRoute,
+    galleryRoute,
     reviewsAndShortsRoute,
     contentRoute,
     enquiriesRoute,
