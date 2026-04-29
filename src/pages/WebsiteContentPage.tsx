@@ -8,6 +8,12 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BadgeCheck,
+  Eye,
   ImageIcon,
   LayoutTemplate,
   Save,
@@ -341,6 +348,7 @@ function HeroPreview({ form }: { form: HeroFormState }) {
 export default function WebsiteContentPage() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<HeroFormState>(EMPTY_HERO_FORM);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const { data: contentItem, isLoading } = useQuery<ContentItem | null, Error>({
     queryKey: ["content", CONTENT_MODEL_KEY],
@@ -424,303 +432,316 @@ export default function WebsiteContentPage() {
         title="Website Content"
         description="Manage reusable static website sections through the generic content API."
         action={
-          <Button
-            onClick={handleSave}
-            disabled={saveMutation.isPending || isLoading}
-            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto"
-          >
-            <Save size={15} />
-            {saveMutation.isPending ? "Saving..." : "Save Hero Section"}
-          </Button>
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPreviewOpen(true)}
+              disabled={isLoading}
+              className="rounded-xl gap-2 shadow-sm w-full sm:w-auto"
+            >
+              <Eye size={15} />
+              Preview
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saveMutation.isPending || isLoading}
+              className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto"
+            >
+              <Save size={15} />
+              {saveMutation.isPending ? "Saving..." : "Save Hero Section"}
+            </Button>
+          </>
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-6">
-          <Card className="rounded-3xl border-slate-100 shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#1E293B]">
-                <LayoutTemplate size={18} />
-                Home Hero Section
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="rounded-full border-slate-200">
-                  modelKey: {CONTENT_MODEL_KEY}
-                </Badge>
-                <Badge variant="outline" className="rounded-full border-slate-200">
-                  {featureCount} feature points
-                </Badge>
+      <div className="space-y-6">
+        <Card className="rounded-3xl border-slate-100 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-[#1E293B]">
+              <LayoutTemplate size={18} />
+              Home Hero Section
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="rounded-full border-slate-200">
+                modelKey: {CONTENT_MODEL_KEY}
+              </Badge>
+              <Badge variant="outline" className="rounded-full border-slate-200">
+                {featureCount} feature points
+              </Badge>
+            </div>
+
+            {isLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-10 w-full rounded-xl" />
+                <Skeleton className="h-28 w-full rounded-2xl" />
+                <Skeleton className="h-48 w-full rounded-2xl" />
               </div>
-
-              {isLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-10 w-full rounded-xl" />
-                  <Skeleton className="h-28 w-full rounded-2xl" />
-                  <Skeleton className="h-48 w-full rounded-2xl" />
+            ) : (
+              <>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Eyebrow Text</Label>
+                    <Input
+                      value={form.eyebrowText}
+                      onChange={(event) =>
+                        updateField("eyebrowText", event.target.value)
+                      }
+                      placeholder="Healing compassion for better care"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Section Status</Label>
+                    <div className="h-10 rounded-xl border border-slate-200 px-3 flex items-center justify-between">
+                      <span className="text-sm text-[#475569]">
+                        Show this hero on the website
+                      </span>
+                      <Switch
+                        checked={form.isActive}
+                        onCheckedChange={(checked) =>
+                          updateField("isActive", checked)
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Eyebrow Text</Label>
-                      <Input
-                        value={form.eyebrowText}
-                        onChange={(event) =>
-                          updateField("eyebrowText", event.target.value)
-                        }
-                        placeholder="Healing compassion for better care"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Section Status</Label>
-                      <div className="h-10 rounded-xl border border-slate-200 px-3 flex items-center justify-between">
-                        <span className="text-sm text-[#475569]">
-                          Show this hero on the website
-                        </span>
-                        <Switch
-                          checked={form.isActive}
-                          onCheckedChange={(checked) =>
-                            updateField("isActive", checked)
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <Label>Title Prefix</Label>
-                      <Input
-                        value={form.titlePrefix}
-                        onChange={(event) =>
-                          updateField("titlePrefix", event.target.value)
-                        }
-                        placeholder="Your Trusted Partner in"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Highlighted Title</Label>
-                      <Input
-                        value={form.titleHighlight}
-                        onChange={(event) =>
-                          updateField("titleHighlight", event.target.value)
-                        }
-                        placeholder="Women's Health &"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Title Suffix</Label>
-                      <Input
-                        value={form.titleSuffix}
-                        onChange={(event) =>
-                          updateField("titleSuffix", event.target.value)
-                        }
-                        placeholder="Aesthetic Care"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Description</Label>
-                      <Textarea
-                        value={form.description}
-                        onChange={(event) =>
-                          updateField("description", event.target.value)
-                        }
-                        placeholder="Intro copy shown below the hero heading"
-                        className="rounded-2xl min-h-[110px] resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Primary CTA Text</Label>
-                      <Input
-                        value={form.primaryCtaText}
-                        onChange={(event) =>
-                          updateField("primaryCtaText", event.target.value)
-                        }
-                        placeholder="Book Appointment"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Primary CTA Link</Label>
-                      <Input
-                        value={form.primaryCtaLink}
-                        onChange={(event) =>
-                          updateField("primaryCtaLink", event.target.value)
-                        }
-                        placeholder="/appointment"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Secondary CTA Text</Label>
-                      <Input
-                        value={form.secondaryCtaText}
-                        onChange={(event) =>
-                          updateField("secondaryCtaText", event.target.value)
-                        }
-                        placeholder="WhatsApp Us"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Secondary CTA Link</Label>
-                      <Input
-                        value={form.secondaryCtaLink}
-                        onChange={(event) =>
-                          updateField("secondaryCtaLink", event.target.value)
-                        }
-                        placeholder="https://wa.me/..."
-                        className="rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Support Card Title</Label>
-                      <Input
-                        value={form.supportTitle}
-                        onChange={(event) =>
-                          updateField("supportTitle", event.target.value)
-                        }
-                        placeholder="24/7"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Support Card Subtitle</Label>
-                      <Input
-                        value={form.supportSubtitle}
-                        onChange={(event) =>
-                          updateField("supportSubtitle", event.target.value)
-                        }
-                        placeholder="Emergency Care"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Success Rate Value</Label>
-                      <Input
-                        value={form.successRateValue}
-                        onChange={(event) =>
-                          updateField("successRateValue", event.target.value)
-                        }
-                        placeholder="99%"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Success Rate Label</Label>
-                      <Input
-                        value={form.successRateLabel}
-                        onChange={(event) =>
-                          updateField("successRateLabel", event.target.value)
-                        }
-                        placeholder="Success Rate"
-                        className="rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div className="space-y-2">
-                      <Label>Feature Point 1</Label>
-                      <Input
-                        value={form.featurePointOne}
-                        onChange={(event) =>
-                          updateField("featurePointOne", event.target.value)
-                        }
-                        placeholder="Safe & Hygienic"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Feature Point 2</Label>
-                      <Input
-                        value={form.featurePointTwo}
-                        onChange={(event) =>
-                          updateField("featurePointTwo", event.target.value)
-                        }
-                        placeholder="20+ Years Expert"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Feature Point 3</Label>
-                      <Input
-                        value={form.featurePointThree}
-                        onChange={(event) =>
-                          updateField("featurePointThree", event.target.value)
-                        }
-                        placeholder="10,000+ Happy Patients"
-                        className="rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <ImageUploadField
-                      id="hero-background-image"
-                      label="Background Image"
-                      hint="Used behind the hero copy."
-                      value={form.backgroundImage}
-                      onPick={(file) => updateField("backgroundImage", file)}
-                    />
-                    <ImageUploadField
-                      id="hero-primary-image"
-                      label="Primary Doctor Image"
-                      hint="Main portrait shown in the hero."
-                      value={form.primaryImage}
-                      onPick={(file) => updateField("primaryImage", file)}
-                    />
-                    <ImageUploadField
-                      id="hero-secondary-image"
-                      label="Secondary Doctor Image"
-                      hint="Smaller supporting portrait card."
-                      value={form.secondaryImage}
-                      onPick={(file) => updateField("secondaryImage", file)}
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <Label>Title Prefix</Label>
+                    <Input
+                      value={form.titlePrefix}
+                      onChange={(event) =>
+                        updateField("titlePrefix", event.target.value)
+                      }
+                      placeholder="Your Trusted Partner in"
+                      className="rounded-xl"
                     />
                   </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                  <div className="space-y-2">
+                    <Label>Highlighted Title</Label>
+                    <Input
+                      value={form.titleHighlight}
+                      onChange={(event) =>
+                        updateField("titleHighlight", event.target.value)
+                      }
+                      placeholder="Women's Health &"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Title Suffix</Label>
+                    <Input
+                      value={form.titleSuffix}
+                      onChange={(event) =>
+                        updateField("titleSuffix", event.target.value)
+                      }
+                      placeholder="Aesthetic Care"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      value={form.description}
+                      onChange={(event) =>
+                        updateField("description", event.target.value)
+                      }
+                      placeholder="Intro copy shown below the hero heading"
+                      className="rounded-2xl min-h-[110px] resize-none"
+                    />
+                  </div>
+                </div>
 
-        <div className="space-y-6">
-          {isLoading ? (
-            <Skeleton className="h-[620px] w-full rounded-3xl" />
-          ) : (
-            <HeroPreview form={form} />
-          )}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Primary CTA Text</Label>
+                    <Input
+                      value={form.primaryCtaText}
+                      onChange={(event) =>
+                        updateField("primaryCtaText", event.target.value)
+                      }
+                      placeholder="Book Appointment"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Primary CTA Link</Label>
+                    <Input
+                      value={form.primaryCtaLink}
+                      onChange={(event) =>
+                        updateField("primaryCtaLink", event.target.value)
+                      }
+                      placeholder="/appointment"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Secondary CTA Text</Label>
+                    <Input
+                      value={form.secondaryCtaText}
+                      onChange={(event) =>
+                        updateField("secondaryCtaText", event.target.value)
+                      }
+                      placeholder="WhatsApp Us"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Secondary CTA Link</Label>
+                    <Input
+                      value={form.secondaryCtaLink}
+                      onChange={(event) =>
+                        updateField("secondaryCtaLink", event.target.value)
+                      }
+                      placeholder="https://wa.me/..."
+                      className="rounded-xl"
+                    />
+                  </div>
+                </div>
 
-          <Card className="rounded-3xl border-slate-100 shadow-sm">
-            <CardContent className="p-5 text-sm text-[#64748B] space-y-2">
-              <p className="font-semibold text-[#1E293B]">
-                Reusable content API
-              </p>
-              <p>
-                This page saves through the generic `content` API using the
-                `modelKey` <strong>{CONTENT_MODEL_KEY}</strong>.
-              </p>
-              <p>
-                The same API can be reused later for static sections like
-                `why_choose_us`, `home_cta`, or any other page block without
-                creating a new backend model each time.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Support Card Title</Label>
+                    <Input
+                      value={form.supportTitle}
+                      onChange={(event) =>
+                        updateField("supportTitle", event.target.value)
+                      }
+                      placeholder="24/7"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Support Card Subtitle</Label>
+                    <Input
+                      value={form.supportSubtitle}
+                      onChange={(event) =>
+                        updateField("supportSubtitle", event.target.value)
+                      }
+                      placeholder="Emergency Care"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Success Rate Value</Label>
+                    <Input
+                      value={form.successRateValue}
+                      onChange={(event) =>
+                        updateField("successRateValue", event.target.value)
+                      }
+                      placeholder="99%"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Success Rate Label</Label>
+                    <Input
+                      value={form.successRateLabel}
+                      onChange={(event) =>
+                        updateField("successRateLabel", event.target.value)
+                      }
+                      placeholder="Success Rate"
+                      className="rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label>Feature Point 1</Label>
+                    <Input
+                      value={form.featurePointOne}
+                      onChange={(event) =>
+                        updateField("featurePointOne", event.target.value)
+                      }
+                      placeholder="Safe & Hygienic"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Feature Point 2</Label>
+                    <Input
+                      value={form.featurePointTwo}
+                      onChange={(event) =>
+                        updateField("featurePointTwo", event.target.value)
+                      }
+                      placeholder="20+ Years Expert"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Feature Point 3</Label>
+                    <Input
+                      value={form.featurePointThree}
+                      onChange={(event) =>
+                        updateField("featurePointThree", event.target.value)
+                      }
+                      placeholder="10,000+ Happy Patients"
+                      className="rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  <ImageUploadField
+                    id="hero-background-image"
+                    label="Background Image"
+                    hint="Used behind the hero copy."
+                    value={form.backgroundImage}
+                    onPick={(file) => updateField("backgroundImage", file)}
+                  />
+                  <ImageUploadField
+                    id="hero-primary-image"
+                    label="Primary Doctor Image"
+                    hint="Main portrait shown in the hero."
+                    value={form.primaryImage}
+                    onPick={(file) => updateField("primaryImage", file)}
+                  />
+                  <ImageUploadField
+                    id="hero-secondary-image"
+                    label="Secondary Doctor Image"
+                    hint="Smaller supporting portrait card."
+                    value={form.secondaryImage}
+                    onPick={(file) => updateField("secondaryImage", file)}
+                  />
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-3xl border-slate-100 shadow-sm">
+          <CardContent className="p-5 text-sm text-[#64748B] space-y-2">
+            <p className="font-semibold text-[#1E293B]">
+              Reusable content API
+            </p>
+            <p>
+              This page saves through the generic `content` API using the
+              `modelKey` <strong>{CONTENT_MODEL_KEY}</strong>.
+            </p>
+            <p>
+              The same API can be reused later for static sections like
+              `why_choose_us`, `home_cta`, or any other page block without
+              creating a new backend model each time.
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-h-[95vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-6xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-slate-900">
+              Hero Preview
+            </DialogTitle>
+          </DialogHeader>
+          <HeroPreview form={form} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

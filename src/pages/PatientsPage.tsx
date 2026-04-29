@@ -420,6 +420,7 @@ export default function PatientsPage() {
     onSuccess: () => {
       toast.success("Patient discharged successfully.");
       queryClient.invalidateQueries({ queryKey: ["patients"] });
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
       setPatientToDischarge(null);
     },
     onError: (mutationError: Error) => toast.error(mutationError.message),
@@ -499,7 +500,7 @@ export default function PatientsPage() {
     <div data-ocid="patients.page">
       <PageHeader
         title="Patient Management"
-        description="Confirmed and completed appointments are added here automatically so staff can maintain records and discharge patients."
+        description="Approved appointments add patients automatically. Completed appointments are treated as discharged, and manual discharge keeps the appointment flow in sync."
       />
 
       <div className="grid gap-3 mb-5 md:grid-cols-3" data-ocid="patients.summary">

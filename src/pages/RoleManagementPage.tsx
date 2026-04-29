@@ -328,7 +328,7 @@ function AddStaffDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="w-[99vw] max-w-none max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-[#1E293B]">
             Add Staff Member
@@ -530,7 +530,7 @@ function EditStaffDialog({
 
   return (
     <Dialog open={!!staff} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="w-[99vw] max-w-none max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-[#1E293B]">
             Manage Staff Access

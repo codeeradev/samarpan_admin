@@ -201,6 +201,7 @@ export default function AppointmentsPage() {
       updateAppointmentApi(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
       toast.success("Appointment updated successfully");
     },
     onError: () => {
@@ -426,7 +427,7 @@ export default function AppointmentsPage() {
     <div data-ocid="appointments.page">
       <PageHeader
         title="Appointments"
-        description={`Manage all patient appointments · ${appointments.length} total`}
+        description={`Approving an appointment adds the patient record. Completing an appointment reflects discharge status automatically.`}
       />
 
       {/* Filter bar */}

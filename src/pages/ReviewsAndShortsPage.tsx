@@ -15,13 +15,13 @@ import {
   updateShortApi,
 } from "@/apiCalls/shorts";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { DataTable, type Column } from "@/components/admin/DataTable";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -47,7 +47,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ExternalLink,
+  Eye,
   MessageSquare,
   Pencil,
   Play,
@@ -57,7 +57,7 @@ import {
   Trash2,
   Video,
 } from "lucide-react";
-import { type ElementType, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 type ContentTab = "reviews" | "shorts";
@@ -131,15 +131,6 @@ function isValidHttpUrl(value: string) {
   } catch {
     return false;
   }
-}
-
-function getAverageRating(reviews: ReviewItem[]) {
-  if (!reviews.length) {
-    return "0.0";
-  }
-
-  const total = reviews.reduce((sum, item) => sum + Number(item.rating ?? 5), 0);
-  return (total / reviews.length).toFixed(1);
 }
 
 function extractYoutubeId(value: string) {
@@ -271,37 +262,6 @@ function buildShortPayload(form: ShortFormData): ShortPayload {
     sortOrder: Number(form.sortOrder),
     isActive: form.isActive,
   };
-}
-
-function MetricCard({
-  label,
-  value,
-  hint,
-  icon: Icon,
-  accentClass,
-}: {
-  label: string;
-  value: string;
-  hint: string;
-  icon: ElementType;
-  accentClass: string;
-}) {
-  return (
-    <Card className="border-slate-200 shadow-sm">
-      <CardContent className="flex items-center gap-4 p-5">
-        <div
-          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm ${accentClass}`}
-        >
-          <Icon size={20} />
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-slate-500">{label}</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
-          <p className="mt-1 text-xs text-slate-500">{hint}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
 }
 
 function RatingStars({
@@ -461,6 +421,9 @@ export default function ReviewsAndShortsPage() {
   const [reviewDeleteTarget, setReviewDeleteTarget] = useState<ReviewItem | null>(
     null,
   );
+  const [reviewPreviewTarget, setReviewPreviewTarget] = useState<ReviewItem | null>(
+    null,
+  );
   const [reviewForm, setReviewForm] = useState<ReviewFormData>(emptyReviewForm);
   const [reviewErrors, setReviewErrors] = useState<ReviewFormErrors>({});
 
@@ -468,6 +431,9 @@ export default function ReviewsAndShortsPage() {
   const [shortDialogMode, setShortDialogMode] = useState<FormMode>("add");
   const [selectedShort, setSelectedShort] = useState<ShortItem | null>(null);
   const [shortDeleteTarget, setShortDeleteTarget] = useState<ShortItem | null>(
+    null,
+  );
+  const [shortPreviewTarget, setShortPreviewTarget] = useState<ShortItem | null>(
     null,
   );
   const [shortForm, setShortForm] = useState<ShortFormData>(emptyShortForm);
@@ -558,14 +524,6 @@ export default function ReviewsAndShortsPage() {
         .some((value) => String(value).toLowerCase().includes(query)),
     );
   }, [shortSearch, shorts]);
-
-  const featuredReview = filteredReviews[0] ?? reviews[0];
-  const featuredShort = filteredShorts[0] ?? shorts[0];
-
-  const reviewCount = reviews.length;
-  const activeReviewCount = reviews.filter((item) => item.isActive !== false).length;
-  const shortCount = shorts.length;
-  const activeShortCount = shorts.filter((item) => item.isActive !== false).length;
 
   function setReviewField<K extends keyof ReviewFormData>(
     key: K,
@@ -765,11 +723,204 @@ export default function ReviewsAndShortsPage() {
     }
   }
 
+  const reviewColumns: Column<ReviewItem>[] = [
+    {
+      key: "name",
+      header: "Name",
+      render: (review) => (
+        <div className="min-w-0">
+          <p className="font-medium text-[#1E293B] truncate">{review.name}</p>
+          <p className="text-xs text-slate-500 truncate">
+            {review.location || "No location"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: "review",
+      header: "Review",
+      render: (review) => (
+        <p className="max-w-md truncate text-sm text-slate-600">{review.review}</p>
+      ),
+    },
+    {
+      key: "rating",
+      header: "Rating",
+      render: (review) => (
+        <div className="flex items-center gap-2">
+          <RatingStars rating={Number(review.rating ?? 5)} size={12} />
+          <span className="text-xs text-slate-500">{Number(review.rating ?? 5)}</span>
+        </div>
+      ),
+    },
+    {
+      key: "sortOrder",
+      header: "Order",
+      render: (review) => (
+        <span className="text-sm text-slate-600">#{review.sortOrder ?? 0}</span>
+      ),
+    },
+    {
+      key: "isActive",
+      header: "Status",
+      render: (review) => (
+        <div className="flex items-center gap-3">
+          <Badge
+            className={
+              review.isActive === false
+                ? "bg-slate-100 text-slate-600"
+                : "bg-emerald-50 text-emerald-700"
+            }
+          >
+            {review.isActive === false ? "Hidden" : "Visible"}
+          </Badge>
+          <Switch
+            checked={review.isActive !== false}
+            onCheckedChange={(checked) =>
+              handleReviewVisibilityChange(review, checked)
+            }
+            disabled={updateReviewMutation.isPending}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (review) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="rounded-lg border-slate-200"
+            onClick={() => setReviewPreviewTarget(review)}
+          >
+            <Eye size={14} />
+            Preview
+          </Button>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
+            onClick={() => openEditReview(review)}
+          >
+            <Pencil size={15} />
+          </Button>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
+            onClick={() => setReviewDeleteTarget(review)}
+          >
+            <Trash2 size={15} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const shortColumns: Column<ShortItem>[] = [
+    {
+      key: "title",
+      header: "Title",
+      render: (short) => (
+        <div className="min-w-0">
+          <p className="font-medium text-[#1E293B] truncate">{short.title}</p>
+          <p className="text-xs text-slate-500 truncate">{getShortHost(short.shortUrl)}</p>
+        </div>
+      ),
+    },
+    {
+      key: "shortUrl",
+      header: "Link",
+      render: (short) => (
+        <a
+          href={short.shortUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="block max-w-xs truncate text-sm text-primary hover:underline"
+        >
+          {short.shortUrl}
+        </a>
+      ),
+    },
+    {
+      key: "sortOrder",
+      header: "Order",
+      render: (short) => (
+        <span className="text-sm text-slate-600">#{short.sortOrder ?? 0}</span>
+      ),
+    },
+    {
+      key: "isActive",
+      header: "Status",
+      render: (short) => (
+        <div className="flex items-center gap-3">
+          <Badge
+            className={
+              short.isActive === false
+                ? "bg-slate-100 text-slate-600"
+                : "bg-emerald-50 text-emerald-700"
+            }
+          >
+            {short.isActive === false ? "Hidden" : "Live"}
+          </Badge>
+          <Switch
+            checked={short.isActive !== false}
+            onCheckedChange={(checked) => handleShortVisibilityChange(short, checked)}
+            disabled={updateShortMutation.isPending}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (short) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="rounded-lg border-slate-200"
+            onClick={() => setShortPreviewTarget(short)}
+          >
+            <Eye size={14} />
+            Preview
+          </Button>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
+            onClick={() => openEditShort(short)}
+          >
+            <Pencil size={15} />
+          </Button>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
+            onClick={() => setShortDeleteTarget(short)}
+          >
+            <Trash2 size={15} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6" data-ocid="reviews_shorts.page">
       <PageHeader
         title="Reviews & Shorts"
-        description="Super Admin can manage testimonial cards and video shorts from one clean publishing workspace."
+        description="Manage reviews and shorts from one place."
         action={
           <>
             <Button
@@ -794,63 +945,6 @@ export default function ReviewsAndShortsPage() {
           </>
         }
       />
-
-      <div className="grid gap-4 xl:grid-cols-[1.3fr_repeat(3,minmax(0,1fr))]">
-        <Card className="overflow-hidden border-0 bg-gradient-to-br from-slate-900 via-slate-800 to-amber-800 text-white shadow-[0_30px_90px_-45px_rgba(15,23,42,0.85)] xl:col-span-1">
-          <CardContent className="relative p-6">
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute -right-16 -top-12 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
-              <div className="absolute bottom-0 left-0 h-32 w-32 rounded-full bg-amber-300/20 blur-3xl" />
-            </div>
-            <div className="relative">
-              <Badge className="bg-white/10 text-white backdrop-blur-sm">
-                Publishing Console
-              </Badge>
-              <h2 className="mt-4 text-2xl font-bold leading-tight">
-                Shape the patient trust section without leaving the admin panel.
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/75">
-                Add polished patient testimonials, control their display order,
-                and keep your shorts library fresh with fast preview-first
-                editing.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-2 text-xs text-white/80">
-                <Badge className="bg-white/10 text-white backdrop-blur-sm">
-                  Admin only
-                </Badge>
-                <Badge className="bg-white/10 text-white backdrop-blur-sm">
-                  Live visibility toggle
-                </Badge>
-                <Badge className="bg-white/10 text-white backdrop-blur-sm">
-                  Website-ready preview
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <MetricCard
-          label="Total Reviews"
-          value={String(reviewCount)}
-          hint={`${activeReviewCount} currently visible on site`}
-          icon={MessageSquare}
-          accentClass="bg-gradient-to-br from-amber-500 to-yellow-500"
-        />
-        <MetricCard
-          label="Average Rating"
-          value={getAverageRating(reviews)}
-          hint="Calculated from all stored testimonials"
-          icon={Star}
-          accentClass="bg-gradient-to-br from-amber-500 to-orange-500"
-        />
-        <MetricCard
-          label="Live Shorts"
-          value={String(activeShortCount)}
-          hint={`${shortCount} total videos in the library`}
-          icon={Video}
-          accentClass="bg-gradient-to-br from-rose-500 to-orange-500"
-        />
-      </div>
 
       <Tabs
         value={activeTab}
@@ -887,9 +981,9 @@ export default function ReviewsAndShortsPage() {
                     <CardTitle className="text-lg text-slate-900">
                       Review Library
                     </CardTitle>
-                    <CardDescription className="mt-1 text-sm text-slate-500">
-                      Search, reorder, edit, and hide testimonials in seconds.
-                    </CardDescription>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Search, edit, preview, and hide reviews.
+                    </p>
                   </div>
                   <div className="relative w-full lg:w-80">
                     <Search
@@ -909,28 +1003,7 @@ export default function ReviewsAndShortsPage() {
 
               <CardContent className="p-5">
                 {isReviewsLoading ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((item) => (
-                      <div
-                        key={`review-skeleton-${item}`}
-                        className="rounded-2xl border border-slate-200 p-5"
-                      >
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <Skeleton className="h-11 w-11 rounded-full" />
-                            <div className="space-y-2">
-                              <Skeleton className="h-4 w-32" />
-                              <Skeleton className="h-3 w-20" />
-                            </div>
-                          </div>
-                          <Skeleton className="h-8 w-20 rounded-full" />
-                        </div>
-                        <Skeleton className="mt-4 h-4 w-full" />
-                        <Skeleton className="mt-2 h-4 w-11/12" />
-                        <Skeleton className="mt-2 h-4 w-9/12" />
-                      </div>
-                    ))}
-                  </div>
+                  <Skeleton className="h-56 w-full rounded-2xl" />
                 ) : isReviewsError ? (
                   <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600">
                     {reviewsError?.message || "Unable to load reviews."}
@@ -945,149 +1018,16 @@ export default function ReviewsAndShortsPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {filteredReviews.map((review, index) => (
-                      <div
-                        key={review._id}
-                        className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-amber-200 hover:shadow-sm"
-                        data-ocid={`reviews_shorts.review_item.${index + 1}`}
-                      >
-                        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                          <div className="flex items-start gap-3">
-                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 text-sm font-semibold text-white">
-                              {getInitials(review.name)}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {review.name}
-                                </p>
-                                <Badge className="bg-slate-100 text-slate-700">
-                                  #{review.sortOrder ?? 0}
-                                </Badge>
-                                <Badge
-                                  className={
-                                    review.isActive === false
-                                      ? "bg-slate-100 text-slate-600"
-                                      : "bg-emerald-50 text-emerald-700"
-                                  }
-                                >
-                                  {review.isActive === false ? "Hidden" : "Visible"}
-                                </Badge>
-                              </div>
-                              <div className="mt-2 flex flex-wrap items-center gap-2">
-                                <RatingStars rating={Number(review.rating ?? 5)} />
-                                {review.location ? (
-                                  <Badge
-                                    variant="outline"
-                                    className="border-slate-200 text-slate-600"
-                                  >
-                                    {review.location}
-                                  </Badge>
-                                ) : null}
-                                {review.treatment ? (
-                                  <Badge
-                                    variant="outline"
-                                    className="border-slate-200 text-slate-600"
-                                  >
-                                    {review.treatment}
-                                  </Badge>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2 self-start">
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="ghost"
-                              className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
-                              onClick={() => openEditReview(review)}
-                              data-ocid={`reviews_shorts.review_edit_button.${index + 1}`}
-                            >
-                              <Pencil size={15} />
-                            </Button>
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="ghost"
-                              className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
-                              onClick={() => setReviewDeleteTarget(review)}
-                              data-ocid={`reviews_shorts.review_delete_button.${index + 1}`}
-                            >
-                              <Trash2 size={15} />
-                            </Button>
-                          </div>
-                        </div>
-
-                        <p className="mt-4 text-sm leading-7 text-slate-600">
-                          {review.review}
-                        </p>
-
-                        <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-xs text-slate-500">
-                            Use sort order to control how testimonials appear on
-                            the website.
-                          </p>
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs font-medium text-slate-500">
-                              Live on website
-                            </span>
-                            <Switch
-                              checked={review.isActive !== false}
-                              onCheckedChange={(checked) =>
-                                handleReviewVisibilityChange(review, checked)
-                              }
-                              disabled={updateReviewMutation.isPending}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <DataTable
+                    columns={reviewColumns}
+                    data={filteredReviews}
+                    rowKey={(review) => review._id}
+                    emptyText="No reviews found."
+                    data-ocid="reviews_shorts.reviews_table"
+                  />
                 )}
               </CardContent>
             </Card>
-
-            {/* <div className="space-y-6 xl:sticky xl:top-24">
-              <Card className="border-slate-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg text-slate-900">
-                    Featured Preview
-                  </CardTitle>
-                  <CardDescription>
-                    A quick visual check for how the highlighted testimonial will
-                    feel on the homepage.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ReviewPreviewCard review={featuredReview} />
-                </CardContent>
-              </Card>
-
-              <Card className="border-slate-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg text-slate-900">
-                    Publishing Tips
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm leading-6 text-slate-600">
-                  <div className="rounded-2xl bg-amber-50 p-4">
-                    Keep reviews concise, human, and specific so cards stay
-                    readable in the website carousel.
-                  </div>
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    Use sort order `0`, `1`, `2` to curate the first few
-                    testimonials visitors see.
-                  </div>
-                  <div className="rounded-2xl bg-emerald-50 p-4">
-                    Hide older reviews instead of deleting them when you may want
-                    to reuse them later.
-                  </div>
-                </CardContent>
-              </Card>
-            </div> */}
           </div>
         </TabsContent>
 
@@ -1100,10 +1040,9 @@ export default function ReviewsAndShortsPage() {
                     <CardTitle className="text-lg text-slate-900">
                       Shorts Library
                     </CardTitle>
-                    <CardDescription className="mt-1 text-sm text-slate-500">
-                      Manage video snippets with thumbnail preview and instant
-                      publish controls.
-                    </CardDescription>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Search, edit, preview, and publish shorts.
+                    </p>
                   </div>
                   <div className="relative w-full lg:w-80">
                     <Search
@@ -1123,18 +1062,7 @@ export default function ReviewsAndShortsPage() {
 
               <CardContent className="p-5">
                 {isShortsLoading ? (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {[1, 2, 3, 4].map((item) => (
-                      <div
-                        key={`short-skeleton-${item}`}
-                        className="rounded-3xl border border-slate-200 p-4"
-                      >
-                        <Skeleton className="aspect-[9/16] w-full rounded-2xl" />
-                        <Skeleton className="mt-4 h-4 w-3/4" />
-                        <Skeleton className="mt-2 h-4 w-1/2" />
-                      </div>
-                    ))}
-                  </div>
+                  <Skeleton className="h-56 w-full rounded-2xl" />
                 ) : isShortsError ? (
                   <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600">
                     {shortsError?.message || "Unable to load shorts."}
@@ -1150,454 +1078,347 @@ export default function ReviewsAndShortsPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {filteredShorts.map((short, index) => {
-                      const thumbnail = getShortThumbnail(short);
-
-                      return (
-                        <div
-                          key={short._id}
-                          className="overflow-hidden rounded-3xl border border-slate-200 bg-white transition hover:border-rose-200 hover:shadow-sm"
-                          data-ocid={`reviews_shorts.short_item.${index + 1}`}
-                        >
-                          <div className="relative h-[340px] bg-slate-950">
-                            {thumbnail ? (
-                              <img
-                                src={thumbnail}
-                                alt={short.title}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-500 via-orange-500 to-amber-400" />
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-slate-950/15" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg">
-                                <Play className="ml-1 text-rose-500" size={24} />
-                              </div>
-                            </div>
-                            <div className="absolute right-4 top-4 flex gap-2">
-                              <Badge className="bg-white/15 text-white backdrop-blur-sm">
-                                #{short.sortOrder ?? 0}
-                              </Badge>
-                              <Badge className="bg-white/15 text-white backdrop-blur-sm">
-                                {short.isActive === false ? "Hidden" : "Live"}
-                              </Badge>
-                            </div>
-                          </div>
-
-                          <div className="space-y-4 p-4">
-                            <div>
-                              <p className="line-clamp-2 text-sm font-semibold text-slate-900">
-                                {short.title}
-                              </p>
-                              <p className="mt-1 text-xs text-slate-500">
-                                {getShortHost(short.shortUrl)}
-                              </p>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex items-center gap-3">
-                                <span className="text-xs font-medium text-slate-500">
-                                  Live
-                                </span>
-                                <Switch
-                                  checked={short.isActive !== false}
-                                  onCheckedChange={(checked) =>
-                                    handleShortVisibilityChange(short, checked)
-                                  }
-                                  disabled={updateShortMutation.isPending}
-                                />
-                              </div>
-
-                              <div className="flex items-center gap-1">
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="ghost"
-                                  className="rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-                                  onClick={() =>
-                                    window.open(
-                                      short.shortUrl,
-                                      "_blank",
-                                      "noopener,noreferrer",
-                                    )
-                                  }
-                                  data-ocid={`reviews_shorts.short_open_button.${index + 1}`}
-                                >
-                                  <ExternalLink size={15} />
-                                </Button>
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="ghost"
-                                  className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
-                                  onClick={() => openEditShort(short)}
-                                  data-ocid={`reviews_shorts.short_edit_button.${index + 1}`}
-                                >
-                                  <Pencil size={15} />
-                                </Button>
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="ghost"
-                                  className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
-                                  onClick={() => setShortDeleteTarget(short)}
-                                  data-ocid={`reviews_shorts.short_delete_button.${index + 1}`}
-                                >
-                                  <Trash2 size={15} />
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <DataTable
+                    columns={shortColumns}
+                    data={filteredShorts}
+                    rowKey={(short) => short._id}
+                    emptyText="No shorts found."
+                    data-ocid="reviews_shorts.shorts_table"
+                  />
                 )}
               </CardContent>
             </Card>
-
-            {/* <div className="space-y-6 xl:sticky xl:top-24">
-              <Card className="border-slate-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg text-slate-900">
-                    Featured Preview
-                  </CardTitle>
-                  <CardDescription>
-                    A vertical card preview to sanity-check title, thumbnail, and
-                    publish state.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ShortPreviewCard short={featuredShort} />
-                </CardContent>
-              </Card>
-
-              <Card className="border-slate-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg text-slate-900">
-                    Workflow Notes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm leading-6 text-slate-600">
-                  <div className="rounded-2xl bg-rose-50 p-4">
-                    Paste a YouTube Shorts URL and let the panel auto-generate a
-                    thumbnail when possible.
-                  </div>
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    Keep titles short so mobile cards stay crisp and readable.
-                  </div>
-                  <div className="rounded-2xl bg-amber-50 p-4">
-                    Use the visibility toggle to stage videos before they go live
-                    on the website.
-                  </div>
-                </CardContent>
-              </Card>
-            </div> */}
           </div>
         </TabsContent>
       </Tabs>
 
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-4xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl text-slate-900">
               {reviewDialogMode === "edit" ? "Edit Review" : "Add Review"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-            <div className="space-y-5">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="review-name">Reviewer Name</Label>
-                  <Input
-                    id="review-name"
-                    value={reviewForm.name}
-                    onChange={(event) =>
-                      setReviewField("name", event.target.value)
-                    }
-                    placeholder="Rajesh Kumar"
-                    className="rounded-xl"
-                  />
-                  {reviewErrors.name ? (
-                    <p className="text-xs text-red-500">{reviewErrors.name}</p>
-                  ) : null}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="review-location">Location</Label>
-                  <Input
-                    id="review-location"
-                    value={reviewForm.location}
-                    onChange={(event) =>
-                      setReviewField("location", event.target.value)
-                    }
-                    placeholder="Bhiwani"
-                    className="rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="review-treatment">Treatment</Label>
-                  <Input
-                    id="review-treatment"
-                    value={reviewForm.treatment}
-                    onChange={(event) =>
-                      setReviewField("treatment", event.target.value)
-                    }
-                    placeholder="Cosmetic Surgery"
-                    className="rounded-xl"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="review-rating">Rating</Label>
-                  <Select
-                    value={reviewForm.rating}
-                    onValueChange={(value) => setReviewField("rating", value)}
-                  >
-                    <SelectTrigger id="review-rating" className="rounded-xl">
-                      <SelectValue placeholder="Select rating" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5">5 Stars</SelectItem>
-                      <SelectItem value="4">4 Stars</SelectItem>
-                      <SelectItem value="3">3 Stars</SelectItem>
-                      <SelectItem value="2">2 Stars</SelectItem>
-                      <SelectItem value="1">1 Star</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {reviewErrors.rating ? (
-                    <p className="text-xs text-red-500">{reviewErrors.rating}</p>
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
-                <div className="space-y-2">
-                  <Label htmlFor="review-sort-order">Sort Order</Label>
-                  <Input
-                    id="review-sort-order"
-                    type="number"
-                    min="0"
-                    value={reviewForm.sortOrder}
-                    onChange={(event) =>
-                      setReviewField("sortOrder", event.target.value)
-                    }
-                    className="rounded-xl"
-                  />
-                  {reviewErrors.sortOrder ? (
-                    <p className="text-xs text-red-500">
-                      {reviewErrors.sortOrder}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      Visible on website
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Turn this off to keep the review saved but hidden.
-                    </p>
-                  </div>
-                  <Switch
-                    checked={reviewForm.isActive}
-                    onCheckedChange={(checked) =>
-                      setReviewField("isActive", checked)
-                    }
-                  />
-                </div>
+          <div className="space-y-5">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="review-name">Reviewer Name</Label>
+                <Input
+                  id="review-name"
+                  value={reviewForm.name}
+                  onChange={(event) =>
+                    setReviewField("name", event.target.value)
+                  }
+                  placeholder="Rajesh Kumar"
+                  className="rounded-xl"
+                />
+                {reviewErrors.name ? (
+                  <p className="text-xs text-red-500">{reviewErrors.name}</p>
+                ) : null}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="review-copy">Review Text</Label>
-                <Textarea
-                  id="review-copy"
-                  rows={6}
-                  value={reviewForm.review}
+                <Label htmlFor="review-location">Location</Label>
+                <Input
+                  id="review-location"
+                  value={reviewForm.location}
                   onChange={(event) =>
-                    setReviewField("review", event.target.value)
+                    setReviewField("location", event.target.value)
                   }
-                  placeholder="Patient experience goes here..."
-                  className="min-h-[180px] rounded-2xl"
+                  placeholder="Bhiwani"
+                  className="rounded-xl"
                 />
-                {reviewErrors.review ? (
-                  <p className="text-xs text-red-500">{reviewErrors.review}</p>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="review-treatment">Treatment</Label>
+                <Input
+                  id="review-treatment"
+                  value={reviewForm.treatment}
+                  onChange={(event) =>
+                    setReviewField("treatment", event.target.value)
+                  }
+                  placeholder="Cosmetic Surgery"
+                  className="rounded-xl"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="review-rating">Rating</Label>
+                <Select
+                  value={reviewForm.rating}
+                  onValueChange={(value) => setReviewField("rating", value)}
+                >
+                  <SelectTrigger id="review-rating" className="rounded-xl">
+                    <SelectValue placeholder="Select rating" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5 Stars</SelectItem>
+                    <SelectItem value="4">4 Stars</SelectItem>
+                    <SelectItem value="3">3 Stars</SelectItem>
+                    <SelectItem value="2">2 Stars</SelectItem>
+                    <SelectItem value="1">1 Star</SelectItem>
+                  </SelectContent>
+                </Select>
+                {reviewErrors.rating ? (
+                  <p className="text-xs text-red-500">{reviewErrors.rating}</p>
                 ) : null}
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">
-                  Live Card Preview
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  This helps you tune copy length before saving.
-                </p>
+            <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
+              <div className="space-y-2">
+                <Label htmlFor="review-sort-order">Sort Order</Label>
+                <Input
+                  id="review-sort-order"
+                  type="number"
+                  min="0"
+                  value={reviewForm.sortOrder}
+                  onChange={(event) =>
+                    setReviewField("sortOrder", event.target.value)
+                  }
+                  className="rounded-xl"
+                />
+                {reviewErrors.sortOrder ? (
+                  <p className="text-xs text-red-500">
+                    {reviewErrors.sortOrder}
+                  </p>
+                ) : null}
               </div>
-              <ReviewPreviewCard review={buildReviewPayload(reviewForm)} />
+
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-slate-900">
+                    Visible on website
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Turn this off to keep the review saved but hidden.
+                  </p>
+                </div>
+                <Switch
+                  checked={reviewForm.isActive}
+                  onCheckedChange={(checked) =>
+                    setReviewField("isActive", checked)
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="review-copy">Review Text</Label>
+              <Textarea
+                id="review-copy"
+                rows={6}
+                value={reviewForm.review}
+                onChange={(event) =>
+                  setReviewField("review", event.target.value)
+                }
+                placeholder="Patient experience goes here..."
+                className="min-h-[180px] rounded-2xl"
+              />
+              {reviewErrors.review ? (
+                <p className="text-xs text-red-500">{reviewErrors.review}</p>
+              ) : null}
             </div>
           </div>
 
-          <DialogFooter className="mt-2 gap-2">
+          <DialogFooter className="mt-2 gap-2 sm:justify-between">
             <Button
               type="button"
               variant="outline"
               className="rounded-xl"
-              onClick={() => setReviewDialogOpen(false)}
+              onClick={() =>
+                setReviewPreviewTarget({
+                  _id: selectedReview?._id ?? "preview",
+                  ...buildReviewPayload(reviewForm),
+                })
+              }
             >
-              Cancel
+              <Eye size={14} />
+              Preview
             </Button>
-            <Button
-              type="button"
-              className="rounded-xl bg-amber-500 text-white hover:bg-amber-600"
-              onClick={handleSaveReview}
-              disabled={isReviewBusy}
-            >
-              {reviewDialogMode === "edit" ? "Save Changes" : "Add Review"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl"
+                onClick={() => setReviewDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="rounded-xl bg-amber-500 text-white hover:bg-amber-600"
+                onClick={handleSaveReview}
+                disabled={isReviewBusy}
+              >
+                {reviewDialogMode === "edit" ? "Save Changes" : "Add Review"}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={shortDialogOpen} onOpenChange={setShortDialogOpen}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-4xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl text-slate-900">
               {shortDialogMode === "edit" ? "Edit Short" : "Add Short"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="short-title">Short Title</Label>
-                <Input
-                  id="short-title"
-                  value={shortForm.title}
-                  onChange={(event) => setShortField("title", event.target.value)}
-                  placeholder="Best cosmetic surgeon in Hisar"
-                  className="rounded-xl"
-                />
-                {shortErrors.title ? (
-                  <p className="text-xs text-red-500">{shortErrors.title}</p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="short-url">Video URL</Label>
-                <Input
-                  id="short-url"
-                  value={shortForm.shortUrl}
-                  onChange={(event) =>
-                    setShortField("shortUrl", event.target.value)
-                  }
-                  placeholder="https://www.youtube.com/shorts/..."
-                  className="rounded-xl"
-                />
-                {shortErrors.shortUrl ? (
-                  <p className="text-xs text-red-500">{shortErrors.shortUrl}</p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="short-thumbnail">Thumbnail URL</Label>
-                <Input
-                  id="short-thumbnail"
-                  value={shortForm.thumbnail}
-                  onChange={(event) =>
-                    setShortField("thumbnail", event.target.value)
-                  }
-                  placeholder="Optional. Leave blank to auto-generate for YouTube."
-                  className="rounded-xl"
-                />
-                {shortErrors.thumbnail ? (
-                  <p className="text-xs text-red-500">{shortErrors.thumbnail}</p>
-                ) : (
-                  <p className="text-xs text-slate-500">
-                    Leave this empty for YouTube Shorts and the panel will try
-                    to use the video thumbnail automatically.
-                  </p>
-                )}
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
-                <div className="space-y-2">
-                  <Label htmlFor="short-sort-order">Sort Order</Label>
-                  <Input
-                    id="short-sort-order"
-                    type="number"
-                    min="0"
-                    value={shortForm.sortOrder}
-                    onChange={(event) =>
-                      setShortField("sortOrder", event.target.value)
-                    }
-                    className="rounded-xl"
-                  />
-                  {shortErrors.sortOrder ? (
-                    <p className="text-xs text-red-500">
-                      {shortErrors.sortOrder}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      Publish on website
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Keep it off if you want to prepare content first.
-                    </p>
-                  </div>
-                  <Switch
-                    checked={shortForm.isActive}
-                    onCheckedChange={(checked) =>
-                      setShortField("isActive", checked)
-                    }
-                  />
-                </div>
-              </div>
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="short-title">Short Title</Label>
+              <Input
+                id="short-title"
+                value={shortForm.title}
+                onChange={(event) => setShortField("title", event.target.value)}
+                placeholder="Best cosmetic surgeon in Hisar"
+                className="rounded-xl"
+              />
+              {shortErrors.title ? (
+                <p className="text-xs text-red-500">{shortErrors.title}</p>
+              ) : null}
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">
-                  Vertical Preview
+            <div className="space-y-2">
+              <Label htmlFor="short-url">Video URL</Label>
+              <Input
+                id="short-url"
+                value={shortForm.shortUrl}
+                onChange={(event) =>
+                  setShortField("shortUrl", event.target.value)
+                }
+                placeholder="https://www.youtube.com/shorts/..."
+                className="rounded-xl"
+              />
+              {shortErrors.shortUrl ? (
+                <p className="text-xs text-red-500">{shortErrors.shortUrl}</p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="short-thumbnail">Thumbnail URL</Label>
+              <Input
+                id="short-thumbnail"
+                value={shortForm.thumbnail}
+                onChange={(event) =>
+                  setShortField("thumbnail", event.target.value)
+                }
+                placeholder="Optional. Leave blank to auto-generate for YouTube."
+                className="rounded-xl"
+              />
+              {shortErrors.thumbnail ? (
+                <p className="text-xs text-red-500">{shortErrors.thumbnail}</p>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  Leave this empty for YouTube Shorts and the panel will try
+                  to use the video thumbnail automatically.
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  Perfect for quickly checking title length and thumbnail impact.
-                </p>
+              )}
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
+              <div className="space-y-2">
+                <Label htmlFor="short-sort-order">Sort Order</Label>
+                <Input
+                  id="short-sort-order"
+                  type="number"
+                  min="0"
+                  value={shortForm.sortOrder}
+                  onChange={(event) =>
+                    setShortField("sortOrder", event.target.value)
+                  }
+                  className="rounded-xl"
+                />
+                {shortErrors.sortOrder ? (
+                  <p className="text-xs text-red-500">
+                    {shortErrors.sortOrder}
+                  </p>
+                ) : null}
               </div>
-              <ShortPreviewCard short={buildShortPayload(shortForm)} />
+
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    Publish on website
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Keep it off if you want to prepare content first.
+                  </p>
+                </div>
+                <Switch
+                  checked={shortForm.isActive}
+                  onCheckedChange={(checked) =>
+                    setShortField("isActive", checked)
+                  }
+                />
+              </div>
             </div>
           </div>
 
-          <DialogFooter className="mt-2 gap-2">
+          <DialogFooter className="mt-2 gap-2 sm:justify-between">
             <Button
               type="button"
               variant="outline"
               className="rounded-xl"
-              onClick={() => setShortDialogOpen(false)}
+              onClick={() =>
+                setShortPreviewTarget({
+                  _id: selectedShort?._id ?? "preview",
+                  ...buildShortPayload(shortForm),
+                })
+              }
             >
-              Cancel
+              <Eye size={14} />
+              Preview
             </Button>
-            <Button
-              type="button"
-              className="rounded-xl bg-rose-500 text-white hover:bg-rose-600"
-              onClick={handleSaveShort}
-              disabled={isShortBusy}
-            >
-              {shortDialogMode === "edit" ? "Save Changes" : "Add Short"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl"
+                onClick={() => setShortDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="rounded-xl bg-rose-500 text-white hover:bg-rose-600"
+                onClick={handleSaveShort}
+                disabled={isShortBusy}
+              >
+                {shortDialogMode === "edit" ? "Save Changes" : "Add Short"}
+              </Button>
+            </div>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!reviewPreviewTarget}
+        onOpenChange={(open) => !open && setReviewPreviewTarget(null)}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-slate-900">Review Preview</DialogTitle>
+          </DialogHeader>
+          <ReviewPreviewCard review={reviewPreviewTarget ?? undefined} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!shortPreviewTarget}
+        onOpenChange={(open) => !open && setShortPreviewTarget(null)}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-slate-900">Short Preview</DialogTitle>
+          </DialogHeader>
+          <ShortPreviewCard short={shortPreviewTarget ?? undefined} />
         </DialogContent>
       </Dialog>
 

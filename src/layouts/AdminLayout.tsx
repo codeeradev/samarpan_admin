@@ -50,6 +50,18 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/dashboard",
   },
   {
+    label: "Services",
+    icon: HeartPulse,
+    path: "/service-management",
+    permissionPath: "/service-management",
+  },
+  {
+    label: "Roles",
+    icon: Shield,
+    path: "/roles",
+    permissionPath: "/roles",
+  },
+  {
     label: "Doctors",
     icon: UserRound,
     path: "/doctors",
@@ -66,12 +78,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: Calendar,
     path: "/appointments",
     permissionPath: "/appointments",
-  },
-  {
-    label: "Service Management",
-    icon: HeartPulse,
-    path: "/service-management",
-    permissionPath: "/service-management",
   },
   {
     label: "Blogs",
@@ -108,12 +114,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: Settings,
     path: "/settings",
     permissionPath: "/settings",
-  },
-  {
-    label: "Role Management",
-    icon: Shield,
-    path: "/roles",
-    permissionPath: "/roles",
   },
 ];
 
