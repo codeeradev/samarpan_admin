@@ -42,20 +42,33 @@ export type AppointmentStatus =
   | "pending"
   | "confirmed"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  | "rejected"
+  | "rescheduled";
 
 export interface Appointment {
-  id: string;
-  patientId: string;
-  patientName: string;
-  doctorId: string;
+  _id: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
   doctorName: string;
-  department: string;
-  date: string; // ISO date string
-  time: string;
-  status: AppointmentStatus;
-  reason: string;
+  doctorId?: string | null;
+  serviceName: string;
+  serviceId?: string | null;
+  appointmentDate: Date | string;
+  preferredDate?: Date | string;
+  reason?: string;
   notes?: string;
+  rescheduleReason?: string;
+  status: AppointmentStatus;
+  approvedAt?: Date | string | null;
+  rescheduledAt?: Date | string | null;
+  rejectedAt?: Date | string | null;
+  rejectionReason?: string;
+  completedAt?: Date | string | null;
+  updatedBy?: string | null;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 // ─── Service ────────────────────────────────────────────────────────────────
@@ -181,12 +194,17 @@ export function getStatusColor(
   return map[status] ?? "gray";
 }
 
-export function formatDate(date: string): string {
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return "TBD";
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) return "TBD";
   return new Intl.DateTimeFormat("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  }).format(new Date(date));
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(parsedDate);
 }
 
 export function formatCurrency(amount: number): string {

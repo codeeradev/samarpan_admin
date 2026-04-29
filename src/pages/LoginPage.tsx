@@ -54,16 +54,19 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo / Branding */}
         <div className="flex flex-col items-center mb-6 sm:mb-8">
-          <div
+          {/* <div
             className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-elevated mb-3 sm:mb-4"
             style={{
               background: "linear-gradient(135deg, #D89F00 0%, #A67C00 100%)",
             }}
-          >
-            <HeartPulse size={24} className="text-white sm:hidden" />
-            <HeartPulse size={28} className="text-white hidden sm:block" />
-          </div>
-          <h1
+          > */}
+<img
+    src="/assets/images/samrpanlogo.webp"
+    alt="Samarpan"
+    className="h-24 w-auto object-contain mr-[10%]"
+  />
+          {/* </div> */}
+          {/* <h1
             className="text-xl sm:text-2xl font-bold"
             style={{
               color: "#1E293B",
@@ -71,10 +74,10 @@ export default function LoginPage() {
             }}
           >
             Samarpan Hospital
-          </h1>
-          <p className="text-xs sm:text-sm mt-1" style={{ color: "#64748B" }}>
+          </h1> */}
+          {/* <p className="text-xs sm:text-sm mt-1" style={{ color: "#64748B" }}>
             Admin Portal
-          </p>
+          </p> */}
         </div>
 
         <Card className="shadow-elevated border-0 rounded-2xl">

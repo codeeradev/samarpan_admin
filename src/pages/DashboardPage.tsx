@@ -318,18 +318,18 @@ export default function DashboardPage() {
                     ))
                   : recent.map((appt, idx) => (
                       <tr
-                        key={appt.id}
+                        key={appt._id}
                         className="border-b border-slate-50 hover:bg-[#F8FAFC] transition-colors"
                         data-ocid={`dashboard.recent_appointments.item.${idx + 1}`}
                       >
                         <td className="px-5 py-3 font-medium text-[#1E293B] whitespace-nowrap">
-                          {appt.patientName}
+                          {appt.fullName}
                         </td>
                         <td className="px-5 py-3 text-[#475569] whitespace-nowrap">
                           {appt.doctorName}
                         </td>
                         <td className="px-5 py-3 text-[#475569] whitespace-nowrap">
-                          {formatDate(appt.date)} · {appt.time}
+                          {formatDate(appt.appointmentDate)}
                         </td>
                         <td className="px-5 py-3 text-[#475569] max-w-[200px] truncate">
                           {appt.reason}
@@ -355,13 +355,13 @@ export default function DashboardPage() {
                 ))
               : recent.map((appt, idx) => (
                   <div
-                    key={appt.id}
+                    key={appt._id}
                     className="px-4 py-3 space-y-1.5"
                     data-ocid={`dashboard.recent_appointments.item.${idx + 1}`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <span className="font-medium text-sm text-[#1E293B] truncate">
-                        {appt.patientName}
+                        {appt.fullName}
                       </span>
                       <StatusBadge status={appt.status} />
                     </div>
@@ -369,7 +369,7 @@ export default function DashboardPage() {
                       <span className="font-medium">Dr.</span> {appt.doctorName}
                     </p>
                     <p className="text-xs text-[#64748B]">
-                      {formatDate(appt.date)} · {appt.time}
+                      {formatDate(appt.appointmentDate)}
                     </p>
                     {appt.reason && (
                       <p className="text-xs text-[#94A3B8] truncate">

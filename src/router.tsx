@@ -3,7 +3,7 @@ import AppointmentsPage from "@/pages/AppointmentsPage";
 import ContentPage from "@/pages/ContentPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DoctorsPage from "@/pages/DoctorsPage";
-import EnquiriesPage from "@/pages/EnquiriesPage";
+// import EnquiriesPage from "@/pages/EnquiriesPage";
 import LoginPage from "@/pages/LoginPage";
 import PatientsPage from "@/pages/PatientsPage";
 import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
@@ -154,12 +154,12 @@ const contentRoute = createRoute({
   component: ContentPage,
 });
 
-const enquiriesRoute = createRoute({
-  getParentRoute: () => adminLayoutRoute,
-  path: "/enquiries",
-  beforeLoad: () => checkPermission("/enquiries"),
-  component: EnquiriesPage,
-});
+// const enquiriesRoute = createRoute({
+//   getParentRoute: () => adminLayoutRoute,
+//   path: "/enquiries",
+//   beforeLoad: () => checkPermission("/enquiries"),
+//   component: EnquiriesPage,
+// });
 
 const settingsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
@@ -189,7 +189,7 @@ const routeTree = rootRoute.addChildren([
     galleryRoute,
     reviewsAndShortsRoute,
     contentRoute,
-    enquiriesRoute,
+    // enquiriesRoute,
     settingsRoute,
     rolesRoute,
   ]),

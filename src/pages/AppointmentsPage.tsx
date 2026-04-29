@@ -29,13 +29,14 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { mockDoctors } from "@/services/mockData";
-import { fetchAppointments } from "@/services/mockData";
+import { getAppointmentsApi, updateAppointmentApi } from "@/apiCalls/appointments";
 import type { Appointment, AppointmentStatus } from "@/types";
 import { formatDate } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, CheckCircle2, Search, XCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import DataTable from 'react-data-table-component';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -75,6 +76,7 @@ interface AppointmentCardProps {
   onReject: () => void;
   onComplete: () => void;
   onReschedule: () => void;
+  isUpdating: boolean; // 👈 ADD THIS
 }
 
 function AppointmentCard({
@@ -84,6 +86,7 @@ function AppointmentCard({
   onReject,
   onComplete,
   onReschedule,
+  isUpdating,
 }: AppointmentCardProps) {
   const isInactive = appt.status === "completed" || appt.status === "cancelled";
   return (
@@ -94,9 +97,9 @@ function AppointmentCard({
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="min-w-0">
           <p className="font-semibold text-[#1E293B] text-sm leading-tight truncate">
-            {appt.patientName}
+            {appt.fullName}
           </p>
-          <p className="text-xs text-[#94A3B8] mt-0.5">{appt.department}</p>
+          <p className="text-xs text-[#94A3B8] mt-0.5">{appt.serviceName}</p>
         </div>
         <StatusBadge status={appt.status} />
       </div>
@@ -111,9 +114,8 @@ function AppointmentCard({
         <div>
           <span className="text-[#94A3B8] block">Date &amp; Time</span>
           <span className="font-medium text-[#334155] block">
-            {formatDate(appt.date)}
+            {formatDate(appt.appointmentDate)}
           </span>
-          <span className="text-[#94A3B8]">{appt.time}</span>
         </div>
       </div>
 
@@ -132,6 +134,7 @@ function AppointmentCard({
                 size="sm"
                 className="h-8 px-3 text-xs bg-green-500 hover:bg-green-600 text-white rounded-xl gap-1 flex-1 sm:flex-none"
                 onClick={onApprove}
+                disabled={isUpdating}
                 data-ocid={`appointments.approve_button.${idx + 1}`}
               >
                 <CheckCircle2 size={12} />
@@ -143,6 +146,7 @@ function AppointmentCard({
                 variant="outline"
                 className="h-8 px-3 text-xs text-rose-500 border-rose-200 hover:bg-rose-50 rounded-xl gap-1 flex-1 sm:flex-none"
                 onClick={onReject}
+                disabled={isUpdating}
                 data-ocid={`appointments.reject_button.${idx + 1}`}
               >
                 <XCircle size={12} />
@@ -184,20 +188,25 @@ function AppointmentCard({
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function AppointmentsPage() {
-  const { data = [], isLoading } = useQuery({
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
     queryKey: ["appointments"],
-    queryFn: fetchAppointments,
+    queryFn: () => getAppointmentsApi({}),
   });
 
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [initialized, setInitialized] = useState(false);
+  const appointments = data?.appointments || [];
 
-  useEffect(() => {
-    if (!isLoading && !initialized) {
-      setAppointments(data);
-      setInitialized(true);
-    }
-  }, [isLoading, initialized, data]);
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: any }) =>
+      updateAppointmentApi(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      toast.success("Appointment updated successfully");
+    },
+    onError: () => {
+      toast.error("Failed to update appointment");
+    },
+  });
 
   // ── Filters ────────────────────────────────────────────────────────────────
   const [search, setSearch] = useState("");
@@ -211,9 +220,10 @@ export default function AppointmentsPage() {
       const matchesStatus = statusFilter === "all" || a.status === statusFilter;
       const matchesSearch =
         !q ||
-        a.patientName.toLowerCase().includes(q) ||
+        a.fullName.toLowerCase().includes(q) ||
         a.doctorName.toLowerCase().includes(q) ||
-        a.department.toLowerCase().includes(q);
+        a.serviceName.toLowerCase().includes(q) ||
+        a.email.toLowerCase().includes(q);
       return matchesStatus && matchesSearch;
     });
   }, [appointments, search, statusFilter]);
@@ -230,25 +240,122 @@ export default function AppointmentsPage() {
   function executeAction() {
     if (!pendingAction) return;
     const { id, type } = pendingAction;
-    const newStatus: AppointmentStatus =
-      type === "approve"
-        ? "confirmed"
-        : type === "reject"
-          ? "cancelled"
-          : "completed";
-
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)),
-    );
-
-    const messages: Record<ActionType, string> = {
-      approve: "Appointment approved successfully.",
-      reject: "Appointment has been rejected.",
-      complete: "Appointment marked as completed.",
+    const actionMap = {
+      approve: "approve",
+      reject: "reject",
+      complete: "complete",
     };
-    toast.success(messages[type]);
+    updateMutation.mutate({ id, payload: { action: actionMap[type] } });
     setPendingAction(null);
   }
+
+  // ── Data table columns ─────────────────────────────────────────────────────
+  const columns = [
+    {
+      name: 'Patient',
+      selector: (row: Appointment) => row.fullName,
+      sortable: true,
+      cell: (row: Appointment) => (
+        <div>
+          <p className="font-semibold text-[#1E293B] text-sm">{row.fullName}</p>
+          <p className="text-xs text-[#94A3B8]">{row.email}</p>
+        </div>
+      ),
+    },
+    {
+      name: 'Doctor',
+      selector: (row: Appointment) => row.doctorName,
+      sortable: true,
+    },
+    {
+      name: 'Date & Time',
+      selector: (row: Appointment) => new Date(row.appointmentDate).getTime(),
+      sortable: true,
+      cell: (row: Appointment) => {
+        const date = new Date(row.appointmentDate);
+        const isValidDate = !isNaN(date.getTime());
+        return (
+          <p className="text-sm text-[#334155] font-medium">
+            {isValidDate ? formatDate(date) : 'TBD'}
+          </p>
+        );
+      },
+    },
+    {
+      name: 'Reason',
+      selector: (row: Appointment) => row.reason || "",
+      cell: (row: Appointment) => (
+        <p className="text-sm text-[#64748B] max-w-[180px] truncate">{row.reason}</p>
+      ),
+    },
+    {
+      name: 'Status',
+      selector: (row: Appointment) => row.status,
+      sortable: true,
+      cell: (row: Appointment) => <StatusBadge status={row.status} />,
+    },
+    {
+      name: 'Actions',
+      cell: (row: Appointment) => {
+        const isInactive = row.status === "completed" || row.status === "cancelled";
+        return (
+          <div className="flex items-center gap-1.5">
+            {row.status === "pending" && (
+              <>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-7 px-2.5 text-xs bg-green-500 hover:bg-green-600 text-white rounded-lg gap-1"
+                  onClick={() => triggerAction(row._id, "approve", row.fullName)}
+                  disabled={updateMutation.isPending}
+                >
+                  <CheckCircle2 size={11} />
+                  Approve
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2.5 text-xs text-rose-500 border-rose-200 hover:bg-rose-50 rounded-lg gap-1"
+                  onClick={() => triggerAction(row._id, "reject", row.fullName)}
+                  disabled={updateMutation.isPending}
+                >
+                  <XCircle size={11} />
+                  Reject
+                </Button>
+              </>
+            )}
+            {row.status === "confirmed" && (
+              <>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2.5 text-xs text-primary border-primary/30 hover:bg-primary/10 rounded-lg gap-1"
+                  onClick={() => openReschedule(row)}
+                  disabled={updateMutation.isPending}
+                >
+                  <CalendarClock size={11} />
+                  Reschedule
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-7 px-2.5 text-xs bg-secondary hover:bg-primary text-white rounded-lg gap-1"
+                  onClick={() => triggerAction(row._id, "complete", row.fullName)}
+                  disabled={updateMutation.isPending}
+                >
+                  <CheckCircle2 size={11} />
+                  Complete
+                </Button>
+              </>
+            )}
+            {isInactive && <span className="text-[#CBD5E1] text-sm select-none pr-1">—</span>}
+          </div>
+        );
+      },
+    },
+  ];
 
   // ── Reschedule modal ────────────────────────────────────────────────────────
   const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(
@@ -264,33 +371,28 @@ export default function AppointmentsPage() {
 
   function openReschedule(appt: Appointment) {
     setRescheduleTarget(appt);
+    const appointmentDate = new Date(appt.appointmentDate);
+    const dateStr = appointmentDate.toISOString().split('T')[0];
+    const timeStr = appointmentDate.toTimeString().split(':').slice(0, 2).join(':');
+    
     setRescheduleForm({
-      date: appt.date,
-      time: appt.time.replace(" AM", "").replace(" PM", ""),
-      doctorId: appt.doctorId,
-      reason: appt.reason,
+      date: dateStr || "",
+      time: timeStr || "",
+      doctorId: appt.doctorId || "",
+      reason: appt.rescheduleReason || appt.reason || "",
     });
   }
 
   function saveReschedule() {
     if (!rescheduleTarget) return;
-    const doctor = mockDoctors.find((d) => d.id === rescheduleForm.doctorId);
-    setAppointments((prev) =>
-      prev.map((a) =>
-        a.id === rescheduleTarget.id
-          ? {
-              ...a,
-              date: rescheduleForm.date,
-              time: rescheduleForm.time,
-              doctorId: rescheduleForm.doctorId,
-              doctorName: doctor?.name ?? a.doctorName,
-              department: doctor?.department ?? a.department,
-              reason: rescheduleForm.reason,
-            }
-          : a,
-      ),
-    );
-    toast.success("Appointment rescheduled successfully.");
+    updateMutation.mutate({
+      id: rescheduleTarget._id,
+      payload: {
+        action: "reschedule",
+        appointmentDate: rescheduleForm.date,
+        rescheduleReason: rescheduleForm.reason,
+      },
+    });
     setRescheduleTarget(null);
   }
 
@@ -402,17 +504,18 @@ export default function AppointmentsPage() {
         ) : (
           filtered.map((appt, idx) => (
             <AppointmentCard
-              key={appt.id}
+              key={appt._id}
               appt={appt}
               idx={idx}
+              isUpdating={updateMutation.isPending}
               onApprove={() =>
-                triggerAction(appt.id, "approve", appt.patientName)
+                triggerAction(appt._id, "approve", appt.fullName)
               }
               onReject={() =>
-                triggerAction(appt.id, "reject", appt.patientName)
+                triggerAction(appt._id, "reject", appt.fullName)
               }
               onComplete={() =>
-                triggerAction(appt.id, "complete", appt.patientName)
+                triggerAction(appt._id, "complete", appt.fullName)
               }
               onReschedule={() => openReschedule(appt)}
             />
@@ -422,184 +525,17 @@ export default function AppointmentsPage() {
 
       {/* Desktop table (hidden on small screens) */}
       <div className="hidden md:block bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-[#F8FAFC] hover:bg-[#F8FAFC]">
-              <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 pl-5">
-                Patient
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3">
-                Doctor
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3">
-                Date &amp; Time
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3">
-                Reason
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3">
-                Status
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 pr-5 text-right">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {isLoading ? (
-              SKELETON_ROWS.map((key) => (
-                <TableRow key={key}>
-                  <TableCell className="pl-5 py-3">
-                    <Skeleton className="h-4 w-32 rounded-lg" />
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <Skeleton className="h-4 w-28 rounded-lg" />
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <Skeleton className="h-4 w-24 rounded-lg" />
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <Skeleton className="h-4 w-36 rounded-lg" />
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <Skeleton className="h-5 w-20 rounded-lg" />
-                  </TableCell>
-                  <TableCell className="pr-5 py-3">
-                    <Skeleton className="h-7 w-24 rounded-lg ml-auto" />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : filtered.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="py-16 text-center"
-                  data-ocid="appointments.empty_state"
-                >
-                  <p className="text-[#94A3B8] text-sm">
-                    No appointments found matching your filters.
-                  </p>
-                </TableCell>
-              </TableRow>
-            ) : (
-              filtered.map((appt, idx) => {
-                const isInactive =
-                  appt.status === "completed" || appt.status === "cancelled";
-                return (
-                  <TableRow
-                    key={appt.id}
-                    className={`border-[#E2E8F0] transition-colors ${isInactive ? "opacity-60" : "hover:bg-[#F8FAFC]"}`}
-                    data-ocid={`appointments.item.${idx + 1}`}
-                  >
-                    <TableCell className="pl-5 py-3">
-                      <p className="font-semibold text-[#1E293B] text-sm leading-tight">
-                        {appt.patientName}
-                      </p>
-                      <p className="text-xs text-[#94A3B8] mt-0.5">
-                        {appt.department}
-                      </p>
-                    </TableCell>
-                    <TableCell className="py-3 text-sm text-[#334155]">
-                      {appt.doctorName}
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <p className="text-sm text-[#334155] font-medium">
-                        {formatDate(appt.date)}
-                      </p>
-                      <p className="text-xs text-[#94A3B8] mt-0.5">
-                        {appt.time}
-                      </p>
-                    </TableCell>
-                    <TableCell className="py-3 text-sm text-[#64748B] max-w-[180px] truncate">
-                      {appt.reason}
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <StatusBadge status={appt.status} />
-                    </TableCell>
-                    <TableCell className="pr-5 py-3">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {appt.status === "pending" && (
-                          <>
-                            <Button
-                              type="button"
-                              size="sm"
-                              className="h-7 px-2.5 text-xs bg-green-500 hover:bg-green-600 text-white rounded-lg gap-1"
-                              onClick={() =>
-                                triggerAction(
-                                  appt.id,
-                                  "approve",
-                                  appt.patientName,
-                                )
-                              }
-                              data-ocid={`appointments.approve_button.${idx + 1}`}
-                            >
-                              <CheckCircle2 size={11} />
-                              Approve
-                            </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              className="h-7 px-2.5 text-xs text-rose-500 border-rose-200 hover:bg-rose-50 rounded-lg gap-1"
-                              onClick={() =>
-                                triggerAction(
-                                  appt.id,
-                                  "reject",
-                                  appt.patientName,
-                                )
-                              }
-                              data-ocid={`appointments.reject_button.${idx + 1}`}
-                            >
-                              <XCircle size={11} />
-                              Reject
-                            </Button>
-                          </>
-                        )}
-                        {appt.status === "confirmed" && (
-                          <>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              className="h-7 px-2.5 text-xs text-primary border-primary/30 hover:bg-primary/10 rounded-lg gap-1"
-                              onClick={() => openReschedule(appt)}
-                              data-ocid={`appointments.reschedule_button.${idx + 1}`}
-                            >
-                              <CalendarClock size={11} />
-                              Reschedule
-                            </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              className="h-7 px-2.5 text-xs bg-secondary hover:bg-primary text-white rounded-lg gap-1"
-                              onClick={() =>
-                                triggerAction(
-                                  appt.id,
-                                  "complete",
-                                  appt.patientName,
-                                )
-                              }
-                              data-ocid={`appointments.complete_button.${idx + 1}`}
-                            >
-                              <CheckCircle2 size={11} />
-                              Complete
-                            </Button>
-                          </>
-                        )}
-                        {isInactive && (
-                          <span className="text-[#CBD5E1] text-sm select-none pr-1">
-                            —
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          progressPending={isLoading}
+          progressComponent={<Skeleton className="h-4 w-full" />}
+          noDataComponent={<p className="text-[#94A3B8] text-sm py-16 text-center">No appointments found matching your filters.</p>}
+          pagination
+          responsive
+          highlightOnHover
+          striped
+        />
       </div>
 
       {/* Confirm action dialog */}
@@ -637,7 +573,7 @@ export default function AppointmentsPage() {
                 Patient
               </Label>
               <Input
-                value={rescheduleTarget?.patientName ?? ""}
+                value={rescheduleTarget?.fullName ?? ""}
                 readOnly
                 className="h-9 rounded-xl border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] text-sm cursor-default"
                 data-ocid="appointments.reschedule.patient_input"

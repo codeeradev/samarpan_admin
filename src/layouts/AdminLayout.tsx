@@ -96,12 +96,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     path: "/content",
     permissionPath: "/content",
   },
-  {
-    label: "Enquiries",
-    icon: MessageSquare,
-    path: "/enquiries",
-    permissionPath: "/enquiries",
-  },
+  // {
+  //   label: "Enquiries",
+  //   icon: MessageSquare,
+  //   path: "/enquiries",
+  //   permissionPath: "/enquiries",
+  // },
   {
     label: "Settings",
     icon: Settings,
@@ -209,7 +209,7 @@ export default function AdminLayout() {
   <img
     src="/assets/images/samrpanlogo.webp"
     alt="Samarpan"
-    className="h-14 w-auto object-contain"
+    className="h-16 w-auto object-contain mr-[10%]"
   />
 </div>
         <SidebarNav
