@@ -24,6 +24,7 @@ export interface PatientItem {
   medicalHistory?: string;
   status?: boolean;
   isActive?: boolean;
+  dischargedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -58,5 +59,21 @@ export const updatePatientApi = async (
     return res?.data?.patient;
   } catch (error: any) {
     throw new Error(error.response?.data?.message ?? "Failed to update patient");
+  }
+};
+
+export const dischargePatientApi = async (
+  id: string,
+): Promise<PatientItem> => {
+  try {
+    const res = await post(`${ENDPOINT.DISCHARGE_PATIENT}/${id}`, undefined, {
+      needAuth: true,
+    });
+
+    return res?.data?.patient;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ?? "Failed to discharge patient",
+    );
   }
 };

@@ -18,18 +18,34 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function normalizePermissions(
+  value: unknown,
+): Record<string, boolean> | undefined {
+  if (!isObject(value)) {
+    return undefined;
+  }
+
+  return Object.entries(value).reduce<Record<string, boolean>>(
+    (acc, [key, item]) => {
+      acc[key] = item === true;
+      return acc;
+    },
+    {},
+  );
+}
+
 function normalizeAdmin(value: unknown): Admin | null {
   if (!isObject(value)) {
     return null;
   }
 
-  const { id, name, email, role, avatar } = value;
+  const { id, name, email, role } = value;
+  const avatar = typeof value.avatar === "string" ? value.avatar : "";
 
   if (
     typeof id !== "string" ||
     typeof name !== "string" ||
-    typeof email !== "string" ||
-    typeof avatar !== "string"
+    typeof email !== "string"
   ) {
     return null;
   }
@@ -43,7 +59,11 @@ function normalizeAdmin(value: unknown): Admin | null {
     return null;
   }
 
-  return { id, name, email, role, avatar };
+  const roleId = typeof value.roleId === "number" ? value.roleId : undefined;
+  const mobile = typeof value.mobile === "string" ? value.mobile : undefined;
+  const permissions = normalizePermissions(value.permissions);
+
+  return { id, name, email, role, avatar, roleId, mobile, permissions };
 }
 
 function normalizeAuthState(value: unknown): AuthState {

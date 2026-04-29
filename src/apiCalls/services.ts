@@ -1,5 +1,5 @@
 import { ENDPOINT } from "@/apis/endpoint";
-import axios, { get, post } from "@/apis/apiClient"; // adjust to your actual axios instance export
+import { get, post } from "@/apis/apiClient";
 
 export interface ServicePayload {
   title: string;
@@ -80,6 +80,18 @@ export const updateServiceApi = async (
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message ?? "Failed to update service",
+    );
+  }
+};
+
+export const deleteServiceApi = async (id: string): Promise<void> => {
+  try {
+    await post(`${ENDPOINT.DELETE_SERVICE}/${id}`, undefined, {
+      needAuth: true,
+    });
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ?? "Failed to delete service",
     );
   }
 };

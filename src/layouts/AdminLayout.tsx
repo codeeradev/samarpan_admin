@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
-import { ROLE_PERMISSIONS, type UserRole } from "@/types";
+import { canAccessPath } from "@/lib/admin-access";
+import { ROLE_LABELS, type UserRole } from "@/types";
 import { Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   Calendar,
@@ -37,7 +38,7 @@ interface NavItem {
   label: string;
   icon: React.ElementType;
   path: string;
-  /** The permission key used in ROLE_PERMISSIONS to check access */
+  /** The route path used to check backend-driven access rules */
   permissionPath: string;
 }
 
@@ -91,10 +92,10 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/reviews-shorts",
   },
   {
-    label: "Content",
+    label: "Website Content",
     icon: FileImage,
-    path: "/content",
-    permissionPath: "/content",
+    path: "/website-content",
+    permissionPath: "/website-content",
   },
   // {
   //   label: "Enquiries",
@@ -168,11 +169,9 @@ export default function AdminLayout() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Filter nav items based on user role
   const role = admin?.role as UserRole | undefined;
-  const allowedPaths = role ? (ROLE_PERMISSIONS[role] ?? []) : [];
   const visibleItems = ALL_NAV_ITEMS.filter((item) =>
-    allowedPaths.includes(item.permissionPath),
+    canAccessPath(admin, item.permissionPath),
   );
 
   function handleLogout() {
@@ -189,16 +188,7 @@ export default function AdminLayout() {
         .toUpperCase()
     : "AD";
 
-  const roleLabel =
-    role === "super-admin"
-      ? "Super Admin"
-      : role === "doctor"
-        ? "Doctor"
-        : role === "receptionist"
-          ? "Receptionist"
-          : role === "nurse"
-            ? "Nurse"
-            : "Admin";
+  const roleLabel = role ? ROLE_LABELS[role] : "Admin";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex">

@@ -1,19 +1,18 @@
 import AdminLayout from "@/layouts/AdminLayout";
 import AppointmentsPage from "@/pages/AppointmentsPage";
-import ContentPage from "@/pages/ContentPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DoctorsPage from "@/pages/DoctorsPage";
 // import EnquiriesPage from "@/pages/EnquiriesPage";
+import GalleryPage from "@/pages/GalleryPage";
 import LoginPage from "@/pages/LoginPage";
 import PatientsPage from "@/pages/PatientsPage";
 import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
 import RoleManagementPage from "@/pages/RoleManagementPage";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import SettingsPage from "@/pages/SettingsPage";
-import GalleryPage from "@/pages/GalleryPage";
+import WebsiteContentPage from "@/pages/WebsiteContentPage";
 import { loadAuthState } from "@/lib/auth-storage";
-import type { UserRole } from "@/types";
-import { ROLE_PERMISSIONS } from "@/types";
+import { canAccessPath } from "@/lib/admin-access";
 import {
   Outlet,
   createRootRoute,
@@ -25,10 +24,7 @@ import BlogsPage from "./pages/BlogPage";
 
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
-interface StoredAuth {
-  isAuthenticated?: boolean;
-  admin?: { role?: string } | null;
-}
+type StoredAuth = ReturnType<typeof loadAuthState>;
 
 function getAuthState(): StoredAuth {
   return loadAuthState();
@@ -38,21 +34,15 @@ function getIsAuthenticated(): boolean {
   return !!getAuthState().isAuthenticated;
 }
 
-function getUserRole(): UserRole | null {
-  const state = getAuthState();
-  return (state.admin?.role as UserRole) ?? null;
-}
-
 function checkPermission(path: string): void {
   if (!getIsAuthenticated()) {
     throw redirect({ to: "/" });
   }
-  const role = getUserRole();
-  if (!role) {
+  const state = getAuthState();
+  if (!state.admin) {
     throw redirect({ to: "/" });
   }
-  const allowed = ROLE_PERMISSIONS[role] ?? [];
-  if (!allowed.includes(path)) {
+  if (!canAccessPath(state.admin, path)) {
     throw redirect({ to: "/dashboard" });
   }
 }
@@ -147,11 +137,11 @@ const reviewsAndShortsRoute = createRoute({
   component: ReviewsAndShortsPage,
 });
 
-const contentRoute = createRoute({
+const websiteContentRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: "/content",
-  beforeLoad: () => checkPermission("/content"),
-  component: ContentPage,
+  path: "/website-content",
+  beforeLoad: () => checkPermission("/website-content"),
+  component: WebsiteContentPage,
 });
 
 // const enquiriesRoute = createRoute({
@@ -188,7 +178,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,
-    contentRoute,
+    websiteContentRoute,
     // enquiriesRoute,
     settingsRoute,
     rolesRoute,

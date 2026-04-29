@@ -12,12 +12,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-
+import { useAuth } from "@/hooks/useAuth";
+import { getRoleFromRoleId } from "@/lib/admin-access";
 import {
   AlertTriangle,
-  Camera,
   Eye,
   EyeOff,
   Lock,
@@ -26,23 +25,36 @@ import {
   Shield,
   User,
 } from "lucide-react";
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
 
 import {
   getSettingsApi,
+  updateAdminAccountApi,
   updateSettingsApi,
   type SettingsItem,
 } from "@/apiCalls/settings";
 
+type AccountFormState = {
+  name: string;
+  email: string;
+  phone: string;
+};
+
 export default function SettingsPage() {
-  const { logout } = useAuth();
+  const { admin, logout, updateAdmin } = useAuth();
 
   const [settings, setSettings] = useState<SettingsItem | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [accountSaving, setAccountSaving] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+
+  const [accountForm, setAccountForm] = useState<AccountFormState>({
+    name: "",
+    email: "",
+    phone: "",
+  });
 
   const [passwordForm, setPasswordForm] = useState({
     newPass: "",
@@ -58,6 +70,14 @@ export default function SettingsPage() {
     loadSettings();
   }, []);
 
+  useEffect(() => {
+    setAccountForm({
+      name: admin?.name ?? "",
+      email: admin?.email ?? "",
+      phone: admin?.mobile ?? "",
+    });
+  }, [admin]);
+
   async function loadSettings() {
     try {
       setLoading(true);
@@ -72,51 +92,100 @@ export default function SettingsPage() {
 
   async function saveSettings(payload?: Partial<SettingsItem>) {
     try {
-      setSaving(true);
-
+      setSettingsSaving(true);
       const body = payload ?? settings;
-
-      const updated = await updateSettingsApi(body!);
-
+      const updated = await updateSettingsApi(body ?? {});
       setSettings(updated);
-
-      toast.success("Settings updated successfully");
+      toast.success("Business settings updated successfully.");
     } catch (err: any) {
       toast.error(err.message);
     } finally {
-      setSaving(false);
+      setSettingsSaving(false);
+    }
+  }
+
+  async function handleAccountSave() {
+    if (!accountForm.name.trim()) {
+      toast.error("Full name is required.");
+      return;
+    }
+
+    if (!accountForm.email.trim()) {
+      toast.error("Email is required.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(accountForm.email.trim())) {
+      toast.error("Enter a valid email address.");
+      return;
+    }
+
+    try {
+      setAccountSaving(true);
+
+      const updated = await updateAdminAccountApi({
+        name: accountForm.name.trim(),
+        email: accountForm.email.trim(),
+        phone: accountForm.phone.trim(),
+      });
+
+      updateAdmin({
+        name: updated.name,
+        email: updated.email,
+        mobile: updated.phone ? String(updated.phone) : "",
+        avatar: updated.image ?? admin?.avatar ?? "",
+        permissions: updated.permissions ?? admin?.permissions,
+        roleId: updated.roleId ?? admin?.roleId,
+        role:
+          updated.roleId !== undefined
+            ? getRoleFromRoleId(updated.roleId)
+            : admin?.role ?? "receptionist",
+      });
+
+      toast.success("Account details updated successfully.");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setAccountSaving(false);
     }
   }
 
   async function handlePasswordUpdate() {
     if (passwordForm.newPass.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error("Password must be at least 8 characters.");
       return;
     }
 
     if (passwordForm.newPass !== passwordForm.confirm) {
-      toast.error("Passwords do not match");
+      toast.error("Passwords do not match.");
       return;
     }
 
-    await saveSettings({ password: passwordForm.newPass });
-
-    setPasswordForm({
-      newPass: "",
-      confirm: "",
-    });
+    try {
+      setPasswordSaving(true);
+      await updateAdminAccountApi({ password: passwordForm.newPass });
+      setPasswordForm({ newPass: "", confirm: "" });
+      toast.success("Password updated successfully.");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setPasswordSaving(false);
+    }
   }
 
-  function updateField(key: keyof SettingsItem, value: any) {
+  function updateField<K extends keyof SettingsItem>(
+    key: K,
+    value: SettingsItem[K],
+  ) {
     setSettings((prev) => ({
-      ...prev!,
+      ...(prev ?? {}),
       [key]: value,
     }));
   }
 
   function updateSocial(key: string, value: string) {
     setSettings((prev) => ({
-      ...prev!,
+      ...(prev ?? {}),
       social_links: {
         ...prev?.social_links,
         [key]: value,
@@ -124,12 +193,10 @@ export default function SettingsPage() {
     }));
   }
 
-  // 👇 Only change: allow UI render even if settings not loaded
   const safeSettings = settings ?? ({} as SettingsItem);
-
-  const initials = safeSettings.name
-    ?.split(" ")
-    .map((n) => n[0])
+  const initials = (accountForm.name || admin?.name || "Admin")
+    .split(" ")
+    .map((name) => name[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
@@ -138,18 +205,19 @@ export default function SettingsPage() {
     <div>
       <PageHeader
         title="Settings"
-        description="Manage admin settings and CMS content."
+        description="Manage account credentials, business details, and legal or informational website settings."
       />
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* PROFILE */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User size={16} />
-              Admin Profile
+              Admin Account
             </CardTitle>
-            <CardDescription>Update admin information</CardDescription>
+            <CardDescription>
+              These details are saved on your login user record.
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -160,182 +228,277 @@ export default function SettingsPage() {
             <div>
               <Label>Full Name</Label>
               <Input
-                value={safeSettings.name ?? ""}
-                onChange={(e) => updateField("name", e.target.value)}
+                value={accountForm.name}
+                onChange={(event) =>
+                  setAccountForm((prev) => ({
+                    ...prev,
+                    name: event.target.value,
+                  }))
+                }
               />
             </div>
 
             <div>
-              <Label>Email</Label>
+              <Label>Login Email</Label>
               <Input
-                value={safeSettings.email ?? ""}
-                onChange={(e) => updateField("email", e.target.value)}
+                type="email"
+                value={accountForm.email}
+                onChange={(event) =>
+                  setAccountForm((prev) => ({
+                    ...prev,
+                    email: event.target.value,
+                  }))
+                }
               />
             </div>
 
             <div>
               <Label>Phone</Label>
               <Input
-                value={safeSettings.mobile_number ?? ""}
-                onChange={(e) =>
-                  updateField("mobile_number", e.target.value)
+                value={accountForm.phone}
+                onChange={(event) =>
+                  setAccountForm((prev) => ({
+                    ...prev,
+                    phone: event.target.value,
+                  }))
                 }
               />
             </div>
 
-            <Button disabled={saving} onClick={() => saveSettings()}>
-              {saving ? "Saving..." : "Save Profile"}
+            <Button disabled={accountSaving} onClick={handleAccountSave}>
+              {accountSaving ? "Saving..." : "Save Account"}
             </Button>
           </CardContent>
         </Card>
 
-        {/* PASSWORD */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock size={16} />
               Password
             </CardTitle>
+            <CardDescription>
+              Update the password used for admin sign-in.
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             <div>
               <Label>New Password</Label>
-              <Input
-                type={showPasswords.newPass ? "text" : "password"}
-                value={passwordForm.newPass}
-                onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    newPass: e.target.value,
-                  })
-                }
-              />
+              <div className="relative">
+                <Input
+                  type={showPasswords.newPass ? "text" : "password"}
+                  value={passwordForm.newPass}
+                  onChange={(event) =>
+                    setPasswordForm((prev) => ({
+                      ...prev,
+                      newPass: event.target.value,
+                    }))
+                  }
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPasswords((prev) => ({
+                      ...prev,
+                      newPass: !prev.newPass,
+                    }))
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+                  aria-label={
+                    showPasswords.newPass ? "Hide password" : "Show password"
+                  }
+                >
+                  {showPasswords.newPass ? (
+                    <EyeOff size={16} />
+                  ) : (
+                    <Eye size={16} />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div>
               <Label>Confirm Password</Label>
-              <Input
-                type={showPasswords.confirm ? "text" : "password"}
-                value={passwordForm.confirm}
-                onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    confirm: e.target.value,
-                  })
-                }
-              />
+              <div className="relative">
+                <Input
+                  type={showPasswords.confirm ? "text" : "password"}
+                  value={passwordForm.confirm}
+                  onChange={(event) =>
+                    setPasswordForm((prev) => ({
+                      ...prev,
+                      confirm: event.target.value,
+                    }))
+                  }
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPasswords((prev) => ({
+                      ...prev,
+                      confirm: !prev.confirm,
+                    }))
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+                  aria-label={
+                    showPasswords.confirm ? "Hide password" : "Show password"
+                  }
+                >
+                  {showPasswords.confirm ? (
+                    <EyeOff size={16} />
+                  ) : (
+                    <Eye size={16} />
+                  )}
+                </button>
+              </div>
             </div>
 
-            <Button disabled={saving} onClick={handlePasswordUpdate}>
-              <Shield size={14} /> Update Password
+            <Button disabled={passwordSaving} onClick={handlePasswordUpdate}>
+              <Shield size={14} />{" "}
+              {passwordSaving ? "Updating..." : "Update Password"}
             </Button>
           </CardContent>
         </Card>
 
-        {/* BUSINESS INFO */}
         <Card>
           <CardHeader>
             <CardTitle>Business Info</CardTitle>
+            <CardDescription>
+              Public-facing contact details for the website.
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             <Input
               placeholder="Inquiry Email"
               value={safeSettings.inquiry_email ?? ""}
-              onChange={(e) =>
-                updateField("inquiry_email", e.target.value)
+              onChange={(event) =>
+                updateField("inquiry_email", event.target.value)
               }
+              disabled={loading}
             />
 
             <Input
               placeholder="Inquiry Mobile"
               value={safeSettings.inquiry_mobile_number ?? ""}
-              onChange={(e) =>
-                updateField("inquiry_mobile_number", e.target.value)
+              onChange={(event) =>
+                updateField("inquiry_mobile_number", event.target.value)
               }
+              disabled={loading}
             />
 
             <Input
               placeholder="Working Hours"
               value={safeSettings.working_hours ?? ""}
-              onChange={(e) =>
-                updateField("working_hours", e.target.value)
+              onChange={(event) =>
+                updateField("working_hours", event.target.value)
               }
+              disabled={loading}
             />
 
             <Textarea
               placeholder="Address"
               value={safeSettings.address ?? ""}
-              onChange={(e) => updateField("address", e.target.value)}
+              onChange={(event) => updateField("address", event.target.value)}
+              disabled={loading}
             />
+
+            <Button
+              disabled={settingsSaving || loading}
+              onClick={() => saveSettings()}
+            >
+              <Save size={14} />{" "}
+              {settingsSaving ? "Saving..." : "Save Business Info"}
+            </Button>
           </CardContent>
         </Card>
 
-        {/* SOCIAL */}
         <Card>
           <CardHeader>
             <CardTitle>Social Links</CardTitle>
+            <CardDescription>
+              Website footer, contact, and social CTA links.
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-3">
             {["facebook", "instagram", "youtube", "whatsapp", "call"].map(
-              (s) => (
+              (item) => (
                 <Input
-                  key={s}
-                  placeholder={s}
-                  value={safeSettings.social_links?.[s] ?? ""}
-                  onChange={(e) => updateSocial(s, e.target.value)}
+                  key={item}
+                  placeholder={item}
+                  value={safeSettings.social_links?.[item] ?? ""}
+                  onChange={(event) => updateSocial(item, event.target.value)}
+                  disabled={loading}
                 />
               ),
             )}
+
+            <Button
+              disabled={settingsSaving || loading}
+              onClick={() => saveSettings()}
+            >
+              <Save size={14} />{" "}
+              {settingsSaving ? "Saving..." : "Save Social Links"}
+            </Button>
           </CardContent>
         </Card>
 
-        {/* CMS */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>CMS Content</CardTitle>
+            <CardDescription>
+              Legal pages and informational copy that still belongs to the settings document.
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             <Textarea
               placeholder="About Us"
               value={safeSettings.about_us ?? ""}
-              onChange={(e) => updateField("about_us", e.target.value)}
+              onChange={(event) => updateField("about_us", event.target.value)}
+              disabled={loading}
             />
 
             <Textarea
               placeholder="Privacy Policy"
               value={safeSettings.privacy_policy ?? ""}
-              onChange={(e) =>
-                updateField("privacy_policy", e.target.value)
+              onChange={(event) =>
+                updateField("privacy_policy", event.target.value)
               }
+              disabled={loading}
             />
 
             <Textarea
               placeholder="Terms & Conditions"
               value={safeSettings.term_and_condition ?? ""}
-              onChange={(e) =>
-                updateField("term_and_condition", e.target.value)
+              onChange={(event) =>
+                updateField("term_and_condition", event.target.value)
               }
+              disabled={loading}
             />
 
             <Textarea
               placeholder="Contact Us"
               value={safeSettings.contact_us ?? ""}
-              onChange={(e) =>
-                updateField("contact_us", e.target.value)
+              onChange={(event) =>
+                updateField("contact_us", event.target.value)
               }
+              disabled={loading}
             />
 
-            <Button disabled={saving} onClick={() => saveSettings()}>
-              <Save size={14} /> Save CMS Content
+            <Button
+              disabled={settingsSaving || loading}
+              onClick={() => saveSettings()}
+            >
+              <Save size={14} />{" "}
+              {settingsSaving ? "Saving..." : "Save CMS Content"}
             </Button>
           </CardContent>
         </Card>
 
-        {/* DANGER */}
         <Card className="border-red-200 bg-red-50">
           <CardHeader>
             <CardTitle className="text-red-600 flex gap-2">

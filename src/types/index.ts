@@ -133,7 +133,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "/blogs",
     "/gallery",
     "/reviews-shorts",
-    "/content",
+    "/website-content",
     "/enquiries",
     "/settings",
     "/roles",

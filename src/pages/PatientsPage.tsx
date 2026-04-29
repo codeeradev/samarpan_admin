@@ -1,9 +1,11 @@
 import {
   type PatientItem,
   type PatientPayload,
+  dischargePatientApi,
   getAllPatientsApi,
   updatePatientApi,
 } from "@/apiCalls/patients";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +57,7 @@ interface PatientFormState {
 }
 
 type PatientFormErrors = Partial<Record<keyof PatientFormState, string>>;
+type PatientStatusFilter = "all" | "active" | "discharged";
 
 const EMPTY_FORM: PatientFormState = {
   name: "",
@@ -82,6 +85,32 @@ function GenderBadge({ gender }: { gender: PatientGender }) {
       className={`text-xs capitalize rounded-lg ${styles[gender]}`}
     >
       {gender}
+    </Badge>
+  );
+}
+
+function isPatientDischarged(patient: PatientItem) {
+  return Boolean(patient.dischargedAt);
+}
+
+function PatientStatusBadge({ patient }: { patient: PatientItem }) {
+  if (isPatientDischarged(patient)) {
+    return (
+      <Badge
+        variant="outline"
+        className="rounded-lg border-amber-200 bg-amber-50 text-amber-700"
+      >
+        Discharged
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-lg border-emerald-200 bg-emerald-50 text-emerald-700"
+    >
+      Active
     </Badge>
   );
 }
@@ -314,6 +343,10 @@ function getPatientRegisteredAt(patient: PatientItem) {
   return patient.createdAt || patient.updatedAt || new Date().toISOString();
 }
 
+function getPatientDischargeLabel(patient: PatientItem) {
+  return patient.dischargedAt ? formatDate(patient.dischargedAt) : "";
+}
+
 function validateForm(form: PatientFormState): PatientFormErrors {
   const errors: PatientFormErrors = {};
   const age = Number(form.age);
@@ -348,7 +381,11 @@ export default function PatientsPage() {
   const [genderFilter, setGenderFilter] = useState<PatientGender | "all">(
     "all",
   );
+  const [statusFilter, setStatusFilter] = useState<PatientStatusFilter>("all");
   const [editPatient, setEditPatient] = useState<PatientItem | null>(null);
+  const [patientToDischarge, setPatientToDischarge] = useState<PatientItem | null>(
+    null,
+  );
   const [form, setForm] = useState<PatientFormState>(EMPTY_FORM);
 
   const {
@@ -378,20 +415,46 @@ export default function PatientsPage() {
     onError: (mutationError: Error) => toast.error(mutationError.message),
   });
 
+  const dischargeMutation = useMutation({
+    mutationFn: (id: string) => dischargePatientApi(id),
+    onSuccess: () => {
+      toast.success("Patient discharged successfully.");
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
+      setPatientToDischarge(null);
+    },
+    onError: (mutationError: Error) => toast.error(mutationError.message),
+  });
+
+  const patientMetrics = useMemo(() => {
+    const total = patients.length;
+    const discharged = patients.filter(isPatientDischarged).length;
+
+    return {
+      total,
+      discharged,
+      active: total - discharged,
+    };
+  }, [patients]);
+
   const filteredPatients = useMemo(() => {
     const query = searchTerm.toLowerCase().trim();
 
     return patients.filter((patient) => {
       const gender = getPatientGender(patient.gender);
+      const isDischarged = isPatientDischarged(patient);
       const matchesSearch =
         !query ||
         getPatientName(patient).toLowerCase().includes(query) ||
         getPatientPhone(patient).toLowerCase().includes(query);
       const matchesGender = genderFilter === "all" || gender === genderFilter;
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && !isDischarged) ||
+        (statusFilter === "discharged" && isDischarged);
 
-      return matchesSearch && matchesGender;
+      return matchesSearch && matchesGender && matchesStatus;
     });
-  }, [patients, searchTerm, genderFilter]);
+  }, [patients, searchTerm, genderFilter, statusFilter]);
 
   const updateForm = (updates: Partial<PatientFormState>) =>
     setForm((prev) => ({ ...prev, ...updates }));
@@ -424,18 +487,53 @@ export default function PatientsPage() {
     });
   };
 
+  const handleDischarge = () => {
+    if (!patientToDischarge) {
+      return;
+    }
+
+    dischargeMutation.mutate(patientToDischarge._id);
+  };
+
   return (
     <div data-ocid="patients.page">
       <PageHeader
         title="Patient Management"
-        description="View and manage all registered patients."
+        description="Confirmed and completed appointments are added here automatically so staff can maintain records and discharge patients."
       />
 
+      <div className="grid gap-3 mb-5 md:grid-cols-3" data-ocid="patients.summary">
+        <div className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#94A3B8]">
+            Total Patients
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-[#1E293B]">
+            {patientMetrics.total}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-600">
+            Active
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-emerald-700">
+            {patientMetrics.active}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-amber-600">
+            Discharged
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-amber-700">
+            {patientMetrics.discharged}
+          </p>
+        </div>
+      </div>
+
       <div
-        className="flex flex-wrap sm:flex-nowrap gap-3 mb-5"
+        className="flex flex-wrap xl:flex-nowrap gap-3 mb-5"
         data-ocid="patients.filter_bar"
       >
-        <div className="relative w-full sm:flex-1">
+        <div className="relative w-full xl:flex-1">
           <Search
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
@@ -465,6 +563,22 @@ export default function PatientsPage() {
             <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
+        <Select
+          value={statusFilter}
+          onValueChange={(value) => setStatusFilter(value as PatientStatusFilter)}
+        >
+          <SelectTrigger
+            className="w-full sm:w-44 rounded-xl border-[#E2E8F0] bg-white focus:ring-primary/30 text-sm"
+            data-ocid="patients.status_filter_select"
+          >
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="discharged">Discharged</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div
@@ -489,6 +603,9 @@ export default function PatientsPage() {
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide max-w-[160px]">
                   Address
+                </TableHead>
+                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+                  Status
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
                   Registered
@@ -518,6 +635,9 @@ export default function PatientsPage() {
                       <Skeleton className="h-4 w-36 rounded-lg" />
                     </TableCell>
                     <TableCell>
+                      <Skeleton className="h-5 w-24 rounded-lg" />
+                    </TableCell>
+                    <TableCell>
                       <Skeleton className="h-4 w-20 rounded-lg" />
                     </TableCell>
                     <TableCell className="pr-5 text-right">
@@ -528,7 +648,7 @@ export default function PatientsPage() {
               ) : filteredPatients.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="text-center py-12 text-[#94A3B8] text-sm"
                     data-ocid="patients.empty_state"
                   >
@@ -573,11 +693,21 @@ export default function PatientsPage() {
                           {getPatientAddress(patient)}
                         </p>
                       </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <PatientStatusBadge patient={patient} />
+                          {isPatientDischarged(patient) ? (
+                            <p className="text-xs text-[#94A3B8]">
+                              {getPatientDischargeLabel(patient)}
+                            </p>
+                          ) : null}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-sm text-[#475569]">
                         {formatDate(getPatientRegisteredAt(patient))}
                       </TableCell>
                       <TableCell className="pr-5 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-2">
                           <Button
                             size="icon"
                             variant="ghost"
@@ -589,6 +719,18 @@ export default function PatientsPage() {
                           >
                             <Pencil size={14} />
                           </Button>
+                          {!isPatientDischarged(patient) ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-8 rounded-lg border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                              onClick={() => setPatientToDischarge(patient)}
+                              data-ocid={`patients.discharge_button.${idx + 1}`}
+                            >
+                              Discharge
+                            </Button>
+                          ) : null}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -657,6 +799,7 @@ export default function PatientsPage() {
                             Gender not set
                           </Badge>
                         )}
+                        <PatientStatusBadge patient={patient} />
                         <Badge
                           variant="outline"
                           className="text-xs rounded-lg bg-red-50 text-red-600 border-red-200"
@@ -673,6 +816,11 @@ export default function PatientsPage() {
                       <p className="text-xs text-[#94A3B8] mt-0.5">
                         Reg: {formatDate(getPatientRegisteredAt(patient))}
                       </p>
+                      {isPatientDischarged(patient) ? (
+                        <p className="text-xs text-amber-600 mt-0.5">
+                          Discharged: {getPatientDischargeLabel(patient)}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <Button
@@ -688,6 +836,20 @@ export default function PatientsPage() {
                       </Button>
                     </div>
                   </div>
+                  {!isPatientDischarged(patient) ? (
+                    <div className="mt-3 flex justify-end">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="rounded-lg border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => setPatientToDischarge(patient)}
+                        data-ocid={`patients.discharge_button.${idx + 1}`}
+                      >
+                        Discharge Patient
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
               );
             })
@@ -710,6 +872,23 @@ export default function PatientsPage() {
         onClose={() => {
           setEditPatient(null);
           setForm(EMPTY_FORM);
+        }}
+      />
+
+      <ConfirmDialog
+        open={!!patientToDischarge}
+        title="Discharge Patient"
+        message={
+          patientToDischarge
+            ? `Mark ${getPatientName(patientToDischarge)} as discharged? This will keep the record in the patient list but mark it as inactive.`
+            : ""
+        }
+        confirmLabel={dischargeMutation.isPending ? "Discharging..." : "Discharge"}
+        onConfirm={handleDischarge}
+        onCancel={() => {
+          if (!dischargeMutation.isPending) {
+            setPatientToDischarge(null);
+          }
         }}
       />
     </div>

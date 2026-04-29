@@ -13,12 +13,14 @@ import {
   saveAuthState,
   type AuthState,
 } from "@/lib/auth-storage";
+import { getRoleFromRoleId, normalizePermissions } from "@/lib/admin-access";
 
 interface AuthContextValue extends AuthState {
   login: (
     email: string,
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
+  updateAdmin: (patch: Partial<Admin>) => void;
   logout: () => void;
 }
 
@@ -27,16 +29,32 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(loadAuthState);
 
+  const updateAdmin = useCallback((patch: Partial<Admin>) => {
+    setState((prev) => {
+      if (!prev.admin) {
+        return prev;
+      }
+
+      const nextState: AuthState = {
+        ...prev,
+        admin: {
+          ...prev.admin,
+          ...patch,
+          permissions:
+            patch.permissions !== undefined
+              ? normalizePermissions(patch.permissions)
+              : prev.admin.permissions,
+        },
+      };
+
+      saveAuthState(nextState);
+      return nextState;
+    });
+  }, []);
+
   const login = useCallback(async (email: string, password: string) => {
     try {
       const data = await loginApi(email, password);
-
-      const roleIdToUserRole: Partial<Record<number, UserRole>> = {
-        1: "super-admin",
-        2: "doctor",
-        3: "nurse",
-        4: "receptionist",
-      };
 
       // Your backend returns role as "SUPER_ADMIN"/"DOCTOR"/... (roleId is also numeric).
       const rawRoleName: string | undefined = data?.admin?.role ?? data?.role;
@@ -54,10 +72,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 : undefined;
 
       const mappedRoleFromId = rawRoleId
-        ? roleIdToUserRole[rawRoleId]
+        ? getRoleFromRoleId(rawRoleId)
         : undefined;
 
-      const role: UserRole = mappedRoleFromName ?? mappedRoleFromId ?? "receptionist";
+      const role: UserRole =
+        mappedRoleFromName ?? mappedRoleFromId ?? "receptionist";
 
       const admin: Admin = {
         id: data.admin?._id || "",
@@ -66,11 +85,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role,
         roleId: rawRoleId ?? 1,
         avatar: data.admin.image || "",
-        permissions: data.admin?.permissions || {},
+        permissions: normalizePermissions(data.admin?.permissions),
         mobile: data.admin?.phone || "",
       };
-
-
 
       const newState: AuthState = {
         isAuthenticated: true,
@@ -103,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("token");
   }, []);
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider value={{ ...state, login, updateAdmin, logout }}>
       {children}
     </AuthContext.Provider>
   );

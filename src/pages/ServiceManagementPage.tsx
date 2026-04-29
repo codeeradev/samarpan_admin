@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/admin/PageHeader";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
   addServiceApi,
+  deleteServiceApi,
   getAllServicesApi,
   updateServiceApi,
   type ServiceItem,
@@ -111,6 +113,7 @@ export default function ServiceManagementPage() {
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<ServiceItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ServiceItem | null>(null);
   const [formData, setFormData] = useState<ServicePayload>(emptyForm);
   const [featuresInput, setFeaturesInput] = useState("");
   const [keywordsInput, setKeywordsInput] = useState("");
@@ -139,6 +142,16 @@ export default function ServiceManagementPage() {
       toast.success("Service updated successfully.");
       queryClient.invalidateQueries({ queryKey: ["service-management"] });
       setModalOpen(false);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteServiceApi,
+    onSuccess: () => {
+      toast.success("Service deleted successfully.");
+      queryClient.invalidateQueries({ queryKey: ["service-management"] });
+      setDeleteTarget(null);
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -248,7 +261,8 @@ export default function ServiceManagementPage() {
     addMutation.mutate(payload);
   }
 
-  const isBusy = addMutation.isPending || updateMutation.isPending;
+  const isBusy =
+    addMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   // ─── Render ──────────────────────────────────────────────────────────────────
 
@@ -312,15 +326,26 @@ export default function ServiceManagementPage() {
                     </TableCell>
                     <TableCell>{service.features?.length || 0}</TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => openEdit(service)}
-                        aria-label="Edit service"
-                        data-ocid="service_management.edit_button"
-                      >
-                        <Pencil size={14} />
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => openEdit(service)}
+                          aria-label="Edit service"
+                          data-ocid="service_management.edit_button"
+                        >
+                          <Pencil size={14} />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setDeleteTarget(service)}
+                          aria-label="Delete service"
+                          data-ocid="service_management.delete_button"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -544,6 +569,17 @@ export default function ServiceManagementPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Service"
+        message={`Delete "${deleteTarget?.title ?? "this service"}"? This action cannot be undone.`}
+        confirmLabel={deleteMutation.isPending ? "Deleting..." : "Delete"}
+        onConfirm={() =>
+          deleteTarget && deleteMutation.mutate(deleteTarget._id)
+        }
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
