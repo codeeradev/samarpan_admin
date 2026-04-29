@@ -5,6 +5,7 @@ import {
   getAllPatientsApi,
   updatePatientApi,
 } from "@/apiCalls/patients";
+import { getAppointmentsApi, type Appointment } from "@/apiCalls/appointments";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/useAuth";
 import type { PatientGender } from "@/types";
 import { formatDate } from "@/types";
 import {
@@ -71,6 +73,14 @@ const EMPTY_FORM: PatientFormState = {
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const SKELETON_ROWS = ["sk1", "sk2", "sk3", "sk4", "sk5"];
+
+function normalizePhone(value?: PatientItem["phone"] | Appointment["phoneNumber"]) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  return String(value).replace(/\D/g, "");
+}
 
 function GenderBadge({ gender }: { gender: PatientGender }) {
   const styles: Record<PatientGender, string> = {
@@ -377,6 +387,8 @@ function buildPayload(form: PatientFormState): PatientPayload {
 
 export default function PatientsPage() {
   const queryClient = useQueryClient();
+  const { admin } = useAuth();
+  const isDoctor = admin?.role === "doctor";
   const [searchTerm, setSearchTerm] = useState("");
   const [genderFilter, setGenderFilter] = useState<PatientGender | "all">(
     "all",
@@ -397,6 +409,56 @@ export default function PatientsPage() {
     queryKey: ["patients"],
     queryFn: getAllPatientsApi,
   });
+
+  const { data: appointmentData } = useQuery({
+    queryKey: ["appointments", "patients-scope", admin?.id],
+    queryFn: () => getAppointmentsApi({}),
+    enabled: isDoctor && Boolean(admin?.id),
+  });
+
+  const roleScopedPatients = useMemo(() => {
+    if (!isDoctor) {
+      return patients;
+    }
+
+    const doctorId = admin?.id;
+    if (!doctorId) {
+      return [];
+    }
+
+    const appointments = appointmentData?.appointments ?? [];
+    const allowedEmails = new Set<string>();
+    const allowedPhones = new Set<string>();
+
+    for (const appt of appointments) {
+      if (appt.doctorId !== doctorId) {
+        continue;
+      }
+
+      if (appt.status === "pending" || appt.status === "rejected") {
+        continue;
+      }
+
+      if (appt.email) {
+        allowedEmails.add(String(appt.email).toLowerCase().trim());
+      }
+
+      const phone = normalizePhone(appt.phoneNumber);
+      if (phone) {
+        allowedPhones.add(phone);
+      }
+    }
+
+    if (allowedEmails.size === 0 && allowedPhones.size === 0) {
+      return [];
+    }
+
+    return patients.filter((patient) => {
+      const email = patient.email ? String(patient.email).toLowerCase().trim() : "";
+      const phone = normalizePhone(patient.phone);
+      return (email && allowedEmails.has(email)) || (phone && allowedPhones.has(phone));
+    });
+  }, [admin?.id, appointmentData?.appointments, isDoctor, patients]);
 
   const updateMutation = useMutation({
     mutationFn: ({
@@ -427,20 +489,20 @@ export default function PatientsPage() {
   });
 
   const patientMetrics = useMemo(() => {
-    const total = patients.length;
-    const discharged = patients.filter(isPatientDischarged).length;
+    const total = roleScopedPatients.length;
+    const discharged = roleScopedPatients.filter(isPatientDischarged).length;
 
     return {
       total,
       discharged,
       active: total - discharged,
     };
-  }, [patients]);
+  }, [roleScopedPatients]);
 
   const filteredPatients = useMemo(() => {
     const query = searchTerm.toLowerCase().trim();
 
-    return patients.filter((patient) => {
+    return roleScopedPatients.filter((patient) => {
       const gender = getPatientGender(patient.gender);
       const isDischarged = isPatientDischarged(patient);
       const matchesSearch =
@@ -455,7 +517,7 @@ export default function PatientsPage() {
 
       return matchesSearch && matchesGender && matchesStatus;
     });
-  }, [patients, searchTerm, genderFilter, statusFilter]);
+  }, [roleScopedPatients, searchTerm, genderFilter, statusFilter]);
 
   const updateForm = (updates: Partial<PatientFormState>) =>
     setForm((prev) => ({ ...prev, ...updates }));
@@ -860,7 +922,7 @@ export default function PatientsPage() {
 
       {!isLoading && filteredPatients.length > 0 && (
         <p className="text-xs text-[#94A3B8] mt-3 px-1">
-          Showing {filteredPatients.length} of {patients.length} patients
+          Showing {filteredPatients.length} of {roleScopedPatients.length} patients
         </p>
       )}
 

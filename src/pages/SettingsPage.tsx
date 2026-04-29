@@ -126,7 +126,7 @@ export default function SettingsPage() {
       const updated = await updateAdminAccountApi({
         name: accountForm.name.trim(),
         email: accountForm.email.trim(),
-        phone: accountForm.phone.trim(),
+        phone: String(accountForm.phone || "").trim(),
       });
 
       updateAdmin({

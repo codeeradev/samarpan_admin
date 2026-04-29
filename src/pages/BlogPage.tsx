@@ -13,6 +13,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { BASE_URL } from "@/apis/endpoint";
 
+import { DataTable, type Column } from "@/components/admin/DataTable";
+import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,7 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Search, Upload } from "lucide-react";
+import { Eye, Plus, Pencil, Trash2, Upload } from "lucide-react";
 
 const BLOG_QUERY_KEY = ["blogs"];
 const SERVICES_QUERY_KEY = ["services"];
@@ -44,7 +46,7 @@ export default function BlogsPage() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"add" | "edit">("add");
   const [selected, setSelected] = useState<BlogItem | null>(null);
-  const [search, setSearch] = useState("");
+  const [previewTarget, setPreviewTarget] = useState<BlogItem | null>(null);
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -75,15 +77,7 @@ export default function BlogsPage() {
     [services],
   );
 
-  const filteredBlogs = useMemo(() => {
-    if (!search.trim()) return blogs;
-    const q = search.toLowerCase();
-    return blogs.filter((b) =>
-      [b.title, b.shortDescription]
-        .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(q)),
-    );
-  }, [search, blogs]);
+  const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
 
   const addMutation = useMutation({ mutationFn: addBlogApi });
 
@@ -92,8 +86,6 @@ export default function BlogsPage() {
   });
 
   const deleteMutation = useMutation({ mutationFn: deleteBlogApi });
-
-  const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
 
   function resolveAssetUrl(path?: string) {
     if (!path) return "";
@@ -210,88 +202,117 @@ export default function BlogsPage() {
     toast.success("Deleted");
   };
 
+  const columns: Column<BlogItem>[] = [
+    {
+      key: "title",
+      header: "Blog",
+      render: (blog) => (
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-10 w-12 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shrink-0">
+            {blog.image ? (
+              <img
+                src={resolveAssetUrl(blog.image)}
+                alt={blog.title || "Blog"}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="h-full w-full bg-slate-100" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-[#1E293B] truncate">
+              {blog.title || "Untitled"}
+            </p>
+            <p className="text-xs text-slate-500 truncate">
+              {blog.shortDescription || "No description"}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "serviceId",
+      header: "Service",
+      render: (blog) => (
+        <span className="text-slate-600">
+          {serviceById.get(blog.serviceId || "") || "—"}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (blog) => (
+        <span
+          className={
+            blog.status === "draft"
+              ? "inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
+              : "inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+          }
+        >
+          {blog.status || "published"}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (blog) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="rounded-lg border-slate-200"
+            onClick={() => setPreviewTarget(blog)}
+          >
+            <Eye size={14} />
+            Preview
+          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            className="rounded-lg"
+            onClick={() => openEdit(blog)}
+          >
+            <Pencil size={16} />
+          </Button>
+          <Button
+            size="icon"
+            variant="destructive"
+            onClick={() => handleDelete(blog._id)}
+          >
+            <Trash2 size={16} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-semibold">Blog Management</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage blog content and SEO
-          </p>
-        </div>
+      <PageHeader
+        title="Blog Management"
+        description="Manage blog content, SEO, and preview posts."
+        action={
+          <Button onClick={openAdd} className="rounded-xl gap-2">
+            <Plus className="h-4 w-4" />
+            Add Blog
+          </Button>
+        }
+      />
 
-        <Button onClick={openAdd}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Blog
-        </Button>
-      </div>
-
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search blogs..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-        />
-      </div>
-
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : (
-          filteredBlogs.map((blog) => (
-            <Card
-              key={blog._id}
-              className="overflow-hidden hover:shadow-md transition"
-            >
-              {blog.image ? (
-                <img
-                  src={resolveAssetUrl(blog.image)}
-                  className="h-40 w-full object-cover"
-                />
-              ) : (
-                <div className="h-40 bg-muted flex items-center justify-center text-sm text-muted-foreground">
-                  No Image
-                </div>
-              )}
-
-              <CardContent className="space-y-3 p-4">
-                <div className="text-xs text-muted-foreground uppercase flex gap-2">
-                  <span>{blog.status}</span>
-                  {serviceById.get(blog.serviceId || "") && (
-                    <span>{serviceById.get(blog.serviceId || "")}</span>
-                  )}
-                </div>
-
-                <h3 className="font-semibold line-clamp-2">{blog.title}</h3>
-
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {blog.shortDescription}
-                </p>
-
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => openEdit(blog)}
-                  >
-                    <Pencil size={16} />
-                  </Button>
-
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    onClick={() => handleDelete(blog._id)}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+      <DataTable<BlogItem>
+        columns={columns}
+        data={blogs}
+        isLoading={isLoading}
+        searchable
+        searchKeys={["title", "shortDescription", "status"] as (keyof BlogItem)[]}
+        emptyText="No blogs found."
+        rowKey={(row) => row._id}
+        data-ocid="blogs.table"
+      />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-3xl overflow-y-auto max-h-[90vh]">
@@ -448,6 +469,51 @@ export default function BlogsPage() {
               {mode === "edit" ? "Update Blog" : "Create Blog"}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!previewTarget}
+        onOpenChange={(nextOpen) => !nextOpen && setPreviewTarget(null)}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Blog Preview</DialogTitle>
+          </DialogHeader>
+
+          {previewTarget && (
+            <div className="space-y-5">
+              {previewTarget.image ? (
+                <div className="overflow-hidden rounded-2xl border bg-slate-50">
+                  <img
+                    src={resolveAssetUrl(previewTarget.image)}
+                    alt={previewTarget.title || "Blog"}
+                    className="h-56 w-full object-cover"
+                  />
+                </div>
+              ) : null}
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {serviceById.get(previewTarget.serviceId || "") || "No service"} ·{" "}
+                  {previewTarget.status || "published"}
+                </p>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  {previewTarget.title || "Untitled"}
+                </h2>
+                <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                  {previewTarget.shortDescription || ""}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-sm font-semibold text-slate-900">Content</p>
+                <p className="mt-2 text-sm leading-7 text-slate-700 whitespace-pre-wrap">
+                  {previewTarget.content || "—"}
+                </p>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

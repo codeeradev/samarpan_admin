@@ -530,7 +530,7 @@ function EditStaffDialog({
 
   return (
     <Dialog open={!!staff} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="w-[99vw] max-w-none max-h-[90vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="w-[98vw] max-w-[96rem] max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-[#1E293B]">
             Manage Staff Access

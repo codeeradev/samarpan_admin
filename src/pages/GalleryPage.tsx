@@ -2,13 +2,15 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState, type ChangeEvent } from "react";
+import { DataTable, type Column } from "@/components/admin/DataTable";
+import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { BASE_URL } from "@/apis/endpoint";
 
-import { Plus, Trash2, ImageIcon } from "lucide-react";
+import { Eye, Plus, Trash2 } from "lucide-react";
 import {
   addGalleryApi,
   deleteGalleryApi,
@@ -23,6 +25,7 @@ export default function GalleryPage() {
   const [open, setOpen] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewTarget, setPreviewTarget] = useState<GalleryItem | null>(null);
 
   const { data: gallery = [], isLoading } = useQuery({
     queryKey: GALLERY_QUERY_KEY,
@@ -74,20 +77,74 @@ export default function GalleryPage() {
   const totalImages = gallery.length;
   const galleryRows = useMemo(() => gallery, [gallery]);
 
+  const columns: Column<GalleryItem>[] = [
+    {
+      key: "image",
+      header: "Image",
+      render: (item) => (
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-14 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shrink-0">
+            <img
+              src={resolveAssetUrl(item.image)}
+              alt="Gallery"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <span className="text-sm text-slate-700 truncate max-w-[420px]">
+            {item.image}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: "createdAt",
+      header: "Uploaded",
+      render: (item) => (
+        <span className="text-sm text-slate-600">
+          {item.createdAt ? new Date(item.createdAt).toLocaleString() : "—"}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (item) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="rounded-lg border-slate-200"
+            onClick={() => setPreviewTarget(item)}
+          >
+            <Eye size={14} />
+            Preview
+          </Button>
+          <Button
+            size="icon"
+            variant="destructive"
+            onClick={() => handleDelete(item._id)}
+            aria-label="Delete image"
+          >
+            <Trash2 size={16} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold">Gallery</h1>
-          <p className="text-sm text-slate-500">
-            Manage website gallery images.
-          </p>
-        </div>
-
-        <Button onClick={() => setOpen(true)}>
-          <Plus size={14} /> Add Image
-        </Button>
-      </div>
+      <PageHeader
+        title="Gallery"
+        description="Manage website gallery images."
+        action={
+          <Button onClick={() => setOpen(true)} className="rounded-xl gap-2">
+            <Plus size={14} /> Add Image
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="rounded-xl border bg-white p-5 shadow-sm">
@@ -96,38 +153,16 @@ export default function GalleryPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {isLoading ? (
-          <div className="rounded-xl border bg-white p-6 text-center text-slate-500">
-            Loading gallery...
-          </div>
-        ) : galleryRows.length === 0 ? (
-          <div className="rounded-xl border bg-white p-6 text-center text-slate-500">
-            No images uploaded yet.
-          </div>
-        ) : (
-          galleryRows.map((item) => (
-            <div key={item._id} className="group overflow-hidden rounded-3xl border bg-white shadow-sm transition hover:shadow-md">
-              <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                <img src={resolveAssetUrl(item.image)} alt="Gallery item" className="h-full w-full object-cover transition duration-200 group-hover:scale-105" />
-              </div>
-              <div className="flex items-center justify-between gap-4 p-4">
-                <div>
-                  <p className="text-sm font-medium text-slate-900">Image</p>
-                  <p className="text-xs text-slate-500">{new Date(item.createdAt ?? "").toLocaleDateString()}</p>
-                </div>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={() => handleDelete(item._id)}
-                >
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      <DataTable<GalleryItem>
+        columns={columns}
+        data={galleryRows}
+        isLoading={isLoading}
+        searchable
+        searchKeys={["image"] as (keyof GalleryItem)[]}
+        emptyText="No images uploaded yet."
+        rowKey={(row) => row._id}
+        data-ocid="gallery.table"
+      />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -149,6 +184,26 @@ export default function GalleryPage() {
               Save Image
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!previewTarget}
+        onOpenChange={(nextOpen) => !nextOpen && setPreviewTarget(null)}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Gallery Preview</DialogTitle>
+          </DialogHeader>
+          {previewTarget && (
+            <div className="overflow-hidden rounded-2xl border bg-slate-50">
+              <img
+                src={resolveAssetUrl(previewTarget.image)}
+                alt="Gallery preview"
+                className="w-full max-h-[70vh] object-contain bg-white"
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

@@ -19724,7 +19724,7 @@ function isFlatArray(arr) {
 const predicates = utils$1.toFlatObject(utils$1, {}, null, function filter(prop) {
   return /^is[A-Z]/.test(prop);
 });
-function toFormData$4(obj, formData, options) {
+function toFormData$5(obj, formData, options) {
   if (!utils$1.isObject(obj)) {
     throw new TypeError("target must be an object");
   }
@@ -19842,7 +19842,7 @@ function encode$2(str) {
 }
 function AxiosURLSearchParams(params, options) {
   this._pairs = [];
-  params && toFormData$4(params, this, options);
+  params && toFormData$5(params, this, options);
 }
 const prototype = AxiosURLSearchParams.prototype;
 prototype.append = function append(name, value) {
@@ -19984,7 +19984,7 @@ const platform$1 = {
   ...platform$2
 };
 function toURLEncodedForm(data, options) {
-  return toFormData$4(data, new platform$1.classes.URLSearchParams(), {
+  return toFormData$5(data, new platform$1.classes.URLSearchParams(), {
     visitor: function(value, key, path, helpers) {
       if (platform$1.isNode && utils$1.isBuffer(value)) {
         this.append(key, value.toString("base64"));
@@ -20093,7 +20093,7 @@ const defaults$1 = {
         if ((isFileList2 = utils$1.isFileList(data)) || contentType.indexOf("multipart/form-data") > -1) {
           const env = own(this, "env");
           const _FormData = env && env.FormData;
-          return toFormData$4(
+          return toFormData$5(
             isFileList2 ? { "files[]": data } : data,
             _FormData && new _FormData(),
             formSerializer
@@ -21858,7 +21858,7 @@ axios.CanceledError = CanceledError$1;
 axios.CancelToken = CancelToken$1;
 axios.isCancel = isCancel$1;
 axios.VERSION = VERSION$1;
-axios.toFormData = toFormData$4;
+axios.toFormData = toFormData$5;
 axios.AxiosError = AxiosError$1;
 axios.Cancel = axios.CanceledError;
 axios.all = function all(promises) {
@@ -21883,7 +21883,7 @@ const {
   Cancel: Cancel$1,
   isAxiosError,
   spread,
-  toFormData: toFormData$3,
+  toFormData: toFormData$4,
   AxiosHeaders: AxiosHeaders2,
   HttpStatusCode,
   formToJSON,
@@ -21899,12 +21899,14 @@ const ENDPOINT = {
   ADD_SERVICE: "/add-service",
   GET_ALL_SERVICES: "/get-all-services",
   UPDATE_SERVICE: "/update-services",
+  DELETE_SERVICE: "/delete-service",
   ADD_DOCTOR: "/add-doctor",
   GET_ALL_DOCTORS: "/get-all-doctors",
   UPDATE_DOCTOR: "/update-doctor",
   DELETE_DOCTOR: "/delete-doctor",
   GET_ALL_PATIENTS: "/get-all-patients",
   UPDATE_PATIENT: "/update-patient",
+  DISCHARGE_PATIENT: "/discharge-patient",
   ADD_REVIEW: "/add-review",
   GET_ALL_REVIEWS: "/get-all-reviews",
   UPDATE_REVIEW: "/update-review",
@@ -21920,8 +21922,15 @@ const ENDPOINT = {
   GET_ALL_GALLERY: "/get-all-gallery",
   ADD_GALLERY: "/add-gallery",
   DELETE_GALLERY: "/delete-gallery",
+  GET_CONTENT: "/get-content",
+  UPSERT_CONTENT: "/upsert-content",
   GET_SETTINGS: "/get-settings",
   UPDATE_SETTINGS: "/update-settings",
+  UPDATE_ADMIN_ACCOUNT: "/update-admin-account",
+  GET_ADMIN_STAFF: "/get-admin-staff",
+  ADD_STAFF: "/add-staff",
+  UPDATE_STAFF: "/update-staff",
+  DELETE_STAFF: "/delete-staff",
   GET_APPOINTMENTS: "/get-appointments",
   UPDATE_APPOINTMENT: "/update-appointment"
 };
@@ -21983,18 +21992,34 @@ const DEFAULT_AUTH_STATE = {
 function isObject$9(value) {
   return typeof value === "object" && value !== null;
 }
+function normalizePermissions$1(value) {
+  if (!isObject$9(value)) {
+    return void 0;
+  }
+  return Object.entries(value).reduce(
+    (acc, [key, item]) => {
+      acc[key] = item === true;
+      return acc;
+    },
+    {}
+  );
+}
 function normalizeAdmin(value) {
   if (!isObject$9(value)) {
     return null;
   }
-  const { id, name, email, role, avatar } = value;
-  if (typeof id !== "string" || typeof name !== "string" || typeof email !== "string" || typeof avatar !== "string") {
+  const { id, name, email, role } = value;
+  const avatar = typeof value.avatar === "string" ? value.avatar : "";
+  if (typeof id !== "string" || typeof name !== "string" || typeof email !== "string") {
     return null;
   }
   if (role !== "super-admin" && role !== "doctor" && role !== "receptionist" && role !== "nurse") {
     return null;
   }
-  return { id, name, email, role, avatar };
+  const roleId = typeof value.roleId === "number" ? value.roleId : void 0;
+  const mobile = typeof value.mobile === "string" ? value.mobile : void 0;
+  const permissions = normalizePermissions$1(value.permissions);
+  return { id, name, email, role, avatar, roleId, mobile, permissions };
 }
 function normalizeAuthState(value) {
   if (!isObject$9(value)) {
@@ -22051,23 +22076,251 @@ function clearAuthState() {
     window.localStorage.removeItem(key);
   }
 }
+const ROLE_ID_TO_USER_ROLE = {
+  1: "super-admin",
+  2: "doctor",
+  3: "nurse",
+  4: "receptionist"
+};
+const USER_ROLE_TO_ROLE_ID = {
+  "super-admin": 1,
+  doctor: 2,
+  nurse: 3,
+  receptionist: 4
+};
+const PERMISSION_LABELS = {
+  manage_services: "Manage services",
+  view_services: "View services",
+  manage_doctors: "Manage doctors",
+  view_doctors: "View doctors",
+  manage_reviews: "Manage reviews",
+  view_reviews: "View reviews",
+  manage_shorts: "Manage shorts",
+  view_shorts: "View shorts",
+  manage_appointments: "Manage appointments",
+  view_appointments: "View appointments",
+  manage_users: "Manage patients",
+  view_users: "View patients",
+  manage_blogs: "Manage blogs",
+  view_blogs: "View blogs",
+  manage_gallery: "Manage gallery",
+  view_gallery: "View gallery",
+  view_settings: "View settings",
+  manage_settings: "Manage settings",
+  view_admin_staff: "View admin staff",
+  manage_admin_staff: "Manage admin staff"
+};
+const PERMISSION_GROUPS = [
+  {
+    title: "Staff & Access",
+    description: "Control who can view staff members and manage role access.",
+    permissions: ["view_admin_staff", "manage_admin_staff"]
+  },
+  {
+    title: "Doctors",
+    description: "Access doctor profiles and administrative doctor actions.",
+    permissions: ["view_doctors", "manage_doctors"]
+  },
+  {
+    title: "Patients",
+    description: "Access patient records and patient management actions.",
+    permissions: ["view_users", "manage_users"]
+  },
+  {
+    title: "Appointments",
+    description: "View appointment requests and update scheduling workflows.",
+    permissions: ["view_appointments", "manage_appointments"]
+  },
+  {
+    title: "Services",
+    description: "Manage website service content and service visibility.",
+    permissions: ["view_services", "manage_services"]
+  },
+  {
+    title: "Reviews",
+    description: "Control testimonial visibility and review moderation.",
+    permissions: ["view_reviews", "manage_reviews"]
+  },
+  {
+    title: "Shorts",
+    description: "Control video shorts visibility and publishing.",
+    permissions: ["view_shorts", "manage_shorts"]
+  },
+  {
+    title: "Blogs",
+    description: "Control blog visibility and publishing workflows.",
+    permissions: ["view_blogs", "manage_blogs"]
+  },
+  {
+    title: "Gallery",
+    description: "Manage gallery uploads and media visibility.",
+    permissions: ["view_gallery", "manage_gallery"]
+  },
+  {
+    title: "Settings",
+    description: "Access and update business settings and CMS settings.",
+    permissions: ["view_settings", "manage_settings"]
+  }
+];
+const ALL_PERMISSION_KEYS = PERMISSION_GROUPS.flatMap(
+  (group) => group.permissions
+);
+const LEGACY_ROLE_FALLBACK_PATHS = {
+  "super-admin": [],
+  doctor: ["/dashboard", "/patients", "/appointments"],
+  receptionist: ["/dashboard", "/patients", "/appointments"],
+  nurse: ["/dashboard", "/patients"]
+};
+const PATH_PERMISSION_RULES = {
+  "/dashboard": {},
+  "/doctors": { permissions: ["view_doctors", "manage_doctors"] },
+  "/patients": { permissions: ["view_users", "manage_users"] },
+  "/appointments": {
+    permissions: ["view_appointments", "manage_appointments"]
+  },
+  "/service-management": {
+    permissions: ["view_services", "manage_services"]
+  },
+  "/blogs": { permissions: ["view_blogs", "manage_blogs"] },
+  "/gallery": { permissions: ["view_gallery", "manage_gallery"] },
+  "/reviews-shorts": {
+    permissions: [
+      "view_reviews",
+      "manage_reviews",
+      "view_shorts",
+      "manage_shorts"
+    ]
+  },
+  "/website-content": { superAdminOnly: true },
+  "/settings": { permissions: ["view_settings", "manage_settings"] },
+  "/roles": {
+    permissions: ["view_admin_staff", "manage_admin_staff"],
+    superAdminOnly: true
+  }
+};
+function isPermissionKey(value) {
+  return ALL_PERMISSION_KEYS.includes(value);
+}
+function normalizePermissions(value) {
+  if (!value || typeof value !== "object") {
+    return {};
+  }
+  return Object.entries(value).reduce((acc, [key, item]) => {
+    acc[key] = item === true;
+    return acc;
+  }, {});
+}
+function getRoleFromRoleId(roleId) {
+  return ROLE_ID_TO_USER_ROLE[roleId ?? 0] ?? "receptionist";
+}
+function createPermissionTemplate(role) {
+  switch (role) {
+    case "doctor":
+      return {
+        view_users: true,
+        view_appointments: true
+      };
+    case "nurse":
+      return {
+        view_users: true,
+        view_appointments: true
+      };
+    case "receptionist":
+      return {
+        view_users: true,
+        manage_users: true,
+        view_appointments: true,
+        manage_appointments: true
+      };
+    case "super-admin":
+      return ALL_PERMISSION_KEYS.reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+      }, {});
+    default:
+      return {};
+  }
+}
+function countEnabledPermissions(permissions) {
+  return Object.values(permissions ?? {}).filter(Boolean).length;
+}
+function setPermissionWithDependencies(current, permission, checked) {
+  const next2 = { ...current, [permission]: checked };
+  if (permission.startsWith("manage_") && checked) {
+    const pairedView = permission.replace("manage_", "view_");
+    if (isPermissionKey(pairedView)) {
+      next2[pairedView] = true;
+    }
+  }
+  if (permission.startsWith("view_") && !checked) {
+    const pairedManage = permission.replace("view_", "manage_");
+    if (isPermissionKey(pairedManage)) {
+      next2[pairedManage] = false;
+    }
+  }
+  return next2;
+}
+function hasConfiguredPermissions(admin) {
+  return countEnabledPermissions(normalizePermissions(admin.permissions)) > 0;
+}
+function canAccessPath(admin, path) {
+  var _a2;
+  if (!admin) {
+    return false;
+  }
+  if (admin.role === "super-admin") {
+    return true;
+  }
+  const rule = PATH_PERMISSION_RULES[path];
+  if (!rule) {
+    return false;
+  }
+  if (rule.superAdminOnly) {
+    return false;
+  }
+  if (!((_a2 = rule.permissions) == null ? void 0 : _a2.length)) {
+    return true;
+  }
+  const permissions = normalizePermissions(admin.permissions);
+  const hasExplicitPermission = rule.permissions.some(
+    (permission) => permissions[permission] === true
+  );
+  if (hasExplicitPermission) {
+    return true;
+  }
+  if (!hasConfiguredPermissions(admin)) {
+    return (LEGACY_ROLE_FALLBACK_PATHS[admin.role] ?? []).includes(path);
+  }
+  return false;
+}
 const AuthContext = reactExports.createContext(null);
 function AuthProvider({ children }) {
   const [state, setState] = reactExports.useState(loadAuthState);
+  const updateAdmin = reactExports.useCallback((patch) => {
+    setState((prev2) => {
+      if (!prev2.admin) {
+        return prev2;
+      }
+      const nextState = {
+        ...prev2,
+        admin: {
+          ...prev2.admin,
+          ...patch,
+          permissions: patch.permissions !== void 0 ? normalizePermissions(patch.permissions) : prev2.admin.permissions
+        }
+      };
+      saveAuthState(nextState);
+      return nextState;
+    });
+  }, []);
   const login = reactExports.useCallback(async (email, password) => {
     var _a2, _b2, _c2, _d2, _e3, _f2, _g2;
     try {
       const data = await loginApi(email, password);
-      const roleIdToUserRole = {
-        1: "super-admin",
-        2: "doctor",
-        3: "nurse",
-        4: "receptionist"
-      };
       const rawRoleName = ((_a2 = data == null ? void 0 : data.admin) == null ? void 0 : _a2.role) ?? (data == null ? void 0 : data.role);
       const rawRoleId = (_b2 = data == null ? void 0 : data.admin) == null ? void 0 : _b2.roleId;
       const mappedRoleFromName = rawRoleName === "SUPER_ADMIN" ? "super-admin" : rawRoleName === "DOCTOR" ? "doctor" : rawRoleName === "NURSE" ? "nurse" : rawRoleName === "RECEPTIONIST" ? "receptionist" : void 0;
-      const mappedRoleFromId = rawRoleId ? roleIdToUserRole[rawRoleId] : void 0;
+      const mappedRoleFromId = rawRoleId ? getRoleFromRoleId(rawRoleId) : void 0;
       const role = mappedRoleFromName ?? mappedRoleFromId ?? "receptionist";
       const admin = {
         id: ((_c2 = data.admin) == null ? void 0 : _c2._id) || "",
@@ -22076,7 +22329,7 @@ function AuthProvider({ children }) {
         role,
         roleId: rawRoleId ?? 1,
         avatar: data.admin.image || "",
-        permissions: ((_f2 = data.admin) == null ? void 0 : _f2.permissions) || {},
+        permissions: normalizePermissions((_f2 = data.admin) == null ? void 0 : _f2.permissions),
         mobile: ((_g2 = data.admin) == null ? void 0 : _g2.phone) || ""
       };
       const newState = {
@@ -22103,7 +22356,7 @@ function AuthProvider({ children }) {
     clearAuthState();
     localStorage.removeItem("token");
   }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(AuthContext.Provider, { value: { ...state, login, logout }, children });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(AuthContext.Provider, { value: { ...state, login, updateAdmin, logout }, children });
 }
 function useAuth() {
   const ctx = reactExports.useContext(AuthContext);
@@ -30406,6 +30659,23 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
+const __iconNode$F = [
+  [
+    "path",
+    {
+      d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+      key: "3c2336"
+    }
+  ],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+];
+const BadgeCheck = createLucideIcon("badge-check", __iconNode$F);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
 const __iconNode$E = [
   ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
@@ -30504,18 +30774,6 @@ const DollarSign = createLucideIcon("dollar-sign", __iconNode$w);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$v = [
-  ["path", { d: "M15 3h6v6", key: "1q9fwt" }],
-  ["path", { d: "M10 14 21 3", key: "gplh6r" }],
-  ["path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6", key: "a6xqqp" }]
-];
-const ExternalLink = createLucideIcon("external-link", __iconNode$v);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$u = [
   [
     "path",
     {
@@ -30533,14 +30791,14 @@ const __iconNode$u = [
   ],
   ["path", { d: "m2 2 20 20", key: "1ooewy" }]
 ];
-const EyeOff = createLucideIcon("eye-off", __iconNode$u);
+const EyeOff = createLucideIcon("eye-off", __iconNode$v);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$t = [
+const __iconNode$u = [
   [
     "path",
     {
@@ -30550,7 +30808,20 @@ const __iconNode$t = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-const Eye = createLucideIcon("eye", __iconNode$t);
+const Eye = createLucideIcon("eye", __iconNode$u);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$t = [
+  ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
+  ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
+  ["circle", { cx: "10", cy: "12", r: "2", key: "737tya" }],
+  ["path", { d: "m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22", key: "wt3hpn" }]
+];
+const FileImage = createLucideIcon("file-image", __iconNode$t);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30558,34 +30829,6 @@ const Eye = createLucideIcon("eye", __iconNode$t);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$s = [
-  ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
-  ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
-  ["circle", { cx: "10", cy: "12", r: "2", key: "737tya" }],
-  ["path", { d: "m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22", key: "wt3hpn" }]
-];
-const FileImage = createLucideIcon("file-image", __iconNode$s);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$r = [
-  ["circle", { cx: "9", cy: "12", r: "1", key: "1vctgf" }],
-  ["circle", { cx: "9", cy: "5", r: "1", key: "hp0tcf" }],
-  ["circle", { cx: "9", cy: "19", r: "1", key: "fkjjf6" }],
-  ["circle", { cx: "15", cy: "12", r: "1", key: "1tmaij" }],
-  ["circle", { cx: "15", cy: "5", r: "1", key: "19l28e" }],
-  ["circle", { cx: "15", cy: "19", r: "1", key: "f4zoj3" }]
-];
-const GripVertical = createLucideIcon("grip-vertical", __iconNode$r);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$q = [
   [
     "path",
     {
@@ -30595,7 +30838,32 @@ const __iconNode$q = [
   ],
   ["path", { d: "M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27", key: "1uw2ng" }]
 ];
-const HeartPulse = createLucideIcon("heart-pulse", __iconNode$q);
+const HeartPulse = createLucideIcon("heart-pulse", __iconNode$s);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$r = [
+  ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", ry: "2", key: "1m3agn" }],
+  ["circle", { cx: "9", cy: "9", r: "2", key: "af1f0g" }],
+  ["path", { d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21", key: "1xmnt7" }]
+];
+const Image = createLucideIcon("image", __iconNode$r);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$q = [
+  ["rect", { width: "7", height: "9", x: "3", y: "3", rx: "1", key: "10lvy0" }],
+  ["rect", { width: "7", height: "5", x: "14", y: "3", rx: "1", key: "16une8" }],
+  ["rect", { width: "7", height: "9", x: "14", y: "12", rx: "1", key: "1hutg5" }],
+  ["rect", { width: "7", height: "5", x: "3", y: "16", rx: "1", key: "ldoo1y" }]
+];
+const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$q);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30603,11 +30871,11 @@ const HeartPulse = createLucideIcon("heart-pulse", __iconNode$q);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$p = [
-  ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", ry: "2", key: "1m3agn" }],
-  ["circle", { cx: "9", cy: "9", r: "2", key: "af1f0g" }],
-  ["path", { d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21", key: "1xmnt7" }]
+  ["rect", { width: "18", height: "7", x: "3", y: "3", rx: "1", key: "f1a2em" }],
+  ["rect", { width: "9", height: "7", x: "3", y: "14", rx: "1", key: "jqznyg" }],
+  ["rect", { width: "5", height: "7", x: "16", y: "14", rx: "1", key: "q5h2i8" }]
 ];
-const Image = createLucideIcon("image", __iconNode$p);
+const LayoutTemplate = createLucideIcon("layout-template", __iconNode$p);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30615,12 +30883,10 @@ const Image = createLucideIcon("image", __iconNode$p);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$o = [
-  ["rect", { width: "7", height: "9", x: "3", y: "3", rx: "1", key: "10lvy0" }],
-  ["rect", { width: "7", height: "5", x: "14", y: "3", rx: "1", key: "16une8" }],
-  ["rect", { width: "7", height: "9", x: "14", y: "12", rx: "1", key: "1hutg5" }],
-  ["rect", { width: "7", height: "5", x: "3", y: "16", rx: "1", key: "ldoo1y" }]
+  ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
+  ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
 ];
-const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$o);
+const Lock = createLucideIcon("lock", __iconNode$o);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30628,11 +30894,11 @@ const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$o);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$n = [
-  ["rect", { width: "18", height: "7", x: "3", y: "3", rx: "1", key: "f1a2em" }],
-  ["rect", { width: "9", height: "7", x: "3", y: "14", rx: "1", key: "jqznyg" }],
-  ["rect", { width: "5", height: "7", x: "16", y: "14", rx: "1", key: "q5h2i8" }]
+  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
+  ["path", { d: "M21 12H9", key: "dn1m92" }],
+  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
 ];
-const LayoutTemplate = createLucideIcon("layout-template", __iconNode$n);
+const LogOut = createLucideIcon("log-out", __iconNode$n);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30640,10 +30906,11 @@ const LayoutTemplate = createLucideIcon("layout-template", __iconNode$n);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$m = [
-  ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
-  ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
+  ["path", { d: "M4 12h16", key: "1lakjw" }],
+  ["path", { d: "M4 18h16", key: "19g7jn" }],
+  ["path", { d: "M4 6h16", key: "1o0s65" }]
 ];
-const Lock = createLucideIcon("lock", __iconNode$m);
+const Menu = createLucideIcon("menu", __iconNode$m);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30651,11 +30918,9 @@ const Lock = createLucideIcon("lock", __iconNode$m);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$l = [
-  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
-  ["path", { d: "M21 12H9", key: "dn1m92" }],
-  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
+  ["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", key: "1lielz" }]
 ];
-const LogOut = createLucideIcon("log-out", __iconNode$l);
+const MessageSquare = createLucideIcon("message-square", __iconNode$l);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30663,28 +30928,6 @@ const LogOut = createLucideIcon("log-out", __iconNode$l);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$k = [
-  ["path", { d: "M4 12h16", key: "1lakjw" }],
-  ["path", { d: "M4 18h16", key: "19g7jn" }],
-  ["path", { d: "M4 6h16", key: "1o0s65" }]
-];
-const Menu = createLucideIcon("menu", __iconNode$k);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$j = [
-  ["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", key: "1lielz" }]
-];
-const MessageSquare = createLucideIcon("message-square", __iconNode$j);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$i = [
   [
     "path",
     {
@@ -30694,33 +30937,33 @@ const __iconNode$i = [
   ],
   ["path", { d: "m15 5 4 4", key: "1mk7zo" }]
 ];
-const Pencil = createLucideIcon("pencil", __iconNode$i);
+const Pencil = createLucideIcon("pencil", __iconNode$k);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$h = [["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]];
-const Play = createLucideIcon("play", __iconNode$h);
+const __iconNode$j = [["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]];
+const Play = createLucideIcon("play", __iconNode$j);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$g = [
+const __iconNode$i = [
   ["path", { d: "M5 12h14", key: "1ays0h" }],
   ["path", { d: "M12 5v14", key: "s699le" }]
 ];
-const Plus = createLucideIcon("plus", __iconNode$g);
+const Plus = createLucideIcon("plus", __iconNode$i);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$f = [
+const __iconNode$h = [
   [
     "path",
     {
@@ -30731,7 +30974,35 @@ const __iconNode$f = [
   ["path", { d: "M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7", key: "1ydtos" }],
   ["path", { d: "M7 3v4a1 1 0 0 0 1 1h7", key: "t51u73" }]
 ];
-const Save = createLucideIcon("save", __iconNode$f);
+const Save = createLucideIcon("save", __iconNode$h);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$g = [
+  ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
+  ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
+];
+const Search = createLucideIcon("search", __iconNode$g);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$f = [
+  [
+    "path",
+    {
+      d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z",
+      key: "1qme2f"
+    }
+  ],
+  ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
+];
+const Settings = createLucideIcon("settings", __iconNode$f);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30739,10 +31010,16 @@ const Save = createLucideIcon("save", __iconNode$f);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$e = [
-  ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
-  ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
+  [
+    "path",
+    {
+      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+      key: "oel41y"
+    }
+  ],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const Search = createLucideIcon("search", __iconNode$e);
+const ShieldCheck = createLucideIcon("shield-check", __iconNode$e);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30753,13 +31030,14 @@ const __iconNode$d = [
   [
     "path",
     {
-      d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z",
-      key: "1qme2f"
+      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+      key: "oel41y"
     }
   ],
-  ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
+  ["path", { d: "M9 12h6", key: "1c52cq" }],
+  ["path", { d: "M12 9v6", key: "199k2o" }]
 ];
-const Settings = createLucideIcon("settings", __iconNode$d);
+const ShieldPlus = createLucideIcon("shield-plus", __iconNode$d);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30773,10 +31051,9 @@ const __iconNode$c = [
       d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
       key: "oel41y"
     }
-  ],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ]
 ];
-const ShieldCheck = createLucideIcon("shield-check", __iconNode$c);
+const Shield = createLucideIcon("shield", __iconNode$c);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30787,12 +31064,12 @@ const __iconNode$b = [
   [
     "path",
     {
-      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
-      key: "oel41y"
+      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
+      key: "r04s7s"
     }
   ]
 ];
-const Shield = createLucideIcon("shield", __iconNode$b);
+const Star = createLucideIcon("star", __iconNode$b);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30800,15 +31077,13 @@ const Shield = createLucideIcon("shield", __iconNode$b);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$a = [
-  [
-    "path",
-    {
-      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
-      key: "r04s7s"
-    }
-  ]
+  ["path", { d: "M3 6h18", key: "d0wm0j" }],
+  ["path", { d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6", key: "4alrt4" }],
+  ["path", { d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2", key: "v07s0e" }],
+  ["line", { x1: "10", x2: "10", y1: "11", y2: "17", key: "1uufr5" }],
+  ["line", { x1: "14", x2: "14", y1: "11", y2: "17", key: "xtxkd" }]
 ];
-const Star = createLucideIcon("star", __iconNode$a);
+const Trash2 = createLucideIcon("trash-2", __iconNode$a);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30816,13 +31091,10 @@ const Star = createLucideIcon("star", __iconNode$a);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$9 = [
-  ["path", { d: "M3 6h18", key: "d0wm0j" }],
-  ["path", { d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6", key: "4alrt4" }],
-  ["path", { d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2", key: "v07s0e" }],
-  ["line", { x1: "10", x2: "10", y1: "11", y2: "17", key: "1uufr5" }],
-  ["line", { x1: "14", x2: "14", y1: "11", y2: "17", key: "xtxkd" }]
+  ["path", { d: "M16 17h6v-6", key: "t6n2it" }],
+  ["path", { d: "m22 17-8.5-8.5-5 5L2 7", key: "x473p" }]
 ];
-const Trash2 = createLucideIcon("trash-2", __iconNode$9);
+const TrendingDown = createLucideIcon("trending-down", __iconNode$9);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30830,10 +31102,10 @@ const Trash2 = createLucideIcon("trash-2", __iconNode$9);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$8 = [
-  ["path", { d: "M16 17h6v-6", key: "t6n2it" }],
-  ["path", { d: "m22 17-8.5-8.5-5 5L2 7", key: "x473p" }]
+  ["path", { d: "M16 7h6v6", key: "box55l" }],
+  ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
 ];
-const TrendingDown = createLucideIcon("trending-down", __iconNode$8);
+const TrendingUp = createLucideIcon("trending-up", __iconNode$8);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30841,17 +31113,6 @@ const TrendingDown = createLucideIcon("trending-down", __iconNode$8);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$7 = [
-  ["path", { d: "M16 7h6v6", key: "box55l" }],
-  ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
-];
-const TrendingUp = createLucideIcon("trending-up", __iconNode$7);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$6 = [
   [
     "path",
     {
@@ -30862,7 +31123,19 @@ const __iconNode$6 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-const TriangleAlert = createLucideIcon("triangle-alert", __iconNode$6);
+const TriangleAlert = createLucideIcon("triangle-alert", __iconNode$7);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$6 = [
+  ["path", { d: "M12 3v12", key: "1x0j5s" }],
+  ["path", { d: "m17 8-5-5-5 5", key: "7q97r8" }],
+  ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }]
+];
+const Upload = createLucideIcon("upload", __iconNode$6);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30870,11 +31143,10 @@ const TriangleAlert = createLucideIcon("triangle-alert", __iconNode$6);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$5 = [
-  ["path", { d: "M12 3v12", key: "1x0j5s" }],
-  ["path", { d: "m17 8-5-5-5 5", key: "7q97r8" }],
-  ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }]
+  ["circle", { cx: "12", cy: "8", r: "5", key: "1hypcn" }],
+  ["path", { d: "M20 21a8 8 0 0 0-16 0", key: "rfgkzh" }]
 ];
-const Upload = createLucideIcon("upload", __iconNode$5);
+const UserRound = createLucideIcon("user-round", __iconNode$5);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30882,10 +31154,10 @@ const Upload = createLucideIcon("upload", __iconNode$5);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$4 = [
-  ["circle", { cx: "12", cy: "8", r: "5", key: "1hypcn" }],
-  ["path", { d: "M20 21a8 8 0 0 0-16 0", key: "rfgkzh" }]
+  ["path", { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", key: "975kel" }],
+  ["circle", { cx: "12", cy: "7", r: "4", key: "17ys0d" }]
 ];
-const UserRound = createLucideIcon("user-round", __iconNode$4);
+const User = createLucideIcon("user", __iconNode$4);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30893,10 +31165,12 @@ const UserRound = createLucideIcon("user-round", __iconNode$4);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$3 = [
-  ["path", { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", key: "975kel" }],
-  ["circle", { cx: "12", cy: "7", r: "4", key: "17ys0d" }]
+  ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
+  ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
+  ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
+  ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
 ];
-const User = createLucideIcon("user", __iconNode$3);
+const Users = createLucideIcon("users", __iconNode$3);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30904,12 +31178,16 @@ const User = createLucideIcon("user", __iconNode$3);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$2 = [
-  ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
-  ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
-  ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
-  ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
+  [
+    "path",
+    {
+      d: "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5",
+      key: "ftymec"
+    }
+  ],
+  ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
 ];
-const Users = createLucideIcon("users", __iconNode$2);
+const Video = createLucideIcon("video", __iconNode$2);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30920,13 +31198,19 @@ const __iconNode$1 = [
   [
     "path",
     {
-      d: "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5",
-      key: "ftymec"
+      d: "m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72",
+      key: "ul74o6"
     }
   ],
-  ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
+  ["path", { d: "m14 7 3 3", key: "1r5n42" }],
+  ["path", { d: "M5 6v4", key: "ilb8ba" }],
+  ["path", { d: "M19 14v4", key: "blhpug" }],
+  ["path", { d: "M10 2v2", key: "7u0qdc" }],
+  ["path", { d: "M7 8H3", key: "zfb6yr" }],
+  ["path", { d: "M21 16h-4", key: "1cnmox" }],
+  ["path", { d: "M11 3H9", key: "1obp7u" }]
 ];
-const Video = createLucideIcon("video", __iconNode$1);
+const WandSparkles = createLucideIcon("wand-sparkles", __iconNode$1);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31372,25 +31656,6 @@ function SheetContent({
     )
   ] });
 }
-const ROLE_PERMISSIONS = {
-  "super-admin": [
-    "/dashboard",
-    "/doctors",
-    "/patients",
-    "/appointments",
-    "/service-management",
-    "/blogs",
-    "/gallery",
-    "/reviews-shorts",
-    "/content",
-    "/enquiries",
-    "/settings",
-    "/roles"
-  ],
-  doctor: ["/dashboard", "/patients", "/appointments"],
-  receptionist: ["/dashboard", "/patients", "/appointments", "/enquiries"],
-  nurse: ["/dashboard", "/patients"]
-};
 const ROLE_LABELS = {
   "super-admin": "Super Admin",
   doctor: "Doctor",
@@ -36585,6 +36850,18 @@ const ALL_NAV_ITEMS = [
     permissionPath: "/dashboard"
   },
   {
+    label: "Services",
+    icon: HeartPulse,
+    path: "/service-management",
+    permissionPath: "/service-management"
+  },
+  {
+    label: "Roles",
+    icon: Shield,
+    path: "/roles",
+    permissionPath: "/roles"
+  },
+  {
     label: "Doctors",
     icon: UserRound,
     path: "/doctors",
@@ -36601,12 +36878,6 @@ const ALL_NAV_ITEMS = [
     icon: Calendar,
     path: "/appointments",
     permissionPath: "/appointments"
-  },
-  {
-    label: "Service Management",
-    icon: HeartPulse,
-    path: "/service-management",
-    permissionPath: "/service-management"
   },
   {
     label: "Blogs",
@@ -36627,10 +36898,10 @@ const ALL_NAV_ITEMS = [
     permissionPath: "/reviews-shorts"
   },
   {
-    label: "Content",
+    label: "Website Content",
     icon: FileImage,
-    path: "/content",
-    permissionPath: "/content"
+    path: "/website-content",
+    permissionPath: "/website-content"
   },
   // {
   //   label: "Enquiries",
@@ -36643,12 +36914,6 @@ const ALL_NAV_ITEMS = [
     icon: Settings,
     path: "/settings",
     permissionPath: "/settings"
-  },
-  {
-    label: "Role Management",
-    icon: Shield,
-    path: "/roles",
-    permissionPath: "/roles"
   }
 ];
 function SidebarNav({
@@ -36684,16 +36949,15 @@ function AdminLayout() {
   const location2 = useLocation();
   const [mobileOpen, setMobileOpen] = reactExports.useState(false);
   const role = admin == null ? void 0 : admin.role;
-  const allowedPaths = role ? ROLE_PERMISSIONS[role] ?? [] : [];
   const visibleItems = ALL_NAV_ITEMS.filter(
-    (item) => allowedPaths.includes(item.permissionPath)
+    (item) => canAccessPath(admin, item.permissionPath)
   );
   function handleLogout() {
     logout();
     navigate({ to: "/" });
   }
   const initials = (admin == null ? void 0 : admin.name) ? admin.name.split(" ").map((n2) => n2[0]).join("").slice(0, 2).toUpperCase() : "AD";
-  const roleLabel = role === "super-admin" ? "Super Admin" : role === "doctor" ? "Doctor" : role === "receptionist" ? "Receptionist" : role === "nurse" ? "Nurse" : "Admin";
+  const roleLabel = role ? ROLE_LABELS[role] : "Admin";
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-screen bg-[#F8FAFC] flex", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("aside", { className: "hidden lg:flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center items-center px-5 py-6 border-b border-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -38942,190 +39206,6 @@ const mockAppointments = [
     status: "pending"
   }
 ];
-const mockServices = [
-  {
-    id: "s1",
-    name: "Emergency Care",
-    description: "24/7 emergency medical care with fully equipped trauma units and rapid response teams.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 2500,
-    category: "Emergency",
-    isActive: true
-  },
-  {
-    id: "s2",
-    name: "Cardiac Surgery",
-    description: "Advanced cardiac procedures including bypass surgery, valve replacement, and angioplasty.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 15e4,
-    category: "Surgery",
-    isActive: true
-  },
-  {
-    id: "s3",
-    name: "Maternity & Delivery",
-    description: "Comprehensive maternity care from prenatal consultations to safe delivery and postnatal support.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 35e3,
-    category: "Maternity",
-    isActive: true
-  },
-  {
-    id: "s4",
-    name: "Diagnostic Imaging",
-    description: "State-of-the-art MRI, CT scan, X-ray, and ultrasound services with same-day reports.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 3500,
-    category: "Diagnostics",
-    isActive: true
-  },
-  {
-    id: "s5",
-    name: "Orthopedic Care",
-    description: "Joint replacements, fracture management, and sports injury rehabilitation programs.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 8e4,
-    category: "Surgery",
-    isActive: true
-  },
-  {
-    id: "s6",
-    name: "Pediatrics",
-    description: "Specialized child healthcare including vaccinations, growth monitoring, and pediatric surgery.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 800,
-    category: "Pediatrics",
-    isActive: true
-  },
-  {
-    id: "s7",
-    name: "Mental Health Clinic",
-    description: "Confidential psychiatric consultations, therapy sessions, and addiction recovery programs.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 1500,
-    category: "Psychiatry",
-    isActive: true
-  },
-  {
-    id: "s8",
-    name: "Eye Care Center",
-    description: "Complete ophthalmology services including LASIK surgery, cataract removal, and retinal treatments.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 5e3,
-    category: "Ophthalmology",
-    isActive: true
-  },
-  {
-    id: "s9",
-    name: "Physiotherapy",
-    description: "Expert physiotherapy and rehabilitation for post-surgical recovery, sports injuries, and chronic pain.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 1200,
-    category: "Rehabilitation",
-    isActive: true
-  },
-  {
-    id: "s10",
-    name: "Laboratory Services",
-    description: "Accredited pathology laboratory offering 500+ diagnostic tests with online reports.",
-    image: "/assets/images/service-placeholder.svg",
-    price: 500,
-    category: "Diagnostics",
-    isActive: false
-  }
-];
-const mockBanners = [
-  {
-    id: "b1",
-    title: "Your Health, Our Priority",
-    subtitle: "World-class medical care with compassion and expertise.",
-    ctaText: "Book Appointment",
-    ctaLink: "/appointment",
-    imageUrl: "/assets/images/banner-placeholder.svg",
-    isActive: true
-  },
-  {
-    id: "b2",
-    title: "Advanced Cardiac Care",
-    subtitle: "Expert heart specialists with state-of-the-art technology.",
-    ctaText: "Learn More",
-    ctaLink: "/cardiology",
-    imageUrl: "/assets/images/banner-placeholder.svg",
-    isActive: false
-  }
-];
-const mockAbout = {
-  heading: "About Samarpan Hospital",
-  description: "Samarpan Hospital has been serving the community for over 25 years, providing exceptional medical care with a patient-centric approach. Our team of 200+ specialists is dedicated to delivering the highest standard of healthcare.",
-  mission: "To provide accessible, affordable, and high-quality healthcare services to all patients with compassion and integrity.",
-  vision: "To be the most trusted healthcare institution in the region, known for clinical excellence and patient satisfaction.",
-  imageUrl: "/assets/images/about-placeholder.svg",
-  stats: [
-    { label: "Years of Service", value: "25+" },
-    { label: "Specialist Doctors", value: "200+" },
-    { label: "Happy Patients", value: "1L+" },
-    { label: "Beds", value: "500+" }
-  ]
-};
-const INITIAL_MANAGED_USERS = [
-  {
-    id: "u1",
-    name: "Suresh Menon",
-    email: "admin@samarpan.com",
-    role: "super-admin",
-    joinedDate: "2022-01-10"
-  },
-  {
-    id: "u2",
-    name: "Anjana Krishnan",
-    email: "anjana.k@samarpan.com",
-    role: "super-admin",
-    joinedDate: "2022-03-15"
-  },
-  {
-    id: "u3",
-    name: "Dr. Rajesh Sharma",
-    email: "doctor@samarpan.com",
-    role: "doctor",
-    joinedDate: "2022-06-01"
-  },
-  {
-    id: "u4",
-    name: "Dr. Priya Mehta",
-    email: "priya.mehta@samarpan.com",
-    role: "doctor",
-    joinedDate: "2023-01-20"
-  },
-  {
-    id: "u5",
-    name: "Priya Nair",
-    email: "receptionist@samarpan.com",
-    role: "receptionist",
-    joinedDate: "2023-04-05"
-  },
-  {
-    id: "u6",
-    name: "Sonal Desai",
-    email: "sonal.d@samarpan.com",
-    role: "receptionist",
-    joinedDate: "2023-07-12"
-  },
-  {
-    id: "u7",
-    name: "Kavitha Iyer",
-    email: "nurse@samarpan.com",
-    role: "nurse",
-    joinedDate: "2023-09-01"
-  },
-  {
-    id: "u8",
-    name: "Meena Rao",
-    email: "meena.rao@samarpan.com",
-    role: "nurse",
-    joinedDate: "2024-02-14"
-  }
-];
-const managedUsersStore = [...INITIAL_MANAGED_USERS];
 const mockDashboardStats = {
   totalPatients: 14352,
   totalAppointments: 1288,
@@ -39162,10 +39242,6 @@ async function fetchAppointments() {
 async function fetchDashboardStats() {
   await delay(500);
   return { ...mockDashboardStats };
-}
-async function fetchManagedUsers() {
-  await delay(400);
-  return [...managedUsersStore];
 }
 const getAppointmentsApi = async (params) => {
   const response = await get$3(ENDPOINT.GET_APPOINTMENTS, {
@@ -41487,7 +41563,8 @@ function AppointmentCard({
   onApprove,
   onReject,
   onComplete,
-  onReschedule
+  onReschedule,
+  isUpdating
 }) {
   const isInactive = appt.status === "completed" || appt.status === "cancelled";
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -41523,7 +41600,7 @@ function AppointmentCard({
                 size: "sm",
                 className: "h-8 px-3 text-xs bg-green-500 hover:bg-green-600 text-white rounded-xl gap-1 flex-1 sm:flex-none",
                 onClick: onApprove,
-                disabled: updateMutation.isPending,
+                disabled: isUpdating,
                 "data-ocid": `appointments.approve_button.${idx + 1}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheck, { size: 12 }),
@@ -41539,7 +41616,7 @@ function AppointmentCard({
                 variant: "outline",
                 className: "h-8 px-3 text-xs text-rose-500 border-rose-200 hover:bg-rose-50 rounded-xl gap-1 flex-1 sm:flex-none",
                 onClick: onReject,
-                disabled: updateMutation.isPending,
+                disabled: isUpdating,
                 "data-ocid": `appointments.reject_button.${idx + 1}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CircleX, { size: 12 }),
@@ -41591,10 +41668,11 @@ function AppointmentsPage() {
     queryFn: () => getAppointmentsApi({})
   });
   const appointments = (data == null ? void 0 : data.appointments) || [];
-  const updateMutation2 = useMutation({
+  const updateMutation = useMutation({
     mutationFn: ({ id, payload }) => updateAppointmentApi(id, payload),
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient2.invalidateQueries({ queryKey: ["patients"] });
       ue$2.success("Appointment updated successfully");
     },
     onError: () => {
@@ -41627,7 +41705,7 @@ function AppointmentsPage() {
       reject: "reject",
       complete: "complete"
     };
-    updateMutation2.mutate({ id, payload: { action: actionMap[type] } });
+    updateMutation.mutate({ id, payload: { action: actionMap[type] } });
     setPendingAction(null);
   }
   const columns = [
@@ -41679,7 +41757,7 @@ function AppointmentsPage() {
                 size: "sm",
                 className: "h-7 px-2.5 text-xs bg-green-500 hover:bg-green-600 text-white rounded-lg gap-1",
                 onClick: () => triggerAction(row._id, "approve", row.fullName),
-                disabled: updateMutation2.isPending,
+                disabled: updateMutation.isPending,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheck, { size: 11 }),
                   "Approve"
@@ -41694,7 +41772,7 @@ function AppointmentsPage() {
                 variant: "outline",
                 className: "h-7 px-2.5 text-xs text-rose-500 border-rose-200 hover:bg-rose-50 rounded-lg gap-1",
                 onClick: () => triggerAction(row._id, "reject", row.fullName),
-                disabled: updateMutation2.isPending,
+                disabled: updateMutation.isPending,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CircleX, { size: 11 }),
                   "Reject"
@@ -41711,7 +41789,7 @@ function AppointmentsPage() {
                 variant: "outline",
                 className: "h-7 px-2.5 text-xs text-primary border-primary/30 hover:bg-primary/10 rounded-lg gap-1",
                 onClick: () => openReschedule(row),
-                disabled: updateMutation2.isPending,
+                disabled: updateMutation.isPending,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarClock, { size: 11 }),
                   "Reschedule"
@@ -41725,7 +41803,7 @@ function AppointmentsPage() {
                 size: "sm",
                 className: "h-7 px-2.5 text-xs bg-secondary hover:bg-primary text-white rounded-lg gap-1",
                 onClick: () => triggerAction(row._id, "complete", row.fullName),
-                disabled: updateMutation2.isPending,
+                disabled: updateMutation.isPending,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheck, { size: 11 }),
                   "Complete"
@@ -41761,7 +41839,7 @@ function AppointmentsPage() {
   }
   function saveReschedule() {
     if (!rescheduleTarget) return;
-    updateMutation2.mutate({
+    updateMutation.mutate({
       id: rescheduleTarget._id,
       payload: {
         action: "reschedule",
@@ -41796,7 +41874,7 @@ function AppointmentsPage() {
       PageHeader,
       {
         title: "Appointments",
-        description: `Manage all patient appointments · ${appointments.length} total`
+        description: `Approving an appointment adds the patient record. Completing an appointment reflects discharge status automatically.`
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-3 mb-5", children: [
@@ -41879,6 +41957,7 @@ function AppointmentsPage() {
       {
         appt,
         idx,
+        isUpdating: updateMutation.isPending,
         onApprove: () => triggerAction(appt._id, "approve", appt.fullName),
         onReject: () => triggerAction(appt._id, "reject", appt.fullName),
         onComplete: () => triggerAction(appt._id, "complete", appt.fullName),
@@ -42116,888 +42195,6 @@ function CardContent({ className, ...props }) {
       ...props
     }
   );
-}
-var SWITCH_NAME = "Switch";
-var [createSwitchContext] = createContextScope(SWITCH_NAME);
-var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
-var Switch$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const {
-      __scopeSwitch,
-      name,
-      checked: checkedProp,
-      defaultChecked,
-      required,
-      disabled,
-      value = "on",
-      onCheckedChange,
-      form,
-      ...switchProps
-    } = props;
-    const [button, setButton] = reactExports.useState(null);
-    const composedRefs = useComposedRefs(forwardedRef, (node2) => setButton(node2));
-    const hasConsumerStoppedPropagationRef = reactExports.useRef(false);
-    const isFormControl = button ? form || !!button.closest("form") : true;
-    const [checked, setChecked] = useControllableState({
-      prop: checkedProp,
-      defaultProp: defaultChecked ?? false,
-      onChange: onCheckedChange,
-      caller: SWITCH_NAME
-    });
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs(SwitchProvider, { scope: __scopeSwitch, checked, disabled, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Primitive.button,
-        {
-          type: "button",
-          role: "switch",
-          "aria-checked": checked,
-          "aria-required": required,
-          "data-state": getState(checked),
-          "data-disabled": disabled ? "" : void 0,
-          disabled,
-          value,
-          ...switchProps,
-          ref: composedRefs,
-          onClick: composeEventHandlers(props.onClick, (event) => {
-            setChecked((prevChecked) => !prevChecked);
-            if (isFormControl) {
-              hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
-              if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
-            }
-          })
-        }
-      ),
-      isFormControl && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        SwitchBubbleInput,
-        {
-          control: button,
-          bubbles: !hasConsumerStoppedPropagationRef.current,
-          name,
-          value,
-          checked,
-          required,
-          disabled,
-          form,
-          style: { transform: "translateX(-100%)" }
-        }
-      )
-    ] });
-  }
-);
-Switch$1.displayName = SWITCH_NAME;
-var THUMB_NAME = "SwitchThumb";
-var SwitchThumb = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeSwitch, ...thumbProps } = props;
-    const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Primitive.span,
-      {
-        "data-state": getState(context.checked),
-        "data-disabled": context.disabled ? "" : void 0,
-        ...thumbProps,
-        ref: forwardedRef
-      }
-    );
-  }
-);
-SwitchThumb.displayName = THUMB_NAME;
-var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
-var SwitchBubbleInput = reactExports.forwardRef(
-  ({
-    __scopeSwitch,
-    control,
-    checked,
-    bubbles = true,
-    ...props
-  }, forwardedRef) => {
-    const ref = reactExports.useRef(null);
-    const composedRefs = useComposedRefs(ref, forwardedRef);
-    const prevChecked = usePrevious(checked);
-    const controlSize = useSize(control);
-    reactExports.useEffect(() => {
-      const input = ref.current;
-      if (!input) return;
-      const inputProto = window.HTMLInputElement.prototype;
-      const descriptor = Object.getOwnPropertyDescriptor(
-        inputProto,
-        "checked"
-      );
-      const setChecked = descriptor.set;
-      if (prevChecked !== checked && setChecked) {
-        const event = new Event("click", { bubbles });
-        setChecked.call(input, checked);
-        input.dispatchEvent(event);
-      }
-    }, [prevChecked, checked, bubbles]);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "input",
-      {
-        type: "checkbox",
-        "aria-hidden": true,
-        defaultChecked: checked,
-        ...props,
-        tabIndex: -1,
-        ref: composedRefs,
-        style: {
-          ...props.style,
-          ...controlSize,
-          position: "absolute",
-          pointerEvents: "none",
-          opacity: 0,
-          margin: 0
-        }
-      }
-    );
-  }
-);
-SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
-function getState(checked) {
-  return checked ? "checked" : "unchecked";
-}
-var Root = Switch$1;
-var Thumb = SwitchThumb;
-function Switch({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Root,
-    {
-      "data-slot": "switch",
-      className: cn(
-        "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      ),
-      ...props,
-      children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Thumb,
-        {
-          "data-slot": "switch-thumb",
-          className: cn(
-            "bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0"
-          )
-        }
-      )
-    }
-  );
-}
-var TABS_NAME = "Tabs";
-var [createTabsContext] = createContextScope(TABS_NAME, [
-  createRovingFocusGroupScope
-]);
-var useRovingFocusGroupScope = createRovingFocusGroupScope();
-var [TabsProvider, useTabsContext] = createTabsContext(TABS_NAME);
-var Tabs$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const {
-      __scopeTabs,
-      value: valueProp,
-      onValueChange,
-      defaultValue,
-      orientation = "horizontal",
-      dir,
-      activationMode = "automatic",
-      ...tabsProps
-    } = props;
-    const direction = useDirection(dir);
-    const [value, setValue] = useControllableState({
-      prop: valueProp,
-      onChange: onValueChange,
-      defaultProp: defaultValue ?? "",
-      caller: TABS_NAME
-    });
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      TabsProvider,
-      {
-        scope: __scopeTabs,
-        baseId: useId(),
-        value,
-        onValueChange: setValue,
-        orientation,
-        dir: direction,
-        activationMode,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Primitive.div,
-          {
-            dir: direction,
-            "data-orientation": orientation,
-            ...tabsProps,
-            ref: forwardedRef
-          }
-        )
-      }
-    );
-  }
-);
-Tabs$1.displayName = TABS_NAME;
-var TAB_LIST_NAME = "TabsList";
-var TabsList$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeTabs, loop = true, ...listProps } = props;
-    const context = useTabsContext(TAB_LIST_NAME, __scopeTabs);
-    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Root$4,
-      {
-        asChild: true,
-        ...rovingFocusGroupScope,
-        orientation: context.orientation,
-        dir: context.dir,
-        loop,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Primitive.div,
-          {
-            role: "tablist",
-            "aria-orientation": context.orientation,
-            ...listProps,
-            ref: forwardedRef
-          }
-        )
-      }
-    );
-  }
-);
-TabsList$1.displayName = TAB_LIST_NAME;
-var TRIGGER_NAME = "TabsTrigger";
-var TabsTrigger$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeTabs, value, disabled = false, ...triggerProps } = props;
-    const context = useTabsContext(TRIGGER_NAME, __scopeTabs);
-    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
-    const triggerId = makeTriggerId(context.baseId, value);
-    const contentId = makeContentId(context.baseId, value);
-    const isSelected = value === context.value;
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Item$1,
-      {
-        asChild: true,
-        ...rovingFocusGroupScope,
-        focusable: !disabled,
-        active: isSelected,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Primitive.button,
-          {
-            type: "button",
-            role: "tab",
-            "aria-selected": isSelected,
-            "aria-controls": contentId,
-            "data-state": isSelected ? "active" : "inactive",
-            "data-disabled": disabled ? "" : void 0,
-            disabled,
-            id: triggerId,
-            ...triggerProps,
-            ref: forwardedRef,
-            onMouseDown: composeEventHandlers(props.onMouseDown, (event) => {
-              if (!disabled && event.button === 0 && event.ctrlKey === false) {
-                context.onValueChange(value);
-              } else {
-                event.preventDefault();
-              }
-            }),
-            onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
-              if ([" ", "Enter"].includes(event.key)) context.onValueChange(value);
-            }),
-            onFocus: composeEventHandlers(props.onFocus, () => {
-              const isAutomaticActivation = context.activationMode !== "manual";
-              if (!isSelected && !disabled && isAutomaticActivation) {
-                context.onValueChange(value);
-              }
-            })
-          }
-        )
-      }
-    );
-  }
-);
-TabsTrigger$1.displayName = TRIGGER_NAME;
-var CONTENT_NAME = "TabsContent";
-var TabsContent$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeTabs, value, forceMount, children, ...contentProps } = props;
-    const context = useTabsContext(CONTENT_NAME, __scopeTabs);
-    const triggerId = makeTriggerId(context.baseId, value);
-    const contentId = makeContentId(context.baseId, value);
-    const isSelected = value === context.value;
-    const isMountAnimationPreventedRef = reactExports.useRef(isSelected);
-    reactExports.useEffect(() => {
-      const rAF = requestAnimationFrame(() => isMountAnimationPreventedRef.current = false);
-      return () => cancelAnimationFrame(rAF);
-    }, []);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || isSelected, children: ({ present }) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Primitive.div,
-      {
-        "data-state": isSelected ? "active" : "inactive",
-        "data-orientation": context.orientation,
-        role: "tabpanel",
-        "aria-labelledby": triggerId,
-        hidden: !present,
-        id: contentId,
-        tabIndex: 0,
-        ...contentProps,
-        ref: forwardedRef,
-        style: {
-          ...props.style,
-          animationDuration: isMountAnimationPreventedRef.current ? "0s" : void 0
-        },
-        children: present && children
-      }
-    ) });
-  }
-);
-TabsContent$1.displayName = CONTENT_NAME;
-function makeTriggerId(baseId, value) {
-  return `${baseId}-trigger-${value}`;
-}
-function makeContentId(baseId, value) {
-  return `${baseId}-content-${value}`;
-}
-var Root2 = Tabs$1;
-var List = TabsList$1;
-var Trigger = TabsTrigger$1;
-var Content = TabsContent$1;
-function Tabs({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Root2,
-    {
-      "data-slot": "tabs",
-      className: cn("flex flex-col gap-2", className),
-      ...props
-    }
-  );
-}
-function TabsList({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    List,
-    {
-      "data-slot": "tabs-list",
-      className: cn(
-        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
-        className
-      ),
-      ...props
-    }
-  );
-}
-function TabsTrigger({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Trigger,
-    {
-      "data-slot": "tabs-trigger",
-      className: cn(
-        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      ),
-      ...props
-    }
-  );
-}
-function TabsContent({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Content,
-    {
-      "data-slot": "tabs-content",
-      className: cn("flex-1 outline-none", className),
-      ...props
-    }
-  );
-}
-function ImageUploadArea({ label, hint }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: label }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-2 border-dashed border-[#CBD5E1] rounded-xl p-5 min-h-[120px] flex flex-col items-center justify-center gap-2 bg-[#F8FAFC] hover:bg-primary/5 hover:border-primary transition-colors cursor-pointer group active:bg-primary/5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 18, className: "text-primary" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-[#1E293B]", children: "Tap to upload image" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8] text-center", children: hint ?? "PNG, JPG up to 5MB" })
-    ] })
-  ] });
-}
-function BannerPreview({ banner }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl overflow-hidden border border-[#E2E8F0]", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wider px-4 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0]", children: "Live Preview" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative bg-gradient-to-br from-primary to-secondary p-6 min-h-[130px] flex flex-col justify-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "div",
-        {
-          className: "absolute inset-0 opacity-10",
-          style: {
-            backgroundImage: "radial-gradient(circle at 70% 50%, white 1px, transparent 1px)",
-            backgroundSize: "20px 20px"
-          }
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-white text-lg font-bold leading-snug max-w-full", children: banner.title || "Banner Title" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-white/80 text-sm mt-1 max-w-full", children: banner.subtitle || "Banner subtitle goes here" }),
-      banner.ctaText && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mt-3 inline-flex items-center px-4 py-1.5 rounded-lg bg-white text-primary text-xs font-semibold w-fit", children: banner.ctaText })
-    ] })
-  ] });
-}
-function SaveRow({ onSave, ocid }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap sm:flex-nowrap items-center justify-end gap-2 pt-1", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Button,
-      {
-        type: "button",
-        variant: "outline",
-        className: "rounded-xl border-slate-200 text-[#64748B] w-full sm:w-auto",
-        onClick: () => ue$2.info("Changes discarded."),
-        children: "Discard"
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Button,
-      {
-        type: "button",
-        className: "rounded-xl bg-primary hover:bg-secondary text-white font-medium px-6 w-full sm:w-auto",
-        onClick: onSave,
-        "data-ocid": ocid,
-        children: "Save Changes"
-      }
-    )
-  ] });
-}
-function ContentPage() {
-  const [loading, setLoading] = reactExports.useState(true);
-  const [bannerData, setBannerData] = reactExports.useState(mockBanners[0]);
-  const [aboutData, setAboutData] = reactExports.useState(mockAbout);
-  const [homeServices, setHomeServices] = reactExports.useState([]);
-  reactExports.useEffect(() => {
-    const t2 = setTimeout(() => {
-      setBannerData({ ...mockBanners[0] });
-      setAboutData({ ...mockAbout });
-      setHomeServices(mockServices.map((s2) => ({ ...s2 })));
-      setLoading(false);
-    }, 700);
-    return () => clearTimeout(t2);
-  }, []);
-  function saveBanner() {
-    ue$2.success("Banner saved successfully!");
-  }
-  function saveAbout() {
-    ue$2.success("About section saved successfully!");
-  }
-  function saveServicesOrder() {
-    ue$2.success("Homepage services order saved!");
-  }
-  function toggleServiceVisibility(id) {
-    setHomeServices(
-      (prev2) => prev2.map((s2) => s2.id === id ? { ...s2, isActive: !s2.isActive } : s2)
-    );
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "content.page", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      PageHeader,
-      {
-        title: "Website Content",
-        description: "Manage homepage banners, about section, and services visibility."
-      }
-    ),
-    loading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", "data-ocid": "content.loading_state", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full sm:w-72 rounded-xl" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-64 w-full rounded-2xl" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-48 w-full rounded-2xl" })
-    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "banner", "data-ocid": "content.tabs", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto -mx-1 px-1 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "bg-[#F1F5F9] rounded-xl p-1 flex-nowrap inline-flex min-w-max", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          TabsTrigger,
-          {
-            value: "banner",
-            className: "rounded-lg text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm whitespace-nowrap",
-            "data-ocid": "content.banner_tab",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(LayoutTemplate, { size: 14, className: "mr-1.5" }),
-              "Banner"
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          TabsTrigger,
-          {
-            value: "about",
-            className: "rounded-lg text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm whitespace-nowrap",
-            "data-ocid": "content.about_tab",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { size: 14, className: "mr-1.5" }),
-              "About"
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          TabsTrigger,
-          {
-            value: "services",
-            className: "rounded-lg text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm whitespace-nowrap",
-            "data-ocid": "content.services_tab",
-            children: "Services Section"
-          }
-        )
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "banner", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-sm border border-[#E2E8F0] rounded-2xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base font-semibold text-[#1E293B]", children: "Homepage Banner" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-sm text-[#64748B]", children: "Configure the primary banner shown on the hospital website homepage." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "banner-title", children: "Banner Title" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "banner-title",
-                    value: bannerData.title,
-                    onChange: (e3) => setBannerData({
-                      ...bannerData,
-                      title: e3.target.value
-                    }),
-                    placeholder: "Your Health, Our Priority",
-                    className: "rounded-xl",
-                    "data-ocid": "content.banner_title_input"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "banner-subtitle", children: "Banner Subtitle" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "banner-subtitle",
-                    value: bannerData.subtitle,
-                    onChange: (e3) => setBannerData({
-                      ...bannerData,
-                      subtitle: e3.target.value
-                    }),
-                    placeholder: "World-class care with compassion",
-                    className: "rounded-xl",
-                    "data-ocid": "content.banner_subtitle_input"
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "banner-description", children: "Banner Description" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Textarea,
-                {
-                  id: "banner-description",
-                  rows: 3,
-                  placeholder: "Brief description shown under the headline…",
-                  className: "rounded-xl resize-none min-h-[100px]",
-                  "data-ocid": "content.banner_description_textarea"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "banner-cta-text", children: "CTA Button Text" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "banner-cta-text",
-                    value: bannerData.ctaText,
-                    onChange: (e3) => setBannerData({
-                      ...bannerData,
-                      ctaText: e3.target.value
-                    }),
-                    placeholder: "Book Appointment",
-                    className: "rounded-xl",
-                    "data-ocid": "content.banner_cta_text_input"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "banner-cta-link", children: "CTA Button Link" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "banner-cta-link",
-                    value: bannerData.ctaLink,
-                    onChange: (e3) => setBannerData({
-                      ...bannerData,
-                      ctaLink: e3.target.value
-                    }),
-                    placeholder: "/appointment",
-                    className: "rounded-xl",
-                    "data-ocid": "content.banner_cta_link_input"
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              ImageUploadArea,
-              {
-                label: "Background Image",
-                hint: "Recommended: 1440×600px, JPG or PNG"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              SaveRow,
-              {
-                onSave: saveBanner,
-                ocid: "content.save_banner_button"
-              }
-            )
-          ] })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-1 space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(BannerPreview, { banner: bannerData }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-sm border border-[#E2E8F0] rounded-2xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wider mb-3", children: "Banner Status" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-[#1E293B]", children: "Active on Homepage" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8] mt-0.5", children: "Toggle to show/hide this banner" })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Switch,
-                {
-                  checked: bannerData.isActive,
-                  onCheckedChange: (checked) => setBannerData({ ...bannerData, isActive: checked }),
-                  "data-ocid": "content.banner_active_switch"
-                }
-              )
-            ] })
-          ] }) })
-        ] })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "about", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-sm border border-[#E2E8F0] rounded-2xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base font-semibold text-[#1E293B]", children: "About Section" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-sm text-[#64748B]", children: "Update the hospital's story, mission, and vision shown on the website." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "about-title", children: "About Title" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "about-title",
-                  value: aboutData.heading,
-                  onChange: (e3) => setAboutData({
-                    ...aboutData,
-                    heading: e3.target.value
-                  }),
-                  placeholder: "About Samarpan Hospital",
-                  className: "rounded-xl",
-                  "data-ocid": "content.about_title_input"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "about-description", children: "About Description" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Textarea,
-                {
-                  id: "about-description",
-                  value: aboutData.description,
-                  onChange: (e3) => setAboutData({
-                    ...aboutData,
-                    description: e3.target.value
-                  }),
-                  rows: 4,
-                  className: "rounded-xl resize-none min-h-[100px]",
-                  "data-ocid": "content.about_description_textarea"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "about-mission", children: "Mission Statement" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
-                  {
-                    id: "about-mission",
-                    value: aboutData.mission,
-                    onChange: (e3) => setAboutData({
-                      ...aboutData,
-                      mission: e3.target.value
-                    }),
-                    rows: 3,
-                    className: "rounded-xl resize-none min-h-[100px]",
-                    "data-ocid": "content.about_mission_textarea"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "about-vision", children: "Vision Statement" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
-                  {
-                    id: "about-vision",
-                    value: aboutData.vision,
-                    onChange: (e3) => setAboutData({
-                      ...aboutData,
-                      vision: e3.target.value
-                    }),
-                    rows: 3,
-                    className: "rounded-xl resize-none min-h-[100px]",
-                    "data-ocid": "content.about_vision_textarea"
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "about-year", children: "Hospital Established Year" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "about-year",
-                  type: "number",
-                  defaultValue: 2e3,
-                  placeholder: "e.g. 1998",
-                  className: "rounded-xl w-full max-w-xs",
-                  "data-ocid": "content.about_year_input"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              ImageUploadArea,
-              {
-                label: "About Section Image",
-                hint: "Recommended: 800×600px, JPG or PNG"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              SaveRow,
-              {
-                onSave: saveAbout,
-                ocid: "content.save_about_button"
-              }
-            )
-          ] })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-sm border border-[#E2E8F0] rounded-2xl h-fit", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-sm font-semibold text-[#1E293B]", children: "Hospital Stats" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-xs text-[#94A3B8]", children: "Displayed as achievement highlights" })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "grid grid-cols-2 gap-3", children: aboutData.stats.map((stat) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "div",
-            {
-              className: "rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-3 text-center",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-primary", children: stat.value }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] mt-0.5 leading-tight", children: stat.label })
-              ]
-            },
-            stat.label
-          )) })
-        ] }) })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "services", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-sm border border-[#E2E8F0] rounded-2xl", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base font-semibold text-[#1E293B]", children: "Homepage Services" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-sm text-[#64748B] mt-1", children: "Manage which services appear on your homepage. Use the toggle to show or hide each service." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-primary font-medium flex items-center gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-1.5 h-1.5 rounded-full bg-primary inline-block" }),
-              "Auto-saved"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                type: "button",
-                variant: "outline",
-                size: "sm",
-                className: "rounded-xl border-[#CBD5E1] text-[#1E293B] hover:bg-primary/5 hover:border-primary text-xs font-medium",
-                onClick: saveServicesOrder,
-                "data-ocid": "content.save_services_button",
-                children: "Save Order"
-              }
-            )
-          ] })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-0", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              className: "divide-y divide-[#F1F5F9]",
-              "data-ocid": "content.services_list",
-              children: homeServices.map((service, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "flex items-center gap-3 px-4 sm:px-6 py-4 hover:bg-[#F8FAFC] transition-colors",
-                  "data-ocid": `content.services_list.item.${index2 + 1}`,
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "button",
-                      {
-                        type: "button",
-                        "aria-label": "Reorder service",
-                        className: "text-[#CBD5E1] hover:text-[#94A3B8] cursor-grab active:cursor-grabbing flex-shrink-0 transition-colors p-1 -ml-1 touch-manipulation",
-                        "data-ocid": `content.services_drag_handle.${index2 + 1}`,
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(GripVertical, { size: 18 })
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-9 h-9 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { size: 15, className: "text-primary" }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-[#1E293B] truncate", children: service.name }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] truncate mt-0.5 hidden sm:block", children: service.description }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] truncate mt-0.5 sm:hidden", children: service.category })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden md:inline-flex items-center px-2.5 py-0.5 rounded-lg bg-[#F1F5F9] text-[#64748B] text-xs font-medium flex-shrink-0", children: service.category }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-shrink-0", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        "span",
-                        {
-                          className: `text-xs font-medium hidden sm:block ${service.isActive ? "text-primary" : "text-[#94A3B8]"}`,
-                          children: service.isActive ? "Visible" : "Hidden"
-                        }
-                      ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Switch,
-                        {
-                          checked: service.isActive,
-                          onCheckedChange: () => toggleServiceVisibility(service.id),
-                          "data-ocid": `content.services_visibility_switch.${index2 + 1}`
-                        }
-                      )
-                    ] })
-                  ]
-                },
-                service.id
-              ))
-            }
-          ),
-          homeServices.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "div",
-            {
-              className: "py-16 flex flex-col items-center justify-center gap-3 text-center",
-              "data-ocid": "content.services_empty_state",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 rounded-2xl bg-[#F1F5F9] flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { size: 22, className: "text-[#94A3B8]" }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-[#1E293B]", children: "No services found" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8]", children: "Add services from the Services page first." })
-              ]
-            }
-          ),
-          homeServices.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 sm:px-6 py-3 border-t border-[#F1F5F9] flex items-center justify-between flex-wrap gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-[#94A3B8]", children: [
-            homeServices.filter((s2) => s2.isActive).length,
-            " of",
-            " ",
-            homeServices.length,
-            " services visible on homepage"
-          ] }) })
-        ] })
-      ] }) })
-    ] })
-  ] });
 }
 const colorMap = {
   gold: {
@@ -65055,17 +64252,17 @@ function appendValue$1(fd, key, value) {
   if (typeof value === "string" && value.trim() === "") return;
   fd.append(key, String(value));
 }
-function normalizePhone$1(value) {
+function normalizePhone$3(value) {
   const digits = (value == null ? void 0 : value.replace(/\D/g, "")) ?? "";
   return digits || void 0;
 }
-function toFormData$2(payload) {
+function toFormData$3(payload) {
   var _a2, _b2, _c2, _d2, _e3, _f2, _g2;
   const fd = new FormData();
   appendValue$1(fd, "name", (_a2 = payload.name) == null ? void 0 : _a2.trim());
   appendValue$1(fd, "email", (_b2 = payload.email) == null ? void 0 : _b2.trim());
   appendValue$1(fd, "password", (_c2 = payload.password) == null ? void 0 : _c2.trim());
-  appendValue$1(fd, "phone", normalizePhone$1(payload.phone));
+  appendValue$1(fd, "phone", normalizePhone$3(payload.phone));
   appendValue$1(fd, "specialization", (_d2 = payload.specialization) == null ? void 0 : _d2.trim());
   appendValue$1(fd, "description", (_e3 = payload.description) == null ? void 0 : _e3.trim());
   appendValue$1(fd, "experience", (_f2 = payload.experience) == null ? void 0 : _f2.trim());
@@ -65095,7 +64292,7 @@ const getAllDoctorsApi = async () => {
 const addDoctorApi = async (payload) => {
   var _a2, _b2, _c2;
   try {
-    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$2(payload), {
+    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$3(payload), {
       needAuth: true
     });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
@@ -65108,7 +64305,7 @@ const updateDoctorApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_DOCTOR}/${id}`,
-      toFormData$2(payload),
+      toFormData$3(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
@@ -65217,7 +64414,7 @@ const SPECIALIZATIONS = [
   "Psychiatry"
 ];
 const SKELETON_ROWS$1 = ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5"];
-const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
+const API_ASSET_ORIGIN$1 = BASE_URL.replace(/\/admin\/?$/, "");
 const emptyForm$1 = {
   name: "",
   specialization: "",
@@ -65251,12 +64448,12 @@ function availabilityToFlags(availability) {
 function splitCommaList(value) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
-function resolveAssetUrl(path) {
+function resolveAssetUrl$1(path) {
   if (!path) return void 0;
   if (/^https?:\/\//.test(path)) return path;
-  return `${API_ASSET_ORIGIN}${path.startsWith("/") ? path : `/${path}`}`;
+  return `${API_ASSET_ORIGIN$1}${path.startsWith("/") ? path : `/${path}`}`;
 }
-function getImageLabel(value) {
+function getImageLabel$1(value) {
   if (value instanceof File) return value.name;
   if (!value) return "";
   return value.split("/").filter(Boolean).pop() ?? value;
@@ -65339,7 +64536,7 @@ function DoctorsPage() {
     },
     onError: (error2) => ue$2.error(error2.message)
   });
-  const updateMutation2 = useMutation({
+  const updateMutation = useMutation({
     mutationFn: ({
       id,
       payload
@@ -65363,7 +64560,7 @@ function DoctorsPage() {
     },
     onError: (error2) => ue$2.error(error2.message)
   });
-  const isSaving = addMutation.isPending || updateMutation2.isPending;
+  const isSaving = addMutation.isPending || updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
   const filtered = reactExports.useMemo(() => {
     if (!searchQuery.trim()) return doctors;
@@ -65408,7 +64605,7 @@ function DoctorsPage() {
       expertise: (doctor.expertise ?? []).join(", ")
     });
     setFormErrors({});
-    setImageFileName(getImageLabel(doctor.image ?? ""));
+    setImageFileName(getImageLabel$1(doctor.image ?? ""));
     if (fileInputRef.current) fileInputRef.current.value = "";
     setIsEditModalOpen(true);
   }
@@ -65431,7 +64628,7 @@ function DoctorsPage() {
       setFormErrors(errors);
       return;
     }
-    updateMutation2.mutate({
+    updateMutation.mutate({
       id: selectedDoctor._id,
       payload: buildPayload$1(formData, "edit")
     });
@@ -65458,7 +64655,7 @@ function DoctorsPage() {
     }
   }
   function renderDoctorAvatar(doctor, sizeClass = "h-9 w-9") {
-    const imageSrc = resolveAssetUrl(doctor.image);
+    const imageSrc = resolveAssetUrl$1(doctor.image);
     return /* @__PURE__ */ jsxRuntimeExports.jsxs(Avatar, { className: `${sizeClass} shrink-0`, children: [
       imageSrc && /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarImage, { src: imageSrc, alt: doctor.name }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "bg-amber-100 text-[#A67C00] text-xs font-bold", children: getInitials$1(doctor.name) })
@@ -65769,7 +64966,7 @@ function DoctorsPage() {
                 onClick: handleUpdate,
                 disabled: isSaving,
                 "data-ocid": "doctors.save_button",
-                children: updateMutation2.isPending ? "Saving..." : "Save Changes"
+                children: updateMutation.isPending ? "Saving..." : "Save Changes"
               }
             )
           ] })
@@ -66124,6 +65321,332 @@ function DoctorForm({
     ] })
   ] });
 }
+function getCellValue(row, key) {
+  const value = row[key];
+  if (value === null || value === void 0) return "—";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  return String(value);
+}
+const SKELETON_IDS = ["sk1", "sk2", "sk3", "sk4", "sk5"];
+function DataTable({
+  columns,
+  data,
+  isLoading = false,
+  searchable = false,
+  searchKeys = [],
+  emptyText = "No records found.",
+  rowKey,
+  mobileCardRender,
+  "data-ocid": dataOcid
+}) {
+  const [search, setSearch] = reactExports.useState("");
+  const filtered = reactExports.useMemo(() => {
+    if (!searchable || !search.trim()) return data;
+    const q2 = search.toLowerCase();
+    return data.filter(
+      (row) => searchKeys.some(
+        (k2) => String(row[k2] ?? "").toLowerCase().includes(q2)
+      )
+    );
+  }, [data, search, searchable, searchKeys]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", "data-ocid": dataOcid, children: [
+    searchable && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full md:max-w-sm", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Search,
+        {
+          size: 15,
+          className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          placeholder: "Search…",
+          value: search,
+          onChange: (e3) => setSearch(e3.target.value),
+          className: "pl-8 h-9 text-sm border-slate-200 rounded-xl w-full",
+          "data-ocid": dataOcid ? `${dataOcid}.search_input` : "table.search_input"
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "md:hidden space-y-2", children: isLoading ? SKELETON_IDS.map((sk) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Card,
+      {
+        className: "shadow-card border border-slate-100 rounded-xl",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded-md" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-1/2 rounded-md" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-2/3 rounded-md" })
+        ] })
+      },
+      sk
+    )) : filtered.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-card border border-slate-100 rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-[#94A3B8] text-sm", children: emptyText }) }) : filtered.map(
+      (row, idx) => mobileCardRender ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
+        {
+          "data-ocid": dataOcid ? `${dataOcid}.item.${idx + 1}` : void 0,
+          children: mobileCardRender(row, idx)
+        },
+        rowKey(row)
+      ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Card,
+        {
+          className: "shadow-card border border-slate-100 rounded-xl overflow-hidden",
+          "data-ocid": dataOcid ? `${dataOcid}.item.${idx + 1}` : void 0,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("dl", { className: "space-y-2", children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              className: "flex items-start gap-2 min-w-0",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide w-28 flex-shrink-0 pt-0.5", children: col.header }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "text-sm text-[#1E293B] flex-1 min-w-0 break-words", children: col.render ? col.render(row) : getCellValue(row, col.key) })
+              ]
+            },
+            String(col.key)
+          )) }) })
+        },
+        rowKey(row)
+      )
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "hidden md:block shadow-card border border-slate-100 rounded-2xl overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { className: "bg-[#F8FAFC] hover:bg-[#F8FAFC] border-b border-slate-100", children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        TableHead,
+        {
+          className: `text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4 ${col.className ?? ""}`,
+          children: col.header
+        },
+        String(col.key)
+      )) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: isLoading ? SKELETON_IDS.map((sk) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { className: "border-b border-slate-50", children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded-md" }) }, String(col.key))) }, sk)) : filtered.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        TableCell,
+        {
+          colSpan: columns.length,
+          className: "text-center py-12 text-[#94A3B8] text-sm",
+          children: emptyText
+        }
+      ) }) : filtered.map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        TableRow,
+        {
+          className: "border-b border-slate-50 hover:bg-[#F8FAFC] transition-colors",
+          "data-ocid": dataOcid ? `${dataOcid}.item.${idx + 1}` : void 0,
+          children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            TableCell,
+            {
+              className: `px-4 py-3 text-sm text-[#1E293B] ${col.className ?? ""}`,
+              children: col.render ? col.render(row) : getCellValue(row, col.key)
+            },
+            String(col.key)
+          ))
+        },
+        rowKey(row)
+      )) })
+    ] }) }) }) })
+  ] });
+}
+const getAllGalleryApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_GALLERY, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery) ?? [];
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch gallery items"
+    );
+  }
+};
+const addGalleryApi = async (image) => {
+  var _a2, _b2, _c2;
+  try {
+    const formData = new FormData();
+    formData.append("image", image);
+    const res = await post(ENDPOINT.ADD_GALLERY, formData, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add gallery image"
+    );
+  }
+};
+const deleteGalleryApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_GALLERY}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(
+      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete gallery image"
+    );
+  }
+};
+const GALLERY_QUERY_KEY = ["gallery"];
+function GalleryPage() {
+  const queryClient2 = useQueryClient();
+  const [open, setOpen] = reactExports.useState(false);
+  const [image, setImage] = reactExports.useState(null);
+  const [previewUrl, setPreviewUrl] = reactExports.useState(null);
+  const [previewTarget, setPreviewTarget] = reactExports.useState(null);
+  const { data: gallery = [], isLoading } = useQuery({
+    queryKey: GALLERY_QUERY_KEY,
+    queryFn: getAllGalleryApi
+  });
+  const addMutation = useMutation({ mutationFn: addGalleryApi });
+  const deleteMutation = useMutation({ mutationFn: deleteGalleryApi });
+  const handleImageChange = (event) => {
+    var _a2;
+    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
+    setImage(file);
+    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
+  function resolveAssetUrl2(path) {
+    if (!path) return "";
+    if (/^https?:\/\//.test(path)) return path;
+    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+  const handleSave = async () => {
+    if (!image) {
+      ue$2.error("Please select an image to upload.");
+      return;
+    }
+    try {
+      await addMutation.mutateAsync(image);
+      ue$2.success("Gallery image added");
+      queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+      setOpen(false);
+      setImage(null);
+      setPreviewUrl(null);
+    } catch (error) {
+      ue$2.error("Unable to upload image.");
+    }
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this image?")) return;
+    await deleteMutation.mutateAsync(id);
+    queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+    ue$2.success("Gallery image deleted");
+  };
+  const totalImages = gallery.length;
+  const galleryRows = reactExports.useMemo(() => gallery, [gallery]);
+  const columns = [
+    {
+      key: "image",
+      header: "Image",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-14 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: resolveAssetUrl2(item.image),
+            alt: "Gallery",
+            className: "h-full w-full object-cover"
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-slate-700 truncate max-w-[420px]", children: item.image })
+      ] })
+    },
+    {
+      key: "createdAt",
+      header: "Uploaded",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-slate-600", children: item.createdAt ? new Date(item.createdAt).toLocaleString() : "—" })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-lg border-slate-200",
+            onClick: () => setPreviewTarget(item),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "destructive",
+            onClick: () => handleDelete(item._id),
+            "aria-label": "Delete image",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+          }
+        )
+      ] })
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Gallery",
+        description: "Manage website gallery images.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: () => setOpen(true), className: "rounded-xl gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 14 }),
+          " Add Image"
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border bg-white p-5 shadow-sm", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500", children: "Total Images" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-3xl font-semibold", children: totalImages })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataTable,
+      {
+        columns,
+        data: galleryRows,
+        isLoading,
+        searchable: true,
+        searchKeys: ["image"],
+        emptyText: "No images uploaded yet.",
+        rowKey: (row) => row._id,
+        "data-ocid": "gallery.table"
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Gallery Image" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "file",
+            accept: "image/*",
+            onChange: handleImageChange
+          }
+        ),
+        previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: previewUrl, alt: "Preview", className: "h-56 w-full object-cover" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save Image" })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!previewTarget,
+        onOpenChange: (nextOpen) => !nextOpen && setPreviewTarget(null),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Gallery Preview" }) }),
+          previewTarget && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-slate-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "img",
+            {
+              src: resolveAssetUrl2(previewTarget.image),
+              alt: "Gallery preview",
+              className: "w-full max-h-[70vh] object-contain bg-white"
+            }
+          ) })
+        ] })
+      }
+    )
+  ] });
+}
 function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -66361,7 +65884,7 @@ function LoginPage() {
     }
   );
 }
-function normalizePhone(value) {
+function normalizePhone$2(value) {
   return value.replace(/\D/g, "");
 }
 const getAllPatientsApi = async () => {
@@ -66380,13 +65903,26 @@ const updatePatientApi = async (id, payload) => {
       `${ENDPOINT.UPDATE_PATIENT}/${id}`,
       {
         ...payload,
-        phone: normalizePhone(payload.phone)
+        phone: normalizePhone$2(payload.phone)
       },
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.patient;
   } catch (error) {
     throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update patient");
+  }
+};
+const dischargePatientApi = async (id) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(`${ENDPOINT.DISCHARGE_PATIENT}/${id}`, void 0, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.patient;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to discharge patient"
+    );
   }
 };
 const EMPTY_FORM = {
@@ -66400,6 +65936,12 @@ const EMPTY_FORM = {
 };
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const SKELETON_ROWS = ["sk1", "sk2", "sk3", "sk4", "sk5"];
+function normalizePhone$1(value) {
+  if (value === null || value === void 0) {
+    return "";
+  }
+  return String(value).replace(/\D/g, "");
+}
 function GenderBadge({ gender }) {
   const styles = {
     male: "bg-primary/10 text-primary border-primary/20",
@@ -66412,6 +65954,29 @@ function GenderBadge({ gender }) {
       variant: "outline",
       className: `text-xs capitalize rounded-lg ${styles[gender]}`,
       children: gender
+    }
+  );
+}
+function isPatientDischarged(patient) {
+  return Boolean(patient.dischargedAt);
+}
+function PatientStatusBadge({ patient }) {
+  if (isPatientDischarged(patient)) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Badge,
+      {
+        variant: "outline",
+        className: "rounded-lg border-amber-200 bg-amber-50 text-amber-700",
+        children: "Discharged"
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Badge,
+    {
+      variant: "outline",
+      className: "rounded-lg border-emerald-200 bg-emerald-50 text-emerald-700",
+      children: "Active"
     }
   );
 }
@@ -66666,6 +66231,9 @@ function getPatientBloodGroup(patient) {
 function getPatientRegisteredAt(patient) {
   return patient.createdAt || patient.updatedAt || (/* @__PURE__ */ new Date()).toISOString();
 }
+function getPatientDischargeLabel(patient) {
+  return patient.dischargedAt ? formatDate(patient.dischargedAt) : "";
+}
 function validateForm(form) {
   const errors = {};
   const age = Number(form.age);
@@ -66692,11 +66260,17 @@ function buildPayload(form) {
 }
 function PatientsPage() {
   const queryClient2 = useQueryClient();
+  const { admin } = useAuth();
+  const isDoctor = (admin == null ? void 0 : admin.role) === "doctor";
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [genderFilter, setGenderFilter] = reactExports.useState(
     "all"
   );
+  const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [editPatient, setEditPatient] = reactExports.useState(null);
+  const [patientToDischarge, setPatientToDischarge] = reactExports.useState(
+    null
+  );
   const [form, setForm] = reactExports.useState(EMPTY_FORM);
   const {
     data: patients = [],
@@ -66707,7 +66281,47 @@ function PatientsPage() {
     queryKey: ["patients"],
     queryFn: getAllPatientsApi
   });
-  const updateMutation2 = useMutation({
+  const { data: appointmentData } = useQuery({
+    queryKey: ["appointments", "patients-scope", admin == null ? void 0 : admin.id],
+    queryFn: () => getAppointmentsApi({}),
+    enabled: isDoctor && Boolean(admin == null ? void 0 : admin.id)
+  });
+  const roleScopedPatients = reactExports.useMemo(() => {
+    if (!isDoctor) {
+      return patients;
+    }
+    const doctorId = admin == null ? void 0 : admin.id;
+    if (!doctorId) {
+      return [];
+    }
+    const appointments = (appointmentData == null ? void 0 : appointmentData.appointments) ?? [];
+    const allowedEmails = /* @__PURE__ */ new Set();
+    const allowedPhones = /* @__PURE__ */ new Set();
+    for (const appt of appointments) {
+      if (appt.doctorId !== doctorId) {
+        continue;
+      }
+      if (appt.status === "pending" || appt.status === "rejected") {
+        continue;
+      }
+      if (appt.email) {
+        allowedEmails.add(String(appt.email).toLowerCase().trim());
+      }
+      const phone = normalizePhone$1(appt.phoneNumber);
+      if (phone) {
+        allowedPhones.add(phone);
+      }
+    }
+    if (allowedEmails.size === 0 && allowedPhones.size === 0) {
+      return [];
+    }
+    return patients.filter((patient) => {
+      const email = patient.email ? String(patient.email).toLowerCase().trim() : "";
+      const phone = normalizePhone$1(patient.phone);
+      return email && allowedEmails.has(email) || phone && allowedPhones.has(phone);
+    });
+  }, [admin == null ? void 0 : admin.id, appointmentData == null ? void 0 : appointmentData.appointments, isDoctor, patients]);
+  const updateMutation = useMutation({
     mutationFn: ({
       id,
       payload
@@ -66720,15 +66334,36 @@ function PatientsPage() {
     },
     onError: (mutationError) => ue$2.error(mutationError.message)
   });
+  const dischargeMutation = useMutation({
+    mutationFn: (id) => dischargePatientApi(id),
+    onSuccess: () => {
+      ue$2.success("Patient discharged successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["patients"] });
+      queryClient2.invalidateQueries({ queryKey: ["appointments"] });
+      setPatientToDischarge(null);
+    },
+    onError: (mutationError) => ue$2.error(mutationError.message)
+  });
+  const patientMetrics = reactExports.useMemo(() => {
+    const total = roleScopedPatients.length;
+    const discharged = roleScopedPatients.filter(isPatientDischarged).length;
+    return {
+      total,
+      discharged,
+      active: total - discharged
+    };
+  }, [roleScopedPatients]);
   const filteredPatients = reactExports.useMemo(() => {
     const query = searchTerm.toLowerCase().trim();
-    return patients.filter((patient) => {
+    return roleScopedPatients.filter((patient) => {
       const gender = getPatientGender(patient.gender);
+      const isDischarged = isPatientDischarged(patient);
       const matchesSearch = !query || getPatientName(patient).toLowerCase().includes(query) || getPatientPhone(patient).toLowerCase().includes(query);
       const matchesGender = genderFilter === "all" || gender === genderFilter;
-      return matchesSearch && matchesGender;
+      const matchesStatus = statusFilter === "all" || statusFilter === "active" && !isDischarged || statusFilter === "discharged" && isDischarged;
+      return matchesSearch && matchesGender && matchesStatus;
     });
-  }, [patients, searchTerm, genderFilter]);
+  }, [roleScopedPatients, searchTerm, genderFilter, statusFilter]);
   const updateForm = (updates) => setForm((prev2) => ({ ...prev2, ...updates }));
   const openEdit = (patient) => {
     setForm({
@@ -66749,26 +66384,46 @@ function PatientsPage() {
       ue$2.error(Object.values(errors)[0] ?? "Please fill in all required fields.");
       return;
     }
-    updateMutation2.mutate({
+    updateMutation.mutate({
       id: editPatient._id,
       payload: buildPayload(form)
     });
+  };
+  const handleDischarge = () => {
+    if (!patientToDischarge) {
+      return;
+    }
+    dischargeMutation.mutate(patientToDischarge._id);
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "patients.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
         title: "Patient Management",
-        description: "View and manage all registered patients."
+        description: "Approved appointments add patients automatically. Completed appointments are treated as discharged, and manual discharge keeps the appointment flow in sync."
       }
     ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 mb-5 md:grid-cols-3", "data-ocid": "patients.summary", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-[#94A3B8]", children: "Total Patients" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-[#1E293B]", children: patientMetrics.total })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 shadow-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-emerald-600", children: "Active" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-emerald-700", children: patientMetrics.active })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-amber-100 bg-amber-50/60 p-4 shadow-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-amber-600", children: "Discharged" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-amber-700", children: patientMetrics.discharged })
+      ] })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
-        className: "flex flex-wrap sm:flex-nowrap gap-3 mb-5",
+        className: "flex flex-wrap xl:flex-nowrap gap-3 mb-5",
         "data-ocid": "patients.filter_bar",
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full sm:flex-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full xl:flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Search,
               {
@@ -66809,6 +66464,28 @@ function PatientsPage() {
                 ] })
               ]
             }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Select,
+            {
+              value: statusFilter,
+              onValueChange: (value) => setStatusFilter(value),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  SelectTrigger,
+                  {
+                    className: "w-full sm:w-44 rounded-xl border-[#E2E8F0] bg-white focus:ring-primary/30 text-sm",
+                    "data-ocid": "patients.status_filter_select",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "All Statuses" })
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { className: "rounded-xl", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "all", children: "All Statuses" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "active", children: "Active" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "discharged", children: "Discharged" })
+                ] })
+              ]
+            }
           )
         ]
       }
@@ -66826,6 +66503,7 @@ function PatientsPage() {
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide", children: "Age" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide", children: "Gender" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide max-w-[160px]", children: "Address" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide", children: "Status" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide", children: "Registered" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide text-right pr-5", children: "Actions" })
             ] }) }),
@@ -66835,12 +66513,13 @@ function PatientsPage() {
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-10 rounded-lg" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-16 rounded-lg" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36 rounded-lg" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24 rounded-lg" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20 rounded-lg" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-8 rounded-lg ml-auto" }) })
             ] }, key)) : filteredPatients.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               TableCell,
               {
-                colSpan: 7,
+                colSpan: 8,
                 className: "text-center py-12 text-[#94A3B8] text-sm",
                 "data-ocid": "patients.empty_state",
                 children: isError ? (error == null ? void 0 : error.message) ?? "Unable to load patients." : "No patients found matching your filters."
@@ -66865,20 +66544,38 @@ function PatientsPage() {
                         children: getPatientAddress(patient)
                       }
                     ) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(PatientStatusBadge, { patient }),
+                      isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8]", children: getPatientDischargeLabel(patient) }) : null
+                    ] }) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-[#475569]", children: formatDate(getPatientRegisteredAt(patient)) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end gap-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Button,
-                      {
-                        size: "icon",
-                        variant: "ghost",
-                        type: "button",
-                        className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10",
-                        onClick: () => openEdit(patient),
-                        "data-ocid": `patients.edit_button.${idx + 1}`,
-                        "aria-label": `Edit ${getPatientName(patient)}`,
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
-                      }
-                    ) }) })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Button,
+                        {
+                          size: "icon",
+                          variant: "ghost",
+                          type: "button",
+                          className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10",
+                          onClick: () => openEdit(patient),
+                          "data-ocid": `patients.edit_button.${idx + 1}`,
+                          "aria-label": `Edit ${getPatientName(patient)}`,
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+                        }
+                      ),
+                      !isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Button,
+                        {
+                          type: "button",
+                          variant: "outline",
+                          size: "sm",
+                          className: "h-8 rounded-lg border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700",
+                          onClick: () => setPatientToDischarge(patient),
+                          "data-ocid": `patients.discharge_button.${idx + 1}`,
+                          children: "Discharge"
+                        }
+                      ) : null
+                    ] }) })
                   ]
                 },
                 patient._id
@@ -66908,61 +66605,80 @@ function PatientsPage() {
             }
           ) : filteredPatients.map((patient, idx) => {
             const gender = getPatientGender(patient.gender);
-            return /* @__PURE__ */ jsxRuntimeExports.jsx(
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
               {
                 className: "p-4 border-b border-[#E2E8F0] last:border-0 hover:bg-[#F8FAFC] transition-colors",
                 "data-ocid": `patients.item.${idx + 1}`,
-                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B] text-sm truncate", children: getPatientName(patient) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] mt-0.5", children: getPatientPhone(patient) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mt-2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-[#64748B]", children: getPatientAgeLabel(patient) }),
-                      gender ? /* @__PURE__ */ jsxRuntimeExports.jsx(GenderBadge, { gender }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Badge,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B] text-sm truncate", children: getPatientName(patient) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] mt-0.5", children: getPatientPhone(patient) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mt-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-[#64748B]", children: getPatientAgeLabel(patient) }),
+                        gender ? /* @__PURE__ */ jsxRuntimeExports.jsx(GenderBadge, { gender }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          Badge,
+                          {
+                            variant: "outline",
+                            className: "text-xs rounded-lg text-[#94A3B8] border-slate-200",
+                            children: "Gender not set"
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(PatientStatusBadge, { patient }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          Badge,
+                          {
+                            variant: "outline",
+                            className: "text-xs rounded-lg bg-red-50 text-red-600 border-red-200",
+                            children: getPatientBloodGroup(patient)
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "p",
                         {
-                          variant: "outline",
-                          className: "text-xs rounded-lg text-[#94A3B8] border-slate-200",
-                          children: "Gender not set"
+                          className: "text-xs text-[#94A3B8] mt-1 truncate",
+                          title: getPatientAddress(patient),
+                          children: getPatientAddress(patient)
                         }
                       ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Badge,
-                        {
-                          variant: "outline",
-                          className: "text-xs rounded-lg bg-red-50 text-red-600 border-red-200",
-                          children: getPatientBloodGroup(patient)
-                        }
-                      )
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-[#94A3B8] mt-0.5", children: [
+                        "Reg: ",
+                        formatDate(getPatientRegisteredAt(patient))
+                      ] }),
+                      isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-amber-600 mt-0.5", children: [
+                        "Discharged: ",
+                        getPatientDischargeLabel(patient)
+                      ] }) : null
                     ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "p",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1 shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Button,
                       {
-                        className: "text-xs text-[#94A3B8] mt-1 truncate",
-                        title: getPatientAddress(patient),
-                        children: getPatientAddress(patient)
+                        size: "icon",
+                        variant: "ghost",
+                        type: "button",
+                        className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10",
+                        onClick: () => openEdit(patient),
+                        "data-ocid": `patients.edit_button.${idx + 1}`,
+                        "aria-label": `Edit ${getPatientName(patient)}`,
+                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
                       }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-[#94A3B8] mt-0.5", children: [
-                      "Reg: ",
-                      formatDate(getPatientRegisteredAt(patient))
-                    ] })
+                    ) })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1 shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  !isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Button,
                     {
-                      size: "icon",
-                      variant: "ghost",
                       type: "button",
-                      className: "h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10",
-                      onClick: () => openEdit(patient),
-                      "data-ocid": `patients.edit_button.${idx + 1}`,
-                      "aria-label": `Edit ${getPatientName(patient)}`,
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+                      variant: "outline",
+                      size: "sm",
+                      className: "rounded-lg border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700",
+                      onClick: () => setPatientToDischarge(patient),
+                      "data-ocid": `patients.discharge_button.${idx + 1}`,
+                      children: "Discharge Patient"
                     }
-                  ) })
-                ] })
+                  ) }) : null
+                ]
               },
               patient._id
             );
@@ -66974,7 +66690,7 @@ function PatientsPage() {
       "Showing ",
       filteredPatients.length,
       " of ",
-      patients.length,
+      roleScopedPatients.length,
       " patients"
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -66982,12 +66698,27 @@ function PatientsPage() {
       {
         open: !!editPatient,
         form,
-        isSaving: updateMutation2.isPending,
+        isSaving: updateMutation.isPending,
         onFormChange: updateForm,
         onSave: handleSaveEdit,
         onClose: () => {
           setEditPatient(null);
           setForm(EMPTY_FORM);
+        }
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmDialog,
+      {
+        open: !!patientToDischarge,
+        title: "Discharge Patient",
+        message: patientToDischarge ? `Mark ${getPatientName(patientToDischarge)} as discharged? This will keep the record in the patient list but mark it as inactive.` : "",
+        confirmLabel: dischargeMutation.isPending ? "Discharging..." : "Discharge",
+        onConfirm: handleDischarge,
+        onCancel: () => {
+          if (!dischargeMutation.isPending) {
+            setPatientToDischarge(null);
+          }
         }
       }
     )
@@ -67071,6 +66802,403 @@ const deleteShortApi = async (id) => {
     throw new Error(((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete short");
   }
 };
+var SWITCH_NAME = "Switch";
+var [createSwitchContext] = createContextScope(SWITCH_NAME);
+var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
+var Switch$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const {
+      __scopeSwitch,
+      name,
+      checked: checkedProp,
+      defaultChecked,
+      required,
+      disabled,
+      value = "on",
+      onCheckedChange,
+      form,
+      ...switchProps
+    } = props;
+    const [button, setButton] = reactExports.useState(null);
+    const composedRefs = useComposedRefs(forwardedRef, (node2) => setButton(node2));
+    const hasConsumerStoppedPropagationRef = reactExports.useRef(false);
+    const isFormControl = button ? form || !!button.closest("form") : true;
+    const [checked, setChecked] = useControllableState({
+      prop: checkedProp,
+      defaultProp: defaultChecked ?? false,
+      onChange: onCheckedChange,
+      caller: SWITCH_NAME
+    });
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(SwitchProvider, { scope: __scopeSwitch, checked, disabled, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Primitive.button,
+        {
+          type: "button",
+          role: "switch",
+          "aria-checked": checked,
+          "aria-required": required,
+          "data-state": getState(checked),
+          "data-disabled": disabled ? "" : void 0,
+          disabled,
+          value,
+          ...switchProps,
+          ref: composedRefs,
+          onClick: composeEventHandlers(props.onClick, (event) => {
+            setChecked((prevChecked) => !prevChecked);
+            if (isFormControl) {
+              hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+              if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+            }
+          })
+        }
+      ),
+      isFormControl && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SwitchBubbleInput,
+        {
+          control: button,
+          bubbles: !hasConsumerStoppedPropagationRef.current,
+          name,
+          value,
+          checked,
+          required,
+          disabled,
+          form,
+          style: { transform: "translateX(-100%)" }
+        }
+      )
+    ] });
+  }
+);
+Switch$1.displayName = SWITCH_NAME;
+var THUMB_NAME = "SwitchThumb";
+var SwitchThumb = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeSwitch, ...thumbProps } = props;
+    const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive.span,
+      {
+        "data-state": getState(context.checked),
+        "data-disabled": context.disabled ? "" : void 0,
+        ...thumbProps,
+        ref: forwardedRef
+      }
+    );
+  }
+);
+SwitchThumb.displayName = THUMB_NAME;
+var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
+var SwitchBubbleInput = reactExports.forwardRef(
+  ({
+    __scopeSwitch,
+    control,
+    checked,
+    bubbles = true,
+    ...props
+  }, forwardedRef) => {
+    const ref = reactExports.useRef(null);
+    const composedRefs = useComposedRefs(ref, forwardedRef);
+    const prevChecked = usePrevious(checked);
+    const controlSize = useSize(control);
+    reactExports.useEffect(() => {
+      const input = ref.current;
+      if (!input) return;
+      const inputProto = window.HTMLInputElement.prototype;
+      const descriptor = Object.getOwnPropertyDescriptor(
+        inputProto,
+        "checked"
+      );
+      const setChecked = descriptor.set;
+      if (prevChecked !== checked && setChecked) {
+        const event = new Event("click", { bubbles });
+        setChecked.call(input, checked);
+        input.dispatchEvent(event);
+      }
+    }, [prevChecked, checked, bubbles]);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "input",
+      {
+        type: "checkbox",
+        "aria-hidden": true,
+        defaultChecked: checked,
+        ...props,
+        tabIndex: -1,
+        ref: composedRefs,
+        style: {
+          ...props.style,
+          ...controlSize,
+          position: "absolute",
+          pointerEvents: "none",
+          opacity: 0,
+          margin: 0
+        }
+      }
+    );
+  }
+);
+SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
+function getState(checked) {
+  return checked ? "checked" : "unchecked";
+}
+var Root = Switch$1;
+var Thumb = SwitchThumb;
+function Switch({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Root,
+    {
+      "data-slot": "switch",
+      className: cn(
+        "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      ),
+      ...props,
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Thumb,
+        {
+          "data-slot": "switch-thumb",
+          className: cn(
+            "bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0"
+          )
+        }
+      )
+    }
+  );
+}
+var TABS_NAME = "Tabs";
+var [createTabsContext] = createContextScope(TABS_NAME, [
+  createRovingFocusGroupScope
+]);
+var useRovingFocusGroupScope = createRovingFocusGroupScope();
+var [TabsProvider, useTabsContext] = createTabsContext(TABS_NAME);
+var Tabs$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const {
+      __scopeTabs,
+      value: valueProp,
+      onValueChange,
+      defaultValue,
+      orientation = "horizontal",
+      dir,
+      activationMode = "automatic",
+      ...tabsProps
+    } = props;
+    const direction = useDirection(dir);
+    const [value, setValue] = useControllableState({
+      prop: valueProp,
+      onChange: onValueChange,
+      defaultProp: defaultValue ?? "",
+      caller: TABS_NAME
+    });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      TabsProvider,
+      {
+        scope: __scopeTabs,
+        baseId: useId(),
+        value,
+        onValueChange: setValue,
+        orientation,
+        dir: direction,
+        activationMode,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive.div,
+          {
+            dir: direction,
+            "data-orientation": orientation,
+            ...tabsProps,
+            ref: forwardedRef
+          }
+        )
+      }
+    );
+  }
+);
+Tabs$1.displayName = TABS_NAME;
+var TAB_LIST_NAME = "TabsList";
+var TabsList$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeTabs, loop = true, ...listProps } = props;
+    const context = useTabsContext(TAB_LIST_NAME, __scopeTabs);
+    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Root$4,
+      {
+        asChild: true,
+        ...rovingFocusGroupScope,
+        orientation: context.orientation,
+        dir: context.dir,
+        loop,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive.div,
+          {
+            role: "tablist",
+            "aria-orientation": context.orientation,
+            ...listProps,
+            ref: forwardedRef
+          }
+        )
+      }
+    );
+  }
+);
+TabsList$1.displayName = TAB_LIST_NAME;
+var TRIGGER_NAME = "TabsTrigger";
+var TabsTrigger$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeTabs, value, disabled = false, ...triggerProps } = props;
+    const context = useTabsContext(TRIGGER_NAME, __scopeTabs);
+    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
+    const triggerId = makeTriggerId(context.baseId, value);
+    const contentId = makeContentId(context.baseId, value);
+    const isSelected = value === context.value;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Item$1,
+      {
+        asChild: true,
+        ...rovingFocusGroupScope,
+        focusable: !disabled,
+        active: isSelected,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive.button,
+          {
+            type: "button",
+            role: "tab",
+            "aria-selected": isSelected,
+            "aria-controls": contentId,
+            "data-state": isSelected ? "active" : "inactive",
+            "data-disabled": disabled ? "" : void 0,
+            disabled,
+            id: triggerId,
+            ...triggerProps,
+            ref: forwardedRef,
+            onMouseDown: composeEventHandlers(props.onMouseDown, (event) => {
+              if (!disabled && event.button === 0 && event.ctrlKey === false) {
+                context.onValueChange(value);
+              } else {
+                event.preventDefault();
+              }
+            }),
+            onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
+              if ([" ", "Enter"].includes(event.key)) context.onValueChange(value);
+            }),
+            onFocus: composeEventHandlers(props.onFocus, () => {
+              const isAutomaticActivation = context.activationMode !== "manual";
+              if (!isSelected && !disabled && isAutomaticActivation) {
+                context.onValueChange(value);
+              }
+            })
+          }
+        )
+      }
+    );
+  }
+);
+TabsTrigger$1.displayName = TRIGGER_NAME;
+var CONTENT_NAME = "TabsContent";
+var TabsContent$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeTabs, value, forceMount, children, ...contentProps } = props;
+    const context = useTabsContext(CONTENT_NAME, __scopeTabs);
+    const triggerId = makeTriggerId(context.baseId, value);
+    const contentId = makeContentId(context.baseId, value);
+    const isSelected = value === context.value;
+    const isMountAnimationPreventedRef = reactExports.useRef(isSelected);
+    reactExports.useEffect(() => {
+      const rAF = requestAnimationFrame(() => isMountAnimationPreventedRef.current = false);
+      return () => cancelAnimationFrame(rAF);
+    }, []);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || isSelected, children: ({ present }) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive.div,
+      {
+        "data-state": isSelected ? "active" : "inactive",
+        "data-orientation": context.orientation,
+        role: "tabpanel",
+        "aria-labelledby": triggerId,
+        hidden: !present,
+        id: contentId,
+        tabIndex: 0,
+        ...contentProps,
+        ref: forwardedRef,
+        style: {
+          ...props.style,
+          animationDuration: isMountAnimationPreventedRef.current ? "0s" : void 0
+        },
+        children: present && children
+      }
+    ) });
+  }
+);
+TabsContent$1.displayName = CONTENT_NAME;
+function makeTriggerId(baseId, value) {
+  return `${baseId}-trigger-${value}`;
+}
+function makeContentId(baseId, value) {
+  return `${baseId}-content-${value}`;
+}
+var Root2 = Tabs$1;
+var List = TabsList$1;
+var Trigger = TabsTrigger$1;
+var Content = TabsContent$1;
+function Tabs({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Root2,
+    {
+      "data-slot": "tabs",
+      className: cn("flex flex-col gap-2", className),
+      ...props
+    }
+  );
+}
+function TabsList({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    List,
+    {
+      "data-slot": "tabs-list",
+      className: cn(
+        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function TabsTrigger({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Trigger,
+    {
+      "data-slot": "tabs-trigger",
+      className: cn(
+        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function TabsContent({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Content,
+    {
+      "data-slot": "tabs-content",
+      className: cn("flex-1 outline-none", className),
+      ...props
+    }
+  );
+}
 const REVIEW_QUERY_KEY = ["reviews-management"];
 const SHORT_QUERY_KEY = ["shorts-management"];
 const emptyReviewForm = {
@@ -67105,13 +67233,6 @@ function isValidHttpUrl(value) {
   } catch {
     return false;
   }
-}
-function getAverageRating(reviews) {
-  if (!reviews.length) {
-    return "0.0";
-  }
-  const total = reviews.reduce((sum, item) => sum + Number(item.rating ?? 5), 0);
-  return (total / reviews.length).toFixed(1);
 }
 function extractYoutubeId(value) {
   if (!value.trim()) {
@@ -67219,28 +67340,6 @@ function buildShortPayload(form) {
     isActive: form.isActive
   };
 }
-function MetricCard({
-  label,
-  value,
-  hint,
-  icon: Icon2,
-  accentClass
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "border-slate-200 shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "flex items-center gap-4 p-5", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "div",
-      {
-        className: `flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm ${accentClass}`,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { size: 20 })
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-500", children: label }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-2xl font-bold text-slate-900", children: value }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-slate-500", children: hint })
-    ] })
-  ] }) });
-}
 function RatingStars({
   rating,
   size: size2 = 14
@@ -67329,12 +67428,18 @@ function ReviewsAndShortsPage() {
   const [reviewDeleteTarget, setReviewDeleteTarget] = reactExports.useState(
     null
   );
+  const [reviewPreviewTarget, setReviewPreviewTarget] = reactExports.useState(
+    null
+  );
   const [reviewForm, setReviewForm] = reactExports.useState(emptyReviewForm);
   const [reviewErrors, setReviewErrors] = reactExports.useState({});
   const [shortDialogOpen, setShortDialogOpen] = reactExports.useState(false);
   const [shortDialogMode, setShortDialogMode] = reactExports.useState("add");
   const [selectedShort, setSelectedShort] = reactExports.useState(null);
   const [shortDeleteTarget, setShortDeleteTarget] = reactExports.useState(
+    null
+  );
+  const [shortPreviewTarget, setShortPreviewTarget] = reactExports.useState(
     null
   );
   const [shortForm, setShortForm] = reactExports.useState(emptyShortForm);
@@ -67400,12 +67505,6 @@ function ReviewsAndShortsPage() {
       (item) => [item.title, item.shortUrl, item.thumbnail, item.sortOrder].filter(Boolean).some((value) => String(value).toLowerCase().includes(query))
     );
   }, [shortSearch, shorts]);
-  filteredReviews[0] ?? reviews[0];
-  filteredShorts[0] ?? shorts[0];
-  const reviewCount = reviews.length;
-  const activeReviewCount = reviews.filter((item) => item.isActive !== false).length;
-  const shortCount = shorts.length;
-  const activeShortCount = shorts.filter((item) => item.isActive !== false).length;
   function setReviewField(key, value) {
     setReviewForm((prev2) => ({ ...prev2, [key]: value }));
     if (reviewErrors[key]) {
@@ -67578,12 +67677,203 @@ function ReviewsAndShortsPage() {
       ue$2.error(getErrorMessage(error));
     }
   }
+  const reviewColumns = [
+    {
+      key: "name",
+      header: "Name",
+      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-[#1E293B] truncate", children: review.name }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500 truncate", children: review.location || "No location" })
+      ] })
+    },
+    {
+      key: "review",
+      header: "Review",
+      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "max-w-md truncate text-sm text-slate-600", children: review.review })
+    },
+    {
+      key: "rating",
+      header: "Rating",
+      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: Number(review.rating ?? 5), size: 12 }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-slate-500", children: Number(review.rating ?? 5) })
+      ] })
+    },
+    {
+      key: "sortOrder",
+      header: "Order",
+      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-slate-600", children: [
+        "#",
+        review.sortOrder ?? 0
+      ] })
+    },
+    {
+      key: "isActive",
+      header: "Status",
+      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Badge,
+          {
+            className: review.isActive === false ? "bg-slate-100 text-slate-600" : "bg-emerald-50 text-emerald-700",
+            children: review.isActive === false ? "Hidden" : "Visible"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Switch,
+          {
+            checked: review.isActive !== false,
+            onCheckedChange: (checked) => handleReviewVisibilityChange(review, checked),
+            disabled: updateReviewMutation.isPending
+          }
+        )
+      ] })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-lg border-slate-200",
+            onClick: () => setReviewPreviewTarget(review),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            size: "icon",
+            variant: "ghost",
+            className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
+            onClick: () => openEditReview(review),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            size: "icon",
+            variant: "ghost",
+            className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
+            onClick: () => setReviewDeleteTarget(review),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
+          }
+        )
+      ] })
+    }
+  ];
+  const shortColumns = [
+    {
+      key: "title",
+      header: "Title",
+      render: (short) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-[#1E293B] truncate", children: short.title }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500 truncate", children: getShortHost(short.shortUrl) })
+      ] })
+    },
+    {
+      key: "shortUrl",
+      header: "Link",
+      render: (short) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "a",
+        {
+          href: short.shortUrl,
+          target: "_blank",
+          rel: "noreferrer",
+          className: "block max-w-xs truncate text-sm text-primary hover:underline",
+          children: short.shortUrl
+        }
+      )
+    },
+    {
+      key: "sortOrder",
+      header: "Order",
+      render: (short) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-slate-600", children: [
+        "#",
+        short.sortOrder ?? 0
+      ] })
+    },
+    {
+      key: "isActive",
+      header: "Status",
+      render: (short) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Badge,
+          {
+            className: short.isActive === false ? "bg-slate-100 text-slate-600" : "bg-emerald-50 text-emerald-700",
+            children: short.isActive === false ? "Hidden" : "Live"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Switch,
+          {
+            checked: short.isActive !== false,
+            onCheckedChange: (checked) => handleShortVisibilityChange(short, checked),
+            disabled: updateShortMutation.isPending
+          }
+        )
+      ] })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (short) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-lg border-slate-200",
+            onClick: () => setShortPreviewTarget(short),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            size: "icon",
+            variant: "ghost",
+            className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
+            onClick: () => openEditShort(short),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            size: "icon",
+            variant: "ghost",
+            className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
+            onClick: () => setShortDeleteTarget(short),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
+          }
+        )
+      ] })
+    }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", "data-ocid": "reviews_shorts.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
         title: "Reviews & Shorts",
-        description: "Super Admin can manage testimonial cards and video shorts from one clean publishing workspace.",
+        description: "Manage reviews and shorts from one place.",
         action: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             Button,
@@ -67615,54 +67905,6 @@ function ReviewsAndShortsPage() {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 xl:grid-cols-[1.3fr_repeat(3,minmax(0,1fr))]", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "overflow-hidden border-0 bg-gradient-to-br from-slate-900 via-slate-800 to-amber-800 text-white shadow-[0_30px_90px_-45px_rgba(15,23,42,0.85)] xl:col-span-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "relative p-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 opacity-20", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -right-16 -top-12 h-40 w-40 rounded-full bg-white/20 blur-3xl" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-0 left-0 h-32 w-32 rounded-full bg-amber-300/20 blur-3xl" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-white/10 text-white backdrop-blur-sm", children: "Publishing Console" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-4 text-2xl font-bold leading-tight", children: "Shape the patient trust section without leaving the admin panel." }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 max-w-2xl text-sm leading-7 text-white/75", children: "Add polished patient testimonials, control their display order, and keep your shorts library fresh with fast preview-first editing." }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 flex flex-wrap gap-2 text-xs text-white/80", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-white/10 text-white backdrop-blur-sm", children: "Admin only" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-white/10 text-white backdrop-blur-sm", children: "Live visibility toggle" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-white/10 text-white backdrop-blur-sm", children: "Website-ready preview" })
-          ] })
-        ] })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        MetricCard,
-        {
-          label: "Total Reviews",
-          value: String(reviewCount),
-          hint: `${activeReviewCount} currently visible on site`,
-          icon: MessageSquare,
-          accentClass: "bg-gradient-to-br from-amber-500 to-yellow-500"
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        MetricCard,
-        {
-          label: "Average Rating",
-          value: getAverageRating(reviews),
-          hint: "Calculated from all stored testimonials",
-          icon: Star,
-          accentClass: "bg-gradient-to-br from-amber-500 to-orange-500"
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        MetricCard,
-        {
-          label: "Live Shorts",
-          value: String(activeShortCount),
-          hint: `${shortCount} total videos in the library`,
-          icon: Video,
-          accentClass: "bg-gradient-to-br from-rose-500 to-orange-500"
-        }
-      )
-    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
       Tabs,
       {
@@ -67700,7 +67942,7 @@ function ReviewsAndShortsPage() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Review Library" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm text-slate-500", children: "Search, reorder, edit, and hide testimonials in seconds." })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-slate-500", children: "Search, edit, preview, and hide reviews." })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -67722,127 +67964,25 @@ function ReviewsAndShortsPage() {
                 )
               ] })
             ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isReviewsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: [1, 2, 3].map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "div",
-              {
-                className: "rounded-2xl border border-slate-200 p-5",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-full" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20" })
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-20 rounded-full" })
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-4 h-4 w-full" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-11/12" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-9/12" })
-                ]
-              },
-              `review-skeleton-${item}`
-            )) }) : isReviewsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (reviewsError == null ? void 0 : reviewsError.message) || "Unable to load reviews." }) : filteredReviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isReviewsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-56 w-full rounded-2xl" }) : isReviewsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (reviewsError == null ? void 0 : reviewsError.message) || "Unable to load reviews." }) : filteredReviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No reviews found" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Try another search or add the first patient testimonial." })
-            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: filteredReviews.map((review, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "div",
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+              DataTable,
               {
-                className: "rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-amber-200 hover:shadow-sm",
-                "data-ocid": `reviews_shorts.review_item.${index2 + 1}`,
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 text-sm font-semibold text-white", children: getInitials(review.name) }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900", children: review.name }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-slate-100 text-slate-700", children: [
-                            "#",
-                            review.sortOrder ?? 0
-                          ] }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Badge,
-                            {
-                              className: review.isActive === false ? "bg-slate-100 text-slate-600" : "bg-emerald-50 text-emerald-700",
-                              children: review.isActive === false ? "Hidden" : "Visible"
-                            }
-                          )
-                        ] }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: Number(review.rating ?? 5) }),
-                          review.location ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Badge,
-                            {
-                              variant: "outline",
-                              className: "border-slate-200 text-slate-600",
-                              children: review.location
-                            }
-                          ) : null,
-                          review.treatment ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Badge,
-                            {
-                              variant: "outline",
-                              className: "border-slate-200 text-slate-600",
-                              children: review.treatment
-                            }
-                          ) : null
-                        ] })
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 self-start", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Button,
-                        {
-                          type: "button",
-                          size: "icon",
-                          variant: "ghost",
-                          className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
-                          onClick: () => openEditReview(review),
-                          "data-ocid": `reviews_shorts.review_edit_button.${index2 + 1}`,
-                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
-                        }
-                      ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Button,
-                        {
-                          type: "button",
-                          size: "icon",
-                          variant: "ghost",
-                          className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
-                          onClick: () => setReviewDeleteTarget(review),
-                          "data-ocid": `reviews_shorts.review_delete_button.${index2 + 1}`,
-                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
-                        }
-                      )
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-sm leading-7 text-slate-600", children: review.review }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Use sort order to control how testimonials appear on the website." }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-slate-500", children: "Live on website" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Switch,
-                        {
-                          checked: review.isActive !== false,
-                          onCheckedChange: (checked) => handleReviewVisibilityChange(review, checked),
-                          disabled: updateReviewMutation.isPending
-                        }
-                      )
-                    ] })
-                  ] })
-                ]
-              },
-              review._id
-            )) }) })
+                columns: reviewColumns,
+                data: filteredReviews,
+                rowKey: (review) => review._id,
+                emptyText: "No reviews found.",
+                "data-ocid": "reviews_shorts.reviews_table"
+              }
+            ) })
           ] }) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "shorts", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Shorts Library" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm text-slate-500", children: "Manage video snippets with thumbnail preview and instant publish controls." })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-slate-500", children: "Search, edit, preview, and publish shorts." })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -67864,371 +68004,317 @@ function ReviewsAndShortsPage() {
                 )
               ] })
             ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isShortsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: [1, 2, 3, 4].map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "div",
-              {
-                className: "rounded-3xl border border-slate-200 p-4",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "aspect-[9/16] w-full rounded-2xl" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-4 h-4 w-3/4" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "mt-2 h-4 w-1/2" })
-                ]
-              },
-              `short-skeleton-${item}`
-            )) }) : isShortsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (shortsError == null ? void 0 : shortsError.message) || "Unable to load shorts." }) : filteredShorts.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isShortsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-56 w-full rounded-2xl" }) : isShortsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (shortsError == null ? void 0 : shortsError.message) || "Unable to load shorts." }) : filteredShorts.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No shorts found" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Paste your first short URL to start building the video showcase." })
-            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: filteredShorts.map((short, index2) => {
-              const thumbnail = getShortThumbnail(short);
-              return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "overflow-hidden rounded-3xl border border-slate-200 bg-white transition hover:border-rose-200 hover:shadow-sm",
-                  "data-ocid": `reviews_shorts.short_item.${index2 + 1}`,
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-[340px] bg-slate-950", children: [
-                      thumbnail ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        "img",
-                        {
-                          src: thumbnail,
-                          alt: short.title,
-                          className: "h-full w-full object-cover"
-                        }
-                      ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-500 via-orange-500 to-amber-400" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-slate-950/15" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { className: "ml-1 text-rose-500", size: 24 }) }) }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute right-4 top-4 flex gap-2", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-white/15 text-white backdrop-blur-sm", children: [
-                          "#",
-                          short.sortOrder ?? 0
-                        ] }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-white/15 text-white backdrop-blur-sm", children: short.isActive === false ? "Hidden" : "Live" })
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 p-4", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "line-clamp-2 text-sm font-semibold text-slate-900", children: short.title }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-slate-500", children: getShortHost(short.shortUrl) })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-slate-500", children: "Live" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Switch,
-                            {
-                              checked: short.isActive !== false,
-                              onCheckedChange: (checked) => handleShortVisibilityChange(short, checked),
-                              disabled: updateShortMutation.isPending
-                            }
-                          )
-                        ] }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Button,
-                            {
-                              type: "button",
-                              size: "icon",
-                              variant: "ghost",
-                              className: "rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700",
-                              onClick: () => window.open(
-                                short.shortUrl,
-                                "_blank",
-                                "noopener,noreferrer"
-                              ),
-                              "data-ocid": `reviews_shorts.short_open_button.${index2 + 1}`,
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { size: 15 })
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Button,
-                            {
-                              type: "button",
-                              size: "icon",
-                              variant: "ghost",
-                              className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
-                              onClick: () => openEditShort(short),
-                              "data-ocid": `reviews_shorts.short_edit_button.${index2 + 1}`,
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Button,
-                            {
-                              type: "button",
-                              size: "icon",
-                              variant: "ghost",
-                              className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
-                              onClick: () => setShortDeleteTarget(short),
-                              "data-ocid": `reviews_shorts.short_delete_button.${index2 + 1}`,
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
-                            }
-                          )
-                        ] })
-                      ] })
-                    ] })
-                  ]
-                },
-                short._id
-              );
-            }) }) })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+              DataTable,
+              {
+                columns: shortColumns,
+                data: filteredShorts,
+                rowKey: (short) => short._id,
+                emptyText: "No shorts found.",
+                "data-ocid": "reviews_shorts.shorts_table"
+              }
+            ) })
           ] }) }) })
         ]
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: reviewDialogOpen, onOpenChange: setReviewDialogOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-4xl", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: reviewDialogOpen, onOpenChange: setReviewDialogOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: reviewDialogMode === "edit" ? "Edit Review" : "Add Review" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-6 xl:grid-cols-[1.2fr_0.8fr]", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-name", children: "Reviewer Name" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "review-name",
-                  value: reviewForm.name,
-                  onChange: (event) => setReviewField("name", event.target.value),
-                  placeholder: "Rajesh Kumar",
-                  className: "rounded-xl"
-                }
-              ),
-              reviewErrors.name ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.name }) : null
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-location", children: "Location" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "review-location",
-                  value: reviewForm.location,
-                  onChange: (event) => setReviewField("location", event.target.value),
-                  placeholder: "Bhiwani",
-                  className: "rounded-xl"
-                }
-              )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-treatment", children: "Treatment" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "review-treatment",
-                  value: reviewForm.treatment,
-                  onChange: (event) => setReviewField("treatment", event.target.value),
-                  placeholder: "Cosmetic Surgery",
-                  className: "rounded-xl"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-rating", children: "Rating" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Select,
-                {
-                  value: reviewForm.rating,
-                  onValueChange: (value) => setReviewField("rating", value),
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "review-rating", className: "rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select rating" }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "5", children: "5 Stars" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "4", children: "4 Stars" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "3", children: "3 Stars" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "2", children: "2 Stars" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "1", children: "1 Star" })
-                    ] })
-                  ]
-                }
-              ),
-              reviewErrors.rating ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.rating }) : null
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-[160px_1fr]", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-sort-order", children: "Sort Order" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "review-sort-order",
-                  type: "number",
-                  min: "0",
-                  value: reviewForm.sortOrder,
-                  onChange: (event) => setReviewField("sortOrder", event.target.value),
-                  className: "rounded-xl"
-                }
-              ),
-              reviewErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.sortOrder }) : null
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Visible on website" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Turn this off to keep the review saved but hidden." })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Switch,
-                {
-                  checked: reviewForm.isActive,
-                  onCheckedChange: (checked) => setReviewField("isActive", checked)
-                }
-              )
-            ] })
-          ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-copy", children: "Review Text" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-name", children: "Reviewer Name" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Textarea,
+              Input,
               {
-                id: "review-copy",
-                rows: 6,
-                value: reviewForm.review,
-                onChange: (event) => setReviewField("review", event.target.value),
-                placeholder: "Patient experience goes here...",
-                className: "min-h-[180px] rounded-2xl"
+                id: "review-name",
+                value: reviewForm.name,
+                onChange: (event) => setReviewField("name", event.target.value),
+                placeholder: "Rajesh Kumar",
+                className: "rounded-xl"
               }
             ),
-            reviewErrors.review ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.review }) : null
+            reviewErrors.name ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.name }) : null
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-location", children: "Location" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "review-location",
+                value: reviewForm.location,
+                onChange: (event) => setReviewField("location", event.target.value),
+                placeholder: "Bhiwani",
+                className: "rounded-xl"
+              }
+            )
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900", children: "Live Card Preview" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-slate-500", children: "This helps you tune copy length before saving." })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-treatment", children: "Treatment" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "review-treatment",
+                value: reviewForm.treatment,
+                onChange: (event) => setReviewField("treatment", event.target.value),
+                placeholder: "Cosmetic Surgery",
+                className: "rounded-xl"
+              }
+            )
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ReviewPreviewCard, { review: buildReviewPayload(reviewForm) })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-rating", children: "Rating" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Select,
+              {
+                value: reviewForm.rating,
+                onValueChange: (value) => setReviewField("rating", value),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "review-rating", className: "rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select rating" }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "5", children: "5 Stars" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "4", children: "4 Stars" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "3", children: "3 Stars" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "2", children: "2 Stars" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "1", children: "1 Star" })
+                  ] })
+                ]
+              }
+            ),
+            reviewErrors.rating ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.rating }) : null
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-[160px_1fr]", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-sort-order", children: "Sort Order" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "review-sort-order",
+                type: "number",
+                min: "0",
+                value: reviewForm.sortOrder,
+                onChange: (event) => setReviewField("sortOrder", event.target.value),
+                className: "rounded-xl"
+              }
+            ),
+            reviewErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.sortOrder }) : null
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Visible on website" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Turn this off to keep the review saved but hidden." })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Switch,
+              {
+                checked: reviewForm.isActive,
+                onCheckedChange: (checked) => setReviewField("isActive", checked)
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-copy", children: "Review Text" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Textarea,
+            {
+              id: "review-copy",
+              rows: 6,
+              value: reviewForm.review,
+              onChange: (event) => setReviewField("review", event.target.value),
+              placeholder: "Patient experience goes here...",
+              className: "min-h-[180px] rounded-2xl"
+            }
+          ),
+          reviewErrors.review ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.review }) : null
         ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-2 gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-2 gap-2 sm:justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           Button,
           {
             type: "button",
             variant: "outline",
             className: "rounded-xl",
-            onClick: () => setReviewDialogOpen(false),
-            children: "Cancel"
+            onClick: () => setReviewPreviewTarget({
+              _id: (selectedReview == null ? void 0 : selectedReview._id) ?? "preview",
+              ...buildReviewPayload(reviewForm)
+            }),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            type: "button",
-            className: "rounded-xl bg-amber-500 text-white hover:bg-amber-600",
-            onClick: handleSaveReview,
-            disabled: isReviewBusy,
-            children: reviewDialogMode === "edit" ? "Save Changes" : "Add Review"
-          }
-        )
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              className: "rounded-xl",
+              onClick: () => setReviewDialogOpen(false),
+              children: "Cancel"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              className: "rounded-xl bg-amber-500 text-white hover:bg-amber-600",
+              onClick: handleSaveReview,
+              disabled: isReviewBusy,
+              children: reviewDialogMode === "edit" ? "Save Changes" : "Add Review"
+            }
+          )
+        ] })
       ] })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: shortDialogOpen, onOpenChange: setShortDialogOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-4xl", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: shortDialogOpen, onOpenChange: setShortDialogOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: shortDialogMode === "edit" ? "Edit Short" : "Add Short" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-6 xl:grid-cols-[1.1fr_0.9fr]", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-title", children: "Short Title" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "short-title",
-                value: shortForm.title,
-                onChange: (event) => setShortField("title", event.target.value),
-                placeholder: "Best cosmetic surgeon in Hisar",
-                className: "rounded-xl"
-              }
-            ),
-            shortErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.title }) : null
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-url", children: "Video URL" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "short-url",
-                value: shortForm.shortUrl,
-                onChange: (event) => setShortField("shortUrl", event.target.value),
-                placeholder: "https://www.youtube.com/shorts/...",
-                className: "rounded-xl"
-              }
-            ),
-            shortErrors.shortUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.shortUrl }) : null
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-thumbnail", children: "Thumbnail URL" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "short-thumbnail",
-                value: shortForm.thumbnail,
-                onChange: (event) => setShortField("thumbnail", event.target.value),
-                placeholder: "Optional. Leave blank to auto-generate for YouTube.",
-                className: "rounded-xl"
-              }
-            ),
-            shortErrors.thumbnail ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.thumbnail }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Leave this empty for YouTube Shorts and the panel will try to use the video thumbnail automatically." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-[160px_1fr]", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-sort-order", children: "Sort Order" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "short-sort-order",
-                  type: "number",
-                  min: "0",
-                  value: shortForm.sortOrder,
-                  onChange: (event) => setShortField("sortOrder", event.target.value),
-                  className: "rounded-xl"
-                }
-              ),
-              shortErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.sortOrder }) : null
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Publish on website" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Keep it off if you want to prepare content first." })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Switch,
-                {
-                  checked: shortForm.isActive,
-                  onCheckedChange: (checked) => setShortField("isActive", checked)
-                }
-              )
-            ] })
-          ] })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-title", children: "Short Title" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "short-title",
+              value: shortForm.title,
+              onChange: (event) => setShortField("title", event.target.value),
+              placeholder: "Best cosmetic surgeon in Hisar",
+              className: "rounded-xl"
+            }
+          ),
+          shortErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.title }) : null
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900", children: "Vertical Preview" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-slate-500", children: "Perfect for quickly checking title length and thumbnail impact." })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-url", children: "Video URL" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "short-url",
+              value: shortForm.shortUrl,
+              onChange: (event) => setShortField("shortUrl", event.target.value),
+              placeholder: "https://www.youtube.com/shorts/...",
+              className: "rounded-xl"
+            }
+          ),
+          shortErrors.shortUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.shortUrl }) : null
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-thumbnail", children: "Thumbnail URL" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "short-thumbnail",
+              value: shortForm.thumbnail,
+              onChange: (event) => setShortField("thumbnail", event.target.value),
+              placeholder: "Optional. Leave blank to auto-generate for YouTube.",
+              className: "rounded-xl"
+            }
+          ),
+          shortErrors.thumbnail ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.thumbnail }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Leave this empty for YouTube Shorts and the panel will try to use the video thumbnail automatically." })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-[160px_1fr]", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "short-sort-order", children: "Sort Order" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "short-sort-order",
+                type: "number",
+                min: "0",
+                value: shortForm.sortOrder,
+                onChange: (event) => setShortField("sortOrder", event.target.value),
+                className: "rounded-xl"
+              }
+            ),
+            shortErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: shortErrors.sortOrder }) : null
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ShortPreviewCard, { short: buildShortPayload(shortForm) })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Publish on website" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Keep it off if you want to prepare content first." })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Switch,
+              {
+                checked: shortForm.isActive,
+                onCheckedChange: (checked) => setShortField("isActive", checked)
+              }
+            )
+          ] })
         ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-2 gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-2 gap-2 sm:justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
           Button,
           {
             type: "button",
             variant: "outline",
             className: "rounded-xl",
-            onClick: () => setShortDialogOpen(false),
-            children: "Cancel"
+            onClick: () => setShortPreviewTarget({
+              _id: (selectedShort == null ? void 0 : selectedShort._id) ?? "preview",
+              ...buildShortPayload(shortForm)
+            }),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            type: "button",
-            className: "rounded-xl bg-rose-500 text-white hover:bg-rose-600",
-            onClick: handleSaveShort,
-            disabled: isShortBusy,
-            children: shortDialogMode === "edit" ? "Save Changes" : "Add Short"
-          }
-        )
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              className: "rounded-xl",
+              onClick: () => setShortDialogOpen(false),
+              children: "Cancel"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              className: "rounded-xl bg-rose-500 text-white hover:bg-rose-600",
+              onClick: handleSaveShort,
+              disabled: isShortBusy,
+              children: shortDialogMode === "edit" ? "Save Changes" : "Add Short"
+            }
+          )
+        ] })
       ] })
     ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!reviewPreviewTarget,
+        onOpenChange: (open) => !open && setReviewPreviewTarget(null),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: "Review Preview" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ReviewPreviewCard, { review: reviewPreviewTarget ?? void 0 })
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!shortPreviewTarget,
+        onOpenChange: (open) => !open && setShortPreviewTarget(null),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: "Short Preview" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ShortPreviewCard, { short: shortPreviewTarget ?? void 0 })
+        ] })
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmDialog,
       {
@@ -68253,128 +68339,70 @@ function ReviewsAndShortsPage() {
     )
   ] });
 }
-function getCellValue(row, key) {
-  const value = row[key];
-  if (value === null || value === void 0) return "—";
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  return String(value);
+function normalizePhone(value) {
+  const digits = (value == null ? void 0 : value.replace(/\D/g, "")) ?? "";
+  return digits || void 0;
 }
-const SKELETON_IDS = ["sk1", "sk2", "sk3", "sk4", "sk5"];
-function DataTable({
-  columns,
-  data,
-  isLoading = false,
-  searchable = false,
-  searchKeys = [],
-  emptyText = "No records found.",
-  rowKey,
-  mobileCardRender,
-  "data-ocid": dataOcid
-}) {
-  const [search, setSearch] = reactExports.useState("");
-  const filtered = reactExports.useMemo(() => {
-    if (!searchable || !search.trim()) return data;
-    const q2 = search.toLowerCase();
-    return data.filter(
-      (row) => searchKeys.some(
-        (k2) => String(row[k2] ?? "").toLowerCase().includes(q2)
-      )
+const getAdminStaffApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ADMIN_STAFF, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.staff) ?? [];
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch admin staff"
     );
-  }, [data, search, searchable, searchKeys]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", "data-ocid": dataOcid, children: [
-    searchable && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full md:max-w-sm", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Search,
-        {
-          size: 15,
-          className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          placeholder: "Search…",
-          value: search,
-          onChange: (e3) => setSearch(e3.target.value),
-          className: "pl-8 h-9 text-sm border-slate-200 rounded-xl w-full",
-          "data-ocid": dataOcid ? `${dataOcid}.search_input` : "table.search_input"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "md:hidden space-y-2", children: isLoading ? SKELETON_IDS.map((sk) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Card,
+  }
+};
+const addAdminStaffApi = async (payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(
+      ENDPOINT.ADD_STAFF,
       {
-        className: "shadow-card border border-slate-100 rounded-xl",
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 space-y-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded-md" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-1/2 rounded-md" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-2/3 rounded-md" })
-        ] })
+        ...payload,
+        phone: normalizePhone(payload.phone),
+        permissions: payload.permissions ?? {}
       },
-      sk
-    )) : filtered.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-card border border-slate-100 rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-[#94A3B8] text-sm", children: emptyText }) }) : filtered.map(
-      (row, idx) => mobileCardRender ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "div",
-        {
-          "data-ocid": dataOcid ? `${dataOcid}.item.${idx + 1}` : void 0,
-          children: mobileCardRender(row, idx)
-        },
-        rowKey(row)
-      ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Card,
-        {
-          className: "shadow-card border border-slate-100 rounded-xl overflow-hidden",
-          "data-ocid": dataOcid ? `${dataOcid}.item.${idx + 1}` : void 0,
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("dl", { className: "space-y-2", children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "div",
-            {
-              className: "flex items-start gap-2 min-w-0",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-xs font-semibold text-[#64748B] uppercase tracking-wide w-28 flex-shrink-0 pt-0.5", children: col.header }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "text-sm text-[#1E293B] flex-1 min-w-0 break-words", children: col.render ? col.render(row) : getCellValue(row, col.key) })
-              ]
-            },
-            String(col.key)
-          )) }) })
-        },
-        rowKey(row)
-      )
-    ) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "hidden md:block shadow-card border border-slate-100 rounded-2xl overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { className: "bg-[#F8FAFC] hover:bg-[#F8FAFC] border-b border-slate-100", children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-        TableHead,
-        {
-          className: `text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4 ${col.className ?? ""}`,
-          children: col.header
-        },
-        String(col.key)
-      )) }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: isLoading ? SKELETON_IDS.map((sk) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { className: "border-b border-slate-50", children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded-md" }) }, String(col.key))) }, sk)) : filtered.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        TableCell,
-        {
-          colSpan: columns.length,
-          className: "text-center py-12 text-[#94A3B8] text-sm",
-          children: emptyText
-        }
-      ) }) : filtered.map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-        TableRow,
-        {
-          className: "border-b border-slate-50 hover:bg-[#F8FAFC] transition-colors",
-          "data-ocid": dataOcid ? `${dataOcid}.item.${idx + 1}` : void 0,
-          children: columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-            TableCell,
-            {
-              className: `px-4 py-3 text-sm text-[#1E293B] ${col.className ?? ""}`,
-              children: col.render ? col.render(row) : getCellValue(row, col.key)
-            },
-            String(col.key)
-          ))
-        },
-        rowKey(row)
-      )) })
-    ] }) }) }) })
-  ] });
-}
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.staff;
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add staff");
+  }
+};
+const updateAdminStaffApi = async (id, payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(`${ENDPOINT.UPDATE_STAFF}/${id}`, payload, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.staff;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update staff"
+    );
+  }
+};
+const deleteAdminStaffApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_STAFF}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(
+      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete staff member"
+    );
+  }
+};
+const EDITABLE_ROLES = [
+  "super-admin",
+  "doctor",
+  "nurse",
+  "receptionist"
+];
+const ADDABLE_ROLES = ["nurse", "receptionist"];
 const ROLE_BADGE_STYLES = {
   "super-admin": "bg-amber-50 text-amber-700 border border-amber-200 font-semibold",
   doctor: "bg-yellow-50 text-yellow-700 border border-yellow-200 font-semibold",
@@ -68390,129 +68418,526 @@ function RoleBadge({ role }) {
     }
   );
 }
-function EditRoleModal({ user, onClose, onSave }) {
-  const [selectedRole, setSelectedRole] = reactExports.useState("");
-  reactExports.useEffect(() => {
-    if (user) setSelectedRole(user.role);
-  }, [user]);
-  function handleSave() {
-    if (!user || !selectedRole) return;
-    onSave(user.id, selectedRole);
+function createBlankPermissions() {
+  return ALL_PERMISSION_KEYS.reduce((acc, key) => {
+    acc[key] = false;
+    return acc;
+  }, {});
+}
+function buildPermissionsState(source) {
+  return {
+    ...createBlankPermissions(),
+    ...normalizePermissions(source)
+  };
+}
+function buildPermissionsForRole(role) {
+  return {
+    ...createBlankPermissions(),
+    ...createPermissionTemplate(role)
+  };
+}
+function getStaffRole(staff) {
+  return getRoleFromRoleId(staff.roleId);
+}
+function getStaffPhone(staff) {
+  return staff.phone ? String(staff.phone) : "Not set";
+}
+function validateAddStaffForm(form) {
+  const errors = {};
+  if (!form.name.trim()) {
+    errors.name = "Full name is required.";
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: !!user, onOpenChange: (open) => !open && onClose(), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    DialogContent,
-    {
-      className: "w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl",
-      "data-ocid": "edit-role.dialog",
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-base font-bold text-[#1E293B] font-display", children: "Edit Role" }) }),
-        user && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5 py-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-slate-100", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { size: 18, className: "text-primary" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-[#1E293B] truncate", children: user.name }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] truncate", children: user.email }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1.5", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RoleBadge, { role: user.role }) })
-            ] })
+  if (!form.email.trim()) {
+    errors.email = "Email is required.";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errors.email = "Enter a valid email address.";
+  }
+  if (!form.password.trim()) {
+    errors.password = "Password is required.";
+  } else if (form.password.trim().length < 8) {
+    errors.password = "Password must be at least 8 characters.";
+  }
+  if (!ADDABLE_ROLES.includes(form.role)) {
+    errors.role = "Choose a supported staff role.";
+  }
+  return errors;
+}
+function PermissionEditor({
+  permissions,
+  selectedRole,
+  onRoleDefaults,
+  onGrantAll,
+  onClearAll,
+  onToggle
+}) {
+  const enabledCount = countEnabledPermissions(permissions);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-slate-100 bg-[#F8FAFC] p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-3 md:flex-row md:items-center md:justify-between", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-[#1E293B]", children: "Permission access" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-[#64748B] mt-1", children: [
+          enabledCount,
+          " enabled for ",
+          ROLE_LABELS[selectedRole]
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-xl border-slate-200",
+            onClick: onRoleDefaults,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(WandSparkles, { size: 14 }),
+              " Role defaults"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-xl border-slate-200",
+            onClick: onGrantAll,
+            children: "Grant all"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-xl border-slate-200",
+            onClick: onClearAll,
+            children: "Clear all"
+          }
+        )
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4", children: PERMISSION_GROUPS.map((group) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "rounded-2xl border border-slate-100 bg-white p-4",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-[#1E293B]", children: group.title }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] mt-1", children: group.description })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Label$1,
-              {
-                htmlFor: "role-select",
-                className: "text-sm font-medium text-[#1E293B]",
-                children: "Assign New Role"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              Select,
-              {
-                value: selectedRole,
-                onValueChange: (v2) => setSelectedRole(v2),
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    SelectTrigger,
-                    {
-                      id: "role-select",
-                      className: "w-full h-10 rounded-xl border-slate-200 text-sm",
-                      "data-ocid": "edit-role.select",
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select a role…" })
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: Object.keys(ROLE_LABELS).map((role) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: role, className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RoleBadge, { role }) }) }, role)) })
-                ]
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "flex-col sm:flex-row gap-2 pt-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-3 md:grid-cols-2", children: group.permissions.map((permission) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
             {
-              type: "button",
-              variant: "outline",
-              onClick: onClose,
-              className: "w-full sm:w-auto rounded-xl text-sm border-slate-200",
-              "data-ocid": "edit-role.cancel_button",
-              children: "Cancel"
+              className: "flex items-start justify-between gap-4 rounded-xl border border-slate-100 bg-[#FCFDFE] px-3 py-3",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-[#1E293B]", children: PERMISSION_LABELS[permission] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8] mt-1 break-all", children: permission })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Switch,
+                  {
+                    checked: permissions[permission] === true,
+                    onCheckedChange: (checked) => onToggle(permission, checked)
+                  }
+                )
+              ]
+            },
+            permission
+          )) })
+        ]
+      },
+      group.title
+    )) })
+  ] });
+}
+function AddStaffDialog({
+  open,
+  isSaving,
+  onClose,
+  onSubmit
+}) {
+  const [form, setForm] = reactExports.useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+    role: "nurse",
+    permissions: buildPermissionsForRole("nurse")
+  });
+  const [errors, setErrors] = reactExports.useState({});
+  reactExports.useEffect(() => {
+    if (!open) {
+      return;
+    }
+    setForm({
+      name: "",
+      email: "",
+      password: "",
+      phone: "",
+      role: "nurse",
+      permissions: buildPermissionsForRole("nurse")
+    });
+    setErrors({});
+  }, [open]);
+  function updateField(key, value) {
+    setForm((prev2) => ({ ...prev2, [key]: value }));
+    if (errors[key]) {
+      setErrors((prev2) => ({ ...prev2, [key]: void 0 }));
+    }
+  }
+  function updateRole(role) {
+    updateField("role", role);
+    setForm((prev2) => ({
+      ...prev2,
+      role,
+      permissions: buildPermissionsForRole(role)
+    }));
+  }
+  function handleSubmit() {
+    const nextErrors = validateAddStaffForm(form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+    onSubmit({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      password: form.password.trim(),
+      phone: form.phone.trim(),
+      roleId: USER_ROLE_TO_ROLE_ID[form.role],
+      permissions: form.permissions
+    });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: (nextOpen) => !nextOpen && onClose(), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "w-[99vw] max-w-none max-h-[90vh] overflow-y-auto rounded-2xl", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-base font-bold text-[#1E293B]", children: "Add Staff Member" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5 py-1", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-slate-100 bg-[#F8FAFC] p-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-[#1E293B]", children: "Quick staff onboarding" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] mt-1", children: "Doctors are still created from the Doctors page. Use this flow for nurses and reception staff, then fine-tune page access before saving." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "staff-name", children: "Full Name" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "staff-name",
+              value: form.name,
+              onChange: (event) => updateField("name", event.target.value),
+              placeholder: "e.g. Riya Verma",
+              className: "rounded-xl"
             }
           ),
+          errors.name && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: errors.name })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "staff-email", children: "Email Address" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
+            Input,
             {
-              type: "button",
-              onClick: handleSave,
-              disabled: !selectedRole,
-              className: "w-full sm:w-auto rounded-xl text-sm bg-primary hover:bg-secondary text-primary-foreground",
-              "data-ocid": "edit-role.confirm_button",
-              children: "Save Changes"
+              id: "staff-email",
+              type: "email",
+              value: form.email,
+              onChange: (event) => updateField("email", event.target.value),
+              placeholder: "staff@samarpan.com",
+              className: "rounded-xl"
             }
-          )
+          ),
+          errors.email && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: errors.email })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "staff-password", children: "Temporary Password" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "staff-password",
+              type: "password",
+              value: form.password,
+              onChange: (event) => updateField("password", event.target.value),
+              placeholder: "At least 8 characters",
+              className: "rounded-xl"
+            }
+          ),
+          errors.password && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: errors.password })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "staff-phone", children: "Phone Number" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "staff-phone",
+              value: form.phone,
+              onChange: (event) => updateField("phone", event.target.value),
+              placeholder: "+91 98765 43210",
+              className: "rounded-xl"
+            }
+          ),
+          errors.phone && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: errors.phone })
         ] })
-      ]
-    }
-  ) });
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "staff-role", children: "Staff Role" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: form.role, onValueChange: (value) => updateRole(value), children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "staff-role", className: "rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select a role" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: ADDABLE_ROLES.map((role) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: role, children: ROLE_LABELS[role] }, role)) })
+        ] }),
+        errors.role && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: errors.role })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PermissionEditor,
+        {
+          permissions: form.permissions,
+          selectedRole: form.role,
+          onRoleDefaults: () => setForm((prev2) => ({
+            ...prev2,
+            permissions: buildPermissionsForRole(prev2.role)
+          })),
+          onGrantAll: () => setForm((prev2) => ({
+            ...prev2,
+            permissions: ALL_PERMISSION_KEYS.reduce(
+              (acc, key) => {
+                acc[key] = true;
+                return acc;
+              },
+              {}
+            )
+          })),
+          onClearAll: () => setForm((prev2) => ({
+            ...prev2,
+            permissions: createBlankPermissions()
+          })),
+          onToggle: (permission, checked) => setForm((prev2) => ({
+            ...prev2,
+            permissions: setPermissionWithDependencies(
+              prev2.permissions,
+              permission,
+              checked
+            )
+          }))
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "flex-col sm:flex-row gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          type: "button",
+          variant: "outline",
+          onClick: onClose,
+          className: "w-full sm:w-auto rounded-xl border-slate-200",
+          children: "Cancel"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          type: "button",
+          onClick: handleSubmit,
+          disabled: isSaving,
+          className: "w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white",
+          children: isSaving ? "Adding..." : "Add Staff Member"
+        }
+      )
+    ] })
+  ] }) });
 }
-const SKELETON_CARD_IDS = ["rmsk1", "rmsk2", "rmsk3", "rmsk4"];
-function RoleManagementPage() {
-  const [users, setUsers] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  const [editingUser, setEditingUser] = reactExports.useState(null);
+function EditStaffDialog({
+  staff,
+  isSaving,
+  onClose,
+  onSubmit
+}) {
+  const [role, setRole] = reactExports.useState("receptionist");
+  const [permissions, setPermissions] = reactExports.useState(
+    createBlankPermissions()
+  );
   reactExports.useEffect(() => {
-    let cancelled = false;
-    setIsLoading(true);
-    fetchManagedUsers().then((data) => {
-      if (!cancelled) {
-        setUsers(data);
-        setIsLoading(false);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-  function handleSaveRole(userId, newRole) {
-    const storeIdx = managedUsersStore.findIndex((u2) => u2.id === userId);
-    if (storeIdx !== -1) {
-      managedUsersStore[storeIdx] = {
-        ...managedUsersStore[storeIdx],
-        role: newRole
-      };
+    if (!staff) {
+      return;
     }
-    setUsers(
-      (prev2) => prev2.map((u2) => u2.id === userId ? { ...u2, role: newRole } : u2)
-    );
-    setEditingUser(null);
-    ue$2.success(`Role updated to "${ROLE_LABELS[newRole]}" successfully.`);
+    setRole(getStaffRole(staff));
+    setPermissions(buildPermissionsState(staff.permissions));
+  }, [staff]);
+  function handleRoleChange(nextRole) {
+    setRole(nextRole);
+    setPermissions(buildPermissionsForRole(nextRole));
   }
+  function handleSave() {
+    if (!staff) {
+      return;
+    }
+    onSubmit(staff._id, {
+      roleId: USER_ROLE_TO_ROLE_ID[role],
+      permissions
+    });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: !!staff, onOpenChange: (nextOpen) => !nextOpen && onClose(), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "w-[98vw] max-w-[96rem] max-h-[90vh] overflow-y-auto rounded-2xl", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-base font-bold text-[#1E293B]", children: "Manage Staff Access" }) }),
+    staff && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5 py-1", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 rounded-2xl border border-slate-100 bg-[#F8FAFC] p-4 md:flex-row md:items-start md:justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 min-w-0", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { size: 18, className: "text-primary" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-[#1E293B] truncate", children: staff.name }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] truncate mt-1", children: staff.email }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(RoleBadge, { role: getStaffRole(staff) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Badge,
+                {
+                  variant: "outline",
+                  className: "rounded-lg border-slate-200 text-xs text-[#64748B]",
+                  children: [
+                    countEnabledPermissions(permissions),
+                    " permissions"
+                  ]
+                }
+              )
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-[#64748B] space-y-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+            "Phone: ",
+            getStaffPhone(staff)
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+            "Joined: ",
+            formatDate(staff.createdAt)
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "edit-staff-role", children: "Role" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Select,
+          {
+            value: role,
+            onValueChange: (value) => handleRoleChange(value),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "edit-staff-role", className: "rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select role" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: EDITABLE_ROLES.map((itemRole) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: itemRole, children: ROLE_LABELS[itemRole] }, itemRole)) })
+            ]
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PermissionEditor,
+        {
+          permissions,
+          selectedRole: role,
+          onRoleDefaults: () => setPermissions(buildPermissionsForRole(role)),
+          onGrantAll: () => setPermissions(
+            ALL_PERMISSION_KEYS.reduce(
+              (acc, key) => {
+                acc[key] = true;
+                return acc;
+              },
+              {}
+            )
+          ),
+          onClearAll: () => setPermissions(createBlankPermissions()),
+          onToggle: (permission, checked) => setPermissions(
+            (prev2) => setPermissionWithDependencies(prev2, permission, checked)
+          )
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "flex-col sm:flex-row gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          type: "button",
+          variant: "outline",
+          onClick: onClose,
+          className: "w-full sm:w-auto rounded-xl border-slate-200",
+          children: "Cancel"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          type: "button",
+          onClick: handleSave,
+          disabled: isSaving || !staff,
+          className: "w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white",
+          children: isSaving ? "Saving..." : "Save Access Changes"
+        }
+      )
+    ] })
+  ] }) });
+}
+function RoleManagementPage() {
+  const { admin } = useAuth();
+  const queryClient2 = useQueryClient();
+  const [editingStaff, setEditingStaff] = reactExports.useState(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = reactExports.useState(false);
+  const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
+  const {
+    data: staff = [],
+    isLoading,
+    isError,
+    error
+  } = useQuery({
+    queryKey: ["admin-staff"],
+    queryFn: getAdminStaffApi
+  });
+  const addMutation = useMutation({
+    mutationFn: addAdminStaffApi,
+    onSuccess: () => {
+      ue$2.success("Staff member added successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["admin-staff"] });
+      setIsAddDialogOpen(false);
+    },
+    onError: (mutationError) => ue$2.error(mutationError.message)
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({
+      id,
+      payload
+    }) => updateAdminStaffApi(id, payload),
+    onSuccess: () => {
+      ue$2.success("Staff access updated successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["admin-staff"] });
+      setEditingStaff(null);
+    },
+    onError: (mutationError) => ue$2.error(mutationError.message)
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteAdminStaffApi,
+    onSuccess: () => {
+      ue$2.success("Staff member removed successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["admin-staff"] });
+      setDeleteTarget(null);
+    },
+    onError: (mutationError) => ue$2.error(mutationError.message)
+  });
+  const staffCounts = reactExports.useMemo(
+    () => EDITABLE_ROLES.map((role) => ({
+      role,
+      count: staff.filter((item) => getStaffRole(item) === role).length
+    })),
+    [staff]
+  );
   const columns = [
     {
       key: "name",
       header: "Name",
-      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2.5 min-w-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-primary", children: row.name.charAt(0).toUpperCase() }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-[#1E293B] truncate", children: row.name })
-      ] })
+      render: (row) => {
+        const isCurrentAccount = (admin == null ? void 0 : admin.id) === row._id;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2.5 min-w-0", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-primary", children: row.name.charAt(0).toUpperCase() }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-[#1E293B] truncate", children: row.name }),
+            isCurrentAccount && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#A67C00] mt-0.5", children: "Current account" })
+          ] })
+        ] });
+      }
     },
     {
       key: "email",
@@ -68521,38 +68946,73 @@ function RoleManagementPage() {
     },
     {
       key: "role",
-      header: "Current Role",
-      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx(RoleBadge, { role: row.role })
+      header: "Role",
+      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx(RoleBadge, { role: getStaffRole(row) })
+    },
+    {
+      key: "permissions",
+      header: "Permissions",
+      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Badge,
+        {
+          variant: "outline",
+          className: "rounded-lg border-slate-200 text-xs font-medium text-[#475569]",
+          children: [
+            countEnabledPermissions(normalizePermissions(row.permissions)),
+            " enabled"
+          ]
+        }
+      )
     },
     {
       key: "joinedDate",
       header: "Joined Date",
-      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[#64748B]", children: formatDate(row.joinedDate) })
+      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[#64748B]", children: formatDate(row.createdAt) })
     },
     {
       key: "action",
       header: "Action",
-      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Button,
-        {
-          type: "button",
-          size: "sm",
-          variant: "outline",
-          onClick: () => setEditingUser(row),
-          className: "rounded-lg text-xs border-[#D89F00] text-[#A67C00] hover:bg-amber-50 hover:text-[#A67C00]",
-          "data-ocid": `role-management.edit_button.${row.id}`,
-          children: "Edit Role"
-        }
-      )
+      render: (row) => {
+        const isCurrentAccount = (admin == null ? void 0 : admin.id) === row._id;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              size: "sm",
+              variant: "outline",
+              disabled: isCurrentAccount,
+              onClick: () => setEditingStaff(row),
+              className: "rounded-lg text-xs border-[#D89F00] text-[#A67C00] hover:bg-amber-50 hover:text-[#A67C00]",
+              children: "Edit Access"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              size: "icon",
+              variant: "ghost",
+              disabled: isCurrentAccount,
+              onClick: () => setDeleteTarget(row),
+              className: "h-8 w-8 rounded-lg text-[#64748B] hover:bg-red-50 hover:text-red-500",
+              "aria-label": "Delete staff member",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
+            }
+          )
+        ] });
+      },
+      className: "text-right"
     }
   ];
-  function mobileCardRender(item, idx) {
+  function mobileCardRender(item, index2) {
+    const isCurrentAccount = (admin == null ? void 0 : admin.id) === item._id;
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       Card,
       {
         className: "shadow-card border border-slate-100 rounded-xl overflow-hidden",
-        "data-ocid": `role-management.item.${idx + 1}`,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4", children: [
+        "data-ocid": `role-management.item.${index2 + 1}`,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 space-y-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2.5 min-w-0", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-bold text-primary", children: item.name.charAt(0).toUpperCase() }) }),
@@ -68561,25 +69021,42 @@ function RoleManagementPage() {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] truncate", children: item.email })
               ] })
             ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(RoleBadge, { role: getStaffRole(item) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-2 text-xs text-[#64748B]", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+              countEnabledPermissions(normalizePermissions(item.permissions)),
+              " permissions"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+              "Joined ",
+              formatDate(item.createdAt)
+            ] })
+          ] }),
+          isCurrentAccount ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl bg-amber-50 px-3 py-2 text-xs text-[#A67C00]", children: "Current account access is locked here for safety." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
               {
                 type: "button",
                 size: "sm",
                 variant: "outline",
-                onClick: () => setEditingUser(item),
-                className: "flex-shrink-0 rounded-lg text-xs border-[#D89F00] text-[#A67C00] hover:bg-amber-50",
-                "data-ocid": `role-management.edit_button.${item.id}`,
-                children: "Edit"
+                onClick: () => setEditingStaff(item),
+                className: "flex-1 rounded-lg text-xs border-[#D89F00] text-[#A67C00] hover:bg-amber-50",
+                children: "Edit Access"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                type: "button",
+                size: "icon",
+                variant: "ghost",
+                onClick: () => setDeleteTarget(item),
+                className: "h-9 w-9 rounded-lg text-[#64748B] hover:bg-red-50 hover:text-red-500",
+                "aria-label": "Delete staff member",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
               }
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 flex items-center justify-between gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(RoleBadge, { role: item.role }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-[#94A3B8]", children: [
-              "Joined ",
-              formatDate(item.joinedDate)
-            ] })
           ] })
         ] })
       }
@@ -68590,68 +69067,78 @@ function RoleManagementPage() {
       PageHeader,
       {
         title: "Role Management",
-        description: "View and manage access roles for all system users. Super Admin only."
+        description: "Manage staff roles, page access, and onboarding for nurses and reception staff.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: () => setIsAddDialogOpen(true),
+            className: "bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldPlus, { size: 15 }),
+              " Add Staff"
+            ]
+          }
+        )
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5", children: Object.keys(ROLE_LABELS).map((role) => {
-      const count2 = users.filter((u2) => u2.role === role).length;
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Card,
-        {
-          className: "shadow-card border border-slate-100 rounded-xl",
-          children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-3 sm:p-4 flex flex-col gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] font-medium uppercase tracking-wide", children: ROLE_LABELS[role] }),
-            isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-8 rounded-md" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-[#1E293B] font-display", children: count2 })
-          ] })
-        },
-        role
-      );
-    }) }),
-    isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "md:hidden space-y-2 mb-2", children: SKELETON_CARD_IDS.map((sk) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5", children: staffCounts.map(({ role, count: count2 }) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       Card,
       {
         className: "shadow-card border border-slate-100 rounded-xl",
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 space-y-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2.5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "w-9 h-9 rounded-full flex-shrink-0" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 space-y-1.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-2/3 rounded-md" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-1/2 rounded-md" })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mt-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24 rounded-full" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20 rounded-md" })
-          ] })
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-3 sm:p-4 flex flex-col gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B] font-medium uppercase tracking-wide", children: ROLE_LABELS[role] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-[#1E293B] font-display", children: isLoading ? "..." : count2 })
         ] })
       },
-      sk
+      role
     )) }),
+    isError && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "mb-4 border border-red-100 bg-red-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4 text-sm text-red-600", children: (error == null ? void 0 : error.message) ?? "Unable to load staff right now." }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       DataTable,
       {
         columns,
-        data: users,
+        data: staff,
         isLoading,
         searchable: true,
         searchKeys: ["name", "email"],
-        emptyText: "No users found.",
-        rowKey: (row) => row.id,
+        emptyText: "No staff members found.",
+        rowKey: (row) => row._id,
         mobileCardRender,
         "data-ocid": "role-management.table"
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
-      EditRoleModal,
+      AddStaffDialog,
       {
-        user: editingUser,
-        onClose: () => setEditingUser(null),
-        onSave: handleSaveRole
+        open: isAddDialogOpen,
+        isSaving: addMutation.isPending,
+        onClose: () => setIsAddDialogOpen(false),
+        onSubmit: (payload) => addMutation.mutate(payload)
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      EditStaffDialog,
+      {
+        staff: editingStaff,
+        isSaving: updateMutation.isPending,
+        onClose: () => setEditingStaff(null),
+        onSubmit: (id, payload) => updateMutation.mutate({ id, payload })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmDialog,
+      {
+        open: !!deleteTarget,
+        title: "Delete Staff Member",
+        message: `Delete "${(deleteTarget == null ? void 0 : deleteTarget.name) ?? "this staff member"}"? This action cannot be undone.`,
+        confirmLabel: deleteMutation.isPending ? "Deleting..." : "Delete",
+        onConfirm: () => deleteTarget && deleteMutation.mutate(deleteTarget._id),
+        onCancel: () => setDeleteTarget(null)
       }
     )
   ] });
 }
-function toFormData$1(payload) {
+function toFormData$2(payload) {
   const fd = new FormData();
   if (payload.title) fd.append("title", payload.title);
   if (payload.slug) fd.append("slug", payload.slug);
@@ -68679,7 +69166,7 @@ const getAllServicesApi = async () => {
 const addServiceApi = async (payload) => {
   var _a2, _b2, _c2;
   try {
-    const res = await post(ENDPOINT.ADD_SERVICE, toFormData$1(payload), { needAuth: true });
+    const res = await post(ENDPOINT.ADD_SERVICE, toFormData$2(payload), { needAuth: true });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.service;
   } catch (error) {
     throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add service");
@@ -68690,13 +69177,25 @@ const updateServiceApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_SERVICE}/${id}`,
-      toFormData$1(payload),
+      toFormData$2(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.service;
   } catch (error) {
     throw new Error(
       ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update service"
+    );
+  }
+};
+const deleteServiceApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_SERVICE}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(
+      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete service"
     );
   }
 };
@@ -68764,6 +69263,7 @@ function ServiceManagementPage() {
   const [search, setSearch] = reactExports.useState("");
   const [modalOpen, setModalOpen] = reactExports.useState(false);
   const [editTarget, setEditTarget] = reactExports.useState(null);
+  const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
   const [formData, setFormData] = reactExports.useState(emptyForm);
   const [featuresInput, setFeaturesInput] = reactExports.useState("");
   const [keywordsInput, setKeywordsInput] = reactExports.useState("");
@@ -68782,12 +69282,21 @@ function ServiceManagementPage() {
     },
     onError: (error) => ue$2.error(error.message)
   });
-  const updateMutation2 = useMutation({
+  const updateMutation = useMutation({
     mutationFn: ({ id, payload }) => updateServiceApi(id, payload),
     onSuccess: () => {
       ue$2.success("Service updated successfully.");
       queryClient2.invalidateQueries({ queryKey: ["service-management"] });
       setModalOpen(false);
+    },
+    onError: (error) => ue$2.error(error.message)
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteServiceApi,
+    onSuccess: () => {
+      ue$2.success("Service deleted successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["service-management"] });
+      setDeleteTarget(null);
     },
     onError: (error) => ue$2.error(error.message)
   });
@@ -68867,12 +69376,12 @@ function ServiceManagementPage() {
       }
     };
     if (editTarget) {
-      updateMutation2.mutate({ id: editTarget._id, payload });
+      updateMutation.mutate({ id: editTarget._id, payload });
       return;
     }
     addMutation.mutate(payload);
   }
-  const isBusy = addMutation.isPending || updateMutation2.isPending;
+  const isBusy = addMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "service_management.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -68925,17 +69434,30 @@ function ServiceManagementPage() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: service.slug }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "max-w-[420px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "line-clamp-2", children: service.shortDescription }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: ((_a3 = service.features) == null ? void 0 : _a3.length) || 0 }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                size: "icon",
-                variant: "ghost",
-                onClick: () => openEdit(service),
-                "aria-label": "Edit service",
-                "data-ocid": "service_management.edit_button",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
-              }
-            ) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  size: "icon",
+                  variant: "ghost",
+                  onClick: () => openEdit(service),
+                  "aria-label": "Edit service",
+                  "data-ocid": "service_management.edit_button",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  size: "icon",
+                  variant: "ghost",
+                  onClick: () => setDeleteTarget(service),
+                  "aria-label": "Delete service",
+                  "data-ocid": "service_management.delete_button",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
+                }
+              )
+            ] }) })
           ] }, service._id);
         }),
         !isLoading && filtered.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 5, className: "text-center py-12 text-slate-500", children: "No services found." }) })
@@ -69143,7 +69665,18 @@ function ServiceManagementPage() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: () => setModalOpen(false), children: "Cancel" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, disabled: isBusy, children: isBusy ? editTarget ? "Updating…" : "Adding…" : editTarget ? "Update Service" : "Add Service" })
       ] })
-    ] }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmDialog,
+      {
+        open: !!deleteTarget,
+        title: "Delete Service",
+        message: `Delete "${(deleteTarget == null ? void 0 : deleteTarget.title) ?? "this service"}"? This action cannot be undone.`,
+        confirmLabel: deleteMutation.isPending ? "Deleting..." : "Delete",
+        onConfirm: () => deleteTarget && deleteMutation.mutate(deleteTarget._id),
+        onCancel: () => setDeleteTarget(null)
+      }
+    )
   ] });
 }
 const getSettingsApi = async () => {
@@ -69174,12 +69707,31 @@ const updateSettingsApi = async (payload) => {
     );
   }
 };
+const updateAdminAccountApi = async (payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(ENDPOINT.UPDATE_ADMIN_ACCOUNT, payload, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.admin;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update admin account"
+    );
+  }
+};
 function SettingsPage() {
-  var _a2;
-  const { logout } = useAuth();
+  const { admin, logout, updateAdmin } = useAuth();
   const [settings, setSettings] = reactExports.useState(null);
   const [loading, setLoading] = reactExports.useState(true);
-  const [saving, setSaving] = reactExports.useState(false);
+  const [settingsSaving, setSettingsSaving] = reactExports.useState(false);
+  const [accountSaving, setAccountSaving] = reactExports.useState(false);
+  const [passwordSaving, setPasswordSaving] = reactExports.useState(false);
+  const [accountForm, setAccountForm] = reactExports.useState({
+    name: "",
+    email: "",
+    phone: ""
+  });
   const [passwordForm, setPasswordForm] = reactExports.useState({
     newPass: "",
     confirm: ""
@@ -69191,6 +69743,13 @@ function SettingsPage() {
   reactExports.useEffect(() => {
     loadSettings();
   }, []);
+  reactExports.useEffect(() => {
+    setAccountForm({
+      name: (admin == null ? void 0 : admin.name) ?? "",
+      email: (admin == null ? void 0 : admin.email) ?? "",
+      phone: (admin == null ? void 0 : admin.mobile) ?? ""
+    });
+  }, [admin]);
   async function loadSettings() {
     try {
       setLoading(true);
@@ -69204,41 +69763,82 @@ function SettingsPage() {
   }
   async function saveSettings(payload) {
     try {
-      setSaving(true);
+      setSettingsSaving(true);
       const body = payload ?? settings;
-      const updated = await updateSettingsApi(body);
+      const updated = await updateSettingsApi(body ?? {});
       setSettings(updated);
-      ue$2.success("Settings updated successfully");
+      ue$2.success("Business settings updated successfully.");
     } catch (err) {
       ue$2.error(err.message);
     } finally {
-      setSaving(false);
+      setSettingsSaving(false);
+    }
+  }
+  async function handleAccountSave() {
+    if (!accountForm.name.trim()) {
+      ue$2.error("Full name is required.");
+      return;
+    }
+    if (!accountForm.email.trim()) {
+      ue$2.error("Email is required.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(accountForm.email.trim())) {
+      ue$2.error("Enter a valid email address.");
+      return;
+    }
+    try {
+      setAccountSaving(true);
+      const updated = await updateAdminAccountApi({
+        name: accountForm.name.trim(),
+        email: accountForm.email.trim(),
+        phone: String(accountForm.phone || "").trim()
+      });
+      updateAdmin({
+        name: updated.name,
+        email: updated.email,
+        mobile: updated.phone ? String(updated.phone) : "",
+        avatar: updated.image ?? (admin == null ? void 0 : admin.avatar) ?? "",
+        permissions: updated.permissions ?? (admin == null ? void 0 : admin.permissions),
+        roleId: updated.roleId ?? (admin == null ? void 0 : admin.roleId),
+        role: updated.roleId !== void 0 ? getRoleFromRoleId(updated.roleId) : (admin == null ? void 0 : admin.role) ?? "receptionist"
+      });
+      ue$2.success("Account details updated successfully.");
+    } catch (err) {
+      ue$2.error(err.message);
+    } finally {
+      setAccountSaving(false);
     }
   }
   async function handlePasswordUpdate() {
     if (passwordForm.newPass.length < 8) {
-      ue$2.error("Password must be at least 8 characters");
+      ue$2.error("Password must be at least 8 characters.");
       return;
     }
     if (passwordForm.newPass !== passwordForm.confirm) {
-      ue$2.error("Passwords do not match");
+      ue$2.error("Passwords do not match.");
       return;
     }
-    await saveSettings({ password: passwordForm.newPass });
-    setPasswordForm({
-      newPass: "",
-      confirm: ""
-    });
+    try {
+      setPasswordSaving(true);
+      await updateAdminAccountApi({ password: passwordForm.newPass });
+      setPasswordForm({ newPass: "", confirm: "" });
+      ue$2.success("Password updated successfully.");
+    } catch (err) {
+      ue$2.error(err.message);
+    } finally {
+      setPasswordSaving(false);
+    }
   }
   function updateField(key, value) {
     setSettings((prev2) => ({
-      ...prev2,
+      ...prev2 ?? {},
       [key]: value
     }));
   }
   function updateSocial(key, value) {
     setSettings((prev2) => ({
-      ...prev2,
+      ...prev2 ?? {},
       social_links: {
         ...prev2 == null ? void 0 : prev2.social_links,
         [key]: value
@@ -69246,13 +69846,13 @@ function SettingsPage() {
     }));
   }
   const safeSettings = settings ?? {};
-  const initials = (_a2 = safeSettings.name) == null ? void 0 : _a2.split(" ").map((n2) => n2[0]).join("").slice(0, 2).toUpperCase();
+  const initials = (accountForm.name || (admin == null ? void 0 : admin.name) || "Admin").split(" ").map((name) => name[0]).join("").slice(0, 2).toUpperCase();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
         title: "Settings",
-        description: "Manage admin settings and CMS content."
+        description: "Manage account credentials, business details, and legal or informational website settings."
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid lg:grid-cols-2 gap-6", children: [
@@ -69260,9 +69860,9 @@ function SettingsPage() {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(User, { size: 16 }),
-            "Admin Profile"
+            "Admin Account"
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Update admin information" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "These details are saved on your login user record." })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Avatar, { className: "h-20 w-20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { children: initials }) }),
@@ -69271,18 +69871,25 @@ function SettingsPage() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
-                value: safeSettings.name ?? "",
-                onChange: (e3) => updateField("name", e3.target.value)
+                value: accountForm.name,
+                onChange: (event) => setAccountForm((prev2) => ({
+                  ...prev2,
+                  name: event.target.value
+                }))
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Email" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Login Email" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
-                value: safeSettings.email ?? "",
-                onChange: (e3) => updateField("email", e3.target.value)
+                type: "email",
+                value: accountForm.email,
+                onChange: (event) => setAccountForm((prev2) => ({
+                  ...prev2,
+                  email: event.target.value
+                }))
               }
             )
           ] }),
@@ -69291,63 +69898,106 @@ function SettingsPage() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
-                value: safeSettings.mobile_number ?? "",
-                onChange: (e3) => updateField("mobile_number", e3.target.value)
+                value: accountForm.phone,
+                onChange: (event) => setAccountForm((prev2) => ({
+                  ...prev2,
+                  phone: event.target.value
+                }))
               }
             )
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { disabled: saving, onClick: () => saveSettings(), children: saving ? "Saving..." : "Save Profile" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { disabled: accountSaving, onClick: handleAccountSave, children: accountSaving ? "Saving..." : "Save Account" })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { size: 16 }),
-          "Password"
-        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { size: 16 }),
+            "Password"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Update the password used for admin sign-in." })
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "New Password" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                type: showPasswords.newPass ? "text" : "password",
-                value: passwordForm.newPass,
-                onChange: (e3) => setPasswordForm({
-                  ...passwordForm,
-                  newPass: e3.target.value
-                })
-              }
-            )
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  type: showPasswords.newPass ? "text" : "password",
+                  value: passwordForm.newPass,
+                  onChange: (event) => setPasswordForm((prev2) => ({
+                    ...prev2,
+                    newPass: event.target.value
+                  })),
+                  className: "pr-10"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => setShowPasswords((prev2) => ({
+                    ...prev2,
+                    newPass: !prev2.newPass
+                  })),
+                  className: "absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8]",
+                  "aria-label": showPasswords.newPass ? "Hide password" : "Show password",
+                  children: showPasswords.newPass ? /* @__PURE__ */ jsxRuntimeExports.jsx(EyeOff, { size: 16 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 16 })
+                }
+              )
+            ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Confirm Password" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                type: showPasswords.confirm ? "text" : "password",
-                value: passwordForm.confirm,
-                onChange: (e3) => setPasswordForm({
-                  ...passwordForm,
-                  confirm: e3.target.value
-                })
-              }
-            )
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  type: showPasswords.confirm ? "text" : "password",
+                  value: passwordForm.confirm,
+                  onChange: (event) => setPasswordForm((prev2) => ({
+                    ...prev2,
+                    confirm: event.target.value
+                  })),
+                  className: "pr-10"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => setShowPasswords((prev2) => ({
+                    ...prev2,
+                    confirm: !prev2.confirm
+                  })),
+                  className: "absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8]",
+                  "aria-label": showPasswords.confirm ? "Hide password" : "Show password",
+                  children: showPasswords.confirm ? /* @__PURE__ */ jsxRuntimeExports.jsx(EyeOff, { size: 16 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 16 })
+                }
+              )
+            ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { disabled: saving, onClick: handlePasswordUpdate, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { disabled: passwordSaving, onClick: handlePasswordUpdate, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Shield, { size: 14 }),
-            " Update Password"
+            " ",
+            passwordSaving ? "Updating..." : "Update Password"
           ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "Business Info" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "Business Info" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Public-facing contact details for the website." })
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Input,
             {
               placeholder: "Inquiry Email",
               value: safeSettings.inquiry_email ?? "",
-              onChange: (e3) => updateField("inquiry_email", e3.target.value)
+              onChange: (event) => updateField("inquiry_email", event.target.value),
+              disabled: loading
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -69355,7 +70005,8 @@ function SettingsPage() {
             {
               placeholder: "Inquiry Mobile",
               value: safeSettings.inquiry_mobile_number ?? "",
-              onChange: (e3) => updateField("inquiry_mobile_number", e3.target.value)
+              onChange: (event) => updateField("inquiry_mobile_number", event.target.value),
+              disabled: loading
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -69363,7 +70014,8 @@ function SettingsPage() {
             {
               placeholder: "Working Hours",
               value: safeSettings.working_hours ?? "",
-              onChange: (e3) => updateField("working_hours", e3.target.value)
+              onChange: (event) => updateField("working_hours", event.target.value),
+              disabled: loading
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -69371,37 +70023,72 @@ function SettingsPage() {
             {
               placeholder: "Address",
               value: safeSettings.address ?? "",
-              onChange: (e3) => updateField("address", e3.target.value)
+              onChange: (event) => updateField("address", event.target.value),
+              disabled: loading
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              disabled: settingsSaving || loading,
+              onClick: () => saveSettings(),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
+                " ",
+                settingsSaving ? "Saving..." : "Save Business Info"
+              ]
             }
           )
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "Social Links" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: ["facebook", "instagram", "youtube", "whatsapp", "call"].map(
-          (s2) => {
-            var _a3;
-            return /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                placeholder: s2,
-                value: ((_a3 = safeSettings.social_links) == null ? void 0 : _a3[s2]) ?? "",
-                onChange: (e3) => updateSocial(s2, e3.target.value)
-              },
-              s2
-            );
-          }
-        ) })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "Social Links" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Website footer, contact, and social CTA links." })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+          ["facebook", "instagram", "youtube", "whatsapp", "call"].map(
+            (item) => {
+              var _a2;
+              return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  placeholder: item,
+                  value: ((_a2 = safeSettings.social_links) == null ? void 0 : _a2[item]) ?? "",
+                  onChange: (event) => updateSocial(item, event.target.value),
+                  disabled: loading
+                },
+                item
+              );
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              disabled: settingsSaving || loading,
+              onClick: () => saveSettings(),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
+                " ",
+                settingsSaving ? "Saving..." : "Save Social Links"
+              ]
+            }
+          )
+        ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "lg:col-span-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "CMS Content" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "CMS Content" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Legal pages and informational copy that still belongs to the settings document." })
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Textarea,
             {
               placeholder: "About Us",
               value: safeSettings.about_us ?? "",
-              onChange: (e3) => updateField("about_us", e3.target.value)
+              onChange: (event) => updateField("about_us", event.target.value),
+              disabled: loading
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -69409,7 +70096,8 @@ function SettingsPage() {
             {
               placeholder: "Privacy Policy",
               value: safeSettings.privacy_policy ?? "",
-              onChange: (e3) => updateField("privacy_policy", e3.target.value)
+              onChange: (event) => updateField("privacy_policy", event.target.value),
+              disabled: loading
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -69417,7 +70105,8 @@ function SettingsPage() {
             {
               placeholder: "Terms & Conditions",
               value: safeSettings.term_and_condition ?? "",
-              onChange: (e3) => updateField("term_and_condition", e3.target.value)
+              onChange: (event) => updateField("term_and_condition", event.target.value),
+              disabled: loading
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -69425,13 +70114,22 @@ function SettingsPage() {
             {
               placeholder: "Contact Us",
               value: safeSettings.contact_us ?? "",
-              onChange: (e3) => updateField("contact_us", e3.target.value)
+              onChange: (event) => updateField("contact_us", event.target.value),
+              disabled: loading
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { disabled: saving, onClick: () => saveSettings(), children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
-            " Save CMS Content"
-          ] })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              disabled: settingsSaving || loading,
+              onClick: () => saveSettings(),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
+                " ",
+                settingsSaving ? "Saving..." : "Save CMS Content"
+              ]
+            }
+          )
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-red-200 bg-red-50", children: [
@@ -69455,139 +70153,676 @@ function SettingsPage() {
     ] })
   ] });
 }
-const getAllGalleryApi = async () => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await get$3(ENDPOINT.GET_ALL_GALLERY, { needAuth: true });
-    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery) ?? [];
-  } catch (error) {
-    throw new Error(
-      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch gallery items"
-    );
+function toFormData$1(payload) {
+  var _a2;
+  const formData = new FormData();
+  formData.append("modelKey", payload.modelKey);
+  if ((_a2 = payload.title) == null ? void 0 : _a2.trim()) {
+    formData.append("title", payload.title.trim());
   }
-};
-const addGalleryApi = async (image) => {
-  var _a2, _b2, _c2;
-  try {
-    const formData = new FormData();
-    formData.append("image", image);
-    const res = await post(ENDPOINT.ADD_GALLERY, formData, {
-      needAuth: true
-    });
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery;
-  } catch (error) {
-    throw new Error(
-      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add gallery image"
-    );
+  formData.append("content", JSON.stringify(payload.content));
+  if (payload.isActive !== void 0) {
+    formData.append("isActive", String(payload.isActive));
   }
-};
-const deleteGalleryApi = async (id) => {
-  var _a2, _b2;
-  try {
-    await post(`${ENDPOINT.DELETE_GALLERY}/${id}`, void 0, {
-      needAuth: true
-    });
-  } catch (error) {
-    throw new Error(
-      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete gallery image"
-    );
-  }
-};
-const GALLERY_QUERY_KEY = ["gallery"];
-function GalleryPage() {
-  const queryClient2 = useQueryClient();
-  const [open, setOpen] = reactExports.useState(false);
-  const [image, setImage] = reactExports.useState(null);
-  const [previewUrl, setPreviewUrl] = reactExports.useState(null);
-  const { data: gallery = [], isLoading } = useQuery({
-    queryKey: GALLERY_QUERY_KEY,
-    queryFn: getAllGalleryApi
+  Object.entries(payload.files ?? {}).forEach(([key, value]) => {
+    if (value instanceof File) {
+      formData.append(key, value);
+    }
   });
-  const addMutation = useMutation({ mutationFn: addGalleryApi });
-  const deleteMutation = useMutation({ mutationFn: deleteGalleryApi });
-  const handleImageChange = (event) => {
-    var _a2;
-    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
-    setImage(file);
-    setPreviewUrl(file ? URL.createObjectURL(file) : null);
-  };
-  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
-  function resolveAssetUrl2(path) {
-    if (!path) return "";
-    if (/^https?:\/\//.test(path)) return path;
-    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
+  return formData;
+}
+const getContentByModelKeyApi = async (modelKey) => {
+  var _a2, _b2, _c2, _d2;
+  try {
+    const res = await get$3(`${ENDPOINT.GET_CONTENT}/${modelKey}`, {
+      needAuth: true
+    });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.content) ?? null;
+  } catch (error) {
+    if (((_b2 = error.response) == null ? void 0 : _b2.status) === 404) {
+      return null;
+    }
+    throw new Error(
+      ((_d2 = (_c2 = error.response) == null ? void 0 : _c2.data) == null ? void 0 : _d2.message) ?? "Failed to fetch content"
+    );
   }
-  const handleSave = async () => {
-    if (!image) {
-      ue$2.error("Please select an image to upload.");
+};
+const upsertContentApi = async (payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(ENDPOINT.UPSERT_CONTENT, toFormData$1(payload), {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.content;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to save content"
+    );
+  }
+};
+const CONTENT_MODEL_KEY = "home_hero";
+const CONTENT_TITLE = "Home Hero Section";
+const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
+const EMPTY_HERO_FORM = {
+  eyebrowText: "",
+  titlePrefix: "",
+  titleHighlight: "",
+  titleSuffix: "",
+  description: "",
+  primaryCtaText: "",
+  primaryCtaLink: "",
+  secondaryCtaText: "",
+  secondaryCtaLink: "",
+  supportTitle: "",
+  supportSubtitle: "",
+  successRateValue: "",
+  successRateLabel: "",
+  featurePointOne: "",
+  featurePointTwo: "",
+  featurePointThree: "",
+  backgroundImage: "",
+  primaryImage: "",
+  secondaryImage: "",
+  isActive: true
+};
+function readString(value) {
+  return typeof value === "string" ? value : "";
+}
+function readBoolean(value, fallback = true) {
+  return typeof value === "boolean" ? value : fallback;
+}
+function getImageLabel(value) {
+  if (value instanceof File) {
+    return value.name;
+  }
+  if (!value) {
+    return "No file selected";
+  }
+  return value.split("/").filter(Boolean).pop() ?? value;
+}
+function resolveAssetUrl(value) {
+  if (value instanceof File || !value) {
+    return "";
+  }
+  if (/^https?:\/\//.test(value)) {
+    return value;
+  }
+  return `${API_ASSET_ORIGIN}${value.startsWith("/") ? value : `/${value}`}`;
+}
+function mapContentToHeroForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    titlePrefix: readString(content.titlePrefix),
+    titleHighlight: readString(content.titleHighlight),
+    titleSuffix: readString(content.titleSuffix),
+    description: readString(content.description),
+    primaryCtaText: readString(content.primaryCtaText),
+    primaryCtaLink: readString(content.primaryCtaLink),
+    secondaryCtaText: readString(content.secondaryCtaText),
+    secondaryCtaLink: readString(content.secondaryCtaLink),
+    supportTitle: readString(content.supportTitle),
+    supportSubtitle: readString(content.supportSubtitle),
+    successRateValue: readString(content.successRateValue),
+    successRateLabel: readString(content.successRateLabel),
+    featurePointOne: readString(content.featurePointOne),
+    featurePointTwo: readString(content.featurePointTwo),
+    featurePointThree: readString(content.featurePointThree),
+    backgroundImage: readString(content.backgroundImage),
+    primaryImage: readString(content.primaryImage),
+    secondaryImage: readString(content.secondaryImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function ImageUploadField({
+  id,
+  label,
+  hint,
+  value,
+  onPick
+}) {
+  const inputRef = reactExports.useRef(null);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: id, children: label }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        type: "button",
+        onClick: () => {
+          var _a2;
+          return (_a2 = inputRef.current) == null ? void 0 : _a2.click();
+        },
+        className: "w-full rounded-2xl border-2 border-dashed border-slate-200 bg-[#F8FAFC] px-4 py-5 text-left hover:border-primary hover:bg-primary/5 transition-colors",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 18 }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-[#1E293B]", children: getImageLabel(value) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8] mt-1", children: hint })
+          ] })
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "input",
+      {
+        ref: inputRef,
+        id,
+        type: "file",
+        accept: "image/*",
+        className: "hidden",
+        onChange: (event) => {
+          var _a2;
+          const file = (_a2 = event.target.files) == null ? void 0 : _a2[0];
+          if (file) {
+            onPick(file);
+          }
+        }
+      }
+    )
+  ] });
+}
+function HeroPreview({ form }) {
+  const backgroundImageUrl = resolveAssetUrl(form.backgroundImage);
+  const primaryImageUrl = resolveAssetUrl(form.primaryImage);
+  const secondaryImageUrl = resolveAssetUrl(form.secondaryImage);
+  const featurePoints = [
+    form.featurePointOne,
+    form.featurePointTwo,
+    form.featurePointThree
+  ].filter(Boolean);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "rounded-3xl overflow-hidden border-slate-100 shadow-sm bg-white", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-sm text-[#1E293B]", children: "Hero Preview" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "relative rounded-[28px] overflow-hidden min-h-[520px] border border-slate-100 bg-[#FEFBF7]",
+        style: {
+          backgroundImage: backgroundImageUrl ? `linear-gradient(90deg, rgba(255,250,244,0.96), rgba(255,250,244,0.82)), url(${backgroundImageUrl})` : "linear-gradient(135deg, #FFFBF6 0%, #F7EFE6 100%)",
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid lg:grid-cols-[1.2fr_0.8fr] gap-6 p-6 lg:p-8", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#B9775B]", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "h-px w-6 bg-[#D7A48E]" }),
+              form.eyebrowText || "Healing compassion for better care"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h2",
+                {
+                  className: "text-4xl lg:text-5xl leading-none font-bold text-[#1B1B1B]",
+                  style: { fontFamily: "Georgia, serif" },
+                  children: form.titlePrefix || "Your Trusted Partner in"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h3",
+                {
+                  className: "text-4xl lg:text-5xl leading-none font-bold text-[#C58972]",
+                  style: { fontFamily: "Georgia, serif" },
+                  children: form.titleHighlight || "Women's Health &"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "h4",
+                {
+                  className: "text-4xl lg:text-5xl leading-none font-bold text-[#1B1B1B]",
+                  style: { fontFamily: "Georgia, serif" },
+                  children: form.titleSuffix || "Aesthetic Care"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "max-w-xl text-sm leading-7 text-[#5F6368]", children: form.description || "Samarpan Hospital, Hisar offers world-class Gynecology, Obstetrics, and Plastic & Cosmetic Surgery services with compassionate care and cutting-edge technology." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-full bg-[#C58972] px-5 py-3 text-sm font-semibold text-white shadow-sm", children: form.primaryCtaText || "Book Appointment" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-full border border-[#C58972] bg-white/90 px-5 py-3 text-sm font-semibold text-[#B9775B]", children: form.secondaryCtaText || "WhatsApp Us" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-3 pt-2", children: featurePoints.length > 0 ? featurePoints.map((point2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-2 text-xs font-medium text-[#4B5563]",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(BadgeCheck, { size: 14, className: "text-[#C58972]" }),
+                  point2
+                ]
+              },
+              point2
+            )) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-2 text-xs font-medium text-[#4B5563]", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(BadgeCheck, { size: 14, className: "text-[#C58972]" }),
+                "Safe & Hygienic"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-2 text-xs font-medium text-[#4B5563]", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(BadgeCheck, { size: 14, className: "text-[#C58972]" }),
+                "20+ Years Expert"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-2 text-xs font-medium text-[#4B5563]", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(BadgeCheck, { size: 14, className: "text-[#C58972]" }),
+                "10,000+ Happy Patients"
+              ] })
+            ] }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-end justify-center min-h-[360px]", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute left-0 top-12 rounded-3xl bg-white px-4 py-3 shadow-sm border border-slate-100", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-[#1E293B]", children: form.supportTitle || "24/7" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B]", children: form.supportSubtitle || "Emergency Care" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute right-0 top-2 rounded-3xl bg-white px-4 py-3 shadow-sm border border-slate-100", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-[#C58972]", children: form.successRateValue || "99%" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#64748B]", children: form.successRateLabel || "Success Rate" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full flex items-end justify-center", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-[78%] max-w-[320px] rounded-[32px] border border-white/70 bg-white/90 shadow-lg overflow-hidden", children: primaryImageUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: primaryImageUrl,
+                  alt: "Primary doctor",
+                  className: "h-[360px] w-full object-cover"
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-[360px] w-full flex items-center justify-center bg-[#F3E7DD] text-[#B9775B]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { size: 28 }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -right-1 bottom-8 w-[42%] max-w-[160px] rounded-[24px] border border-white/70 bg-white/95 shadow-md overflow-hidden", children: secondaryImageUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: secondaryImageUrl,
+                  alt: "Secondary doctor",
+                  className: "h-[190px] w-full object-cover"
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-[190px] w-full flex items-center justify-center bg-[#F8EFE8] text-[#B9775B]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { size: 22 }) }) })
+            ] })
+          ] })
+        ] })
+      }
+    ) })
+  ] });
+}
+function WebsiteContentPage() {
+  const queryClient2 = useQueryClient();
+  const [form, setForm] = reactExports.useState(EMPTY_HERO_FORM);
+  const [previewOpen, setPreviewOpen] = reactExports.useState(false);
+  const { data: contentItem, isLoading } = useQuery({
+    queryKey: ["content", CONTENT_MODEL_KEY],
+    queryFn: () => getContentByModelKeyApi(CONTENT_MODEL_KEY)
+  });
+  reactExports.useEffect(() => {
+    setForm(mapContentToHeroForm(contentItem ?? null));
+  }, [contentItem]);
+  const saveMutation = useMutation({
+    mutationFn: upsertContentApi,
+    onSuccess: (data) => {
+      ue$2.success("Hero content saved successfully.");
+      queryClient2.setQueryData(["content", CONTENT_MODEL_KEY], data);
+      setForm(mapContentToHeroForm(data));
+    },
+    onError: (error) => ue$2.error(error.message)
+  });
+  const featureCount = reactExports.useMemo(
+    () => [form.featurePointOne, form.featurePointTwo, form.featurePointThree].filter(
+      Boolean
+    ).length,
+    [form.featurePointOne, form.featurePointTwo, form.featurePointThree]
+  );
+  function updateField(key, value) {
+    setForm((prev2) => ({ ...prev2, [key]: value }));
+  }
+  function handleSave() {
+    if (!form.titlePrefix.trim()) {
+      ue$2.error("Hero title prefix is required.");
       return;
     }
-    try {
-      await addMutation.mutateAsync(image);
-      ue$2.success("Gallery image added");
-      queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
-      setOpen(false);
-      setImage(null);
-      setPreviewUrl(null);
-    } catch (error) {
-      ue$2.error("Unable to upload image.");
-    }
-  };
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this image?")) return;
-    await deleteMutation.mutateAsync(id);
-    queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
-    ue$2.success("Gallery image deleted");
-  };
-  const totalImages = gallery.length;
-  const galleryRows = reactExports.useMemo(() => gallery, [gallery]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-xl font-bold", children: "Gallery" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500", children: "Manage website gallery images." })
+    saveMutation.mutate({
+      modelKey: CONTENT_MODEL_KEY,
+      title: CONTENT_TITLE,
+      isActive: form.isActive,
+      content: {
+        eyebrowText: form.eyebrowText.trim(),
+        titlePrefix: form.titlePrefix.trim(),
+        titleHighlight: form.titleHighlight.trim(),
+        titleSuffix: form.titleSuffix.trim(),
+        description: form.description.trim(),
+        primaryCtaText: form.primaryCtaText.trim(),
+        primaryCtaLink: form.primaryCtaLink.trim(),
+        secondaryCtaText: form.secondaryCtaText.trim(),
+        secondaryCtaLink: form.secondaryCtaLink.trim(),
+        supportTitle: form.supportTitle.trim(),
+        supportSubtitle: form.supportSubtitle.trim(),
+        successRateValue: form.successRateValue.trim(),
+        successRateLabel: form.successRateLabel.trim(),
+        featurePointOne: form.featurePointOne.trim(),
+        featurePointTwo: form.featurePointTwo.trim(),
+        featurePointThree: form.featurePointThree.trim(),
+        backgroundImage: typeof form.backgroundImage === "string" ? form.backgroundImage : "",
+        primaryImage: typeof form.primaryImage === "string" ? form.primaryImage : "",
+        secondaryImage: typeof form.secondaryImage === "string" ? form.secondaryImage : ""
+      },
+      files: {
+        backgroundImage: form.backgroundImage,
+        primaryImage: form.primaryImage,
+        secondaryImage: form.secondaryImage
+      }
+    });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "website-content.page", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Website Content",
+        description: "Manage reusable static website sections through the generic content API.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              onClick: () => setPreviewOpen(true),
+              disabled: isLoading,
+              className: "rounded-xl gap-2 shadow-sm w-full sm:w-auto",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 15 }),
+                "Preview"
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              onClick: handleSave,
+              disabled: saveMutation.isPending || isLoading,
+              className: "bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 15 }),
+                saveMutation.isPending ? "Saving..." : "Save Hero Section"
+              ]
+            }
+          )
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "rounded-3xl border-slate-100 shadow-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2 text-[#1E293B]", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(LayoutTemplate, { size: 18 }),
+          "Home Hero Section"
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "outline", className: "rounded-full border-slate-200", children: [
+              "modelKey: ",
+              CONTENT_MODEL_KEY
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "outline", className: "rounded-full border-slate-200", children: [
+              featureCount,
+              " feature points"
+            ] })
+          ] }),
+          isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full rounded-xl" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-28 w-full rounded-2xl" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-48 w-full rounded-2xl" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Eyebrow Text" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.eyebrowText,
+                    onChange: (event) => updateField("eyebrowText", event.target.value),
+                    placeholder: "Healing compassion for better care",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Section Status" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "h-10 rounded-xl border border-slate-200 px-3 flex items-center justify-between", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-[#475569]", children: "Show this hero on the website" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Switch,
+                    {
+                      checked: form.isActive,
+                      onCheckedChange: (checked) => updateField("isActive", checked)
+                    }
+                  )
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title Prefix" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.titlePrefix,
+                    onChange: (event) => updateField("titlePrefix", event.target.value),
+                    placeholder: "Your Trusted Partner in",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Highlighted Title" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.titleHighlight,
+                    onChange: (event) => updateField("titleHighlight", event.target.value),
+                    placeholder: "Women's Health &",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title Suffix" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.titleSuffix,
+                    onChange: (event) => updateField("titleSuffix", event.target.value),
+                    placeholder: "Aesthetic Care",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Description" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Textarea,
+                  {
+                    value: form.description,
+                    onChange: (event) => updateField("description", event.target.value),
+                    placeholder: "Intro copy shown below the hero heading",
+                    className: "rounded-2xl min-h-[110px] resize-none"
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Primary CTA Text" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.primaryCtaText,
+                    onChange: (event) => updateField("primaryCtaText", event.target.value),
+                    placeholder: "Book Appointment",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Primary CTA Link" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.primaryCtaLink,
+                    onChange: (event) => updateField("primaryCtaLink", event.target.value),
+                    placeholder: "/appointment",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Secondary CTA Text" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.secondaryCtaText,
+                    onChange: (event) => updateField("secondaryCtaText", event.target.value),
+                    placeholder: "WhatsApp Us",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Secondary CTA Link" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.secondaryCtaLink,
+                    onChange: (event) => updateField("secondaryCtaLink", event.target.value),
+                    placeholder: "https://wa.me/...",
+                    className: "rounded-xl"
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Support Card Title" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.supportTitle,
+                    onChange: (event) => updateField("supportTitle", event.target.value),
+                    placeholder: "24/7",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Support Card Subtitle" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.supportSubtitle,
+                    onChange: (event) => updateField("supportSubtitle", event.target.value),
+                    placeholder: "Emergency Care",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Success Rate Value" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.successRateValue,
+                    onChange: (event) => updateField("successRateValue", event.target.value),
+                    placeholder: "99%",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Success Rate Label" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.successRateLabel,
+                    onChange: (event) => updateField("successRateLabel", event.target.value),
+                    placeholder: "Success Rate",
+                    className: "rounded-xl"
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Feature Point 1" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.featurePointOne,
+                    onChange: (event) => updateField("featurePointOne", event.target.value),
+                    placeholder: "Safe & Hygienic",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Feature Point 2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.featurePointTwo,
+                    onChange: (event) => updateField("featurePointTwo", event.target.value),
+                    placeholder: "20+ Years Expert",
+                    className: "rounded-xl"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Feature Point 3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: form.featurePointThree,
+                    onChange: (event) => updateField("featurePointThree", event.target.value),
+                    placeholder: "10,000+ Happy Patients",
+                    className: "rounded-xl"
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ImageUploadField,
+                {
+                  id: "hero-background-image",
+                  label: "Background Image",
+                  hint: "Used behind the hero copy.",
+                  value: form.backgroundImage,
+                  onPick: (file) => updateField("backgroundImage", file)
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ImageUploadField,
+                {
+                  id: "hero-primary-image",
+                  label: "Primary Doctor Image",
+                  hint: "Main portrait shown in the hero.",
+                  value: form.primaryImage,
+                  onPick: (file) => updateField("primaryImage", file)
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ImageUploadField,
+                {
+                  id: "hero-secondary-image",
+                  label: "Secondary Doctor Image",
+                  hint: "Smaller supporting portrait card.",
+                  value: form.secondaryImage,
+                  onPick: (file) => updateField("secondaryImage", file)
+                }
+              )
+            ] })
+          ] })
+        ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: () => setOpen(true), children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 14 }),
-        " Add Image"
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border bg-white p-5 shadow-sm", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500", children: "Total Images" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-3xl font-semibold", children: totalImages })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 lg:grid-cols-3", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl border bg-white p-6 text-center text-slate-500", children: "Loading gallery..." }) : galleryRows.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl border bg-white p-6 text-center text-slate-500", children: "No images uploaded yet." }) : galleryRows.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "group overflow-hidden rounded-3xl border bg-white shadow-sm transition hover:shadow-md", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative aspect-[4/3] overflow-hidden bg-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: resolveAssetUrl2(item.image), alt: "Gallery item", className: "h-full w-full object-cover transition duration-200 group-hover:scale-105" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4 p-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Image" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: new Date(item.createdAt ?? "").toLocaleDateString() })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "rounded-3xl border-slate-100 shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-5 text-sm text-[#64748B] space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B]", children: "Reusable content API" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+          "This page saves through the generic `content` API using the `modelKey` ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: CONTENT_MODEL_KEY }),
+          "."
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            size: "icon",
-            variant: "destructive",
-            onClick: () => handleDelete(item._id),
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
-          }
-        )
-      ] })
-    ] }, item._id)) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Gallery Image" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "file",
-            accept: "image/*",
-            onChange: handleImageChange
-          }
-        ),
-        previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: previewUrl, alt: "Preview", className: "h-56 w-full object-cover" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save Image" })
-      ] })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "The same API can be reused later for static sections like `why_choose_us`, `home_cta`, or any other page block without creating a new backend model each time." })
+      ] }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: previewOpen, onOpenChange: setPreviewOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[95vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-6xl", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: "Hero Preview" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(HeroPreview, { form })
     ] }) })
   ] });
 }
@@ -69674,7 +70909,7 @@ function BlogsPage() {
   const [open, setOpen] = reactExports.useState(false);
   const [mode, setMode] = reactExports.useState("add");
   const [selected, setSelected] = reactExports.useState(null);
-  const [search, setSearch] = reactExports.useState("");
+  const [previewTarget, setPreviewTarget] = reactExports.useState(null);
   const [imagePreview, setImagePreview] = reactExports.useState(null);
   const [form, setForm] = reactExports.useState({
     title: "",
@@ -69699,19 +70934,12 @@ function BlogsPage() {
     () => new Map(services.map((s2) => [s2._id, s2.title])),
     [services]
   );
-  const filteredBlogs = reactExports.useMemo(() => {
-    if (!search.trim()) return blogs;
-    const q2 = search.toLowerCase();
-    return blogs.filter(
-      (b2) => [b2.title, b2.shortDescription].filter(Boolean).some((v2) => String(v2).toLowerCase().includes(q2))
-    );
-  }, [search, blogs]);
+  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
   const addMutation = useMutation({ mutationFn: addBlogApi });
-  const updateMutation2 = useMutation({
+  const updateMutation = useMutation({
     mutationFn: ({ id, payload }) => updateBlogApi(id, payload)
   });
   const deleteMutation = useMutation({ mutationFn: deleteBlogApi });
-  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
   function resolveAssetUrl2(path) {
     if (!path) return "";
     if (/^https?:\/\//.test(path)) return path;
@@ -69786,7 +71014,7 @@ function BlogsPage() {
     };
     try {
       if (mode === "edit" && selected) {
-        await updateMutation2.mutateAsync({
+        await updateMutation.mutateAsync({
           id: selected._id,
           payload
         });
@@ -69806,73 +71034,107 @@ function BlogsPage() {
     queryClient2.invalidateQueries({ queryKey: BLOG_QUERY_KEY });
     ue$2.success("Deleted");
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-semibold", children: "Blog Management" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Manage blog content and SEO" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: openAdd, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
-        "Add Blog"
+  const columns = [
+    {
+      key: "title",
+      header: "Blog",
+      render: (blog) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-12 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shrink-0", children: blog.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: resolveAssetUrl2(blog.image),
+            alt: blog.title || "Blog",
+            className: "h-full w-full object-cover"
+          }
+        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full w-full bg-slate-100" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-[#1E293B] truncate", children: blog.title || "Untitled" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500 truncate", children: blog.shortDescription || "No description" })
+        ] })
       ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative max-w-sm", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-3 h-4 w-4 text-muted-foreground" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
+    },
+    {
+      key: "serviceId",
+      header: "Service",
+      render: (blog) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-600", children: serviceById.get(blog.serviceId || "") || "—" })
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (blog) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "span",
         {
-          placeholder: "Search blogs...",
-          value: search,
-          onChange: (e3) => setSearch(e3.target.value),
-          className: "pl-9"
+          className: blog.status === "draft" ? "inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700" : "inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700",
+          children: blog.status || "published"
         }
       )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid md:grid-cols-2 xl:grid-cols-3 gap-6", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Loading..." }) : filteredBlogs.map((blog) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      Card,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (blog) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-lg border-slate-200",
+            onClick: () => setPreviewTarget(blog),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "outline",
+            className: "rounded-lg",
+            onClick: () => openEdit(blog),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 16 })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "destructive",
+            onClick: () => handleDelete(blog._id),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+          }
+        )
+      ] })
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
       {
-        className: "overflow-hidden hover:shadow-md transition",
-        children: [
-          blog.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "img",
-            {
-              src: resolveAssetUrl2(blog.image),
-              className: "h-40 w-full object-cover"
-            }
-          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-40 bg-muted flex items-center justify-center text-sm text-muted-foreground", children: "No Image" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3 p-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-muted-foreground uppercase flex gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: blog.status }),
-              serviceById.get(blog.serviceId || "") && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: serviceById.get(blog.serviceId || "") })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold line-clamp-2", children: blog.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground line-clamp-2", children: blog.shortDescription }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 pt-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  size: "icon",
-                  variant: "outline",
-                  onClick: () => openEdit(blog),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 16 })
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  size: "icon",
-                  variant: "destructive",
-                  onClick: () => handleDelete(blog._id),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
-                }
-              )
-            ] })
-          ] })
-        ]
-      },
-      blog._id
-    )) }),
+        title: "Blog Management",
+        description: "Manage blog content, SEO, and preview posts.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: openAdd, className: "rounded-xl gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "h-4 w-4" }),
+          "Add Blog"
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataTable,
+      {
+        columns,
+        data: blogs,
+        isLoading,
+        searchable: true,
+        searchKeys: ["title", "shortDescription", "status"],
+        emptyText: "No blogs found.",
+        rowKey: (row) => row._id,
+        "data-ocid": "blogs.table"
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-3xl overflow-y-auto max-h-[90vh]", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: mode === "edit" ? "Edit Blog" : "Create Blog" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
@@ -70003,7 +71265,41 @@ function BlogsPage() {
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: mode === "edit" ? "Update Blog" : "Create Blog" })
       ] })
-    ] }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!previewTarget,
+        onOpenChange: (nextOpen) => !nextOpen && setPreviewTarget(null),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Blog Preview" }) }),
+          previewTarget && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
+            previewTarget.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-slate-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "img",
+              {
+                src: resolveAssetUrl2(previewTarget.image),
+                alt: previewTarget.title || "Blog",
+                className: "h-56 w-full object-cover"
+              }
+            ) }) : null,
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs font-semibold uppercase tracking-wide text-slate-500", children: [
+                serviceById.get(previewTarget.serviceId || "") || "No service",
+                " ·",
+                " ",
+                previewTarget.status || "published"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-semibold text-slate-900", children: previewTarget.title || "Untitled" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-600 whitespace-pre-wrap", children: previewTarget.shortDescription || "" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-slate-200 bg-white p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900", children: "Content" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-7 text-slate-700 whitespace-pre-wrap", children: previewTarget.content || "—" })
+            ] })
+          ] })
+        ] })
+      }
+    )
   ] });
 }
 function getAuthState() {
@@ -70012,21 +71308,15 @@ function getAuthState() {
 function getIsAuthenticated() {
   return !!getAuthState().isAuthenticated;
 }
-function getUserRole() {
-  var _a2;
-  const state = getAuthState();
-  return ((_a2 = state.admin) == null ? void 0 : _a2.role) ?? null;
-}
 function checkPermission(path) {
   if (!getIsAuthenticated()) {
     throw redirect({ to: "/" });
   }
-  const role = getUserRole();
-  if (!role) {
+  const state = getAuthState();
+  if (!state.admin) {
     throw redirect({ to: "/" });
   }
-  const allowed = ROLE_PERMISSIONS[role] ?? [];
-  if (!allowed.includes(path)) {
+  if (!canAccessPath(state.admin, path)) {
     throw redirect({ to: "/dashboard" });
   }
 }
@@ -70101,11 +71391,11 @@ const reviewsAndShortsRoute = createRoute({
   beforeLoad: () => checkPermission("/reviews-shorts"),
   component: ReviewsAndShortsPage
 });
-const contentRoute = createRoute({
+const websiteContentRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: "/content",
-  beforeLoad: () => checkPermission("/content"),
-  component: ContentPage
+  path: "/website-content",
+  beforeLoad: () => checkPermission("/website-content"),
+  component: WebsiteContentPage
 });
 const settingsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
@@ -70130,7 +71420,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,
-    contentRoute,
+    websiteContentRoute,
     // enquiriesRoute,
     settingsRoute,
     rolesRoute
