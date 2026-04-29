@@ -3137,9 +3137,9 @@ var defaultTimeoutProvider = {
   // replace the global setTimeout (like tests) won't work since we'll already
   // have a hard reference to the original implementation at the time when this
   // file was imported.
-  setTimeout: (callback, delay2) => setTimeout(callback, delay2),
+  setTimeout: (callback, delay) => setTimeout(callback, delay),
   clearTimeout: (timeoutId) => clearTimeout(timeoutId),
-  setInterval: (callback, delay2) => setInterval(callback, delay2),
+  setInterval: (callback, delay) => setInterval(callback, delay),
   clearInterval: (intervalId) => clearInterval(intervalId)
 };
 var TimeoutManager = (_b = class {
@@ -3157,14 +3157,14 @@ var TimeoutManager = (_b = class {
   setTimeoutProvider(provider) {
     __privateSet(this, _provider, provider);
   }
-  setTimeout(callback, delay2) {
-    return __privateGet(this, _provider).setTimeout(callback, delay2);
+  setTimeout(callback, delay) {
+    return __privateGet(this, _provider).setTimeout(callback, delay);
   }
   clearTimeout(timeoutId) {
     __privateGet(this, _provider).clearTimeout(timeoutId);
   }
-  setInterval(callback, delay2) {
-    return __privateGet(this, _provider).setInterval(callback, delay2);
+  setInterval(callback, delay) {
+    return __privateGet(this, _provider).setInterval(callback, delay);
   }
   clearInterval(intervalId) {
     __privateGet(this, _provider).clearInterval(intervalId);
@@ -3665,7 +3665,7 @@ function createRetryer(config2) {
       }
       const retry = config2.retry ?? (environmentManager.isServer() ? 0 : 3);
       const retryDelay = config2.retryDelay ?? defaultRetryDelay;
-      const delay2 = typeof retryDelay === "function" ? retryDelay(failureCount, error) : retryDelay;
+      const delay = typeof retryDelay === "function" ? retryDelay(failureCount, error) : retryDelay;
       const shouldRetry = retry === true || typeof retry === "number" && failureCount < retry || typeof retry === "function" && retry(failureCount, error);
       if (isRetryCancelled || !shouldRetry) {
         reject(error);
@@ -3673,7 +3673,7 @@ function createRetryer(config2) {
       }
       failureCount++;
       (_a2 = config2.onFail) == null ? void 0 : _a2.call(config2, failureCount, error);
-      sleep(delay2).then(() => {
+      sleep(delay).then(() => {
         return canContinue() ? void 0 : pause();
       }).then(() => {
         if (isRetryCancelled) {
@@ -21932,7 +21932,8 @@ const ENDPOINT = {
   UPDATE_STAFF: "/update-staff",
   DELETE_STAFF: "/delete-staff",
   GET_APPOINTMENTS: "/get-appointments",
-  UPDATE_APPOINTMENT: "/update-appointment"
+  UPDATE_APPOINTMENT: "/update-appointment",
+  GET_DASHBOARD: "/get-dashboard"
 };
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -30659,7 +30660,7 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$F = [
+const __iconNode$E = [
   [
     "path",
     {
@@ -30669,22 +30670,7 @@ const __iconNode$F = [
   ],
   ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const BadgeCheck = createLucideIcon("badge-check", __iconNode$F);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$E = [
-  ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
-  ["path", { d: "M16 2v4", key: "4m81vk" }],
-  ["path", { d: "M8 2v4", key: "1cmpym" }],
-  ["path", { d: "M3 10h5", key: "r794hk" }],
-  ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
-  ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
-];
-const CalendarClock = createLucideIcon("calendar-clock", __iconNode$E);
+const BadgeCheck = createLucideIcon("badge-check", __iconNode$E);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30692,47 +30678,51 @@ const CalendarClock = createLucideIcon("calendar-clock", __iconNode$E);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$D = [
+  ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
+  ["path", { d: "M16 2v4", key: "4m81vk" }],
+  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M3 10h5", key: "r794hk" }],
+  ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
+  ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
+];
+const CalendarClock = createLucideIcon("calendar-clock", __iconNode$D);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$C = [
   ["path", { d: "M8 2v4", key: "1cmpym" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
   ["path", { d: "M3 10h18", key: "8toen8" }]
 ];
-const Calendar = createLucideIcon("calendar", __iconNode$D);
+const Calendar = createLucideIcon("calendar", __iconNode$C);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$C = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", __iconNode$C);
+const __iconNode$B = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
+const Check = createLucideIcon("check", __iconNode$B);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$B = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$B);
+const __iconNode$A = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$A);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$A = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$A);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$z = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
-];
-const CircleCheck = createLucideIcon("circle-check", __iconNode$z);
+const __iconNode$z = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$z);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30741,10 +30731,9 @@ const CircleCheck = createLucideIcon("circle-check", __iconNode$z);
  */
 const __iconNode$y = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
-  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const CircleX = createLucideIcon("circle-x", __iconNode$y);
+const CircleCheck = createLucideIcon("circle-check", __iconNode$y);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30753,9 +30742,10 @@ const CircleX = createLucideIcon("circle-x", __iconNode$y);
  */
 const __iconNode$x = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
+  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
+  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
 ];
-const Clock = createLucideIcon("clock", __iconNode$x);
+const CircleX = createLucideIcon("circle-x", __iconNode$x);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30763,10 +30753,10 @@ const Clock = createLucideIcon("clock", __iconNode$x);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$w = [
-  ["line", { x1: "12", x2: "12", y1: "2", y2: "22", key: "7eqyqh" }],
-  ["path", { d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", key: "1b0p4s" }]
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
 ];
-const DollarSign = createLucideIcon("dollar-sign", __iconNode$w);
+const Clock = createLucideIcon("clock", __iconNode$w);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31673,13 +31663,6 @@ function formatDate(date2) {
     hour: "2-digit",
     minute: "2-digit"
   }).format(parsedDate);
-}
-function formatCurrency(amount) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0
-  }).format(amount);
 }
 var prefix$1 = "Invariant failed";
 function invariant(condition, message) {
@@ -39017,232 +39000,6 @@ function Textarea({ className, ...props }) {
     }
   );
 }
-const mockDoctors = [
-  {
-    id: "d1",
-    name: "Dr. Rajesh Sharma",
-    specialization: "Cardiologist",
-    experience: 15,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "available",
-    email: "rajesh.sharma@samarpan.com",
-    phone: "+91 98765 43210",
-    qualification: "MD, DM Cardiology",
-    department: "Cardiology"
-  },
-  {
-    id: "d2",
-    name: "Dr. Priya Mehta",
-    specialization: "Gynecologist",
-    experience: 12,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "available",
-    email: "priya.mehta@samarpan.com",
-    phone: "+91 98765 43211",
-    qualification: "MD, DGO",
-    department: "Gynecology"
-  },
-  {
-    id: "d3",
-    name: "Dr. Anil Kumar",
-    specialization: "Orthopedic Surgeon",
-    experience: 18,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "busy",
-    email: "anil.kumar@samarpan.com",
-    phone: "+91 98765 43212",
-    qualification: "MS Orthopedics",
-    department: "Orthopedics"
-  },
-  {
-    id: "d4",
-    name: "Dr. Sunita Patel",
-    specialization: "Pediatrician",
-    experience: 10,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "available",
-    email: "sunita.patel@samarpan.com",
-    phone: "+91 98765 43213",
-    qualification: "MD Pediatrics",
-    department: "Pediatrics"
-  },
-  {
-    id: "d5",
-    name: "Dr. Vikram Singh",
-    specialization: "Neurologist",
-    experience: 20,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "on-leave",
-    email: "vikram.singh@samarpan.com",
-    phone: "+91 98765 43214",
-    qualification: "MD, DM Neurology",
-    department: "Neurology"
-  },
-  {
-    id: "d6",
-    name: "Dr. Meera Gupta",
-    specialization: "Dermatologist",
-    experience: 8,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "available",
-    email: "meera.gupta@samarpan.com",
-    phone: "+91 98765 43215",
-    qualification: "MD Dermatology",
-    department: "Dermatology"
-  },
-  {
-    id: "d7",
-    name: "Dr. Suresh Nair",
-    specialization: "ENT Specialist",
-    experience: 14,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "available",
-    email: "suresh.nair@samarpan.com",
-    phone: "+91 98765 43216",
-    qualification: "MS ENT",
-    department: "ENT"
-  },
-  {
-    id: "d8",
-    name: "Dr. Kavitha Reddy",
-    specialization: "Ophthalmologist",
-    experience: 11,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "busy",
-    email: "kavitha.reddy@samarpan.com",
-    phone: "+91 98765 43217",
-    qualification: "MS Ophthalmology",
-    department: "Ophthalmology"
-  },
-  {
-    id: "d9",
-    name: "Dr. Ramesh Iyer",
-    specialization: "General Surgeon",
-    experience: 16,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "available",
-    email: "ramesh.iyer@samarpan.com",
-    phone: "+91 98765 43218",
-    qualification: "MS General Surgery",
-    department: "Surgery"
-  },
-  {
-    id: "d10",
-    name: "Dr. Anjali Bose",
-    specialization: "Psychiatrist",
-    experience: 9,
-    profileImage: "/assets/images/doctor-placeholder.svg",
-    availability: "available",
-    email: "anjali.bose@samarpan.com",
-    phone: "+91 98765 43219",
-    qualification: "MD Psychiatry",
-    department: "Psychiatry"
-  }
-];
-const mockAppointments = [
-  {
-    _id: "a1",
-    fullName: "Arjun Verma",
-    email: "arjun@example.com",
-    phoneNumber: "+91-9876543210",
-    doctorId: "d1",
-    doctorName: "Dr. Rajesh Sharma",
-    serviceName: "Cardiology",
-    serviceId: "s1",
-    appointmentDate: "2025-04-15T10:00:00Z",
-    reason: "Chest pain follow-up",
-    status: "confirmed"
-  },
-  {
-    _id: "a2",
-    fullName: "Lakshmi Rajan",
-    email: "lakshmi@example.com",
-    phoneNumber: "+91-9876543211",
-    doctorId: "d2",
-    doctorName: "Dr. Priya Mehta",
-    serviceName: "Gynecology",
-    serviceId: "s2",
-    appointmentDate: "2025-04-15T11:30:00Z",
-    reason: "Routine checkup",
-    status: "pending"
-  },
-  {
-    _id: "a3",
-    fullName: "Mohit Agarwal",
-    email: "mohit@example.com",
-    phoneNumber: "+91-9876543212",
-    doctorId: "d3",
-    doctorName: "Dr. Anil Kumar",
-    serviceName: "Orthopedics",
-    serviceId: "s3",
-    appointmentDate: "2025-04-14T09:00:00Z",
-    reason: "Knee pain consultation",
-    status: "completed"
-  },
-  {
-    _id: "a4",
-    fullName: "Divya Krishnan",
-    email: "divya@example.com",
-    phoneNumber: "+91-9876543213",
-    doctorId: "d4",
-    doctorName: "Dr. Sunita Patel",
-    serviceName: "Pediatrics",
-    serviceId: "s4",
-    appointmentDate: "2025-04-16T14:00:00Z",
-    reason: "Child vaccination",
-    status: "confirmed"
-  },
-  {
-    _id: "a5",
-    fullName: "Rahul Desai",
-    email: "rahul@example.com",
-    phoneNumber: "+91-9876543214",
-    doctorId: "d7",
-    doctorName: "Dr. Suresh Nair",
-    serviceName: "ENT",
-    serviceId: "s5",
-    appointmentDate: "2025-04-17T15:30:00Z",
-    reason: "Hearing loss evaluation",
-    status: "pending"
-  }
-];
-const mockDashboardStats = {
-  totalPatients: 14352,
-  totalAppointments: 1288,
-  totalDoctors: 84,
-  totalRevenue: 348760,
-  appointmentTrends: [
-    { month: "Jan", appointments: 60, consultations: 30 },
-    { month: "Feb", appointments: 90, consultations: 55 },
-    { month: "Mar", appointments: 85, consultations: 60 },
-    { month: "Apr", appointments: 100, consultations: 70 },
-    { month: "May", appointments: 130, consultations: 80 },
-    { month: "Jun", appointments: 155, consultations: 90 },
-    { month: "Jul", appointments: 120, consultations: 75 },
-    { month: "Aug", appointments: 135, consultations: 85 },
-    { month: "Sep", appointments: 115, consultations: 65 },
-    { month: "Oct", appointments: 100, consultations: 60 },
-    { month: "Nov", appointments: 190, consultations: 95 },
-    { month: "Dec", appointments: 160, consultations: 80 }
-  ],
-  patientGrowth: [
-    { age: "0-10", count: 52 },
-    { age: "10-19", count: 76 },
-    { age: "20-39", count: 64 },
-    { age: "30-44", count: 92 },
-    { age: "50-64", count: 70 },
-    { age: "55+", count: 83 }
-  ]
-};
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-async function fetchAppointments() {
-  await delay(500);
-  return [...mockAppointments];
-}
-async function fetchDashboardStats() {
-  await delay(500);
-  return { ...mockDashboardStats };
-}
 const getAppointmentsApi = async (params) => {
   const response = await get$3(ENDPOINT.GET_APPOINTMENTS, {
     params,
@@ -39257,6 +39014,82 @@ const updateAppointmentApi = async (id, payload) => {
     { needAuth: true }
   );
   return response.data;
+};
+function appendValue$1(fd, key, value) {
+  if (value === void 0 || value === null) return;
+  if (typeof value === "string" && value.trim() === "") return;
+  fd.append(key, String(value));
+}
+function normalizePhone$3(value) {
+  const digits = (value == null ? void 0 : value.replace(/\D/g, "")) ?? "";
+  return digits || void 0;
+}
+function toFormData$3(payload) {
+  var _a2, _b2, _c2, _d2, _e3, _f2, _g2;
+  const fd = new FormData();
+  appendValue$1(fd, "name", (_a2 = payload.name) == null ? void 0 : _a2.trim());
+  appendValue$1(fd, "email", (_b2 = payload.email) == null ? void 0 : _b2.trim());
+  appendValue$1(fd, "password", (_c2 = payload.password) == null ? void 0 : _c2.trim());
+  appendValue$1(fd, "phone", normalizePhone$3(payload.phone));
+  appendValue$1(fd, "specialization", (_d2 = payload.specialization) == null ? void 0 : _d2.trim());
+  appendValue$1(fd, "description", (_e3 = payload.description) == null ? void 0 : _e3.trim());
+  appendValue$1(fd, "experience", (_f2 = payload.experience) == null ? void 0 : _f2.trim());
+  appendValue$1(fd, "qualification", (_g2 = payload.qualification) == null ? void 0 : _g2.trim());
+  appendValue$1(fd, "status", payload.status);
+  appendValue$1(fd, "isActive", payload.isActive);
+  if (payload.image instanceof File) {
+    fd.append("image", payload.image);
+  }
+  if (payload.expertise) {
+    fd.append("expertise", JSON.stringify(payload.expertise));
+  }
+  if (payload.permissions) {
+    fd.append("permissions", JSON.stringify(payload.permissions));
+  }
+  return fd;
+}
+const getAllDoctorsApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_DOCTORS, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctors) ?? [];
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch doctors");
+  }
+};
+const addDoctorApi = async (payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$3(payload), {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add doctor");
+  }
+};
+const updateDoctorApi = async (id, payload) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_DOCTOR}/${id}`,
+      toFormData$3(payload),
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update doctor");
+  }
+};
+const deleteDoctorApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_DOCTOR}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete doctor");
+  }
 };
 var jt = (n2) => {
   switch (n2) {
@@ -41667,6 +41500,10 @@ function AppointmentsPage() {
     queryKey: ["appointments"],
     queryFn: () => getAppointmentsApi({})
   });
+  const { data: doctors = [] } = useQuery({
+    queryKey: ["doctors"],
+    queryFn: getAllDoctorsApi
+  });
   const appointments = (data == null ? void 0 : data.appointments) || [];
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }) => updateAppointmentApi(id, payload),
@@ -42076,13 +41913,13 @@ function AppointmentsPage() {
                             children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select doctor" })
                           }
                         ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { className: "rounded-xl max-h-52", children: mockDoctors.map((d2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: d2.id, className: "text-sm", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { className: "rounded-xl max-h-52", children: doctors.map((d2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: d2._id, className: "text-sm", children: [
                           d2.name,
                           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[#94A3B8] ml-1 text-xs", children: [
                             "· ",
-                            d2.specialization
+                            d2.specialization ?? "Doctor"
                           ] })
-                        ] }, d2.id)) })
+                        ] }, d2._id)) })
                       ]
                     }
                   )
@@ -42267,6 +42104,10 @@ function StatCard({
     ] })
   ] }) });
 }
+const getDashboardApi = async () => {
+  const response = await get$3(ENDPOINT.GET_DASHBOARD, { needAuth: true });
+  return response.data;
+};
 var isArray$e = Array.isArray;
 var isArray_1 = isArray$e;
 var freeGlobal$1 = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
@@ -63919,44 +63760,6 @@ var BarChart = generateCategoricalChart({
   }],
   formatAxisMap
 });
-const DAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS_SHORT = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec"
-];
-function buildWeeklyData() {
-  const today = /* @__PURE__ */ new Date();
-  return Array.from({ length: 7 }, (_2, i2) => {
-    const d2 = new Date(today);
-    d2.setDate(today.getDate() - (6 - i2));
-    return {
-      day: DAYS_SHORT[d2.getDay()],
-      appointments: Math.floor(Math.random() * 30) + 10 + i2 * 3
-    };
-  });
-}
-function buildMonthlyGrowth() {
-  const today = /* @__PURE__ */ new Date();
-  return Array.from({ length: 6 }, (_2, i2) => {
-    const d2 = new Date(today.getFullYear(), today.getMonth() - (5 - i2), 1);
-    return {
-      month: MONTHS_SHORT[d2.getMonth()],
-      patients: Math.floor(Math.random() * 60) + 40 + i2 * 5
-    };
-  });
-}
-const weeklyData = buildWeeklyData();
-const monthlyGrowth = buildMonthlyGrowth();
 const SKELETON_STAT_KEYS = ["sk-stat-1", "sk-stat-2", "sk-stat-3", "sk-stat-4"];
 const SKELETON_ROW_KEYS = [
   "sk-row-1",
@@ -63967,15 +63770,15 @@ const SKELETON_ROW_KEYS = [
 ];
 const SKELETON_CELL_KEYS = ["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5"];
 function DashboardPage() {
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  var _a2;
+  const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["dashboard-stats"],
-    queryFn: fetchDashboardStats
+    queryFn: getDashboardApi
   });
-  const { data: appointments, isLoading: apptLoading } = useQuery({
-    queryKey: ["appointments"],
-    queryFn: fetchAppointments
-  });
-  const recent = (appointments == null ? void 0 : appointments.slice(0, 5)) ?? [];
+  const recent = (data == null ? void 0 : data.recentAppointments) ?? [];
+  const apptLoading = statsLoading;
+  const totals = data == null ? void 0 : data.totals;
+  const charts = data == null ? void 0 : data.charts;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "dashboard.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -64001,9 +63804,8 @@ function DashboardPage() {
         {
           icon: Users,
           label: "Total Patients",
-          value: stats.totalPatients.toLocaleString(),
+          value: ((totals == null ? void 0 : totals.totalPatients) ?? 0).toLocaleString(),
           subtitle: "total patients",
-          trend: 1.31,
           color: "gold"
         }
       ),
@@ -64012,9 +63814,8 @@ function DashboardPage() {
         {
           icon: Calendar,
           label: "Appointments",
-          value: stats.totalAppointments.toLocaleString(),
+          value: ((totals == null ? void 0 : totals.appointmentsThisWeek) ?? 0).toLocaleString(),
           subtitle: "this week",
-          trend: 1.01,
           color: "gold-deep"
         }
       ),
@@ -64023,20 +63824,18 @@ function DashboardPage() {
         {
           icon: UserRound,
           label: "Available Doctors",
-          value: stats.totalDoctors,
+          value: ((totals == null ? void 0 : totals.totalDoctors) ?? 0).toLocaleString(),
           subtitle: "available doctors",
-          trend: -0.83,
           color: "green"
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         StatCard,
         {
-          icon: DollarSign,
-          label: "Revenue",
-          value: formatCurrency(stats.totalRevenue),
-          subtitle: "this month",
-          trend: 1.1,
+          icon: MessageSquare,
+          label: "Pending Appointments",
+          value: (((_a2 = data == null ? void 0 : data.appointmentsByStatus) == null ? void 0 : _a2.pending) ?? 0).toLocaleString(),
+          subtitle: "needs action",
           color: "orange"
         }
       )
@@ -64052,7 +63851,10 @@ function DashboardPage() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "px-2 sm:px-6", children: statsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-[250px] w-full rounded-xl" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { height: 250 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
               LineChart,
               {
-                data: weeklyData,
+                data: ((charts == null ? void 0 : charts.appointmentsLast7Days) ?? []).map((row) => ({
+                  day: row.day,
+                  appointments: row.count
+                })),
                 margin: { top: 8, right: 8, left: -24, bottom: 0 },
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3", stroke: "#F1F5F9" }),
@@ -64112,7 +63914,10 @@ function DashboardPage() {
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "px-2 sm:px-6", children: statsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-[250px] w-full rounded-xl" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { height: 250 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
               BarChart,
               {
-                data: monthlyGrowth,
+                data: ((charts == null ? void 0 : charts.patientsLast6Months) ?? []).map((row) => ({
+                  month: row.month,
+                  patients: row.count
+                })),
                 margin: { top: 8, right: 8, left: -24, bottom: 0 },
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -64244,85 +64049,62 @@ function DashboardPage() {
           ] })
         ]
       }
-    )
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4 sm:mt-6", children: statsLoading ? SKELETON_STAT_KEYS.map((k2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Card,
+      {
+        className: "rounded-2xl shadow-card border border-slate-100",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-5 space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-xl" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24 rounded" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-20 rounded" })
+        ] })
+      },
+      `content-${k2}`
+    )) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        StatCard,
+        {
+          icon: FileImage,
+          label: "Blogs",
+          value: ((totals == null ? void 0 : totals.totalBlogs) ?? 0).toLocaleString(),
+          subtitle: "total posts",
+          color: "purple"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        StatCard,
+        {
+          icon: Image,
+          label: "Gallery Images",
+          value: ((totals == null ? void 0 : totals.totalGallery) ?? 0).toLocaleString(),
+          subtitle: "uploaded",
+          color: "gold"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        StatCard,
+        {
+          icon: MessageSquare,
+          label: "Reviews",
+          value: ((totals == null ? void 0 : totals.totalReviews) ?? 0).toLocaleString(),
+          subtitle: "saved",
+          color: "green"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        StatCard,
+        {
+          icon: Calendar,
+          label: "Total Appointments",
+          value: ((totals == null ? void 0 : totals.totalAppointments) ?? 0).toLocaleString(),
+          subtitle: "all time",
+          color: "gold-deep"
+        }
+      )
+    ] }) })
   ] });
 }
-function appendValue$1(fd, key, value) {
-  if (value === void 0 || value === null) return;
-  if (typeof value === "string" && value.trim() === "") return;
-  fd.append(key, String(value));
-}
-function normalizePhone$3(value) {
-  const digits = (value == null ? void 0 : value.replace(/\D/g, "")) ?? "";
-  return digits || void 0;
-}
-function toFormData$3(payload) {
-  var _a2, _b2, _c2, _d2, _e3, _f2, _g2;
-  const fd = new FormData();
-  appendValue$1(fd, "name", (_a2 = payload.name) == null ? void 0 : _a2.trim());
-  appendValue$1(fd, "email", (_b2 = payload.email) == null ? void 0 : _b2.trim());
-  appendValue$1(fd, "password", (_c2 = payload.password) == null ? void 0 : _c2.trim());
-  appendValue$1(fd, "phone", normalizePhone$3(payload.phone));
-  appendValue$1(fd, "specialization", (_d2 = payload.specialization) == null ? void 0 : _d2.trim());
-  appendValue$1(fd, "description", (_e3 = payload.description) == null ? void 0 : _e3.trim());
-  appendValue$1(fd, "experience", (_f2 = payload.experience) == null ? void 0 : _f2.trim());
-  appendValue$1(fd, "qualification", (_g2 = payload.qualification) == null ? void 0 : _g2.trim());
-  appendValue$1(fd, "status", payload.status);
-  appendValue$1(fd, "isActive", payload.isActive);
-  if (payload.image instanceof File) {
-    fd.append("image", payload.image);
-  }
-  if (payload.expertise) {
-    fd.append("expertise", JSON.stringify(payload.expertise));
-  }
-  if (payload.permissions) {
-    fd.append("permissions", JSON.stringify(payload.permissions));
-  }
-  return fd;
-}
-const getAllDoctorsApi = async () => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await get$3(ENDPOINT.GET_ALL_DOCTORS, { needAuth: true });
-    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctors) ?? [];
-  } catch (error) {
-    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch doctors");
-  }
-};
-const addDoctorApi = async (payload) => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$3(payload), {
-      needAuth: true
-    });
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
-  } catch (error) {
-    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add doctor");
-  }
-};
-const updateDoctorApi = async (id, payload) => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await post(
-      `${ENDPOINT.UPDATE_DOCTOR}/${id}`,
-      toFormData$3(payload),
-      { needAuth: true }
-    );
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
-  } catch (error) {
-    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update doctor");
-  }
-};
-const deleteDoctorApi = async (id) => {
-  var _a2, _b2;
-  try {
-    await post(`${ENDPOINT.DELETE_DOCTOR}/${id}`, void 0, {
-      needAuth: true
-    });
-  } catch (error) {
-    throw new Error(((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete doctor");
-  }
-};
 function Table({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "div",

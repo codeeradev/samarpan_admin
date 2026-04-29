@@ -28,8 +28,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { mockDoctors } from "@/services/mockData";
 import { getAppointmentsApi, updateAppointmentApi } from "@/apiCalls/appointments";
+import { getAllDoctorsApi, type DoctorItem } from "@/apiCalls/doctors";
 import type { Appointment, AppointmentStatus } from "@/types";
 import { formatDate } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -192,6 +192,11 @@ export default function AppointmentsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["appointments"],
     queryFn: () => getAppointmentsApi({}),
+  });
+
+  const { data: doctors = [] } = useQuery<DoctorItem[], Error>({
+    queryKey: ["doctors"],
+    queryFn: getAllDoctorsApi,
   });
 
   const appointments = data?.appointments || [];
@@ -639,11 +644,11 @@ export default function AppointmentsPage() {
                   <SelectValue placeholder="Select doctor" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl max-h-52">
-                  {mockDoctors.map((d) => (
-                    <SelectItem key={d.id} value={d.id} className="text-sm">
+                  {doctors.map((d) => (
+                    <SelectItem key={d._id} value={d._id} className="text-sm">
                       {d.name}
                       <span className="text-[#94A3B8] ml-1 text-xs">
-                        · {d.specialization}
+                        · {d.specialization ?? "Doctor"}
                       </span>
                     </SelectItem>
                   ))}

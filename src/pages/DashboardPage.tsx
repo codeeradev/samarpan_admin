@@ -3,10 +3,18 @@ import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAppointments, fetchDashboardStats } from "@/services/mockData";
-import { formatCurrency, formatDate } from "@/types";
+import { getDashboardApi } from "@/apiCalls/dashboard";
+import { formatDate } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Clock, DollarSign, UserRound, Users } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  FileImage,
+  ImageIcon,
+  MessageSquare,
+  Users,
+  UserRound,
+} from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -18,51 +26,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-// ─── Inline chart data generators ─────────────────────────────────────────────
-
-const DAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS_SHORT = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-function buildWeeklyData() {
-  const today = new Date();
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() - (6 - i));
-    return {
-      day: DAYS_SHORT[d.getDay()],
-      appointments: Math.floor(Math.random() * 30) + 10 + i * 3,
-    };
-  });
-}
-
-function buildMonthlyGrowth() {
-  const today = new Date();
-  return Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(today.getFullYear(), today.getMonth() - (5 - i), 1);
-    return {
-      month: MONTHS_SHORT[d.getMonth()],
-      patients: Math.floor(Math.random() * 60) + 40 + i * 5,
-    };
-  });
-}
-
-// Generated once per mount (stable across re-renders)
-const weeklyData = buildWeeklyData();
-const monthlyGrowth = buildMonthlyGrowth();
 
 // ─── Skeleton keys ──────────────────────────────────────────────────────────
 
@@ -79,17 +42,15 @@ const SKELETON_CELL_KEYS = ["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5"];
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["dashboard-stats"],
-    queryFn: fetchDashboardStats,
+    queryFn: getDashboardApi,
   });
 
-  const { data: appointments, isLoading: apptLoading } = useQuery({
-    queryKey: ["appointments"],
-    queryFn: fetchAppointments,
-  });
-
-  const recent = appointments?.slice(0, 5) ?? [];
+  const recent = data?.recentAppointments ?? [];
+  const apptLoading = statsLoading;
+  const totals = data?.totals;
+  const charts = data?.charts;
 
   return (
     <div data-ocid="dashboard.page">
@@ -118,33 +79,29 @@ export default function DashboardPage() {
             <StatCard
               icon={Users}
               label="Total Patients"
-              value={stats!.totalPatients.toLocaleString()}
+              value={(totals?.totalPatients ?? 0).toLocaleString()}
               subtitle="total patients"
-              trend={1.31}
               color="gold"
             />
             <StatCard
               icon={Calendar}
               label="Appointments"
-              value={stats!.totalAppointments.toLocaleString()}
+              value={(totals?.appointmentsThisWeek ?? 0).toLocaleString()}
               subtitle="this week"
-              trend={1.01}
               color="gold-deep"
             />
             <StatCard
               icon={UserRound}
               label="Available Doctors"
-              value={stats!.totalDoctors}
+              value={(totals?.totalDoctors ?? 0).toLocaleString()}
               subtitle="available doctors"
-              trend={-0.83}
               color="green"
             />
             <StatCard
-              icon={DollarSign}
-              label="Revenue"
-              value={formatCurrency(stats!.totalRevenue)}
-              subtitle="this month"
-              trend={1.1}
+              icon={MessageSquare}
+              label="Pending Appointments"
+              value={(data?.appointmentsByStatus?.pending ?? 0).toLocaleString()}
+              subtitle="needs action"
               color="orange"
             />
           </>
@@ -170,7 +127,10 @@ export default function DashboardPage() {
               <div style={{ height: 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={weeklyData}
+                    data={(charts?.appointmentsLast7Days ?? []).map((row) => ({
+                      day: row.day,
+                      appointments: row.count,
+                    }))}
                     margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
@@ -226,7 +186,10 @@ export default function DashboardPage() {
               <div style={{ height: 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={monthlyGrowth}
+                    data={(charts?.patientsLast6Months ?? []).map((row) => ({
+                      month: row.month,
+                      patients: row.count,
+                    }))}
                     margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
                   >
                     <CartesianGrid
@@ -381,6 +344,55 @@ export default function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* ── Content snapshot ─────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4 sm:mt-6">
+        {statsLoading ? (
+          SKELETON_STAT_KEYS.map((k) => (
+            <Card
+              key={`content-${k}`}
+              className="rounded-2xl shadow-card border border-slate-100"
+            >
+              <CardContent className="p-5 space-y-3">
+                <Skeleton className="h-11 w-11 rounded-xl" />
+                <Skeleton className="h-4 w-24 rounded" />
+                <Skeleton className="h-7 w-20 rounded" />
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <>
+            <StatCard
+              icon={FileImage}
+              label="Blogs"
+              value={(totals?.totalBlogs ?? 0).toLocaleString()}
+              subtitle="total posts"
+              color="purple"
+            />
+            <StatCard
+              icon={ImageIcon}
+              label="Gallery Images"
+              value={(totals?.totalGallery ?? 0).toLocaleString()}
+              subtitle="uploaded"
+              color="gold"
+            />
+            <StatCard
+              icon={MessageSquare}
+              label="Reviews"
+              value={(totals?.totalReviews ?? 0).toLocaleString()}
+              subtitle="saved"
+              color="green"
+            />
+            <StatCard
+              icon={Calendar}
+              label="Total Appointments"
+              value={(totals?.totalAppointments ?? 0).toLocaleString()}
+              subtitle="all time"
+              color="gold-deep"
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }
