@@ -156,6 +156,7 @@ const PATH_PERMISSION_RULES: Record<
     ],
   },
   "/website-content": { superAdminOnly: true },
+  "/website-pages": {},
   "/settings": { permissions: ["view_settings", "manage_settings"] },
   "/roles": {
     permissions: ["view_admin_staff", "manage_admin_staff"],

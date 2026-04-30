@@ -104,6 +104,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/website-content",
   },
   // {
+  //   label: "Website Pages",
+  //   icon: FileImage,
+  //   path: "/website-pages",
+  //   permissionPath: "/website-pages",
+  // },
+  // {
   //   label: "Enquiries",
   //   icon: MessageSquare,
   //   path: "/enquiries",
@@ -193,7 +199,7 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex">
       {/* ── Desktop Sidebar ─────────────────────────────────────── */}
-      <aside className="hidden lg:flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30">
+      <aside className="flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30">
         {/* Logo */}
 <div className="flex justify-center items-center px-5 py-6 border-b border-slate-100">
   <img
@@ -226,9 +232,9 @@ export default function AdminLayout() {
       </aside>
 
       {/* ── Main Wrapper ─────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col lg:ml-64">
+      <div className="flex-1 flex flex-col md:ml-64">
         {/* ── Topbar ──────────────────────────────────────────────── */}
-        <header className="fixed top-0 right-0 left-0 lg:left-64 bg-white border-b border-slate-200 z-20">
+        <header className="fixed top-0 right-0 left-0 md:left-64 bg-white border-b border-slate-200 z-20">
           <div className="flex items-center h-14 md:h-16 px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3">
             {/* Mobile hamburger */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

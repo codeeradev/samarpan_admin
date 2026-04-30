@@ -10,6 +10,7 @@ import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
 import RoleManagementPage from "@/pages/RoleManagementPage";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import SettingsPage from "@/pages/SettingsPage";
+import PagesPage from "@/pages/PagesPage";
 import WebsiteContentPage from "@/pages/WebsiteContentPage";
 import { loadAuthState } from "@/lib/auth-storage";
 import { canAccessPath } from "@/lib/admin-access";
@@ -144,6 +145,13 @@ const websiteContentRoute = createRoute({
   component: WebsiteContentPage,
 });
 
+const websitePagesRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/website-pages",
+  beforeLoad: () => checkPermission("/website-pages"),
+  component: PagesPage,
+});
+
 // const enquiriesRoute = createRoute({
 //   getParentRoute: () => adminLayoutRoute,
 //   path: "/enquiries",
@@ -179,6 +187,7 @@ const routeTree = rootRoute.addChildren([
     galleryRoute,
     reviewsAndShortsRoute,
     websiteContentRoute,
+    websitePagesRoute,
     // enquiriesRoute,
     settingsRoute,
     rolesRoute,

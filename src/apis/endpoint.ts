@@ -1,6 +1,6 @@
 export const BASE_URL =
   import.meta.env.VITE_API_URL || "https://samarpanapi.codeeratech.com/admin";
-// import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
+  // import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
 
 export const ENDPOINT = {
   LOGIN: "/admin-login",
@@ -32,6 +32,10 @@ export const ENDPOINT = {
   DELETE_GALLERY: "/delete-gallery",
   GET_CONTENT: "/get-content",
   UPSERT_CONTENT: "/upsert-content",
+  GET_ALL_PAGES: "/get-all-pages",
+  ADD_PAGE: "/add-page",
+  UPDATE_PAGE: "/update-page",
+  DELETE_PAGE: "/delete-page",
   GET_SETTINGS: "/get-settings",
   UPDATE_SETTINGS: "/update-settings",
   UPDATE_ADMIN_ACCOUNT: "/update-admin-account",
