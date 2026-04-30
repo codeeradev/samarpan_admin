@@ -201,13 +201,13 @@ export default function AdminLayout() {
       {/* ── Desktop Sidebar ─────────────────────────────────────── */}
       <aside className="flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30">
         {/* Logo */}
-<div className="flex justify-center items-center px-5 py-6 border-b border-slate-100">
-  <img
-    src="/assets/images/samrpanlogo.webp"
-    alt="Samarpan"
-    className="h-16 w-auto object-contain mr-[10%]"
-  />
-</div>
+        <div className="flex justify-center items-center px-5 py-6 border-b border-slate-100">
+          <img
+            src="/assets/images/samrpanlogo.webp"
+            alt="Samarpan"
+            className="h-16 w-auto object-contain mr-[10%]"
+          />
+        </div>
         <SidebarNav
           currentPath={location.pathname}
           visibleItems={visibleItems}
