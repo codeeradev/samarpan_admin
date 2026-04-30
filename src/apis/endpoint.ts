@@ -46,4 +46,5 @@ export const ENDPOINT = {
   GET_APPOINTMENTS: "/get-appointments",
   UPDATE_APPOINTMENT: "/update-appointment",
   GET_DASHBOARD: "/get-dashboard",
+  
 };
