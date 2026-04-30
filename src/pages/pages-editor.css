@@ -1,0 +1,40 @@
+html {
+  font-size: 16px !important;
+}
+
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  color: #1e293b;
+  background-color: #f8fafc;
+}
+
+.website-page-editor .note-editor.note-frame {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: none;
+}
+
+.website-page-editor .note-toolbar {
+  margin: 0;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.website-page-editor .note-btn {
+  border-radius: 0.75rem;
+}
+
+.website-page-editor .note-editing-area .note-editable {
+  min-height: 320px;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  color: #1e293b;
+}
+
+.website-page-editor .note-statusbar {
+  border-top: 1px solid #e2e8f0;
+}

@@ -1,24 +1,46 @@
-import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import {
+  type PageItem,
+  type PagePayload,
+  type PageStatus,
+  addPageApi,
+  deletePageApi,
+  getAllPagesApi,
+  updatePageApi,
+} from "@/apiCalls/pages";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { addPageApi, deletePageApi, getAllPagesApi, updatePageApi, type PageItem, type PagePayload } from "@/apiCalls/pages";
-import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import ReactSummernote from "react-summernote";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import $ from "jquery";
+import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import DataTable, { type TableColumn } from "react-data-table-component";
+import ReactSummernote from "react-summernote";
+import { toast } from "sonner";
 import "bootstrap/dist/css/bootstrap.css";
 import "react-summernote/dist/react-summernote.css";
 import "summernote/dist/summernote.css";
 import "summernote/dist/summernote.js";
+import "./pages-editor.css";
 
 if (typeof window !== "undefined") {
   const win = window as any;
@@ -29,7 +51,61 @@ const emptyPageForm: PagePayload = {
   title: "",
   slug: "",
   content: "",
-  isActive: true,
+  status: "published",
+  metaTitle: "",
+  metaDescription: "",
+};
+
+const pageTableStyles = {
+  table: {
+    style: {
+      backgroundColor: "transparent",
+    },
+  },
+  headRow: {
+    style: {
+      minHeight: "54px",
+      backgroundColor: "#F8FAFC",
+      borderBottomWidth: "1px",
+      borderBottomColor: "#E2E8F0",
+    },
+  },
+  headCells: {
+    style: {
+      color: "#64748B",
+      fontSize: "12px",
+      fontWeight: 700,
+      textTransform: "uppercase" as const,
+      letterSpacing: "0.04em",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+    },
+  },
+  rows: {
+    style: {
+      minHeight: "72px",
+      borderBottomWidth: "1px",
+      borderBottomColor: "#F1F5F9",
+      backgroundColor: "#FFFFFF",
+    },
+  },
+  cells: {
+    style: {
+      paddingLeft: "16px",
+      paddingRight: "16px",
+      color: "#1E293B",
+      fontSize: "14px",
+    },
+  },
+  pagination: {
+    style: {
+      borderTopWidth: "1px",
+      borderTopColor: "#E2E8F0",
+      minHeight: "60px",
+      color: "#475569",
+      backgroundColor: "#FFFFFF",
+    },
+  },
 };
 
 function slugify(value: string) {
@@ -39,6 +115,39 @@ function slugify(value: string) {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+}
+
+function formatPageDate(value?: string) {
+  if (!value) {
+    return "—";
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "—";
+  }
+
+  return parsed.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function StatusBadge({ status }: { status: PageStatus }) {
+  const isPublished = status === "published";
+
+  return (
+    <Badge
+      className={
+        isPublished
+          ? "bg-emerald-50 text-emerald-700"
+          : "bg-amber-50 text-amber-700"
+      }
+    >
+      {isPublished ? "Published" : "Draft"}
+    </Badge>
+  );
 }
 
 export default function PagesPage() {
@@ -62,6 +171,7 @@ export default function PagesPage() {
       toast.success("Page added successfully.");
       queryClient.invalidateQueries({ queryKey: ["pages"] });
       setModalOpen(false);
+      setFormData(emptyPageForm);
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -73,6 +183,8 @@ export default function PagesPage() {
       toast.success("Page updated successfully.");
       queryClient.invalidateQueries({ queryKey: ["pages"] });
       setModalOpen(false);
+      setFormData(emptyPageForm);
+      setEditTarget(null);
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -89,12 +201,21 @@ export default function PagesPage() {
 
   const filteredPages = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return data;
-    return data.filter(
-      (page) =>
-        page.title.toLowerCase().includes(query) ||
-        page.slug.toLowerCase().includes(query) ||
-        page.content.toLowerCase().includes(query),
+    if (!query) {
+      return data;
+    }
+
+    return data.filter((page) =>
+      [
+        page.title,
+        page.slug,
+        page.content,
+        page.seo.metaTitle,
+        page.seo.metaDescription,
+        page.status,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
     );
   }, [data, search]);
 
@@ -110,7 +231,9 @@ export default function PagesPage() {
       title: page.title,
       slug: page.slug,
       content: page.content,
-      isActive: page.isActive,
+      status: page.status,
+      metaTitle: page.seo.metaTitle,
+      metaDescription: page.seo.metaDescription,
     });
     setModalOpen(true);
   }
@@ -124,6 +247,7 @@ export default function PagesPage() {
     if (!deleteTarget?._id) {
       return;
     }
+
     deleteMutation.mutate(deleteTarget._id);
   }
 
@@ -135,10 +259,19 @@ export default function PagesPage() {
 
     const payload: PagePayload = {
       title: formData.title.trim(),
-      slug: formData.slug.trim() ? slugify(formData.slug) : slugify(formData.title),
+      slug: formData.slug.trim()
+        ? slugify(formData.slug)
+        : slugify(formData.title),
       content: formData.content,
-      isActive: formData.isActive,
+      status: formData.status,
+      metaTitle: formData.metaTitle.trim(),
+      metaDescription: formData.metaDescription.trim(),
     };
+
+    if (!payload.slug) {
+      toast.error("Slug is required.");
+      return;
+    }
 
     if (editTarget) {
       updateMutation.mutate({ id: editTarget._id, payload });
@@ -148,16 +281,96 @@ export default function PagesPage() {
     addMutation.mutate(payload);
   }
 
+  const columns: TableColumn<PageItem>[] = [
+    {
+      name: "Page",
+      grow: 1.4,
+      cell: (page) => (
+        <div className="min-w-0 py-3">
+          <p className="truncate text-sm font-semibold text-slate-900">
+            {page.title}
+          </p>
+          <p className="truncate text-xs text-slate-500">/{page.slug}</p>
+        </div>
+      ),
+    },
+    {
+      name: "Status",
+      width: "150px",
+      cell: (page) => <StatusBadge status={page.status} />,
+    },
+    {
+      name: "SEO",
+      grow: 1.4,
+      cell: (page) => (
+        <div className="min-w-0 py-3">
+          <p className="truncate text-sm text-slate-800">
+            {page.seo.metaTitle || "No meta title"}
+          </p>
+          <p className="line-clamp-2 text-xs text-slate-500">
+            {page.seo.metaDescription || "No meta description"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      name: "Updated",
+      width: "150px",
+      cell: (page) => (
+        <span className="text-sm text-slate-600">
+          {formatPageDate(page.updatedAt ?? page.createdAt)}
+        </span>
+      ),
+    },
+    {
+      name: "Actions",
+      right: true,
+      width: "200px",
+      cell: (page) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="rounded-xl border-slate-200"
+            onClick={() => openPreview(page)}
+          >
+            <Eye size={14} />
+            Preview
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
+            onClick={() => openEdit(page)}
+          >
+            <Pencil size={15} />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
+            onClick={() => setDeleteTarget(page)}
+          >
+            <Trash2 size={15} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div data-ocid="website-pages.page">
+    <div className="space-y-6" data-ocid="website_pages.page">
       <PageHeader
         title="Website Pages"
-        description="Create, edit, and publish standalone website pages with rich HTML content."
+        description="Create SEO-ready website pages with title, content, publish status, and meta details."
         action={
           <Button
             type="button"
             onClick={openAdd}
-            className="rounded-xl gap-2 shadow-sm w-full sm:w-auto"
+            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto"
           >
             <Plus size={16} />
             Add page
@@ -166,207 +379,350 @@ export default function PagesPage() {
       />
 
       <Card className="rounded-3xl border-slate-100 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-[#1E293B]">Page library</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex-1 min-w-0">
-              <Label htmlFor="page-search" className="text-sm text-slate-500">
-                Search pages
-              </Label>
-              <Input
-                id="page-search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search title, slug, or content"
-                className="mt-2"
-              />
+        <CardHeader className="gap-4 border-b border-slate-100 pb-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <CardTitle className="text-lg text-slate-900">
+                Page Library
+              </CardTitle>
+              <p className="mt-1 text-sm text-slate-500">
+                Preview and manage custom website pages from one place.
+              </p>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <span>{filteredPages.length} pages found</span>
+            <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+              <div className="relative w-full lg:w-80">
+                <Search
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+                <Input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search title, slug, content, SEO..."
+                  className="rounded-xl border-slate-200 pl-9"
+                />
+              </div>
+              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-600">
+                {filteredPages.length} page
+                {filteredPages.length === 1 ? "" : "s"}
+              </div>
             </div>
           </div>
+        </CardHeader>
 
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Updated</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-sm text-slate-500">
-                      Loading pages...
-                    </TableCell>
-                  </TableRow>
-                ) : filteredPages.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-sm text-slate-500">
-                      No pages found. Create your first page to show here.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredPages.map((page) => (
-                    <TableRow key={page._id}>
-                      <TableCell>{page.title}</TableCell>
-                      <TableCell>{page.slug}</TableCell>
-                      <TableCell>
-                        <Badge variant={page.isActive ? "secondary" : "outline"}>
-                          {page.isActive ? "Published" : "Draft"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(page.updatedAt ?? page.createdAt ?? "").toLocaleDateString()}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openPreview(page)}
-                        >
-                          <Eye size={16} />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEdit(page)}
-                        >
-                          <Pencil size={16} />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setDeleteTarget(page)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+        <CardContent className="p-5">
+          <div className="overflow-hidden rounded-2xl border border-slate-100">
+            <DataTable
+              columns={columns}
+              data={filteredPages}
+              customStyles={pageTableStyles}
+              progressPending={isLoading}
+              pagination
+              responsive
+              highlightOnHover
+              persistTableHead
+              noDataComponent={
+                <div className="py-16 text-center">
+                  <p className="text-base font-semibold text-slate-900">
+                    No pages found
+                  </p>
+                  <p className="mt-2 text-sm text-slate-500">
+                    Add your first website page to see it here.
+                  </p>
+                </div>
+              }
+            />
           </div>
         </CardContent>
       </Card>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-4xl rounded-3xl border-slate-200">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-5xl">
           <DialogHeader>
-            <DialogTitle>{editTarget ? "Edit page" : "Add new page"}</DialogTitle>
+            <DialogTitle className="text-xl text-slate-900">
+              {editTarget ? "Edit Website Page" : "Add Website Page"}
+            </DialogTitle>
             <DialogDescription>
-              {editTarget
-                ? "Update the title, slug, publish status, and rich page content."
-                : "Create a new page and manage its SEO-friendly slug and publish state."}
+              Manage the page title, SEO metadata, publish status, and
+              Summernote content.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="page-title">Page title</Label>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="space-y-2 lg:col-span-2">
+                <Label htmlFor="page-title">Page Title</Label>
                 <Input
                   id="page-title"
                   value={formData.title}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
-                  placeholder="Enter page title"
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      title: event.target.value,
+                    }))
+                  }
+                  placeholder="About Samarpan Hospital"
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="page-slug">Page slug</Label>
-                <Input
-                  id="page-slug"
-                  value={formData.slug}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, slug: event.target.value }))}
-                  placeholder="Enter page slug or leave blank to auto-generate"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-4">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">Publish status</p>
-                <p className="text-sm text-slate-500">Switch between published and draft state.</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Switch
-                  checked={formData.isActive}
-                  onCheckedChange={(value) => setFormData((prev) => ({ ...prev, isActive: value }))}
-                />
-                <span className="text-sm text-slate-700">{formData.isActive ? "Published" : "Draft"}</span>
+                <Label htmlFor="page-status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      status: value as PageStatus,
+                    }))
+                  }
+                >
+                  <SelectTrigger id="page-status" className="rounded-xl">
+                    <SelectValue placeholder="Select page status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="page-content">Page content</Label>
-              <ReactSummernote
-                value={formData.content}
-                options={{
-                  height: 300,
-                  dialogsInBody: true,
-                  toolbar: [
-                    ["style", ["style"]],
-                    ["font", ["bold", "underline", "italic", "clear"]],
-                    ["fontname", ["fontname"]],
-                    ["para", ["ul", "ol", "paragraph"]],
-                    ["insert", ["link", "picture", "video"]],
-                    ["view", ["fullscreen", "codeview"]],
-                  ],
-                }}
-                onChange={(content) => setFormData((prev) => ({ ...prev, content }))}
+              <Label htmlFor="page-slug">Slug</Label>
+              <Input
+                id="page-slug"
+                value={formData.slug}
+                onChange={(event) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    slug: event.target.value,
+                  }))
+                }
+                placeholder="about-samarpan"
+                className="rounded-xl"
               />
+              <p className="text-xs text-slate-500">
+                Leave it clean and short. We’ll save this as `/
+                {formData.slug.trim()
+                  ? slugify(formData.slug)
+                  : slugify(formData.title) || "page-slug"}
+                `.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-4">
+                <h3 className="text-base font-semibold text-slate-900">
+                  SEO Details
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  Add meta title and meta description for search and social
+                  previews.
+                </p>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="page-meta-title">Meta Title</Label>
+                  <Input
+                    id="page-meta-title"
+                    value={formData.metaTitle}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        metaTitle: event.target.value,
+                      }))
+                    }
+                    placeholder="Samarpan Hospital | Expert Care in Hisar"
+                    className="rounded-xl bg-white"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="page-meta-description">
+                    Meta Description
+                  </Label>
+                  <Textarea
+                    id="page-meta-description"
+                    rows={4}
+                    value={formData.metaDescription}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        metaDescription: event.target.value,
+                      }))
+                    }
+                    placeholder="Short SEO description for this page."
+                    className="rounded-2xl bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Page Content</Label>
+              <div className="website-page-editor">
+                <ReactSummernote
+                  value={formData.content}
+                  options={{
+                    height: 340,
+                    dialogsInBody: true,
+                    toolbar: [
+                      ["style", ["style"]],
+                      ["font", ["bold", "underline", "italic", "clear"]],
+                      ["fontsize", ["fontsize"]],
+                      ["para", ["ul", "ol", "paragraph"]],
+                      ["insert", ["link", "picture", "video"]],
+                      ["view", ["fullscreen", "codeview"]],
+                    ],
+                  }}
+                  onChange={(content) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      content,
+                    }))
+                  }
+                />
+              </div>
             </div>
           </div>
 
-          <DialogFooter className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
-              Cancel
+          <DialogFooter className="mt-4 gap-2 sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl"
+              onClick={() => {
+                setPreviewPage({
+                  _id: editTarget?._id ?? "preview",
+                  title: formData.title,
+                  slug: formData.slug.trim()
+                    ? slugify(formData.slug)
+                    : slugify(formData.title),
+                  content: formData.content,
+                  status: formData.status,
+                  seo: {
+                    metaTitle: formData.metaTitle,
+                    metaDescription: formData.metaDescription,
+                  },
+                });
+                setPreviewOpen(true);
+              }}
+            >
+              <Eye size={14} />
+              Preview
             </Button>
-            <Button type="button" onClick={handleSave} disabled={addMutation.isPending || updateMutation.isPending}>
-              {editTarget ? "Update page" : "Create page"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl"
+                onClick={() => setModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="rounded-xl"
+                onClick={handleSave}
+                disabled={addMutation.isPending || updateMutation.isPending}
+              >
+                {editTarget ? "Update Page" : "Create Page"}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-4xl rounded-3xl border-slate-200">
+      <Dialog
+        open={previewOpen || !!previewPage}
+        onOpenChange={(open) => {
+          setPreviewOpen(open);
+          if (!open) {
+            setPreviewPage(null);
+          }
+        }}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-5xl">
           <DialogHeader>
-            <DialogTitle>Preview page</DialogTitle>
+            <DialogTitle className="text-xl text-slate-900">
+              Page Preview
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 px-4 pb-4">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-              <h2 className="text-lg font-semibold text-slate-900">{previewPage?.title}</h2>
-              <p className="text-sm text-slate-500">/{previewPage?.slug}</p>
+
+          {previewPage ? (
+            <div className="space-y-4 px-1 pb-2">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                <div className="flex flex-wrap items-center gap-3">
+                  <StatusBadge status={previewPage.status} />
+                  <span className="text-sm text-slate-500">
+                    /{previewPage.slug}
+                  </span>
+                </div>
+                <h2 className="mt-3 text-2xl font-semibold text-slate-900">
+                  {previewPage.title || "Untitled page"}
+                </h2>
+                <div className="mt-4 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      Meta Title
+                    </p>
+                    <p className="mt-1 text-sm text-slate-700">
+                      {previewPage.seo.metaTitle || "No meta title"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      Meta Description
+                    </p>
+                    <p className="mt-1 text-sm text-slate-700">
+                      {previewPage.seo.metaDescription || "No meta description"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 prose prose-slate max-w-full">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      previewPage.content || "<p>No content added yet.</p>",
+                  }}
+                />
+              </div>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 prose prose-slate max-w-full">
-              <div dangerouslySetInnerHTML={{ __html: previewPage?.content ?? "<p>No content</p>" }} />
-            </div>
-          </div>
+          ) : null}
         </DialogContent>
       </Dialog>
 
-      <Dialog open={Boolean(deleteTarget)} onOpenChange={() => setDeleteTarget(null)}>
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
         <DialogContent className="max-w-xl rounded-3xl border-slate-200">
           <DialogHeader>
             <DialogTitle>Delete page</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the page {deleteTarget?.title}? This cannot be undone.
+              Are you sure you want to delete {deleteTarget?.title}? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setDeleteTarget(null)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl"
+              onClick={() => setDeleteTarget(null)}
+            >
               Cancel
             </Button>
-            <Button type="button" variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+            <Button
+              type="button"
+              variant="destructive"
+              className="rounded-xl"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
               Delete
             </Button>
           </DialogFooter>

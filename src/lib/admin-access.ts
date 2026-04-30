@@ -156,7 +156,7 @@ const PATH_PERMISSION_RULES: Record<
     ],
   },
   "/website-content": { superAdminOnly: true },
-  "/website-pages": {},
+  "/website-pages": { superAdminOnly: true },
   "/settings": { permissions: ["view_settings", "manage_settings"] },
   "/roles": {
     permissions: ["view_admin_staff", "manage_admin_staff"],
@@ -168,9 +168,7 @@ function isPermissionKey(value: string): value is PermissionKey {
   return ALL_PERMISSION_KEYS.includes(value as PermissionKey);
 }
 
-export function normalizePermissions(
-  value: unknown,
-): Record<string, boolean> {
+export function normalizePermissions(value: unknown): Record<string, boolean> {
   if (!value || typeof value !== "object") {
     return {};
   }

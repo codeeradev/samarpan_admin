@@ -16,6 +16,7 @@ import {
   Calendar,
   ChevronDown,
   FileImage,
+  FileText,
   HeartPulse,
   ImageIcon,
   LayoutDashboard,
@@ -103,12 +104,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     path: "/website-content",
     permissionPath: "/website-content",
   },
-  // {
-  //   label: "Website Pages",
-  //   icon: FileImage,
-  //   path: "/website-pages",
-  //   permissionPath: "/website-pages",
-  // },
+  {
+    label: "Website Pages",
+    icon: FileText,
+    path: "/website-pages",
+    permissionPath: "/website-pages",
+  },
   // {
   //   label: "Enquiries",
   //   icon: MessageSquare,

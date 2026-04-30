@@ -21904,10 +21904,7 @@ const ENDPOINT = {
   GET_ALL_PATIENTS: "/get-all-patients",
   UPDATE_PATIENT: "/update-patient",
   DISCHARGE_PATIENT: "/discharge-patient",
-  ADD_REVIEW: "/add-review",
-  GET_ALL_REVIEWS: "/get-all-reviews",
-  UPDATE_REVIEW: "/update-review",
-  DELETE_REVIEW: "/delete-review",
+  GET_GOOGLE_REVIEWS: "/get-all-reviews",
   ADD_SHORT: "/add-short",
   GET_ALL_SHORTS: "/get-all-shorts",
   UPDATE_SHORT: "/update-short",
@@ -22194,7 +22191,7 @@ const PATH_PERMISSION_RULES = {
     ]
   },
   "/website-content": { superAdminOnly: true },
-  "/website-pages": {},
+  "/website-pages": { superAdminOnly: true },
   "/settings": { permissions: ["view_settings", "manage_settings"] },
   "/roles": {
     permissions: ["view_admin_staff", "manage_admin_staff"],
@@ -30662,7 +30659,7 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$E = [
+const __iconNode$G = [
   [
     "path",
     {
@@ -30672,14 +30669,14 @@ const __iconNode$E = [
   ],
   ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const BadgeCheck = createLucideIcon("badge-check", __iconNode$E);
+const BadgeCheck = createLucideIcon("badge-check", __iconNode$G);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$D = [
+const __iconNode$F = [
   ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["path", { d: "M8 2v4", key: "1cmpym" }],
@@ -30687,44 +30684,67 @@ const __iconNode$D = [
   ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
   ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
 ];
-const CalendarClock = createLucideIcon("calendar-clock", __iconNode$D);
+const CalendarClock = createLucideIcon("calendar-clock", __iconNode$F);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$C = [
+const __iconNode$E = [
   ["path", { d: "M8 2v4", key: "1cmpym" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
   ["path", { d: "M3 10h18", key: "8toen8" }]
 ];
-const Calendar = createLucideIcon("calendar", __iconNode$C);
+const Calendar = createLucideIcon("calendar", __iconNode$E);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$B = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", __iconNode$B);
+const __iconNode$D = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
+const Check = createLucideIcon("check", __iconNode$D);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$A = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$A);
+const __iconNode$C = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$C);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$z = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$z);
+const __iconNode$B = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$B);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$A = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+];
+const CircleCheck = createLucideIcon("circle-check", __iconNode$A);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$z = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
+  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
+];
+const CircleX = createLucideIcon("circle-x", __iconNode$z);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30733,9 +30753,9 @@ const ChevronUp = createLucideIcon("chevron-up", __iconNode$z);
  */
 const __iconNode$y = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
 ];
-const CircleCheck = createLucideIcon("circle-check", __iconNode$y);
+const Clock = createLucideIcon("clock", __iconNode$y);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30743,11 +30763,11 @@ const CircleCheck = createLucideIcon("circle-check", __iconNode$y);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$x = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
-  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
+  ["path", { d: "M15 3h6v6", key: "1q9fwt" }],
+  ["path", { d: "M10 14 21 3", key: "gplh6r" }],
+  ["path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6", key: "a6xqqp" }]
 ];
-const CircleX = createLucideIcon("circle-x", __iconNode$x);
+const ExternalLink = createLucideIcon("external-link", __iconNode$x);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30755,17 +30775,6 @@ const CircleX = createLucideIcon("circle-x", __iconNode$x);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$w = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
-];
-const Clock = createLucideIcon("clock", __iconNode$w);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$v = [
   [
     "path",
     {
@@ -30783,14 +30792,14 @@ const __iconNode$v = [
   ],
   ["path", { d: "m2 2 20 20", key: "1ooewy" }]
 ];
-const EyeOff = createLucideIcon("eye-off", __iconNode$v);
+const EyeOff = createLucideIcon("eye-off", __iconNode$w);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$u = [
+const __iconNode$v = [
   [
     "path",
     {
@@ -30800,7 +30809,20 @@ const __iconNode$u = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-const Eye = createLucideIcon("eye", __iconNode$u);
+const Eye = createLucideIcon("eye", __iconNode$v);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$u = [
+  ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
+  ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
+  ["circle", { cx: "10", cy: "12", r: "2", key: "737tya" }],
+  ["path", { d: "m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22", key: "wt3hpn" }]
+];
+const FileImage = createLucideIcon("file-image", __iconNode$u);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30810,10 +30832,11 @@ const Eye = createLucideIcon("eye", __iconNode$u);
 const __iconNode$t = [
   ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
   ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
-  ["circle", { cx: "10", cy: "12", r: "2", key: "737tya" }],
-  ["path", { d: "m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22", key: "wt3hpn" }]
+  ["path", { d: "M10 9H8", key: "b1mrlr" }],
+  ["path", { d: "M16 13H8", key: "t4e002" }],
+  ["path", { d: "M16 17H8", key: "z1uh3a" }]
 ];
-const FileImage = createLucideIcon("file-image", __iconNode$t);
+const FileText = createLucideIcon("file-text", __iconNode$t);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -36888,12 +36911,12 @@ const ALL_NAV_ITEMS = [
     path: "/website-content",
     permissionPath: "/website-content"
   },
-  // {
-  //   label: "Website Pages",
-  //   icon: FileImage,
-  //   path: "/website-pages",
-  //   permissionPath: "/website-pages",
-  // },
+  {
+    label: "Website Pages",
+    icon: FileText,
+    path: "/website-pages",
+    permissionPath: "/website-pages"
+  },
   // {
   //   label: "Enquiries",
   //   icon: MessageSquare,
@@ -37522,7 +37545,7 @@ const STATUS_MAP = {
     className: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-50"
   }
 };
-function StatusBadge({ status }) {
+function StatusBadge$1({ status }) {
   const style2 = STATUS_MAP[status] ?? {
     label: status,
     className: "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-50"
@@ -41432,7 +41455,7 @@ function AppointmentCard({
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-[#1E293B] text-sm leading-tight truncate", children: appt.fullName }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8] mt-0.5", children: appt.serviceName })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: appt.status })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: appt.status })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-2 mb-3 text-xs", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -41600,7 +41623,7 @@ function AppointmentsPage() {
       name: "Status",
       selector: (row) => row.status,
       sortable: true,
-      cell: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: row.status })
+      cell: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: row.status })
     },
     {
       name: "Actions",
@@ -64036,7 +64059,7 @@ function DashboardPage() {
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-[#475569] whitespace-nowrap", children: appt.doctorName }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-[#475569] whitespace-nowrap", children: formatDate(appt.appointmentDate) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-[#475569] max-w-[200px] truncate", children: appt.reason }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: appt.status }) })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: appt.status }) })
                   ]
                 },
                 appt._id
@@ -64054,7 +64077,7 @@ function DashboardPage() {
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-sm text-[#1E293B] truncate", children: appt.fullName }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: appt.status })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: appt.status })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-[#475569]", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: "Dr." }),
@@ -64510,7 +64533,7 @@ function DoctorsPage() {
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mt-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-amber-50 text-[#A67C00] px-2 py-0.5 rounded-md font-medium", children: doctor.specialization || "No specialization" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-[#64748B]", children: getDoctorExperience(doctor) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: getDoctorAvailability(doctor) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: getDoctorAvailability(doctor) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#94A3B8] mt-1", children: getDoctorPhone(doctor) })
           ] })
@@ -64611,7 +64634,7 @@ function DoctorsPage() {
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-[#1E293B] text-sm", children: doctor.specialization || "Not set" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-[#64748B] text-sm", children: getDoctorExperience(doctor) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-[#64748B] text-sm", children: getDoctorPhone(doctor) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: getDoctorAvailability(doctor) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: getDoctorAvailability(doctor) }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   Button,
@@ -66527,43 +66550,41 @@ function PatientsPage() {
     )
   ] });
 }
-const getAllReviewsApi = async () => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await get$3(ENDPOINT.GET_ALL_REVIEWS, { needAuth: true });
-    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.reviews) ?? [];
-  } catch (error) {
-    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch reviews");
-  }
-};
-const addReviewApi = async (payload) => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await post(ENDPOINT.ADD_REVIEW, payload, { needAuth: true });
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.review;
-  } catch (error) {
-    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add review");
-  }
-};
-const updateReviewApi = async (id, payload) => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await post(`${ENDPOINT.UPDATE_REVIEW}/${id}`, payload, {
-      needAuth: true
-    });
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.review;
-  } catch (error) {
-    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update review");
-  }
-};
-const deleteReviewApi = async (id) => {
+function normalizeGoogleReviewItem(item, index2) {
+  const authorName = item.authorName || item.author_name || item.name || `Google Reviewer ${index2 + 1}`;
+  const text = item.text || item.review || "";
+  return {
+    id: item.id || item._id || `${authorName}-${item.time || item.updatedAt || index2}`,
+    authorName,
+    authorUrl: item.authorUrl || item.author_url || "",
+    profilePhotoUrl: item.profilePhotoUrl || item.profile_photo_url || "",
+    rating: typeof item.rating === "number" ? item.rating : Number(item.rating || 5),
+    relativeTimeDescription: item.relativeTimeDescription || item.relative_time_description || item.updatedAt || item.createdAt || "",
+    text,
+    time: typeof item.time === "number" || item.time === null ? item.time : void 0,
+    language: item.language || item.original_language || ""
+  };
+}
+function normalizeGoogleReviewsSummary(payload) {
+  const rawReviews = Array.isArray(payload == null ? void 0 : payload.reviews) ? payload.reviews : Array.isArray(payload) ? payload : [];
+  return {
+    placeId: (payload == null ? void 0 : payload.placeId) || (payload == null ? void 0 : payload.place_id) || "",
+    placeName: (payload == null ? void 0 : payload.placeName) || (payload == null ? void 0 : payload.name) || "Samarpan Hospital",
+    rating: typeof (payload == null ? void 0 : payload.rating) === "number" ? payload.rating : Number((payload == null ? void 0 : payload.rating) || 0),
+    reviews: rawReviews.map(
+      (item, index2) => normalizeGoogleReviewItem(item, index2)
+    ),
+    source: (payload == null ? void 0 : payload.source) || "google",
+    fetchedAt: (payload == null ? void 0 : payload.fetchedAt) || (payload == null ? void 0 : payload.updatedAt) || ""
+  };
+}
+const getGoogleReviewsApi = async () => {
   var _a2, _b2;
   try {
-    await post(`${ENDPOINT.DELETE_REVIEW}/${id}`, void 0, {
-      needAuth: true
-    });
+    const res = await get$3(ENDPOINT.GET_GOOGLE_REVIEWS, { needAuth: true });
+    return normalizeGoogleReviewsSummary(res == null ? void 0 : res.data);
   } catch (error) {
-    throw new Error(((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete review");
+    throw new Error(((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to fetch reviews");
   }
 };
 const getAllShortsApi = async () => {
@@ -67004,14 +67025,11 @@ function TabsContent({
 }
 const REVIEW_QUERY_KEY = ["reviews-management"];
 const SHORT_QUERY_KEY = ["shorts-management"];
-const emptyReviewForm = {
-  name: "",
-  review: "",
-  location: "",
-  treatment: "",
-  rating: "5",
-  sortOrder: "0",
-  isActive: true
+const emptyGoogleReviews = {
+  placeName: "Samarpan Hospital",
+  rating: 0,
+  reviews: [],
+  source: "google"
 };
 const emptyShortForm = {
   title: "",
@@ -67086,24 +67104,6 @@ function getShortHost(shortUrl) {
     return "External video";
   }
 }
-function validateReviewForm(form) {
-  const errors = {};
-  const rating = Number(form.rating);
-  const sortOrder = Number(form.sortOrder);
-  if (!form.name.trim()) {
-    errors.name = "Reviewer name is required.";
-  }
-  if (!form.review.trim()) {
-    errors.review = "Review text is required.";
-  }
-  if (Number.isNaN(rating) || rating < 1 || rating > 5) {
-    errors.rating = "Rating must be between 1 and 5.";
-  }
-  if (Number.isNaN(sortOrder) || sortOrder < 0) {
-    errors.sortOrder = "Sort order must be 0 or more.";
-  }
-  return errors;
-}
 function validateShortForm(form) {
   const errors = {};
   const sortOrder = Number(form.sortOrder);
@@ -67123,17 +67123,6 @@ function validateShortForm(form) {
   }
   return errors;
 }
-function buildReviewPayload(form) {
-  return {
-    name: form.name.trim(),
-    review: form.review.trim(),
-    location: form.location.trim(),
-    treatment: form.treatment.trim(),
-    rating: Number(form.rating),
-    sortOrder: Number(form.sortOrder),
-    isActive: form.isActive
-  };
-}
 function buildShortPayload(form) {
   return {
     title: form.title.trim(),
@@ -67143,11 +67132,33 @@ function buildShortPayload(form) {
     isActive: form.isActive
   };
 }
+function formatReviewTimestamp(review) {
+  var _a2;
+  if ((_a2 = review.relativeTimeDescription) == null ? void 0 : _a2.trim()) {
+    const maybeDate = new Date(review.relativeTimeDescription);
+    if (!Number.isNaN(maybeDate.getTime())) {
+      return maybeDate.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      });
+    }
+    return review.relativeTimeDescription;
+  }
+  if (typeof review.time === "number") {
+    return new Date(review.time * 1e3).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  }
+  return "Google review";
+}
 function RatingStars({
   rating,
   size: size2 = 14
 }) {
-  const normalized = Math.max(1, Math.min(5, Number(rating || 5)));
+  const normalized = Math.max(0, Math.min(5, Number(rating || 0)));
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1 text-amber-500", children: Array.from({ length: 5 }, (_2, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
     Star,
     {
@@ -67157,32 +67168,45 @@ function RatingStars({
     `rating-${index2 + 1}`
   )) });
 }
-function ReviewPreviewCard({
-  review
-}) {
-  var _a2, _b2, _c2;
-  if (!review) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-[28px] border border-dashed border-slate-200 bg-slate-50 p-8 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { className: "text-amber-500", size: 22 }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-base font-semibold text-slate-900", children: "Review preview will appear here" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-6 text-slate-500", children: "Add a patient story to instantly see how the testimonial card feels in the website section." })
-    ] });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-[28px] border border-amber-100 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(168,119,0,0.45)]", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-1.5 w-24 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-300" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-5 flex items-start justify-between gap-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-2xl font-semibold text-amber-600", children: '"' }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: Number(review.rating ?? 5) })
+function GoogleReviewCard({ review }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "h-full rounded-[28px] border border-slate-200 bg-white shadow-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "flex h-full flex-col p-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex min-w-0 items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Avatar, { className: "h-12 w-12 border border-slate-100", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            AvatarImage,
+            {
+              src: review.profilePhotoUrl,
+              alt: review.authorName
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "bg-amber-50 text-sm font-semibold text-amber-700", children: getInitials(review.authorName) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-sm font-semibold text-slate-900", children: review.authorName }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-xs text-slate-500", children: formatReviewTimestamp(review) })
+        ] })
+      ] }),
+      review.authorUrl ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "a",
+        {
+          href: review.authorUrl,
+          target: "_blank",
+          rel: "noreferrer",
+          className: "inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { size: 13 }),
+            "Open"
+          ]
+        }
+      ) : null
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-5 min-h-[132px] text-sm leading-7 text-slate-600", children: ((_a2 = review.review) == null ? void 0 : _a2.trim()) || "Your testimonial copy will show here with the same warm visual treatment used across the panel preview." }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-6 border-t border-slate-100 pt-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 text-sm font-semibold text-white", children: getInitials(((_b2 = review.name) == null ? void 0 : _b2.trim()) || "Guest") }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-sm font-semibold text-slate-900", children: ((_c2 = review.name) == null ? void 0 : _c2.trim()) || "Patient name" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-xs text-slate-500", children: [review.location, review.treatment].filter(Boolean).join(" | ") || "Location | Treatment" })
-      ] })
-    ] }) })
-  ] });
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 flex items-center gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: Number(review.rating ?? 5) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-slate-500", children: Number(review.rating ?? 5).toFixed(1) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 flex-1 whitespace-pre-line text-sm leading-7 text-slate-600", children: review.text || "No review text available." })
+  ] }) });
 }
 function ShortPreviewCard({
   short
@@ -67225,36 +67249,23 @@ function ReviewsAndShortsPage() {
   const [activeTab, setActiveTab] = reactExports.useState("reviews");
   const [reviewSearch, setReviewSearch] = reactExports.useState("");
   const [shortSearch, setShortSearch] = reactExports.useState("");
-  const [reviewDialogOpen, setReviewDialogOpen] = reactExports.useState(false);
-  const [reviewDialogMode, setReviewDialogMode] = reactExports.useState("add");
-  const [selectedReview, setSelectedReview] = reactExports.useState(null);
-  const [reviewDeleteTarget, setReviewDeleteTarget] = reactExports.useState(
-    null
-  );
-  const [reviewPreviewTarget, setReviewPreviewTarget] = reactExports.useState(
-    null
-  );
-  const [reviewForm, setReviewForm] = reactExports.useState(emptyReviewForm);
-  const [reviewErrors, setReviewErrors] = reactExports.useState({});
   const [shortDialogOpen, setShortDialogOpen] = reactExports.useState(false);
   const [shortDialogMode, setShortDialogMode] = reactExports.useState("add");
   const [selectedShort, setSelectedShort] = reactExports.useState(null);
   const [shortDeleteTarget, setShortDeleteTarget] = reactExports.useState(
     null
   );
-  const [shortPreviewTarget, setShortPreviewTarget] = reactExports.useState(
-    null
-  );
+  const [shortPreviewTarget, setShortPreviewTarget] = reactExports.useState(null);
   const [shortForm, setShortForm] = reactExports.useState(emptyShortForm);
   const [shortErrors, setShortErrors] = reactExports.useState({});
   const {
-    data: reviews = [],
+    data: reviewSummary = emptyGoogleReviews,
     isLoading: isReviewsLoading,
     isError: isReviewsError,
     error: reviewsError
   } = useQuery({
     queryKey: REVIEW_QUERY_KEY,
-    queryFn: getAllReviewsApi
+    queryFn: getGoogleReviewsApi
   });
   const {
     data: shorts = [],
@@ -67265,14 +67276,6 @@ function ReviewsAndShortsPage() {
     queryKey: SHORT_QUERY_KEY,
     queryFn: getAllShortsApi
   });
-  const addReviewMutation = useMutation({ mutationFn: addReviewApi });
-  const updateReviewMutation = useMutation({
-    mutationFn: ({
-      id,
-      payload
-    }) => updateReviewApi(id, payload)
-  });
-  const deleteReviewMutation = useMutation({ mutationFn: deleteReviewApi });
   const addShortMutation = useMutation({ mutationFn: addShortApi });
   const updateShortMutation = useMutation({
     mutationFn: ({
@@ -67281,24 +67284,34 @@ function ReviewsAndShortsPage() {
     }) => updateShortApi(id, payload)
   });
   const deleteShortMutation = useMutation({ mutationFn: deleteShortApi });
-  const isReviewBusy = addReviewMutation.isPending || updateReviewMutation.isPending || deleteReviewMutation.isPending;
   const isShortBusy = addShortMutation.isPending || updateShortMutation.isPending || deleteShortMutation.isPending;
+  const reviewAverageRating = reactExports.useMemo(() => {
+    if (reviewSummary.rating > 0) {
+      return reviewSummary.rating;
+    }
+    if (!reviewSummary.reviews.length) {
+      return 0;
+    }
+    const total = reviewSummary.reviews.reduce(
+      (sum, review) => sum + Number(review.rating || 0),
+      0
+    );
+    return total / reviewSummary.reviews.length;
+  }, [reviewSummary.rating, reviewSummary.reviews]);
   const filteredReviews = reactExports.useMemo(() => {
     if (!reviewSearch.trim()) {
-      return reviews;
+      return reviewSummary.reviews;
     }
     const query = reviewSearch.toLowerCase();
-    return reviews.filter(
-      (item) => [
-        item.name,
-        item.review,
-        item.location,
-        item.treatment,
-        item.rating,
-        item.sortOrder
+    return reviewSummary.reviews.filter(
+      (review) => [
+        review.authorName,
+        review.text,
+        review.relativeTimeDescription,
+        review.rating
       ].filter(Boolean).some((value) => String(value).toLowerCase().includes(query))
     );
-  }, [reviewSearch, reviews]);
+  }, [reviewSearch, reviewSummary.reviews]);
   const filteredShorts = reactExports.useMemo(() => {
     if (!shortSearch.trim()) {
       return shorts;
@@ -67308,16 +67321,6 @@ function ReviewsAndShortsPage() {
       (item) => [item.title, item.shortUrl, item.thumbnail, item.sortOrder].filter(Boolean).some((value) => String(value).toLowerCase().includes(query))
     );
   }, [shortSearch, shorts]);
-  function setReviewField(key, value) {
-    setReviewForm((prev2) => ({ ...prev2, [key]: value }));
-    if (reviewErrors[key]) {
-      setReviewErrors((prev2) => {
-        const next2 = { ...prev2 };
-        delete next2[key];
-        return next2;
-      });
-    }
-  }
   function setShortField(key, value) {
     setShortForm((prev2) => ({ ...prev2, [key]: value }));
     if (shortErrors[key]) {
@@ -67327,30 +67330,6 @@ function ReviewsAndShortsPage() {
         return next2;
       });
     }
-  }
-  function openAddReview() {
-    setActiveTab("reviews");
-    setReviewDialogMode("add");
-    setSelectedReview(null);
-    setReviewForm(emptyReviewForm);
-    setReviewErrors({});
-    setReviewDialogOpen(true);
-  }
-  function openEditReview(review) {
-    setActiveTab("reviews");
-    setReviewDialogMode("edit");
-    setSelectedReview(review);
-    setReviewForm({
-      name: review.name ?? "",
-      review: review.review ?? "",
-      location: review.location ?? "",
-      treatment: review.treatment ?? "",
-      rating: String(review.rating ?? 5),
-      sortOrder: String(review.sortOrder ?? 0),
-      isActive: review.isActive !== false
-    });
-    setReviewErrors({});
-    setReviewDialogOpen(true);
   }
   function openAddShort() {
     setActiveTab("shorts");
@@ -67373,32 +67352,6 @@ function ReviewsAndShortsPage() {
     });
     setShortErrors({});
     setShortDialogOpen(true);
-  }
-  async function handleSaveReview() {
-    const errors = validateReviewForm(reviewForm);
-    if (Object.keys(errors).length > 0) {
-      setReviewErrors(errors);
-      return;
-    }
-    const payload = buildReviewPayload(reviewForm);
-    try {
-      if (reviewDialogMode === "edit" && selectedReview) {
-        await updateReviewMutation.mutateAsync({
-          id: selectedReview._id,
-          payload
-        });
-        ue$2.success("Review updated successfully.");
-      } else {
-        await addReviewMutation.mutateAsync(payload);
-        ue$2.success("Review added successfully.");
-      }
-      await queryClient2.invalidateQueries({ queryKey: REVIEW_QUERY_KEY });
-      setReviewDialogOpen(false);
-      setSelectedReview(null);
-      setReviewForm(emptyReviewForm);
-    } catch (error) {
-      ue$2.error(getErrorMessage(error));
-    }
   }
   async function handleSaveShort() {
     const errors = validateShortForm(shortForm);
@@ -67426,19 +67379,6 @@ function ReviewsAndShortsPage() {
       ue$2.error(getErrorMessage(error));
     }
   }
-  async function handleDeleteReview() {
-    if (!reviewDeleteTarget) {
-      return;
-    }
-    try {
-      await deleteReviewMutation.mutateAsync(reviewDeleteTarget._id);
-      ue$2.success("Review deleted successfully.");
-      await queryClient2.invalidateQueries({ queryKey: REVIEW_QUERY_KEY });
-      setReviewDeleteTarget(null);
-    } catch (error) {
-      ue$2.error(getErrorMessage(error));
-    }
-  }
   async function handleDeleteShort() {
     if (!shortDeleteTarget) {
       return;
@@ -67448,20 +67388,6 @@ function ReviewsAndShortsPage() {
       ue$2.success("Short deleted successfully.");
       await queryClient2.invalidateQueries({ queryKey: SHORT_QUERY_KEY });
       setShortDeleteTarget(null);
-    } catch (error) {
-      ue$2.error(getErrorMessage(error));
-    }
-  }
-  async function handleReviewVisibilityChange(review, checked) {
-    try {
-      await updateReviewMutation.mutateAsync({
-        id: review._id,
-        payload: { isActive: checked }
-      });
-      ue$2.success(
-        checked ? "Review made visible on website." : "Review hidden from website."
-      );
-      await queryClient2.invalidateQueries({ queryKey: REVIEW_QUERY_KEY });
     } catch (error) {
       ue$2.error(getErrorMessage(error));
     }
@@ -67480,101 +67406,6 @@ function ReviewsAndShortsPage() {
       ue$2.error(getErrorMessage(error));
     }
   }
-  const reviewColumns = [
-    {
-      key: "name",
-      header: "Name",
-      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-[#1E293B] truncate", children: review.name }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500 truncate", children: review.location || "No location" })
-      ] })
-    },
-    {
-      key: "review",
-      header: "Review",
-      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "max-w-md truncate text-sm text-slate-600", children: review.review })
-    },
-    {
-      key: "rating",
-      header: "Rating",
-      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: Number(review.rating ?? 5), size: 12 }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-slate-500", children: Number(review.rating ?? 5) })
-      ] })
-    },
-    {
-      key: "sortOrder",
-      header: "Order",
-      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-slate-600", children: [
-        "#",
-        review.sortOrder ?? 0
-      ] })
-    },
-    {
-      key: "isActive",
-      header: "Status",
-      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Badge,
-          {
-            className: review.isActive === false ? "bg-slate-100 text-slate-600" : "bg-emerald-50 text-emerald-700",
-            children: review.isActive === false ? "Hidden" : "Visible"
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Switch,
-          {
-            checked: review.isActive !== false,
-            onCheckedChange: (checked) => handleReviewVisibilityChange(review, checked),
-            disabled: updateReviewMutation.isPending
-          }
-        )
-      ] })
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      className: "text-right",
-      render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            type: "button",
-            size: "sm",
-            variant: "outline",
-            className: "rounded-lg border-slate-200",
-            onClick: () => setReviewPreviewTarget(review),
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
-              "Preview"
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            type: "button",
-            size: "icon",
-            variant: "ghost",
-            className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
-            onClick: () => openEditReview(review),
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            type: "button",
-            size: "icon",
-            variant: "ghost",
-            className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
-            onClick: () => setReviewDeleteTarget(review),
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
-          }
-        )
-      ] })
-    }
-  ];
   const shortColumns = [
     {
       key: "title",
@@ -67676,36 +67507,20 @@ function ReviewsAndShortsPage() {
       PageHeader,
       {
         title: "Reviews & Shorts",
-        description: "Manage reviews and shorts from one place.",
-        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              type: "button",
-              variant: "outline",
-              className: "rounded-xl border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800",
-              onClick: openAddReview,
-              "data-ocid": "reviews_shorts.add_review_button",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 15 }),
-                "Add Review"
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              type: "button",
-              className: "rounded-xl bg-rose-500 text-white shadow-sm hover:bg-rose-600",
-              onClick: openAddShort,
-              "data-ocid": "reviews_shorts.add_short_button",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 15 }),
-                "Add Short"
-              ]
-            }
-          )
-        ] })
+        description: "Monitor live Google reviews and manage video shorts from one place.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            className: "rounded-xl bg-rose-500 text-white shadow-sm hover:bg-rose-600",
+            onClick: openAddShort,
+            "data-ocid": "reviews_shorts.add_short_button",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 15 }),
+              "Add Short"
+            ]
+          }
+        )
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -67723,8 +67538,8 @@ function ReviewsAndShortsPage() {
                 className: "rounded-xl px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-amber-700 data-[state=active]:shadow-sm",
                 "data-ocid": "reviews_shorts.reviews_tab",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { size: 14, className: "mr-2" }),
-                  "Patient Reviews"
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { size: 14, className: "mr-2" }),
+                  "Google Reviews"
                 ]
               }
             ),
@@ -67741,11 +67556,40 @@ function ReviewsAndShortsPage() {
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "reviews", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "reviews", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Review Library" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-slate-500", children: "Search, edit, preview, and hide reviews." })
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-amber-50 text-amber-700", children: "Live from Google" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    Badge,
+                    {
+                      variant: "outline",
+                      className: "border-slate-200 text-slate-600",
+                      children: [
+                        reviewSummary.reviews.length,
+                        " review",
+                        reviewSummary.reviews.length === 1 ? "" : "s"
+                      ]
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: reviewSummary.placeName || "Samarpan Hospital" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(RatingStars, { rating: reviewAverageRating }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-slate-700", children: reviewAverageRating.toFixed(1) })
+                    ] }),
+                    reviewSummary.fetchedAt ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                      "Synced",
+                      " ",
+                      new Date(reviewSummary.fetchedAt).toLocaleString(
+                        "en-IN"
+                      )
+                    ] }) : null
+                  ] })
+                ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -67760,27 +67604,35 @@ function ReviewsAndShortsPage() {
                   {
                     value: reviewSearch,
                     onChange: (event) => setReviewSearch(event.target.value),
-                    placeholder: "Search by name, review, location...",
+                    placeholder: "Search author or review text...",
                     className: "rounded-xl border-slate-200 pl-9",
                     "data-ocid": "reviews_shorts.review_search_input"
                   }
                 )
               ] })
             ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isReviewsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-56 w-full rounded-2xl" }) : isReviewsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (reviewsError == null ? void 0 : reviewsError.message) || "Unable to load reviews." }) : filteredReviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No reviews found" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Try another search or add the first patient testimonial." })
-            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-              DataTable,
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: isReviewsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 xl:grid-cols-2", children: ["review-skeleton-1", "review-skeleton-2"].map((key) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Card,
               {
-                columns: reviewColumns,
-                data: filteredReviews,
-                rowKey: (review) => review._id,
-                emptyText: "No reviews found.",
-                "data-ocid": "reviews_shorts.reviews_table"
-              }
-            ) })
-          ] }) }) }),
+                className: "rounded-[28px] border border-slate-200",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4 p-6", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-12 w-12 rounded-full" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36 rounded" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-24 rounded" })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24 rounded" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-24 w-full rounded-2xl" })
+                ] })
+              },
+              key
+            )) }) : isReviewsError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600", children: (reviewsError == null ? void 0 : reviewsError.message) || "Unable to load reviews." }) : filteredReviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No Google reviews found" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Try another search or wait for reviews to sync from Google." })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 xl:grid-cols-2", children: filteredReviews.map((review) => /* @__PURE__ */ jsxRuntimeExports.jsx(GoogleReviewCard, { review }, review.id)) }) })
+          ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "shorts", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-slate-200 shadow-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -67824,161 +67676,6 @@ function ReviewsAndShortsPage() {
         ]
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: reviewDialogOpen, onOpenChange: setReviewDialogOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: reviewDialogMode === "edit" ? "Edit Review" : "Add Review" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-name", children: "Reviewer Name" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "review-name",
-                value: reviewForm.name,
-                onChange: (event) => setReviewField("name", event.target.value),
-                placeholder: "Rajesh Kumar",
-                className: "rounded-xl"
-              }
-            ),
-            reviewErrors.name ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.name }) : null
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-location", children: "Location" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "review-location",
-                value: reviewForm.location,
-                onChange: (event) => setReviewField("location", event.target.value),
-                placeholder: "Bhiwani",
-                className: "rounded-xl"
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-treatment", children: "Treatment" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "review-treatment",
-                value: reviewForm.treatment,
-                onChange: (event) => setReviewField("treatment", event.target.value),
-                placeholder: "Cosmetic Surgery",
-                className: "rounded-xl"
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-rating", children: "Rating" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              Select,
-              {
-                value: reviewForm.rating,
-                onValueChange: (value) => setReviewField("rating", value),
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "review-rating", className: "rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select rating" }) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "5", children: "5 Stars" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "4", children: "4 Stars" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "3", children: "3 Stars" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "2", children: "2 Stars" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "1", children: "1 Star" })
-                  ] })
-                ]
-              }
-            ),
-            reviewErrors.rating ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.rating }) : null
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-[160px_1fr]", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-sort-order", children: "Sort Order" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "review-sort-order",
-                type: "number",
-                min: "0",
-                value: reviewForm.sortOrder,
-                onChange: (event) => setReviewField("sortOrder", event.target.value),
-                className: "rounded-xl"
-              }
-            ),
-            reviewErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.sortOrder }) : null
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Visible on website" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Turn this off to keep the review saved but hidden." })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Switch,
-              {
-                checked: reviewForm.isActive,
-                onCheckedChange: (checked) => setReviewField("isActive", checked)
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "review-copy", children: "Review Text" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Textarea,
-            {
-              id: "review-copy",
-              rows: 6,
-              value: reviewForm.review,
-              onChange: (event) => setReviewField("review", event.target.value),
-              placeholder: "Patient experience goes here...",
-              className: "min-h-[180px] rounded-2xl"
-            }
-          ),
-          reviewErrors.review ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-500", children: reviewErrors.review }) : null
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-2 gap-2 sm:justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            type: "button",
-            variant: "outline",
-            className: "rounded-xl",
-            onClick: () => setReviewPreviewTarget({
-              _id: (selectedReview == null ? void 0 : selectedReview._id) ?? "preview",
-              ...buildReviewPayload(reviewForm)
-            }),
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
-              "Preview"
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              type: "button",
-              variant: "outline",
-              className: "rounded-xl",
-              onClick: () => setReviewDialogOpen(false),
-              children: "Cancel"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              type: "button",
-              className: "rounded-xl bg-amber-500 text-white hover:bg-amber-600",
-              onClick: handleSaveReview,
-              disabled: isReviewBusy,
-              children: reviewDialogMode === "edit" ? "Save Changes" : "Add Review"
-            }
-          )
-        ] })
-      ] })
-    ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: shortDialogOpen, onOpenChange: setShortDialogOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: shortDialogMode === "edit" ? "Edit Short" : "Add Short" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
@@ -68099,34 +67796,12 @@ function ReviewsAndShortsPage() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Dialog,
       {
-        open: !!reviewPreviewTarget,
-        onOpenChange: (open) => !open && setReviewPreviewTarget(null),
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: "Review Preview" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ReviewPreviewCard, { review: reviewPreviewTarget ?? void 0 })
-        ] })
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Dialog,
-      {
         open: !!shortPreviewTarget,
         onOpenChange: (open) => !open && setShortPreviewTarget(null),
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: "Short Preview" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(ShortPreviewCard, { short: shortPreviewTarget ?? void 0 })
         ] })
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      ConfirmDialog,
-      {
-        open: !!reviewDeleteTarget,
-        title: "Delete this review?",
-        message: "This testimonial will be removed from the library. You can hide reviews instead if you only want them off the website.",
-        confirmLabel: "Delete Review",
-        onConfirm: handleDeleteReview,
-        onCancel: () => setReviewDeleteTarget(null)
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -69956,27 +69631,64 @@ function SettingsPage() {
     ] })
   ] });
 }
+function normalizePageItem(page) {
+  const seo = page.seo || {};
+  return {
+    _id: page._id,
+    title: page.title || "",
+    slug: page.slug || "",
+    content: page.content || "",
+    status: page.status || (page.isActive === false ? "draft" : "published"),
+    seo: {
+      metaTitle: seo.metaTitle || page.metaTitle || "",
+      metaDescription: seo.metaDescription || page.metaDescription || ""
+    },
+    isActive: page.isActive,
+    createdAt: page.createdAt,
+    updatedAt: page.updatedAt
+  };
+}
+function toRequestPayload(payload) {
+  return {
+    title: payload.title.trim(),
+    slug: payload.slug.trim(),
+    content: payload.content,
+    status: payload.status,
+    isActive: payload.status === "published",
+    metaTitle: payload.metaTitle.trim(),
+    metaDescription: payload.metaDescription.trim(),
+    seo: {
+      metaTitle: payload.metaTitle.trim(),
+      metaDescription: payload.metaDescription.trim()
+    }
+  };
+}
 const getAllPagesApi = async () => {
   var _a2;
   const res = await get$3(ENDPOINT.GET_ALL_PAGES, { needAuth: true });
-  return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.pages) ?? [];
+  return (((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.pages) ?? []).map(normalizePageItem);
 };
 const addPageApi = async (payload) => {
   var _a2;
-  const res = await post(ENDPOINT.ADD_PAGE, payload, { needAuth: true });
-  return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.page;
+  const res = await post(ENDPOINT.ADD_PAGE, toRequestPayload(payload), {
+    needAuth: true
+  });
+  return normalizePageItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.page) ?? {});
 };
 const updatePageApi = async (id, payload) => {
   var _a2;
-  const res = await post(`${ENDPOINT.UPDATE_PAGE}/${id}`, payload, {
-    needAuth: true
-  });
-  return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.page;
+  const res = await post(
+    `${ENDPOINT.UPDATE_PAGE}/${id}`,
+    toRequestPayload(payload),
+    {
+      needAuth: true
+    }
+  );
+  return normalizePageItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.page) ?? {});
 };
 const deletePageApi = async (id) => {
   await post(`${ENDPOINT.DELETE_PAGE}/${id}`, void 0, { needAuth: true });
 };
-var reactSummernote = { exports: {} };
 var jquery = { exports: {} };
 /*!
  * jQuery JavaScript Library v3.7.1
@@ -76327,6 +76039,7 @@ var jquery = { exports: {} };
 })(jquery);
 var jqueryExports = jquery.exports;
 const $ = /* @__PURE__ */ getDefaultExportFromCjs(jqueryExports);
+var reactSummernote = { exports: {} };
 (function(module, exports$1) {
   (function webpackUniversalModuleDefinition(root2, factory2) {
     module.exports = factory2(jqueryExports, reactExports);
@@ -94341,10 +94054,87 @@ const emptyPageForm = {
   title: "",
   slug: "",
   content: "",
-  isActive: true
+  status: "published",
+  metaTitle: "",
+  metaDescription: ""
+};
+const pageTableStyles = {
+  table: {
+    style: {
+      backgroundColor: "transparent"
+    }
+  },
+  headRow: {
+    style: {
+      minHeight: "54px",
+      backgroundColor: "#F8FAFC",
+      borderBottomWidth: "1px",
+      borderBottomColor: "#E2E8F0"
+    }
+  },
+  headCells: {
+    style: {
+      color: "#64748B",
+      fontSize: "12px",
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: "0.04em",
+      paddingLeft: "16px",
+      paddingRight: "16px"
+    }
+  },
+  rows: {
+    style: {
+      minHeight: "72px",
+      borderBottomWidth: "1px",
+      borderBottomColor: "#F1F5F9",
+      backgroundColor: "#FFFFFF"
+    }
+  },
+  cells: {
+    style: {
+      paddingLeft: "16px",
+      paddingRight: "16px",
+      color: "#1E293B",
+      fontSize: "14px"
+    }
+  },
+  pagination: {
+    style: {
+      borderTopWidth: "1px",
+      borderTopColor: "#E2E8F0",
+      minHeight: "60px",
+      color: "#475569",
+      backgroundColor: "#FFFFFF"
+    }
+  }
 };
 function slugify(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
+}
+function formatPageDate(value) {
+  if (!value) {
+    return "—";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "—";
+  }
+  return parsed.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+function StatusBadge({ status }) {
+  const isPublished = status === "published";
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Badge,
+    {
+      className: isPublished ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700",
+      children: isPublished ? "Published" : "Draft"
+    }
+  );
 }
 function PagesPage() {
   const queryClient2 = useQueryClient();
@@ -94365,6 +94155,7 @@ function PagesPage() {
       ue$2.success("Page added successfully.");
       queryClient2.invalidateQueries({ queryKey: ["pages"] });
       setModalOpen(false);
+      setFormData(emptyPageForm);
     },
     onError: (error) => ue$2.error(error.message)
   });
@@ -94374,6 +94165,8 @@ function PagesPage() {
       ue$2.success("Page updated successfully.");
       queryClient2.invalidateQueries({ queryKey: ["pages"] });
       setModalOpen(false);
+      setFormData(emptyPageForm);
+      setEditTarget(null);
     },
     onError: (error) => ue$2.error(error.message)
   });
@@ -94388,9 +94181,18 @@ function PagesPage() {
   });
   const filteredPages = reactExports.useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return data;
+    if (!query) {
+      return data;
+    }
     return data.filter(
-      (page) => page.title.toLowerCase().includes(query) || page.slug.toLowerCase().includes(query) || page.content.toLowerCase().includes(query)
+      (page) => [
+        page.title,
+        page.slug,
+        page.content,
+        page.seo.metaTitle,
+        page.seo.metaDescription,
+        page.status
+      ].filter(Boolean).some((value) => String(value).toLowerCase().includes(query))
     );
   }, [data, search]);
   function openAdd() {
@@ -94404,7 +94206,9 @@ function PagesPage() {
       title: page.title,
       slug: page.slug,
       content: page.content,
-      isActive: page.isActive
+      status: page.status,
+      metaTitle: page.seo.metaTitle,
+      metaDescription: page.seo.metaDescription
     });
     setModalOpen(true);
   }
@@ -94427,26 +94231,106 @@ function PagesPage() {
       title: formData.title.trim(),
       slug: formData.slug.trim() ? slugify(formData.slug) : slugify(formData.title),
       content: formData.content,
-      isActive: formData.isActive
+      status: formData.status,
+      metaTitle: formData.metaTitle.trim(),
+      metaDescription: formData.metaDescription.trim()
     };
+    if (!payload.slug) {
+      ue$2.error("Slug is required.");
+      return;
+    }
     if (editTarget) {
       updateMutation.mutate({ id: editTarget._id, payload });
       return;
     }
     addMutation.mutate(payload);
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "website-pages.page", children: [
+  const columns = [
+    {
+      name: "Page",
+      grow: 1.4,
+      cell: (page) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 py-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-sm font-semibold text-slate-900", children: page.title }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "truncate text-xs text-slate-500", children: [
+          "/",
+          page.slug
+        ] })
+      ] })
+    },
+    {
+      name: "Status",
+      width: "150px",
+      cell: (page) => /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: page.status })
+    },
+    {
+      name: "SEO",
+      grow: 1.4,
+      cell: (page) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 py-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-sm text-slate-800", children: page.seo.metaTitle || "No meta title" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "line-clamp-2 text-xs text-slate-500", children: page.seo.metaDescription || "No meta description" })
+      ] })
+    },
+    {
+      name: "Updated",
+      width: "150px",
+      cell: (page) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-slate-600", children: formatPageDate(page.updatedAt ?? page.createdAt) })
+    },
+    {
+      name: "Actions",
+      right: true,
+      width: "200px",
+      cell: (page) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            variant: "outline",
+            size: "sm",
+            className: "rounded-xl border-slate-200",
+            onClick: () => openPreview(page),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            variant: "ghost",
+            size: "icon",
+            className: "rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700",
+            onClick: () => openEdit(page),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 15 })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            variant: "ghost",
+            size: "icon",
+            className: "rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600",
+            onClick: () => setDeleteTarget(page),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 })
+          }
+        )
+      ] })
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", "data-ocid": "website_pages.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
         title: "Website Pages",
-        description: "Create, edit, and publish standalone website pages with rich HTML content.",
+        description: "Create SEO-ready website pages with title, content, publish status, and meta details.",
         action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
           Button,
           {
             type: "button",
             onClick: openAdd,
-            className: "rounded-xl gap-2 shadow-sm w-full sm:w-auto",
+            className: "w-full gap-2 rounded-xl shadow-sm sm:w-auto",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 16 }),
               "Add page"
@@ -94456,179 +94340,323 @@ function PagesPage() {
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "rounded-3xl border-slate-100 shadow-sm", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-[#1E293B]", children: "Page library" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-3 md:flex-row md:items-center md:justify-between", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-search", className: "text-sm text-slate-500", children: "Search pages" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "gap-4 border-b border-slate-100 pb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg text-slate-900", children: "Page Library" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-slate-500", children: "Preview and manage custom website pages from one place." })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex w-full flex-col gap-3 sm:flex-row lg:w-auto", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full lg:w-80", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Search,
+              {
+                size: 15,
+                className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              }
+            ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
-                id: "page-search",
                 value: search,
                 onChange: (event) => setSearch(event.target.value),
-                placeholder: "Search title, slug, or content",
-                className: "mt-2"
+                placeholder: "Search title, slug, content, SEO...",
+                className: "rounded-xl border-slate-200 pl-9"
               }
             )
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 text-sm text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-600", children: [
             filteredPages.length,
-            " pages found"
-          ] }) })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Title" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Slug" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Status" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Updated" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: "Actions" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 5, className: "text-center py-10 text-sm text-slate-500", children: "Loading pages..." }) }) : filteredPages.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 5, className: "text-center py-10 text-sm text-slate-500", children: "No pages found. Create your first page to show here." }) }) : filteredPages.map((page) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: page.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: page.slug }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: page.isActive ? "secondary" : "outline", children: page.isActive ? "Published" : "Draft" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: new Date(page.updatedAt ?? page.createdAt ?? "").toLocaleDateString() }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: "text-right space-x-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  type: "button",
-                  variant: "outline",
-                  size: "sm",
-                  onClick: () => openPreview(page),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 16 })
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  type: "button",
-                  variant: "outline",
-                  size: "sm",
-                  onClick: () => openEdit(page),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 16 })
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  type: "button",
-                  variant: "destructive",
-                  size: "sm",
-                  onClick: () => setDeleteTarget(page),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
-                }
-              )
-            ] })
-          ] }, page._id)) })
-        ] }) })
-      ] })
+            " page",
+            filteredPages.length === 1 ? "" : "s"
+          ] })
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border border-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Xe,
+        {
+          columns,
+          data: filteredPages,
+          customStyles: pageTableStyles,
+          progressPending: isLoading,
+          pagination: true,
+          responsive: true,
+          highlightOnHover: true,
+          persistTableHead: true,
+          noDataComponent: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "py-16 text-center", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-slate-900", children: "No pages found" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-slate-500", children: "Add your first website page to see it here." })
+          ] })
+        }
+      ) }) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: modalOpen, onOpenChange: setModalOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-4xl rounded-3xl border-slate-200", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: modalOpen, onOpenChange: setModalOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-5xl", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editTarget ? "Edit page" : "Add new page" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: editTarget ? "Update the title, slug, publish status, and rich page content." : "Create a new page and manage its SEO-friendly slug and publish state." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: editTarget ? "Edit Website Page" : "Add Website Page" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: "Manage the page title, SEO metadata, publish status, and Summernote content." })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-title", children: "Page title" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 lg:grid-cols-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 lg:col-span-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-title", children: "Page Title" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
                 id: "page-title",
                 value: formData.title,
-                onChange: (event) => setFormData((prev2) => ({ ...prev2, title: event.target.value })),
-                placeholder: "Enter page title"
+                onChange: (event) => setFormData((prev2) => ({
+                  ...prev2,
+                  title: event.target.value
+                })),
+                placeholder: "About Samarpan Hospital",
+                className: "rounded-xl"
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-slug", children: "Page slug" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-status", children: "Status" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Select,
               {
-                id: "page-slug",
-                value: formData.slug,
-                onChange: (event) => setFormData((prev2) => ({ ...prev2, slug: event.target.value })),
-                placeholder: "Enter page slug or leave blank to auto-generate"
+                value: formData.status,
+                onValueChange: (value) => setFormData((prev2) => ({
+                  ...prev2,
+                  status: value
+                })),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "page-status", className: "rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select page status" }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "published", children: "Published" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
+                  ] })
+                ]
               }
             )
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900", children: "Publish status" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500", children: "Switch between published and draft state." })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-slug", children: "Slug" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "page-slug",
+              value: formData.slug,
+              onChange: (event) => setFormData((prev2) => ({
+                ...prev2,
+                slug: event.target.value
+              })),
+              placeholder: "about-samarpan",
+              className: "rounded-xl"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-slate-500", children: [
+            "Leave it clean and short. We’ll save this as `/",
+            formData.slug.trim() ? slugify(formData.slug) : slugify(formData.title) || "page-slug",
+            "`."
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-3xl border border-slate-200 bg-slate-50 p-5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-slate-900", children: "SEO Details" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-slate-500", children: "Add meta title and meta description for search and social previews." })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Switch,
-              {
-                checked: formData.isActive,
-                onCheckedChange: (value) => setFormData((prev2) => ({ ...prev2, isActive: value }))
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-slate-700", children: formData.isActive ? "Published" : "Draft" })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-meta-title", children: "Meta Title" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "page-meta-title",
+                  value: formData.metaTitle,
+                  onChange: (event) => setFormData((prev2) => ({
+                    ...prev2,
+                    metaTitle: event.target.value
+                  })),
+                  placeholder: "Samarpan Hospital | Expert Care in Hisar",
+                  className: "rounded-xl bg-white"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-meta-description", children: "Meta Description" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Textarea,
+                {
+                  id: "page-meta-description",
+                  rows: 4,
+                  value: formData.metaDescription,
+                  onChange: (event) => setFormData((prev2) => ({
+                    ...prev2,
+                    metaDescription: event.target.value
+                  })),
+                  placeholder: "Short SEO description for this page.",
+                  className: "rounded-2xl bg-white"
+                }
+              )
+            ] })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-content", children: "Page content" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Page Content" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             ReactSummernote,
             {
               value: formData.content,
               options: {
-                height: 300,
+                height: 340,
                 dialogsInBody: true,
                 toolbar: [
                   ["style", ["style"]],
                   ["font", ["bold", "underline", "italic", "clear"]],
-                  ["fontname", ["fontname"]],
+                  ["fontsize", ["fontsize"]],
                   ["para", ["ul", "ol", "paragraph"]],
                   ["insert", ["link", "picture", "video"]],
                   ["view", ["fullscreen", "codeview"]]
                 ]
               },
-              onChange: (content) => setFormData((prev2) => ({ ...prev2, content }))
+              onChange: (content) => setFormData((prev2) => ({
+                ...prev2,
+                content
+              }))
+            }
+          ) })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-4 gap-2 sm:justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            variant: "outline",
+            className: "rounded-xl",
+            onClick: () => {
+              setPreviewPage({
+                _id: (editTarget == null ? void 0 : editTarget._id) ?? "preview",
+                title: formData.title,
+                slug: formData.slug.trim() ? slugify(formData.slug) : slugify(formData.title),
+                content: formData.content,
+                status: formData.status,
+                seo: {
+                  metaTitle: formData.metaTitle,
+                  metaDescription: formData.metaDescription
+                }
+              });
+              setPreviewOpen(true);
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              className: "rounded-xl",
+              onClick: () => setModalOpen(false),
+              children: "Cancel"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              type: "button",
+              className: "rounded-xl",
+              onClick: handleSave,
+              disabled: addMutation.isPending || updateMutation.isPending,
+              children: editTarget ? "Update Page" : "Create Page"
             }
           )
         ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "outline", onClick: () => setModalOpen(false), children: "Cancel" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", onClick: handleSave, disabled: addMutation.isPending || updateMutation.isPending, children: editTarget ? "Update page" : "Create page" })
       ] })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: previewOpen, onOpenChange: setPreviewOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-4xl rounded-3xl border-slate-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Preview page" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 px-4 pb-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-3xl border border-slate-200 bg-slate-50 p-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-lg font-semibold text-slate-900", children: previewPage == null ? void 0 : previewPage.title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-slate-500", children: [
-            "/",
-            previewPage == null ? void 0 : previewPage.slug
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-3xl border border-slate-200 bg-white p-6 prose prose-slate max-w-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { dangerouslySetInnerHTML: { __html: (previewPage == null ? void 0 : previewPage.content) ?? "<p>No content</p>" } }) })
-      ] })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: Boolean(deleteTarget), onOpenChange: () => setDeleteTarget(null), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-xl rounded-3xl border-slate-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Delete page" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogDescription, { children: [
-          "Are you sure you want to delete the page ",
-          deleteTarget == null ? void 0 : deleteTarget.title,
-          "? This cannot be undone."
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: previewOpen || !!previewPage,
+        onOpenChange: (open) => {
+          setPreviewOpen(open);
+          if (!open) {
+            setPreviewPage(null);
+          }
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-5xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-slate-900", children: "Page Preview" }) }),
+          previewPage ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 px-1 pb-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-3xl border border-slate-200 bg-slate-50 p-5", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge, { status: previewPage.status }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-slate-500", children: [
+                  "/",
+                  previewPage.slug
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 text-2xl font-semibold text-slate-900", children: previewPage.title || "Untitled page" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold uppercase tracking-wide text-slate-400", children: "Meta Title" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-slate-700", children: previewPage.seo.metaTitle || "No meta title" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold uppercase tracking-wide text-slate-400", children: "Meta Description" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-slate-700", children: previewPage.seo.metaDescription || "No meta description" })
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-3xl border border-slate-200 bg-white p-6 prose prose-slate max-w-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                dangerouslySetInnerHTML: {
+                  __html: previewPage.content || "<p>No content added yet.</p>"
+                }
+              }
+            ) })
+          ] }) : null
         ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "flex justify-end gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "outline", onClick: () => setDeleteTarget(null), children: "Cancel" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "destructive", onClick: handleDelete, disabled: deleteMutation.isPending, children: "Delete" })
-      ] })
-    ] }) })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!deleteTarget,
+        onOpenChange: (open) => !open && setDeleteTarget(null),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-xl rounded-3xl border-slate-200", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Delete page" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogDescription, { children: [
+              "Are you sure you want to delete ",
+              deleteTarget == null ? void 0 : deleteTarget.title,
+              "? This action cannot be undone."
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "flex justify-end gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                type: "button",
+                variant: "outline",
+                className: "rounded-xl",
+                onClick: () => setDeleteTarget(null),
+                children: "Cancel"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                type: "button",
+                variant: "destructive",
+                className: "rounded-xl",
+                onClick: handleDelete,
+                disabled: deleteMutation.isPending,
+                children: "Delete"
+              }
+            )
+          ] })
+        ] })
+      }
+    )
   ] });
 }
 function toFormData$1(payload) {
