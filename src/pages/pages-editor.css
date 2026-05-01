@@ -11,30 +11,29 @@ body {
   background-color: #f8fafc;
 }
 
-.website-page-editor .note-editor.note-frame {
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  border-radius: 1.5rem;
-  box-shadow: none;
-}
-
-.website-page-editor .note-toolbar {
-  margin: 0;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
-}
-
-.website-page-editor .note-btn {
-  border-radius: 0.75rem;
-}
-
-.website-page-editor .note-editing-area .note-editable {
+.website-page-editor .ProseMirror {
   min-height: 320px;
   padding: 1rem 1.25rem;
   background: #ffffff;
   color: #1e293b;
+  outline: none;
 }
 
-.website-page-editor .note-statusbar {
-  border-top: 1px solid #e2e8f0;
+.website-page-editor {
+  border: 1px solid #e2e8f0;
+  border-radius: 1.5rem;
+  background: white;
+}
+
+.website-page-editor .ProseMirror {
+  min-height: 320px;
+  padding: 1rem 1.25rem;
+  outline: none;
+}
+
+.website-page-editor button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  font-size: 13px;
 }

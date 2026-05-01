@@ -93,9 +93,9 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/gallery",
   },
   {
-    label: "Reviews & Shorts",
+    label: "Shorts",
     icon: Star,
-    path: "/reviews-shorts",
+    path: "/shorts",
     permissionPath: "/reviews-shorts",
   },
   {

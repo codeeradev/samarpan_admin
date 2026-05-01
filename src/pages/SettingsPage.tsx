@@ -139,7 +139,7 @@ export default function SettingsPage() {
         role:
           updated.roleId !== undefined
             ? getRoleFromRoleId(updated.roleId)
-            : admin?.role ?? "receptionist",
+            : (admin?.role ?? "receptionist"),
       });
 
       toast.success("Account details updated successfully.");
@@ -390,6 +390,15 @@ export default function SettingsPage() {
             />
 
             <Input
+              placeholder="Whatsapp Inquiry Number"
+              value={safeSettings.whatsapp_number ?? ""}
+              onChange={(event) =>
+                updateField("whatsapp_number", event.target.value)
+              }
+              disabled={loading}
+            />
+
+            <Input
               placeholder="Working Hours"
               value={safeSettings.working_hours ?? ""}
               onChange={(event) =>
@@ -446,11 +455,61 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Google Reviews</CardTitle>
+            <CardDescription>
+              Configure Google Place details used to fetch public reviews.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <Input
+              placeholder="Google Place ID"
+              value={safeSettings.google_reviews?.place_id ?? ""}
+              onChange={(event) =>
+                setSettings((prev) => ({
+                  ...(prev ?? {}),
+                  google_reviews: {
+                    ...prev?.google_reviews,
+                    place_id: event.target.value,
+                  },
+                }))
+              }
+              disabled={loading}
+            />
+
+            <Input
+              placeholder="Google API Key"
+              value={safeSettings.google_reviews?.api_key ?? ""}
+              onChange={(event) =>
+                setSettings((prev) => ({
+                  ...(prev ?? {}),
+                  google_reviews: {
+                    ...prev?.google_reviews,
+                    api_key: event.target.value,
+                  },
+                }))
+              }
+              disabled={loading}
+            />
+
+            <Button
+              disabled={settingsSaving || loading}
+              onClick={() => saveSettings()}
+            >
+              <Save size={14} />{" "}
+              {settingsSaving ? "Saving..." : "Save Google Settings"}
+            </Button>
+          </CardContent>
+        </Card>
+        
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>CMS Content</CardTitle>
             <CardDescription>
-              Legal pages and informational copy that still belongs to the settings document.
+              Legal pages and informational copy that still belongs to the
+              settings document.
             </CardDescription>
           </CardHeader>
 

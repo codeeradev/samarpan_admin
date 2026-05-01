@@ -274,7 +274,7 @@ export default function ServiceManagementPage() {
         action={
           <Button
             onClick={openAdd}
-            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2"
+            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 bg-[#D89F00]"
             data-ocid="service_management.add_button"
           >
             <Plus size={15} /> Add Service
@@ -561,7 +561,7 @@ export default function ServiceManagementPage() {
             <Button variant="outline" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isBusy}>
+            <Button onClick={handleSave} disabled={isBusy} className="bg-[#D89F00]">
               {isBusy
                 ? editTarget ? "Updating…" : "Adding…"
                 : editTarget ? "Update Service" : "Add Service"}

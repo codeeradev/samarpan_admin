@@ -133,7 +133,7 @@ const galleryRoute = createRoute({
 
 const reviewsAndShortsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: "/reviews-shorts",
+  path: "/shorts",
   beforeLoad: () => checkPermission("/reviews-shorts"),
   component: ReviewsAndShortsPage,
 });

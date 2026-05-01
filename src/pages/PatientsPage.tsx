@@ -310,7 +310,7 @@ function PatientFormModal({
             type="button"
             onClick={onSave}
             disabled={isSaving}
-            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white"
+            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white bg-[#D89F00]"
             data-ocid="patients.form.submit_button"
           >
             {isSaving ? "Updating..." : "Update Patient"}

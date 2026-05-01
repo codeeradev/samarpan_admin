@@ -257,7 +257,7 @@ export default function WebsiteContentPageImpl() {
             <Button
               onClick={handleSave}
               disabled={saveMutation.isPending || isLoading}
-              className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto"
+              className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto bg-[#D89F00]"
             >
               <Save size={15} />
               {saveMutation.isPending
@@ -274,7 +274,7 @@ export default function WebsiteContentPageImpl() {
         onValueChange={(value) => setSelectedSection(value as SectionKey)}
         className="mb-6"
       >
-        <TabsList className="inline-flex w-full rounded-3xl bg-slate-100 p-1.5">
+        <TabsList className="inline-flex w-full rounded-3xl bg-slate-100 p-2 gap-2 h-15">
           <TabsTrigger value="home_hero" className="flex-1 rounded-2xl">
             Home Hero
           </TabsTrigger>
@@ -325,21 +325,6 @@ export default function WebsiteContentPageImpl() {
             ) : (
               <AboutSectionEditor form={aboutForm} updateField={updateAboutField} />
             )}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-3xl border-slate-100 shadow-sm">
-          <CardContent className="p-5 text-sm text-[#64748B] space-y-2">
-            <p className="font-semibold text-[#1E293B]">Reusable content API</p>
-            <p>
-              This page saves through the generic `content` API using the
-              `modelKey` <strong>{selectedSection}</strong>.
-            </p>
-            <p>
-              The same API can be reused later for static sections like
-              `why_choose_us`, `home_cta`, or any other page block without
-              creating a new backend model each time.
-            </p>
           </CardContent>
         </Card>
       </div>

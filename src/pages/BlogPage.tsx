@@ -36,6 +36,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { toast } from "sonner";
 import { Eye, Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 
 const BLOG_QUERY_KEY = ["blogs"];
 const SERVICES_QUERY_KEY = ["services"];
@@ -47,7 +48,7 @@ export default function BlogsPage() {
   const [mode, setMode] = useState<"add" | "edit">("add");
   const [selected, setSelected] = useState<BlogItem | null>(null);
   const [previewTarget, setPreviewTarget] = useState<BlogItem | null>(null);
-
+  const [deleteTarget, setDeleteTarget] = useState<BlogItem | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [form, setForm] = useState({
@@ -281,7 +282,7 @@ export default function BlogsPage() {
           <Button
             size="icon"
             variant="destructive"
-            onClick={() => handleDelete(blog._id)}
+            onClick={() => setDeleteTarget(blog)}
           >
             <Trash2 size={16} />
           </Button>
@@ -296,7 +297,7 @@ export default function BlogsPage() {
         title="Blog Management"
         description="Manage blog content, SEO, and preview posts."
         action={
-          <Button onClick={openAdd} className="rounded-xl gap-2">
+          <Button onClick={openAdd} className="rounded-xl gap-2 bg-[#D89F00]">
             <Plus className="h-4 w-4" />
             Add Blog
           </Button>
@@ -308,14 +309,16 @@ export default function BlogsPage() {
         data={blogs}
         isLoading={isLoading}
         searchable
-        searchKeys={["title", "shortDescription", "status"] as (keyof BlogItem)[]}
+        searchKeys={
+          ["title", "shortDescription", "status"] as (keyof BlogItem)[]
+        }
         emptyText="No blogs found."
         rowKey={(row) => row._id}
         data-ocid="blogs.table"
       />
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="max-w-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>
               {mode === "edit" ? "Edit Blog" : "Create Blog"}
@@ -342,9 +345,7 @@ export default function BlogsPage() {
                     <Label>Service</Label>
                     <Select
                       value={form.serviceId}
-                      onValueChange={(v) =>
-                        setForm({ ...form, serviceId: v })
-                      }
+                      onValueChange={(v) => setForm({ ...form, serviceId: v })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select Service" />
@@ -457,15 +458,13 @@ export default function BlogsPage() {
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={(e) =>
-                      handleImage(e.target.files?.[0] || null)
-                    }
+                    onChange={(e) => handleImage(e.target.files?.[0] || null)}
                   />
                 </label>
               </CardContent>
             </Card>
 
-            <Button onClick={handleSave} className="w-full">
+            <Button onClick={handleSave} className="w-full bg-[#D89F00]">
               {mode === "edit" ? "Update Blog" : "Create Blog"}
             </Button>
           </div>
@@ -495,8 +494,9 @@ export default function BlogsPage() {
 
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  {serviceById.get(previewTarget.serviceId || "") || "No service"} ·{" "}
-                  {previewTarget.status || "published"}
+                  {serviceById.get(previewTarget.serviceId || "") ||
+                    "No service"}{" "}
+                  · {previewTarget.status || "published"}
                 </p>
                 <h2 className="text-xl font-semibold text-slate-900">
                   {previewTarget.title || "Untitled"}
@@ -515,6 +515,19 @@ export default function BlogsPage() {
             </div>
           )}
         </DialogContent>
+        <ConfirmDialog
+          open={!!deleteTarget}
+          title="Delete this blog?"
+          message="This blog will be permanently removed."
+          confirmLabel="Delete Blog"
+          onConfirm={() => {
+            if (deleteTarget) {
+              handleDelete(deleteTarget._id);
+              setDeleteTarget(null);
+            }
+          }}
+          onCancel={() => setDeleteTarget(null)}
+        />
       </Dialog>
     </div>
   );

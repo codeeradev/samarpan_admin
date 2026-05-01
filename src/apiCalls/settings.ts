@@ -22,6 +22,12 @@ export interface SettingsItem {
   term_and_condition?: string;
   privacy_policy?: string;
   about_us?: string;
+  google_reviews?: {
+    place_id?: string;
+    api_key?: string;
+  };
+
+  whatsapp_number?: string;
   social_links?: SocialLinks;
 }
 

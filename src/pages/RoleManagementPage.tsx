@@ -328,7 +328,7 @@ function AddStaffDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="w-[99vw] max-w-none max-h-[90vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="!w-[95vw] !max-w-[80vw] max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-[#1E293B]">
             Add Staff Member
@@ -477,7 +477,7 @@ function AddStaffDialog({
             type="button"
             onClick={handleSubmit}
             disabled={isSaving}
-            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white"
+            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white bg-[#D89F00]"
           >
             {isSaving ? "Adding..." : "Add Staff Member"}
           </Button>
@@ -530,7 +530,7 @@ function EditStaffDialog({
 
   return (
     <Dialog open={!!staff} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="w-[98vw] max-w-[96rem] max-h-[90vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="w-[98vw] !max-w-[80vw] max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-[#1E293B]">
             Manage Staff Access
@@ -864,7 +864,7 @@ export default function RoleManagementPage() {
         action={
           <Button
             onClick={() => setIsAddDialogOpen(true)}
-            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto"
+            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto bg-[#D89F00]"
           >
             <ShieldPlus size={15} /> Add Staff
           </Button>

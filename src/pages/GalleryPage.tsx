@@ -5,7 +5,12 @@ import { useMemo, useState, type ChangeEvent } from "react";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { BASE_URL } from "@/apis/endpoint";
@@ -82,17 +87,12 @@ export default function GalleryPage() {
       key: "image",
       header: "Image",
       render: (item) => (
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-14 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shrink-0">
-            <img
-              src={resolveAssetUrl(item.image)}
-              alt="Gallery"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <span className="text-sm text-slate-700 truncate max-w-[420px]">
-            {item.image}
-          </span>
+        <div className="h-14 w-20 overflow-hidden rounded-lg border border-slate-100 bg-slate-50">
+          <img
+            src={resolveAssetUrl(item.image)}
+            alt="Gallery"
+            className="h-full w-full object-cover"
+          />
         </div>
       ),
     },
@@ -140,18 +140,14 @@ export default function GalleryPage() {
         title="Gallery"
         description="Manage website gallery images."
         action={
-          <Button onClick={() => setOpen(true)} className="rounded-xl gap-2">
+          <Button
+            onClick={() => setOpen(true)}
+            className="rounded-xl gap-2 bg-[#D89F00]"
+          >
             <Plus size={14} /> Add Image
           </Button>
         }
       />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="rounded-xl border bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Total Images</p>
-          <p className="mt-2 text-3xl font-semibold">{totalImages}</p>
-        </div>
-      </div>
 
       <DataTable<GalleryItem>
         columns={columns}
@@ -170,14 +166,14 @@ export default function GalleryPage() {
             <DialogTitle>Add Gallery Image</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
+            <Input type="file" accept="image/*" onChange={handleImageChange} />
             {previewUrl && (
               <div className="overflow-hidden rounded-2xl border bg-slate-100">
-                <img src={previewUrl} alt="Preview" className="h-56 w-full object-cover" />
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="h-56 w-full object-cover"
+                />
               </div>
             )}
             <Button onClick={handleSave} className="w-full">

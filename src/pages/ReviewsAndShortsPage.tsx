@@ -1,9 +1,4 @@
 import {
-  type GoogleReviewItem,
-  type GoogleReviewsSummary,
-  getGoogleReviewsApi,
-} from "@/apiCalls/reviews";
-import {
   type ShortItem,
   type ShortPayload,
   addShortApi,
@@ -14,7 +9,6 @@ import {
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { type Column, DataTable } from "@/components/admin/DataTable";
 import { PageHeader } from "@/components/admin/PageHeader";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,20 +26,18 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ExternalLink,
   Eye,
   Pencil,
   Play,
   Plus,
   Search,
-  Star,
   Trash2,
   Video,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-type ContentTab = "reviews" | "shorts";
+// type ContentTab = "reviews" | "shorts";
 type FormMode = "add" | "edit";
 
 type ShortFormData = {
@@ -58,15 +50,7 @@ type ShortFormData = {
 
 type ShortFormErrors = Partial<Record<keyof ShortFormData, string>>;
 
-const REVIEW_QUERY_KEY = ["reviews-management"];
 const SHORT_QUERY_KEY = ["shorts-management"];
-
-const emptyGoogleReviews: GoogleReviewsSummary = {
-  placeName: "Samarpan Hospital",
-  rating: 0,
-  reviews: [],
-  source: "google",
-};
 
 const emptyShortForm: ShortFormData = {
   title: "",
@@ -82,16 +66,6 @@ function getErrorMessage(error: unknown) {
   }
 
   return "Something went wrong. Please try again.";
-}
-
-function getInitials(value: string) {
-  return value
-    .split(" ")
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
 }
 
 function isValidHttpUrl(value: string) {
@@ -198,106 +172,6 @@ function buildShortPayload(form: ShortFormData): ShortPayload {
   };
 }
 
-function formatReviewTimestamp(review: GoogleReviewItem) {
-  if (review.relativeTimeDescription?.trim()) {
-    const maybeDate = new Date(review.relativeTimeDescription);
-    if (!Number.isNaN(maybeDate.getTime())) {
-      return maybeDate.toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-    }
-
-    return review.relativeTimeDescription;
-  }
-
-  if (typeof review.time === "number") {
-    return new Date(review.time * 1000).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  }
-
-  return "Google review";
-}
-
-function RatingStars({
-  rating,
-  size = 14,
-}: {
-  rating: number;
-  size?: number;
-}) {
-  const normalized = Math.max(0, Math.min(5, Number(rating || 0)));
-
-  return (
-    <div className="flex items-center gap-1 text-amber-500">
-      {Array.from({ length: 5 }, (_, index) => (
-        <Star
-          key={`rating-${index + 1}`}
-          size={size}
-          className={index < normalized ? "fill-current" : "text-slate-200"}
-        />
-      ))}
-    </div>
-  );
-}
-
-function GoogleReviewCard({ review }: { review: GoogleReviewItem }) {
-  return (
-    <Card className="h-full rounded-[28px] border border-slate-200 bg-white shadow-sm">
-      <CardContent className="flex h-full flex-col p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <Avatar className="h-12 w-12 border border-slate-100">
-              <AvatarImage
-                src={review.profilePhotoUrl}
-                alt={review.authorName}
-              />
-              <AvatarFallback className="bg-amber-50 text-sm font-semibold text-amber-700">
-                {getInitials(review.authorName)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-900">
-                {review.authorName}
-              </p>
-              <p className="truncate text-xs text-slate-500">
-                {formatReviewTimestamp(review)}
-              </p>
-            </div>
-          </div>
-
-          {review.authorUrl ? (
-            <a
-              href={review.authorUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
-            >
-              <ExternalLink size={13} />
-              Open
-            </a>
-          ) : null}
-        </div>
-
-        <div className="mt-4 flex items-center gap-2">
-          <RatingStars rating={Number(review.rating ?? 5)} />
-          <span className="text-xs font-medium text-slate-500">
-            {Number(review.rating ?? 5).toFixed(1)}
-          </span>
-        </div>
-
-        <p className="mt-4 flex-1 whitespace-pre-line text-sm leading-7 text-slate-600">
-          {review.text || "No review text available."}
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
 function ShortPreviewCard({
   short,
 }: {
@@ -366,8 +240,7 @@ function ShortPreviewCard({
 export default function ReviewsAndShortsPage() {
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<ContentTab>("reviews");
-  const [reviewSearch, setReviewSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("shorts");
   const [shortSearch, setShortSearch] = useState("");
 
   const [shortDialogOpen, setShortDialogOpen] = useState(false);
@@ -380,16 +253,6 @@ export default function ReviewsAndShortsPage() {
     useState<ShortItem | null>(null);
   const [shortForm, setShortForm] = useState<ShortFormData>(emptyShortForm);
   const [shortErrors, setShortErrors] = useState<ShortFormErrors>({});
-
-  const {
-    data: reviewSummary = emptyGoogleReviews,
-    isLoading: isReviewsLoading,
-    isError: isReviewsError,
-    error: reviewsError,
-  } = useQuery<GoogleReviewsSummary, Error>({
-    queryKey: REVIEW_QUERY_KEY,
-    queryFn: getGoogleReviewsApi,
-  });
 
   const {
     data: shorts = [],
@@ -417,41 +280,6 @@ export default function ReviewsAndShortsPage() {
     addShortMutation.isPending ||
     updateShortMutation.isPending ||
     deleteShortMutation.isPending;
-
-  const reviewAverageRating = useMemo(() => {
-    if (reviewSummary.rating > 0) {
-      return reviewSummary.rating;
-    }
-
-    if (!reviewSummary.reviews.length) {
-      return 0;
-    }
-
-    const total = reviewSummary.reviews.reduce(
-      (sum, review) => sum + Number(review.rating || 0),
-      0,
-    );
-
-    return total / reviewSummary.reviews.length;
-  }, [reviewSummary.rating, reviewSummary.reviews]);
-
-  const filteredReviews = useMemo(() => {
-    if (!reviewSearch.trim()) {
-      return reviewSummary.reviews;
-    }
-
-    const query = reviewSearch.toLowerCase();
-    return reviewSummary.reviews.filter((review) =>
-      [
-        review.authorName,
-        review.text,
-        review.relativeTimeDescription,
-        review.rating,
-      ]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(query)),
-    );
-  }, [reviewSearch, reviewSummary.reviews]);
 
   const filteredShorts = useMemo(() => {
     if (!shortSearch.trim()) {
@@ -583,20 +411,6 @@ export default function ReviewsAndShortsPage() {
       ),
     },
     {
-      key: "shortUrl",
-      header: "Link",
-      render: (short) => (
-        <a
-          href={short.shortUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="block max-w-xs truncate text-sm text-primary hover:underline"
-        >
-          {short.shortUrl}
-        </a>
-      ),
-    },
-    {
       key: "sortOrder",
       header: "Order",
       render: (short) => (
@@ -669,12 +483,12 @@ export default function ReviewsAndShortsPage() {
   return (
     <div className="space-y-6" data-ocid="reviews_shorts.page">
       <PageHeader
-        title="Reviews & Shorts"
-        description="Monitor live Google reviews and manage video shorts from one place."
+        title="Shorts"
+        description="Manage video shorts from one place."
         action={
           <Button
             type="button"
-            className="rounded-xl bg-rose-500 text-white shadow-sm hover:bg-rose-600"
+            className="rounded-xl bg-[#D89F00] text-white shadow-sm hover:bg-rose-600"
             onClick={openAddShort}
             data-ocid="reviews_shorts.add_short_button"
           >
@@ -686,19 +500,10 @@ export default function ReviewsAndShortsPage() {
 
       <Tabs
         value={activeTab}
-        onValueChange={(value) => setActiveTab(value as ContentTab)}
         className="space-y-6"
       >
         <div className="overflow-x-auto">
           <TabsList className="inline-flex min-w-max rounded-2xl bg-slate-100 p-1.5">
-            <TabsTrigger
-              value="reviews"
-              className="rounded-xl px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-amber-700 data-[state=active]:shadow-sm"
-              data-ocid="reviews_shorts.reviews_tab"
-            >
-              <Star size={14} className="mr-2" />
-              Google Reviews
-            </TabsTrigger>
             <TabsTrigger
               value="shorts"
               className="rounded-xl px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
@@ -709,108 +514,6 @@ export default function ReviewsAndShortsPage() {
             </TabsTrigger>
           </TabsList>
         </div>
-
-        <TabsContent value="reviews" className="mt-0">
-          <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="gap-4 border-b border-slate-100 pb-5">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge className="bg-amber-50 text-amber-700">
-                      Live from Google
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="border-slate-200 text-slate-600"
-                    >
-                      {reviewSummary.reviews.length} review
-                      {reviewSummary.reviews.length === 1 ? "" : "s"}
-                    </Badge>
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg text-slate-900">
-                      {reviewSummary.placeName || "Samarpan Hospital"}
-                    </CardTitle>
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                      <div className="flex items-center gap-2">
-                        <RatingStars rating={reviewAverageRating} />
-                        <span className="font-medium text-slate-700">
-                          {reviewAverageRating.toFixed(1)}
-                        </span>
-                      </div>
-                      {reviewSummary.fetchedAt ? (
-                        <span>
-                          Synced{" "}
-                          {new Date(reviewSummary.fetchedAt).toLocaleString(
-                            "en-IN",
-                          )}
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="relative w-full lg:w-80">
-                  <Search
-                    size={15}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  />
-                  <Input
-                    value={reviewSearch}
-                    onChange={(event) => setReviewSearch(event.target.value)}
-                    placeholder="Search author or review text..."
-                    className="rounded-xl border-slate-200 pl-9"
-                    data-ocid="reviews_shorts.review_search_input"
-                  />
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent className="p-5">
-              {isReviewsLoading ? (
-                <div className="grid gap-4 xl:grid-cols-2">
-                  {["review-skeleton-1", "review-skeleton-2"].map((key) => (
-                    <Card
-                      key={key}
-                      className="rounded-[28px] border border-slate-200"
-                    >
-                      <CardContent className="space-y-4 p-6">
-                        <div className="flex items-center gap-3">
-                          <Skeleton className="h-12 w-12 rounded-full" />
-                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-36 rounded" />
-                            <Skeleton className="h-3 w-24 rounded" />
-                          </div>
-                        </div>
-                        <Skeleton className="h-4 w-24 rounded" />
-                        <Skeleton className="h-24 w-full rounded-2xl" />
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : isReviewsError ? (
-                <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600">
-                  {reviewsError?.message || "Unable to load reviews."}
-                </div>
-              ) : filteredReviews.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
-                  <p className="text-base font-semibold text-slate-900">
-                    No Google reviews found
-                  </p>
-                  <p className="mt-2 text-sm text-slate-500">
-                    Try another search or wait for reviews to sync from Google.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-4 xl:grid-cols-2">
-                  {filteredReviews.map((review) => (
-                    <GoogleReviewCard key={review.id} review={review} />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="shorts" className="mt-0">
           <div className="grid gap-6">
@@ -998,7 +701,7 @@ export default function ReviewsAndShortsPage() {
               </Button>
               <Button
                 type="button"
-                className="rounded-xl bg-rose-500 text-white hover:bg-rose-600"
+                className="rounded-xl bg-rose-500 text-white hover:bg-rose-600 bg-[#D89F00]"
                 onClick={handleSaveShort}
                 disabled={isShortBusy}
               >

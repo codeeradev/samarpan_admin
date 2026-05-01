@@ -710,7 +710,7 @@ export default function DoctorsPage() {
       {/* Add Doctor Modal */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent
-          className="rounded-2xl w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto"
+          className="rounded-2xl w-[95vw] max-w-2xl max-h-[90vh] !max-w-[40vw] overflow-y-auto"
           data-ocid="doctors.dialog"
         >
           <DialogHeader>
@@ -755,7 +755,7 @@ export default function DoctorsPage() {
       {/* Edit Doctor Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent
-          className="rounded-2xl w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto"
+          className="rounded-2xl w-[95vw] max-w-2xl !max-w-[40vw] max-h-[90vh] overflow-y-auto"
           data-ocid="doctors.dialog"
         >
           <DialogHeader>

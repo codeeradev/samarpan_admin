@@ -30,22 +30,14 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import $ from "jquery";
 import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
-import ReactSummernote from "react-summernote";
 import { toast } from "sonner";
-import "bootstrap/dist/css/bootstrap.css";
-import "react-summernote/dist/react-summernote.css";
-import "summernote/dist/summernote.css";
-import "summernote/dist/summernote.js";
-import "./pages-editor.css";
 
-if (typeof window !== "undefined") {
-  const win = window as any;
-  win.$ = win.jQuery = $;
-}
+import PageEditor from "@/components/editor/pageEditor";
+
+import "./pages-editor.css";
 
 const emptyPageForm: PagePayload = {
   title: "",
@@ -370,7 +362,7 @@ export default function PagesPage() {
           <Button
             type="button"
             onClick={openAdd}
-            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto"
+            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto bg-[#D89F00]"
           >
             <Plus size={16} />
             Add page
@@ -399,7 +391,7 @@ export default function PagesPage() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search title, slug, content, SEO..."
-                  className="rounded-xl border-slate-200 pl-9"
+                  className="rounded-xl border-slate-200 !pl-9"
                 />
               </div>
               <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-600">
@@ -444,7 +436,7 @@ export default function PagesPage() {
             </DialogTitle>
             <DialogDescription>
               Manage the page title, SEO metadata, publish status, and
-              Summernote content.
+              content.
             </DialogDescription>
           </DialogHeader>
 
@@ -562,27 +554,15 @@ export default function PagesPage() {
             <div className="space-y-2">
               <Label>Page Content</Label>
               <div className="website-page-editor">
-                <ReactSummernote
-                  value={formData.content}
-                  options={{
-                    height: 340,
-                    dialogsInBody: true,
-                    toolbar: [
-                      ["style", ["style"]],
-                      ["font", ["bold", "underline", "italic", "clear"]],
-                      ["fontsize", ["fontsize"]],
-                      ["para", ["ul", "ol", "paragraph"]],
-                      ["insert", ["link", "picture", "video"]],
-                      ["view", ["fullscreen", "codeview"]],
-                    ],
-                  }}
-                  onChange={(content) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      content,
-                    }))
-                  }
-                />
+<PageEditor
+  value={formData.content}
+  onChange={(content) =>
+    setFormData((prev) => ({
+      ...prev,
+      content,
+    }))
+  }
+/>
               </div>
             </div>
           </div>
@@ -623,7 +603,7 @@ export default function PagesPage() {
               </Button>
               <Button
                 type="button"
-                className="rounded-xl"
+                className="rounded-xl bg-[#D89F00]"
                 onClick={handleSave}
                 disabled={addMutation.isPending || updateMutation.isPending}
               >
