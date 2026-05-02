@@ -192,8 +192,15 @@ export default function BlogsPage() {
 
       queryClient.invalidateQueries({ queryKey: BLOG_QUERY_KEY });
       setOpen(false);
-    } catch {
-      toast.error("Something went wrong");
+    } catch (error: any) {
+
+      console.log(error)
+      const message =
+        error?.response?.data?.errors?.[0] ||
+        error?.response?.data?.message ||
+        "Something went wrong";
+
+      toast.error(message);
     }
   };
 

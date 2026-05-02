@@ -83,9 +83,7 @@ export const addBlogApi = async (
 
     return res?.data?.blog;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to add blog",
-    );
+    throw error;
   }
 };
 
@@ -103,9 +101,7 @@ export const updateBlogApi = async (
 
     return res?.data?.blog;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to update blog",
-    );
+    throw error
   }
 };
 
