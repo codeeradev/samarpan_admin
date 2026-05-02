@@ -470,7 +470,7 @@ export default function ReviewsAndShortsPage() {
             type="button"
             size="icon"
             variant="ghost"
-            className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
+            className="rounded-xl text-slate-500"
             onClick={() => setShortDeleteTarget(short)}
           >
             <Trash2 size={15} />

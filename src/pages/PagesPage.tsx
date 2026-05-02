@@ -343,7 +343,7 @@ export default function PagesPage() {
             type="button"
             variant="ghost"
             size="icon"
-            className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
+            className="rounded-xl text-slate-500"
             onClick={() => setDeleteTarget(page)}
           >
             <Trash2 size={15} />
@@ -429,14 +429,28 @@ export default function PagesPage() {
       </Card>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-5xl">
+        <DialogContent
+          className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-[1200px]"
+          // Disable Radix focus trap — TinyMCE manages its own focus
+          onInteractOutside={(e) => {
+            const el = e.target as HTMLElement;
+            if (
+              el.closest(".tox-tinymce-aux") ||
+              el.closest(".tox-dialog") ||
+              el.closest(".tox-menu") ||
+              el.closest(".tox-pop") ||
+              document.querySelector(".tox-dialog")
+            ) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl text-slate-900">
               {editTarget ? "Edit Website Page" : "Add Website Page"}
             </DialogTitle>
             <DialogDescription>
-              Manage the page title, SEO metadata, publish status, and
-              content.
+              Manage the page title, SEO metadata, publish status, and content.
             </DialogDescription>
           </DialogHeader>
 
@@ -554,15 +568,15 @@ export default function PagesPage() {
             <div className="space-y-2">
               <Label>Page Content</Label>
               <div className="website-page-editor">
-<PageEditor
-  value={formData.content}
-  onChange={(content) =>
-    setFormData((prev) => ({
-      ...prev,
-      content,
-    }))
-  }
-/>
+                <PageEditor
+                  value={formData.content}
+                  onChange={(content) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      content,
+                    }))
+                  }
+                />
               </div>
             </div>
           </div>

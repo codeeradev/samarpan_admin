@@ -198,9 +198,9 @@ export default function AdminLayout() {
   const roleLabel = role ? ROLE_LABELS[role] : "Admin";
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex">
+    <div className="min-h-screen bg-[#F8FAFC] flex overflow-x-hidden">
       {/* ── Desktop Sidebar ─────────────────────────────────────── */}
-      <aside className="flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30">
+      <aside className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30">
         {/* Logo */}
         <div className="flex justify-center items-center px-5 py-6 border-b border-slate-100">
           <img
@@ -233,7 +233,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* ── Main Wrapper ─────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col md:ml-64">
+      <div className="flex-1 min-w-0 flex flex-col md:ml-64">
         {/* ── Topbar ──────────────────────────────────────────────── */}
         <header className="fixed top-0 right-0 left-0 md:left-64 bg-white border-b border-slate-200 z-20">
           <div className="flex items-center h-14 md:h-16 px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3">
@@ -336,9 +336,11 @@ export default function AdminLayout() {
         </header>
 
         {/* ── Page Content ─────────────────────────────────────────── */}
-        <main className="flex-1 pt-14 md:pt-16">
-          <div className="p-3 sm:p-4 lg:p-6">
-            <Outlet />
+        <main className="flex-1 min-w-0 pt-14 md:pt-16">
+          <div className="overflow-x-auto">
+            <div className="min-w-0 p-3 sm:p-4 lg:p-6">
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

@@ -779,7 +779,7 @@ export default function RoleManagementPage() {
               variant="ghost"
               disabled={isCurrentAccount}
               onClick={() => setDeleteTarget(row)}
-              className="h-8 w-8 rounded-lg text-[#64748B] hover:bg-red-50 hover:text-red-500"
+              className="h-8 w-8 rounded-lg text-[#64748B]"
               aria-label="Delete staff member"
             >
               <Trash2 size={14} />
@@ -844,7 +844,7 @@ export default function RoleManagementPage() {
                 size="icon"
                 variant="ghost"
                 onClick={() => setDeleteTarget(item)}
-                className="h-9 w-9 rounded-lg text-[#64748B] hover:bg-red-50 hover:text-red-500"
+                className="h-9 w-9 rounded-lg text-[#64748B]"
                 aria-label="Delete staff member"
               >
                 <Trash2 size={14} />

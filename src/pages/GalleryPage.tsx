@@ -123,7 +123,7 @@ export default function GalleryPage() {
           </Button>
           <Button
             size="icon"
-            variant="destructive"
+            variant="ghost"
             onClick={() => handleDelete(item._id)}
             aria-label="Delete image"
           >

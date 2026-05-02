@@ -11,24 +11,10 @@ body {
   background-color: #f8fafc;
 }
 
-.website-page-editor .ProseMirror {
-  min-height: 320px;
-  padding: 1rem 1.25rem;
-  background: #ffffff;
-  color: #1e293b;
-  outline: none;
-}
-
 .website-page-editor {
   border: 1px solid #e2e8f0;
   border-radius: 1.5rem;
   background: white;
-}
-
-.website-page-editor .ProseMirror {
-  min-height: 320px;
-  padding: 1rem 1.25rem;
-  outline: none;
 }
 
 .website-page-editor button {
@@ -36,4 +22,40 @@ body {
   border-radius: 8px;
   background: #f1f5f9;
   font-size: 13px;
+}
+
+.tox-tinymce-aux,
+.tox-dialog,
+.tox-menu,
+.tox-pop,
+.tox-dialog-wrap {
+  z-index: 9999999 !important;
+}
+
+/* allow clicking inside TinyMCE modals (isko comment krne se button click off hor rhe hai) */
+.tox-tinymce-aux * {
+  pointer-events: auto !important;
+}
+
+/* Add this — the overlay itself must not block TinyMCE portals */
+[data-radix-dialog-overlay] {
+  pointer-events: none !important;
+}
+
+/* Keep the dialog content itself clickable */
+[data-radix-dialog-content] {
+  pointer-events: auto !important;
+}
+
+.tox-tinymce-aux,
+.tox-dialog,
+.tox-menu,
+.tox-pop,
+.tox-dialog-wrap {
+  z-index: 9999999 !important;
+  pointer-events: auto !important;
+}
+
+.tox-tinymce-aux * {
+  pointer-events: auto !important;
 }

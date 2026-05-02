@@ -460,7 +460,7 @@ export default function DoctorsPage() {
                   size="icon"
                   variant="ghost"
                   type="button"
-                  className="h-8 w-8 text-[#64748B] hover:text-red-500 hover:bg-red-50 rounded-lg"
+                  className="h-8 w-8 text-[#64748B] rounded-lg"
                   onClick={() => openDelete(doctor)}
                   aria-label={`Delete ${doctor.name}`}
                   data-ocid={`doctors.delete_button.${idx + 1}`}
@@ -648,7 +648,7 @@ export default function DoctorsPage() {
                           size="icon"
                           variant="ghost"
                           type="button"
-                          className="h-8 w-8 text-[#64748B] hover:text-red-500 hover:bg-red-50 rounded-lg"
+                          className="h-8 w-8 text-[#64748B] rounded-lg"
                           onClick={() => openDelete(doctor)}
                           aria-label={`Delete ${doctor.name}`}
                           data-ocid={`doctors.delete_button.${idx + 1}`}

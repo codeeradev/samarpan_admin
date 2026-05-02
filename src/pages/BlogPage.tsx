@@ -225,7 +225,12 @@ export default function BlogsPage() {
               {blog.title || "Untitled"}
             </p>
             <p className="text-xs text-slate-500 truncate">
-              {blog.shortDescription || "No description"}
+              {(() => {
+                const desc = blog.shortDescription ?? "";
+                return desc.length > 80
+                  ? desc.slice(0, 80) + "..."
+                  : desc || "No description";
+              })()}
             </p>
           </div>
         </div>
@@ -281,7 +286,7 @@ export default function BlogsPage() {
           </Button>
           <Button
             size="icon"
-            variant="destructive"
+            variant="ghost"
             onClick={() => setDeleteTarget(blog)}
           >
             <Trash2 size={16} />

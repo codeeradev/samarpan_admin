@@ -1,7 +1,6 @@
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
+"use client";
+
+import { Editor } from "@tinymce/tinymce-react";
 
 type Props = {
   value: string;
@@ -9,55 +8,54 @@ type Props = {
 };
 
 export default function PageEditor({ value, onChange }: Props) {
-  const editor = useEditor({
-    extensions: [StarterKit, Link, Image],
-    content: value,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-  });
-
-  if (!editor) return null;
-
   return (
     <div className="rounded-2xl border border-slate-200 bg-white">
-      
-      {/* Toolbar */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 p-2">
-        <button onClick={() => editor.chain().focus().toggleBold().run()}>
-          Bold
-        </button>
+      <Editor
+        tinymceScriptSrc="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js"
+        apiKey="gz0vccrxxqfout41hqr8gthfroa4l5qnrgjmgdqmjhuw0tfr"
+        value={value}
+        onEditorChange={(content) => onChange(content)}
+        init={{
+          height: 500,
+          menubar: true,
+          toolbar_mode: "wrap",
+          ui_mode: "split",
 
-        <button onClick={() => editor.chain().focus().toggleItalic().run()}>
-          Italic
-        </button>
+          // FIX
+          fixed_toolbar_container: false,
 
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-          H2
-        </button>
+          zindex: 9999999,
 
-        <button onClick={() => editor.chain().focus().toggleBulletList().run()}>
-          List
-        </button>
+          plugins: [
+            "advlist",
+            "autolink",
+            "lists",
+            "link",
+            "image",
+            "charmap",
+            "preview",
+            "anchor",
+            "searchreplace",
+            "visualblocks",
+            "code",
+            "fullscreen",
+            "insertdatetime",
+            "media",
+            "table",
+            "help",
+            "wordcount",
+          ],
 
-        <button
-          onClick={() => {
-            const url = prompt("Enter URL");
-            if (url) editor.chain().focus().setLink({ href: url }).run();
-          }}
-        >
-          Link
-        </button>
+          toolbar:
+            "undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | code fullscreen preview",
 
-        <button onClick={() => editor.chain().focus().toggleCodeBlock().run()}>
-          Code
-        </button>
-      </div>
+          image_title: true,
+          automatic_uploads: true,
+          file_picker_types: "image",
 
-      {/* Editor */}
-      <EditorContent
-        editor={editor}
-        className="min-h-[320px] p-4 prose max-w-none"
+          // MOST IMPORTANT
+          dialog_type: "modal",
+        }}
       />
     </div>
   );
