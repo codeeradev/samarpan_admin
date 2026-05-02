@@ -1,12 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getContentByModelKeyApi, upsertContentApi, type ContentItem } from "@/apiCalls/content";
+import {
+  getContentByModelKeyApi,
+  upsertContentApi,
+  type ContentItem,
+} from "@/apiCalls/content";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, LayoutTemplate, Save } from "lucide-react";
@@ -39,10 +48,15 @@ import {
 
 export default function WebsiteContentPageImpl() {
   const queryClient = useQueryClient();
-  const [selectedSection, setSelectedSection] = useState<SectionKey>("home_hero");
+  const [selectedSection, setSelectedSection] =
+    useState<SectionKey>("home_hero");
   const [heroForm, setHeroForm] = useState<HeroFormState>(EMPTY_HERO_FORM);
-  const [howItWorksForm, setHowItWorksForm] = useState<HowItWorksFormState>(EMPTY_HOW_IT_WORK_FORM);
-  const [whyChooseUsForm, setWhyChooseUsForm] = useState<WhyChooseUsFormState>(EMPTY_WHY_CHOOSE_US_FORM);
+  const [howItWorksForm, setHowItWorksForm] = useState<HowItWorksFormState>(
+    EMPTY_HOW_IT_WORK_FORM,
+  );
+  const [whyChooseUsForm, setWhyChooseUsForm] = useState<WhyChooseUsFormState>(
+    EMPTY_WHY_CHOOSE_US_FORM,
+  );
   const [aboutForm, setAboutForm] = useState<AboutFormState>(EMPTY_ABOUT_FORM);
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -66,7 +80,9 @@ export default function WebsiteContentPageImpl() {
   const saveMutation = useMutation({
     mutationFn: upsertContentApi,
     onSuccess: (data) => {
-      toast.success(`${SECTION_META[selectedSection].title} saved successfully.`);
+      toast.success(
+        `${SECTION_META[selectedSection].title} saved successfully.`,
+      );
       queryClient.setQueryData(["content", selectedSection], data);
 
       if (selectedSection === "home_hero") {
@@ -84,12 +100,22 @@ export default function WebsiteContentPageImpl() {
 
   const featureCount = useMemo(
     () =>
-      [heroForm.featurePointOne, heroForm.featurePointTwo, heroForm.featurePointThree].filter(Boolean)
-        .length,
-    [heroForm.featurePointOne, heroForm.featurePointTwo, heroForm.featurePointThree],
+      [
+        heroForm.featurePointOne,
+        heroForm.featurePointTwo,
+        heroForm.featurePointThree,
+      ].filter(Boolean).length,
+    [
+      heroForm.featurePointOne,
+      heroForm.featurePointTwo,
+      heroForm.featurePointThree,
+    ],
   );
 
-  function updateHeroField<K extends keyof HeroFormState>(key: K, value: HeroFormState[K]) {
+  function updateHeroField<K extends keyof HeroFormState>(
+    key: K,
+    value: HeroFormState[K],
+  ) {
     setHeroForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -107,7 +133,10 @@ export default function WebsiteContentPageImpl() {
     setWhyChooseUsForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function updateAboutField<K extends keyof AboutFormState>(key: K, value: AboutFormState[K]) {
+  function updateAboutField<K extends keyof AboutFormState>(
+    key: K,
+    value: AboutFormState[K],
+  ) {
     setAboutForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -139,9 +168,18 @@ export default function WebsiteContentPageImpl() {
           featurePointOne: heroForm.featurePointOne.trim(),
           featurePointTwo: heroForm.featurePointTwo.trim(),
           featurePointThree: heroForm.featurePointThree.trim(),
-          backgroundImage: typeof heroForm.backgroundImage === "string" ? heroForm.backgroundImage : "",
-          primaryImage: typeof heroForm.primaryImage === "string" ? heroForm.primaryImage : "",
-          secondaryImage: typeof heroForm.secondaryImage === "string" ? heroForm.secondaryImage : "",
+          backgroundImage:
+            typeof heroForm.backgroundImage === "string"
+              ? heroForm.backgroundImage
+              : "",
+          primaryImage:
+            typeof heroForm.primaryImage === "string"
+              ? heroForm.primaryImage
+              : "",
+          secondaryImage:
+            typeof heroForm.secondaryImage === "string"
+              ? heroForm.secondaryImage
+              : "",
         },
         files: {
           backgroundImage: heroForm.backgroundImage,
@@ -173,7 +211,10 @@ export default function WebsiteContentPageImpl() {
           stepTwoDescription: howItWorksForm.stepTwoDescription.trim(),
           stepThreeTitle: howItWorksForm.stepThreeTitle.trim(),
           stepThreeDescription: howItWorksForm.stepThreeDescription.trim(),
-          sectionImage: typeof howItWorksForm.sectionImage === "string" ? howItWorksForm.sectionImage : "",
+          sectionImage:
+            typeof howItWorksForm.sectionImage === "string"
+              ? howItWorksForm.sectionImage
+              : "",
         },
         files: {
           sectionImage: howItWorksForm.sectionImage,
@@ -196,6 +237,14 @@ export default function WebsiteContentPageImpl() {
           eyebrowText: whyChooseUsForm.eyebrowText.trim(),
           heading: whyChooseUsForm.heading.trim(),
           description: whyChooseUsForm.description.trim(),
+          sectionImage:
+            typeof whyChooseUsForm.sectionImage === "string"
+              ? whyChooseUsForm.sectionImage
+              : "",
+          secondaryImage:
+            typeof whyChooseUsForm.secondaryImage === "string"
+              ? whyChooseUsForm.secondaryImage
+              : "",
           cardOneTitle: whyChooseUsForm.cardOneTitle.trim(),
           cardOneDescription: whyChooseUsForm.cardOneDescription.trim(),
           cardTwoTitle: whyChooseUsForm.cardTwoTitle.trim(),
@@ -204,6 +253,10 @@ export default function WebsiteContentPageImpl() {
           cardThreeDescription: whyChooseUsForm.cardThreeDescription.trim(),
           cardFourTitle: whyChooseUsForm.cardFourTitle.trim(),
           cardFourDescription: whyChooseUsForm.cardFourDescription.trim(),
+        },
+        files: {
+          sectionImage: whyChooseUsForm.sectionImage,
+          secondaryImage: whyChooseUsForm.secondaryImage,
         },
       });
       return;
@@ -229,7 +282,10 @@ export default function WebsiteContentPageImpl() {
         bulletFour: aboutForm.bulletFour.trim(),
         ctaText: aboutForm.ctaText.trim(),
         ctaLink: aboutForm.ctaLink.trim(),
-        sectionImage: typeof aboutForm.sectionImage === "string" ? aboutForm.sectionImage : "",
+        sectionImage:
+          typeof aboutForm.sectionImage === "string"
+            ? aboutForm.sectionImage
+            : "",
       },
       files: {
         sectionImage: aboutForm.sectionImage,
@@ -300,11 +356,17 @@ export default function WebsiteContentPageImpl() {
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="rounded-full border-slate-200">
+              <Badge
+                variant="outline"
+                className="rounded-full border-slate-200"
+              >
                 modelKey: {selectedSection}
               </Badge>
               {selectedSection === "home_hero" ? (
-                <Badge variant="outline" className="rounded-full border-slate-200">
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-slate-200"
+                >
                   {featureCount} feature points
                 </Badge>
               ) : null}
@@ -317,13 +379,25 @@ export default function WebsiteContentPageImpl() {
                 <Skeleton className="h-48 w-full rounded-2xl" />
               </div>
             ) : selectedSection === "home_hero" ? (
-              <HeroSectionEditor form={heroForm} updateField={updateHeroField} />
+              <HeroSectionEditor
+                form={heroForm}
+                updateField={updateHeroField}
+              />
             ) : selectedSection === "home_how_we_work" ? (
-              <HowItWorksSectionEditor form={howItWorksForm} updateField={updateHowItWorksField} />
+              <HowItWorksSectionEditor
+                form={howItWorksForm}
+                updateField={updateHowItWorksField}
+              />
             ) : selectedSection === "why_choose_us" ? (
-              <WhyChooseUsSectionEditor form={whyChooseUsForm} updateField={updateWhyChooseUsField} />
+              <WhyChooseUsSectionEditor
+                form={whyChooseUsForm}
+                updateField={updateWhyChooseUsField}
+              />
             ) : (
-              <AboutSectionEditor form={aboutForm} updateField={updateAboutField} />
+              <AboutSectionEditor
+                form={aboutForm}
+                updateField={updateAboutField}
+              />
             )}
           </CardContent>
         </Card>

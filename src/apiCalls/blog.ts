@@ -1,5 +1,6 @@
 import { get, post } from "@/apis/apiClient";
 import { ENDPOINT } from "@/apis/endpoint";
+import { createApiRequestError } from "@/lib/api-errors";
 
 /* ================= TYPES ================= */
 
@@ -64,9 +65,7 @@ export const getAllBlogsApi = async (): Promise<BlogItem[]> => {
     });
     return res?.data?.blogs ?? [];
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to fetch blogs",
-    );
+    throw createApiRequestError(error, "Failed to fetch blogs");
   }
 };
 
@@ -83,7 +82,7 @@ export const addBlogApi = async (
 
     return res?.data?.blog;
   } catch (error: any) {
-    throw error;
+    throw createApiRequestError(error, "Failed to add blog");
   }
 };
 
@@ -101,7 +100,7 @@ export const updateBlogApi = async (
 
     return res?.data?.blog;
   } catch (error: any) {
-    throw error
+    throw createApiRequestError(error, "Failed to update blog");
   }
 };
 
@@ -112,8 +111,6 @@ export const deleteBlogApi = async (id: string): Promise<void> => {
       needAuth: true,
     });
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to delete blog",
-    );
+    throw createApiRequestError(error, "Failed to delete blog");
   }
 };

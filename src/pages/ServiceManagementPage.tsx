@@ -23,6 +23,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  getApiErrorMessage,
+  mapApiErrorsToFields,
+} from "@/lib/api-errors";
+import {
   addServiceApi,
   deleteServiceApi,
   getAllServicesApi,
@@ -44,6 +48,59 @@ function slugify(value: string): string {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+}
+
+type ServiceFormMode = "add" | "edit";
+
+type ServiceFormErrors = Partial<
+  Record<"title" | "slug" | "shortDescription" | "image" | "icon" | "faqs", string>
+>;
+
+function validateServiceForm(
+  form: ServicePayload,
+  mode: ServiceFormMode,
+  services: ServiceItem[],
+  currentId?: string,
+): ServiceFormErrors {
+  const errors: ServiceFormErrors = {};
+  const nextSlug = form.slug.trim() ? slugify(form.slug) : slugify(form.title);
+  const duplicateSlug = services.find(
+    (service) => service.slug === nextSlug && service._id !== currentId,
+  );
+  const incompleteFaqIndex = (form.faqs ?? []).findIndex((faq) => {
+    const question = faq.question.trim();
+    const answer = faq.answer.trim();
+
+    return (question || answer) && !(question && answer);
+  });
+
+  if (!form.title.trim()) {
+    errors.title = "Title is required.";
+  }
+
+  if (!form.shortDescription.trim()) {
+    errors.shortDescription = "Short description is required.";
+  }
+
+  if (!nextSlug) {
+    errors.slug = "Slug is required.";
+  } else if (duplicateSlug) {
+    errors.slug = "Another service already uses this slug.";
+  }
+
+  if (mode === "add" && !(form.image instanceof File)) {
+    errors.image = "Service image is required.";
+  }
+
+  if (mode === "add" && !(form.icon instanceof File)) {
+    errors.icon = "Service icon is required.";
+  }
+
+  if (incompleteFaqIndex >= 0) {
+    errors.faqs = `FAQ ${incompleteFaqIndex + 1} needs both a question and an answer.`;
+  }
+
+  return errors;
 }
 
 // ─── Empty form ──────────────────────────────────────────────────────────────────
@@ -115,6 +172,7 @@ export default function ServiceManagementPage() {
   const [editTarget, setEditTarget] = useState<ServiceItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ServiceItem | null>(null);
   const [formData, setFormData] = useState<ServicePayload>(emptyForm);
+  const [formErrors, setFormErrors] = useState<ServiceFormErrors>({});
   const [featuresInput, setFeaturesInput] = useState("");
   const [keywordsInput, setKeywordsInput] = useState("");
   const imageRef = useRef<HTMLInputElement>(null);
@@ -132,7 +190,6 @@ export default function ServiceManagementPage() {
       queryClient.invalidateQueries({ queryKey: ["service-management"] });
       setModalOpen(false);
     },
-    onError: (error: Error) => toast.error(error.message),
   });
 
   const updateMutation = useMutation({
@@ -143,7 +200,6 @@ export default function ServiceManagementPage() {
       queryClient.invalidateQueries({ queryKey: ["service-management"] });
       setModalOpen(false);
     },
-    onError: (error: Error) => toast.error(error.message),
   });
 
   const deleteMutation = useMutation({
@@ -153,7 +209,7 @@ export default function ServiceManagementPage() {
       queryClient.invalidateQueries({ queryKey: ["service-management"] });
       setDeleteTarget(null);
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error) => toast.error(getApiErrorMessage(error, "Failed to delete service.")),
   });
 
   const filtered = useMemo(() => {
@@ -172,6 +228,7 @@ export default function ServiceManagementPage() {
   function openAdd() {
     setEditTarget(null);
     setFormData(emptyForm);
+    setFormErrors({});
     setFeaturesInput("");
     setKeywordsInput("");
     setModalOpen(true);
@@ -190,6 +247,7 @@ export default function ServiceManagementPage() {
       faqs: service.faqs || [],
       seo: service.seo || { metaTitle: "", metaDescription: "", keywords: [] },
     });
+    setFormErrors({});
     setFeaturesInput((service.features || []).join(", "));
     setKeywordsInput((service.seo?.keywords || []).join(", "));
     setModalOpen(true);
@@ -199,6 +257,10 @@ export default function ServiceManagementPage() {
 
   function setField<K extends keyof ServicePayload>(key: K, value: ServicePayload[K]) {
     setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormErrors((prev) => ({
+      ...prev,
+      [key as keyof ServiceFormErrors]: undefined,
+    }));
   }
 
   function setSeoField(key: keyof NonNullable<ServicePayload["seo"]>, value: string) {
@@ -213,6 +275,7 @@ export default function ServiceManagementPage() {
       ...prev,
       faqs: [...(prev.faqs || []), { question: "", answer: "" }],
     }));
+    setFormErrors((prev) => ({ ...prev, faqs: undefined }));
   }
 
   function updateFaq(index: number, field: "question" | "answer", value: string) {
@@ -221,6 +284,7 @@ export default function ServiceManagementPage() {
       faqs[index] = { ...faqs[index], [field]: value };
       return { ...prev, faqs };
     });
+    setFormErrors((prev) => ({ ...prev, faqs: undefined }));
   }
 
   function removeFaq(index: number) {
@@ -228,13 +292,20 @@ export default function ServiceManagementPage() {
       ...prev,
       faqs: (prev.faqs || []).filter((_, i) => i !== index),
     }));
+    setFormErrors((prev) => ({ ...prev, faqs: undefined }));
   }
 
   // ─── Save ────────────────────────────────────────────────────────────────────
 
-  function handleSave() {
-    if (!formData.title.trim()) {
-      toast.error("Title is required.");
+  async function handleSave() {
+    const mode: ServiceFormMode = editTarget ? "edit" : "add";
+    const errors = validateServiceForm(formData, mode, data, editTarget?._id);
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error(
+        Object.values(errors)[0] ?? "Please correct the highlighted fields.",
+      );
       return;
     }
 
@@ -254,11 +325,31 @@ export default function ServiceManagementPage() {
       },
     };
 
-    if (editTarget) {
-      updateMutation.mutate({ id: editTarget._id, payload });
-      return;
+    try {
+      if (editTarget) {
+        await updateMutation.mutateAsync({ id: editTarget._id, payload });
+        return;
+      }
+
+      await addMutation.mutateAsync(payload);
+    } catch (error) {
+      const backendErrors = mapApiErrorsToFields<
+        keyof ServiceFormErrors
+      >(error, {
+        title: /title/i,
+        slug: /slug/i,
+        shortDescription: /short description/i,
+        image: /\bimage\b/i,
+        icon: /\bicon\b/i,
+        faqs: /\bfaq\b/i,
+      });
+
+      if (Object.keys(backendErrors).length > 0) {
+        setFormErrors((prev) => ({ ...prev, ...backendErrors }));
+      }
+
+      toast.error(getApiErrorMessage(error, "Failed to save service."));
     }
-    addMutation.mutate(payload);
   }
 
   const isBusy =
@@ -361,7 +452,15 @@ export default function ServiceManagementPage() {
       </div>
 
       {/* ── Add / Edit Modal ────────────────────────────────────────────────── */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(nextOpen) => {
+          setModalOpen(nextOpen);
+          if (!nextOpen) {
+            setFormErrors({});
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
@@ -389,7 +488,11 @@ export default function ServiceManagementPage() {
                   value={formData.title}
                   onChange={(e) => setField("title", e.target.value)}
                   placeholder="e.g. Emergency Care"
+                  className={formErrors.title ? "border-red-400 focus-visible:ring-red-400" : undefined}
                 />
+                {formErrors.title ? (
+                  <p className="text-xs text-red-500">{formErrors.title}</p>
+                ) : null}
               </div>
 
               {/* Slug */}
@@ -400,20 +503,39 @@ export default function ServiceManagementPage() {
                   value={formData.slug}
                   onChange={(e) => setField("slug", e.target.value)}
                   placeholder="Auto-generated from title if left empty"
+                  className={formErrors.slug ? "border-red-400 focus-visible:ring-red-400" : undefined}
                 />
+                {formErrors.slug ? (
+                  <p className="text-xs text-red-500">{formErrors.slug}</p>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    Saved as `/
+                    {formData.slug.trim()
+                      ? slugify(formData.slug)
+                      : slugify(formData.title) || "service-slug"}
+                    `.
+                  </p>
+                )}
               </div>
 
               {/* Short Description */}
               <div className="space-y-1">
-                <Label htmlFor="svc-short-desc">Short Description</Label>
+                <Label htmlFor="svc-short-desc">
+                  Short Description <span className="text-red-500">*</span>
+                </Label>
                 <Textarea
                   id="svc-short-desc"
                   value={formData.shortDescription}
                   onChange={(e) => setField("shortDescription", e.target.value)}
                   placeholder="Brief summary shown in listings"
-                  className="resize-none min-h-[80px]"
+                  className={`resize-none min-h-[80px] ${formErrors.shortDescription ? "border-red-400 focus-visible:ring-red-400" : ""}`}
                   rows={3}
                 />
+                {formErrors.shortDescription ? (
+                  <p className="text-xs text-red-500">
+                    {formErrors.shortDescription}
+                  </p>
+                ) : null}
               </div>
 
               {/* Features */}
@@ -431,7 +553,9 @@ export default function ServiceManagementPage() {
 
               {/* Image */}
               <div className="space-y-1">
-                <Label>Service Image</Label>
+                <Label>
+                  Service Image <span className="text-red-500">*</span>
+                </Label>
                 {/* Preview existing image URL when editing */}
                 {editTarget && typeof formData.image === "string" && formData.image && (
                   <p className="text-xs text-slate-500 truncate mb-1">
@@ -442,16 +566,26 @@ export default function ServiceManagementPage() {
                   ref={imageRef}
                   type="file"
                   accept="image/*"
+                  className={formErrors.image ? "border-red-400 focus-visible:ring-red-400" : undefined}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) setField("image", file);
                   }}
                 />
+                {formErrors.image ? (
+                  <p className="text-xs text-red-500">{formErrors.image}</p>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    Upload a service image for new entries.
+                  </p>
+                )}
               </div>
 
               {/* Icon */}
               <div className="space-y-1">
-                <Label>Service Icon</Label>
+                <Label>
+                  Service Icon <span className="text-red-500">*</span>
+                </Label>
                 {editTarget && typeof formData.icon === "string" && formData.icon && (
                   <p className="text-xs text-slate-500 truncate mb-1">
                     Current: {formData.icon}
@@ -461,11 +595,19 @@ export default function ServiceManagementPage() {
                   ref={iconRef}
                   type="file"
                   accept="image/*,.svg"
+                  className={formErrors.icon ? "border-red-400 focus-visible:ring-red-400" : undefined}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) setField("icon", file);
                   }}
                 />
+                {formErrors.icon ? (
+                  <p className="text-xs text-red-500">{formErrors.icon}</p>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    Upload a service icon for cards and listings.
+                  </p>
+                )}
               </div>
             </TabsContent>
 
@@ -511,6 +653,9 @@ export default function ServiceManagementPage() {
               >
                 <Plus size={14} /> Add FAQ
               </Button>
+              {formErrors.faqs ? (
+                <p className="text-xs text-red-500">{formErrors.faqs}</p>
+              ) : null}
             </TabsContent>
 
             {/* ── Tab 4: SEO ────────────────────────────────────────────── */}

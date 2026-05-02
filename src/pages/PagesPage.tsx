@@ -29,6 +29,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  getApiErrorMessage,
+  mapApiErrorsToFields,
+} from "@/lib/api-errors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -38,6 +42,10 @@ import { toast } from "sonner";
 import PageEditor from "@/components/editor/pageEditor";
 
 import "./pages-editor.css";
+
+type PageFormErrors = Partial<
+  Record<"title" | "slug" | "metaTitle" | "metaDescription", string>
+>;
 
 const emptyPageForm: PagePayload = {
   title: "",
@@ -126,6 +134,39 @@ function formatPageDate(value?: string) {
   });
 }
 
+function validatePageForm(
+  form: PagePayload,
+  pages: PageItem[],
+  currentId?: string,
+): PageFormErrors {
+  const errors: PageFormErrors = {};
+  const nextSlug = form.slug.trim() ? slugify(form.slug) : slugify(form.title);
+  const duplicateSlug = pages.find(
+    (page) => page.slug === nextSlug && page._id !== currentId,
+  );
+
+  if (!form.title.trim()) {
+    errors.title = "Title is required.";
+  }
+
+  if (!nextSlug) {
+    errors.slug = "Slug is required.";
+  } else if (duplicateSlug) {
+    errors.slug = "Another page already uses this slug.";
+  }
+
+  if (form.metaTitle.trim().length > 60) {
+    errors.metaTitle = "Meta title should stay within 60 characters.";
+  }
+
+  if (form.metaDescription.trim().length > 160) {
+    errors.metaDescription =
+      "Meta description should stay within 160 characters.";
+  }
+
+  return errors;
+}
+
 function StatusBadge({ status }: { status: PageStatus }) {
   const isPublished = status === "published";
 
@@ -151,6 +192,7 @@ export default function PagesPage() {
   const [previewPage, setPreviewPage] = useState<PageItem | null>(null);
   const [editTarget, setEditTarget] = useState<PageItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PageItem | null>(null);
+  const [formErrors, setFormErrors] = useState<PageFormErrors>({});
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["pages"],
@@ -164,8 +206,8 @@ export default function PagesPage() {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
       setModalOpen(false);
       setFormData(emptyPageForm);
+      setFormErrors({});
     },
-    onError: (error: Error) => toast.error(error.message),
   });
 
   const updateMutation = useMutation({
@@ -177,8 +219,8 @@ export default function PagesPage() {
       setModalOpen(false);
       setFormData(emptyPageForm);
       setEditTarget(null);
+      setFormErrors({});
     },
-    onError: (error: Error) => toast.error(error.message),
   });
 
   const deleteMutation = useMutation({
@@ -188,7 +230,7 @@ export default function PagesPage() {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
       setDeleteTarget(null);
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error) => toast.error(getApiErrorMessage(error, "Failed to delete page.")),
   });
 
   const filteredPages = useMemo(() => {
@@ -214,6 +256,7 @@ export default function PagesPage() {
   function openAdd() {
     setEditTarget(null);
     setFormData(emptyPageForm);
+    setFormErrors({});
     setModalOpen(true);
   }
 
@@ -227,6 +270,7 @@ export default function PagesPage() {
       metaTitle: page.seo.metaTitle,
       metaDescription: page.seo.metaDescription,
     });
+    setFormErrors({});
     setModalOpen(true);
   }
 
@@ -243,9 +287,25 @@ export default function PagesPage() {
     deleteMutation.mutate(deleteTarget._id);
   }
 
-  function handleSave() {
-    if (!formData.title.trim()) {
-      toast.error("Title is required.");
+  function setField<K extends keyof PagePayload>(key: K, value: PagePayload[K]) {
+    setFormData((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+    setFormErrors((prev) => ({
+      ...prev,
+      [key as keyof PageFormErrors]: undefined,
+    }));
+  }
+
+  async function handleSave() {
+    const errors = validatePageForm(formData, data, editTarget?._id);
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error(
+        Object.values(errors)[0] ?? "Please correct the highlighted fields.",
+      );
       return;
     }
 
@@ -260,17 +320,27 @@ export default function PagesPage() {
       metaDescription: formData.metaDescription.trim(),
     };
 
-    if (!payload.slug) {
-      toast.error("Slug is required.");
-      return;
-    }
+    try {
+      if (editTarget) {
+        await updateMutation.mutateAsync({ id: editTarget._id, payload });
+        return;
+      }
 
-    if (editTarget) {
-      updateMutation.mutate({ id: editTarget._id, payload });
-      return;
-    }
+      await addMutation.mutateAsync(payload);
+    } catch (error) {
+      const backendErrors = mapApiErrorsToFields<keyof PageFormErrors>(error, {
+        title: /title/i,
+        slug: /slug/i,
+        metaTitle: /meta title/i,
+        metaDescription: /meta description/i,
+      });
 
-    addMutation.mutate(payload);
+      if (Object.keys(backendErrors).length > 0) {
+        setFormErrors((prev) => ({ ...prev, ...backendErrors }));
+      }
+
+      toast.error(getApiErrorMessage(error, "Failed to save page."));
+    }
   }
 
   const columns: TableColumn<PageItem>[] = [
@@ -428,10 +498,18 @@ export default function PagesPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(nextOpen) => {
+          setModalOpen(nextOpen);
+          if (!nextOpen) {
+            setFormErrors({});
+          }
+        }}
+        modal={false}
+      >
         <DialogContent
           className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-[1200px]"
-          // Disable Radix focus trap — TinyMCE manages its own focus
           onInteractOutside={(e) => {
             const el = e.target as HTMLElement;
             if (
@@ -457,29 +535,26 @@ export default function PagesPage() {
           <div className="space-y-6">
             <div className="grid gap-4 lg:grid-cols-3">
               <div className="space-y-2 lg:col-span-2">
-                <Label htmlFor="page-title">Page Title</Label>
+                <Label htmlFor="page-title">
+                  Page Title <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="page-title"
                   value={formData.title}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      title: event.target.value,
-                    }))
-                  }
+                  onChange={(event) => setField("title", event.target.value)}
                   placeholder="About Samarpan Hospital"
-                  className="rounded-xl"
+                  className={`rounded-xl ${formErrors.title ? "border-red-400 focus-visible:ring-red-400" : ""}`}
                 />
+                {formErrors.title ? (
+                  <p className="text-xs text-red-500">{formErrors.title}</p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="page-status">Status</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      status: value as PageStatus,
-                    }))
+                    setField("status", value as PageStatus)
                   }
                 >
                   <SelectTrigger id="page-status" className="rounded-xl">
@@ -498,22 +573,21 @@ export default function PagesPage() {
               <Input
                 id="page-slug"
                 value={formData.slug}
-                onChange={(event) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    slug: event.target.value,
-                  }))
-                }
+                onChange={(event) => setField("slug", event.target.value)}
                 placeholder="about-samarpan"
-                className="rounded-xl"
+                className={`rounded-xl ${formErrors.slug ? "border-red-400 focus-visible:ring-red-400" : ""}`}
               />
-              <p className="text-xs text-slate-500">
-                Leave it clean and short. We’ll save this as `/
-                {formData.slug.trim()
-                  ? slugify(formData.slug)
-                  : slugify(formData.title) || "page-slug"}
-                `.
-              </p>
+              {formErrors.slug ? (
+                <p className="text-xs text-red-500">{formErrors.slug}</p>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  Leave it clean and short. We’ll save this as `/
+                  {formData.slug.trim()
+                    ? slugify(formData.slug)
+                    : slugify(formData.title) || "page-slug"}
+                  `.
+                </p>
+              )}
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
@@ -534,14 +608,24 @@ export default function PagesPage() {
                     id="page-meta-title"
                     value={formData.metaTitle}
                     onChange={(event) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        metaTitle: event.target.value,
-                      }))
+                      setField("metaTitle", event.target.value)
                     }
                     placeholder="Samarpan Hospital | Expert Care in Hisar"
-                    className="rounded-xl bg-white"
+                    maxLength={60}
+                    className={`rounded-xl bg-white ${formErrors.metaTitle ? "border-red-400 focus-visible:ring-red-400" : ""}`}
                   />
+                  <div className="flex items-center justify-between gap-3 text-xs">
+                    {formErrors.metaTitle ? (
+                      <p className="text-red-500">{formErrors.metaTitle}</p>
+                    ) : (
+                      <p className="text-slate-500">
+                        Aim for 50 to 60 characters.
+                      </p>
+                    )}
+                    <span className="text-slate-400">
+                      {formData.metaTitle.length}/60
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -553,14 +637,26 @@ export default function PagesPage() {
                     rows={4}
                     value={formData.metaDescription}
                     onChange={(event) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        metaDescription: event.target.value,
-                      }))
+                      setField("metaDescription", event.target.value)
                     }
                     placeholder="Short SEO description for this page."
-                    className="rounded-2xl bg-white"
+                    maxLength={160}
+                    className={`rounded-2xl bg-white ${formErrors.metaDescription ? "border-red-400 focus-visible:ring-red-400" : ""}`}
                   />
+                  <div className="flex items-center justify-between gap-3 text-xs">
+                    {formErrors.metaDescription ? (
+                      <p className="text-red-500">
+                        {formErrors.metaDescription}
+                      </p>
+                    ) : (
+                      <p className="text-slate-500">
+                        Search descriptions usually fit within 160 characters.
+                      </p>
+                    )}
+                    <span className="text-slate-400">
+                      {formData.metaDescription.length}/160
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -570,12 +666,7 @@ export default function PagesPage() {
               <div className="website-page-editor">
                 <PageEditor
                   value={formData.content}
-                  onChange={(content) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      content,
-                    }))
-                  }
+                  onChange={(content) => setField("content", content)}
                 />
               </div>
             </div>

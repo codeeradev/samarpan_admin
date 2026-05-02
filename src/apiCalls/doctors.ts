@@ -1,5 +1,6 @@
 import { get, post } from "@/apis/apiClient";
 import { ENDPOINT } from "@/apis/endpoint";
+import { createApiRequestError } from "@/lib/api-errors";
 
 export interface DoctorPayload {
   name: string;
@@ -81,7 +82,7 @@ export const getAllDoctorsApi = async (): Promise<DoctorItem[]> => {
     const res = await get(ENDPOINT.GET_ALL_DOCTORS, { needAuth: true });
     return res?.data?.doctors ?? [];
   } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to fetch doctors");
+    throw createApiRequestError(error, "Failed to fetch doctors");
   }
 };
 
@@ -94,7 +95,7 @@ export const addDoctorApi = async (
     });
     return res?.data?.doctor;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to add doctor");
+    throw createApiRequestError(error, "Failed to add doctor");
   }
 };
 
@@ -110,7 +111,7 @@ export const updateDoctorApi = async (
     );
     return res?.data?.doctor;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to update doctor");
+    throw createApiRequestError(error, "Failed to update doctor");
   }
 };
 
@@ -120,6 +121,6 @@ export const deleteDoctorApi = async (id: string): Promise<void> => {
       needAuth: true,
     });
   } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to delete doctor");
+    throw createApiRequestError(error, "Failed to delete doctor");
   }
 };

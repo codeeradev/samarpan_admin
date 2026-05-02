@@ -1,6 +1,6 @@
 export const BASE_URL =
-  // import.meta.env.VITE_API_URL || "https://samarpanapi.codeeratech.com/admin";
-import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
+  import.meta.env.VITE_API_URL || "https://samarpanapi.codeeratech.com/admin";
+// import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
 
 export const ENDPOINT = {
   LOGIN: "/admin-login",
@@ -26,6 +26,14 @@ export const ENDPOINT = {
   GET_ALL_GALLERY: "/get-all-gallery",
   ADD_GALLERY: "/add-gallery",
   DELETE_GALLERY: "/delete-gallery",
+  GET_ALL_CAREERS: "/get-all-careers",
+  ADD_CAREER: "/add-career",
+  UPDATE_CAREER: "/update-career",
+  DELETE_CAREER: "/delete-career",
+  ADD_HONOR: "/add-honor",
+  GET_ALL_HONORS: "/get-all-honors",
+  UPDATE_HONOR: "/update-honor",
+  DELETE_HONOR: "/delete-honor",
   GET_CONTENT: "/get-content",
   UPSERT_CONTENT: "/upsert-content",
   GET_ALL_PAGES: "/get-all-pages",
@@ -42,4 +50,9 @@ export const ENDPOINT = {
   GET_APPOINTMENTS: "/get-appointments",
   UPDATE_APPOINTMENT: "/update-appointment",
   GET_DASHBOARD: "/get-dashboard",
+
+  ADD_SPECIALIZATION: "/add-specialization",
+  GET_ALL_SPECIALIZATIONS: "/get-all-specializations",
+  UPDATE_SPECIALIZATION: "/update-specialization",
+  DELETE_SPECIALIZATION: "/delete-specialization",
 };

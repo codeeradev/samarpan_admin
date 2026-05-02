@@ -33,6 +33,10 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  getApiErrorMessage,
+  mapApiErrorsToFields,
+} from "@/lib/api-errors";
 
 import { toast } from "sonner";
 import { Eye, Plus, Pencil, Trash2, Upload } from "lucide-react";
@@ -40,6 +44,76 @@ import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 
 const BLOG_QUERY_KEY = ["blogs"];
 const SERVICES_QUERY_KEY = ["services"];
+
+type BlogFormState = {
+  title: string;
+  shortDescription: string;
+  content: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  status: "draft" | "published";
+  serviceId: string;
+  image: File | null;
+};
+
+type BlogFormErrors = Partial<
+  Record<
+    "title" | "serviceId" | "shortDescription" | "content" | "metaTitle" | "metaDescription" | "image",
+    string
+  >
+>;
+
+const EMPTY_FORM: BlogFormState = {
+  title: "",
+  shortDescription: "",
+  content: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: "",
+  status: "published",
+  serviceId: "",
+  image: null,
+};
+
+function validateBlogForm(
+  form: BlogFormState,
+  mode: "add" | "edit",
+): BlogFormErrors {
+  const errors: BlogFormErrors = {};
+
+  if (!form.title.trim()) {
+    errors.title = "Title is required.";
+  }
+
+  if (!form.serviceId) {
+    errors.serviceId = "Please select a service.";
+  }
+
+  if (!form.shortDescription.trim()) {
+    errors.shortDescription = "Short description is required.";
+  } else if (form.shortDescription.trim().length > 300) {
+    errors.shortDescription = "Short description cannot exceed 300 characters.";
+  }
+
+  if (!form.content.trim()) {
+    errors.content = "Content is required.";
+  }
+
+  if (form.metaTitle.trim().length > 60) {
+    errors.metaTitle = "Meta title should stay within 60 characters.";
+  }
+
+  if (form.metaDescription.trim().length > 160) {
+    errors.metaDescription = "Meta description should stay within 160 characters.";
+  }
+
+  if (mode === "add" && !form.image) {
+    errors.image = "Featured image is required.";
+  }
+
+  return errors;
+}
 
 export default function BlogsPage() {
   const queryClient = useQueryClient();
@@ -50,18 +124,8 @@ export default function BlogsPage() {
   const [previewTarget, setPreviewTarget] = useState<BlogItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<BlogItem | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  const [form, setForm] = useState({
-    title: "",
-    shortDescription: "",
-    content: "",
-    metaTitle: "",
-    metaDescription: "",
-    keywords: "",
-    status: "published",
-    serviceId: "",
-    image: null as File | null,
-  });
+  const [form, setForm] = useState<BlogFormState>(EMPTY_FORM);
+  const [formErrors, setFormErrors] = useState<BlogFormErrors>({});
 
   const { data: blogs = [], isLoading } = useQuery({
     queryKey: BLOG_QUERY_KEY,
@@ -98,17 +162,8 @@ export default function BlogsPage() {
     setMode("add");
     setSelected(null);
     setImagePreview(null);
-    setForm({
-      title: "",
-      shortDescription: "",
-      content: "",
-      metaTitle: "",
-      metaDescription: "",
-      keywords: "",
-      status: "published",
-      serviceId: "",
-      image: null,
-    });
+    setForm(EMPTY_FORM);
+    setFormErrors({});
     setOpen(true);
   };
 
@@ -129,33 +184,36 @@ export default function BlogsPage() {
       serviceId: blog.serviceId || "",
       image: null,
     });
+    setFormErrors({});
 
     setOpen(true);
   };
 
   const handleImage = (file: File | null) => {
     if (!file) return;
-    setForm({ ...form, image: file });
+    setField("image", file);
     setImagePreview(URL.createObjectURL(file));
   };
 
+  function setField<K extends keyof BlogFormState>(
+    key: K,
+    value: BlogFormState[K],
+  ) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setFormErrors((prev) => ({
+      ...prev,
+      [key as keyof BlogFormErrors]: undefined,
+    }));
+  }
+
   const handleSave = async () => {
-    if (
-      !form.title.trim() ||
-      !form.shortDescription.trim() ||
-      !form.content.trim()
-    ) {
-      toast.error("Title, description and content are required.");
-      return;
-    }
+    const errors = validateBlogForm(form, mode);
 
-    if (!form.serviceId) {
-      toast.error("Please select a service.");
-      return;
-    }
-
-    if (mode === "add" && !form.image) {
-      toast.error("Please upload image.");
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error(
+        Object.values(errors)[0] ?? "Please correct the highlighted fields.",
+      );
       return;
     }
 
@@ -193,21 +251,32 @@ export default function BlogsPage() {
       queryClient.invalidateQueries({ queryKey: BLOG_QUERY_KEY });
       setOpen(false);
     } catch (error: any) {
+      const backendErrors = mapApiErrorsToFields<keyof BlogFormErrors>(error, {
+        title: /title/i,
+        serviceId: /service/i,
+        shortDescription: /short description/i,
+        content: /content/i,
+        metaTitle: /meta title/i,
+        metaDescription: /meta description/i,
+        image: /\bimage\b/i,
+      });
 
-      console.log(error)
-      const message =
-        error?.response?.data?.errors?.[0] ||
-        error?.response?.data?.message ||
-        "Something went wrong";
+      if (Object.keys(backendErrors).length > 0) {
+        setFormErrors((prev) => ({ ...prev, ...backendErrors }));
+      }
 
-      toast.error(message);
+      toast.error(getApiErrorMessage(error, "Failed to save blog."));
     }
   };
 
   const handleDelete = async (id: string) => {
-    await deleteMutation.mutateAsync(id);
-    queryClient.invalidateQueries({ queryKey: BLOG_QUERY_KEY });
-    toast.success("Deleted");
+    try {
+      await deleteMutation.mutateAsync(id);
+      queryClient.invalidateQueries({ queryKey: BLOG_QUERY_KEY });
+      toast.success("Deleted");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to delete blog."));
+    }
   };
 
   const columns: Column<BlogItem>[] = [
@@ -329,7 +398,15 @@ export default function BlogsPage() {
         data-ocid="blogs.table"
       />
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(nextOpen) => {
+          setOpen(nextOpen);
+          if (!nextOpen) {
+            setFormErrors({});
+          }
+        }}
+      >
         <DialogContent className="max-w-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>
@@ -344,22 +421,28 @@ export default function BlogsPage() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>Title</Label>
+                    <Label>
+                      Title <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       value={form.title}
-                      onChange={(e) =>
-                        setForm({ ...form, title: e.target.value })
-                      }
+                      onChange={(e) => setField("title", e.target.value)}
+                      className={formErrors.title ? "border-red-400 focus-visible:ring-red-400" : undefined}
                     />
+                    {formErrors.title ? (
+                      <p className="text-xs text-red-500">{formErrors.title}</p>
+                    ) : null}
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Service</Label>
+                    <Label>
+                      Service <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       value={form.serviceId}
-                      onValueChange={(v) => setForm({ ...form, serviceId: v })}
+                      onValueChange={(v) => setField("serviceId", v)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className={formErrors.serviceId ? "border-red-400 focus-visible:ring-red-400" : undefined}>
                         <SelectValue placeholder="Select Service" />
                       </SelectTrigger>
                       <SelectContent>
@@ -370,6 +453,11 @@ export default function BlogsPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {formErrors.serviceId ? (
+                      <p className="text-xs text-red-500">
+                        {formErrors.serviceId}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="space-y-2">
@@ -377,10 +465,7 @@ export default function BlogsPage() {
                     <Select
                       value={form.status}
                       onValueChange={(v) =>
-                        setForm({
-                          ...form,
-                          status: v as "draft" | "published",
-                        })
+                        setField("status", v as "draft" | "published")
                       }
                     >
                       <SelectTrigger>
@@ -400,22 +485,42 @@ export default function BlogsPage() {
               <CardContent className="p-6 space-y-4">
                 <h3 className="font-semibold">Content</h3>
 
-                <Textarea
-                  placeholder="Short Description"
-                  value={form.shortDescription}
-                  onChange={(e) =>
-                    setForm({ ...form, shortDescription: e.target.value })
-                  }
-                />
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Short Description"
+                    value={form.shortDescription}
+                    onChange={(e) =>
+                      setField("shortDescription", e.target.value)
+                    }
+                    maxLength={300}
+                    className={formErrors.shortDescription ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  />
+                  <div className="flex items-center justify-between gap-3 text-xs">
+                    {formErrors.shortDescription ? (
+                      <p className="text-red-500">
+                        {formErrors.shortDescription}
+                      </p>
+                    ) : (
+                      <p className="text-slate-500">
+                        Keep this concise for blog cards and listings.
+                      </p>
+                    )}
+                    <span className="text-slate-400">
+                      {form.shortDescription.length}/300
+                    </span>
+                  </div>
+                </div>
 
                 <Textarea
                   placeholder="Blog Content"
                   rows={8}
                   value={form.content}
-                  onChange={(e) =>
-                    setForm({ ...form, content: e.target.value })
-                  }
+                  onChange={(e) => setField("content", e.target.value)}
+                  className={formErrors.content ? "border-red-400 focus-visible:ring-red-400" : undefined}
                 />
+                {formErrors.content ? (
+                  <p className="text-xs text-red-500">{formErrors.content}</p>
+                ) : null}
               </CardContent>
             </Card>
 
@@ -426,28 +531,45 @@ export default function BlogsPage() {
                 <Input
                   placeholder="Meta Title"
                   value={form.metaTitle}
-                  onChange={(e) =>
-                    setForm({ ...form, metaTitle: e.target.value })
-                  }
+                  onChange={(e) => setField("metaTitle", e.target.value)}
+                  maxLength={60}
+                  className={formErrors.metaTitle ? "border-red-400 focus-visible:ring-red-400" : undefined}
                 />
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  {formErrors.metaTitle ? (
+                    <p className="text-red-500">{formErrors.metaTitle}</p>
+                  ) : (
+                    <p className="text-slate-500">
+                      Search engines usually show about 60 characters.
+                    </p>
+                  )}
+                  <span className="text-slate-400">{form.metaTitle.length}/60</span>
+                </div>
 
                 <Textarea
                   placeholder="Meta Description"
                   value={form.metaDescription}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      metaDescription: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setField("metaDescription", e.target.value)}
+                  maxLength={160}
+                  className={formErrors.metaDescription ? "border-red-400 focus-visible:ring-red-400" : undefined}
                 />
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  {formErrors.metaDescription ? (
+                    <p className="text-red-500">{formErrors.metaDescription}</p>
+                  ) : (
+                    <p className="text-slate-500">
+                      Search snippets usually fit within 160 characters.
+                    </p>
+                  )}
+                  <span className="text-slate-400">
+                    {form.metaDescription.length}/160
+                  </span>
+                </div>
 
                 <Input
                   placeholder="Keywords (comma separated)"
                   value={form.keywords}
-                  onChange={(e) =>
-                    setForm({ ...form, keywords: e.target.value })
-                  }
+                  onChange={(e) => setField("keywords", e.target.value)}
                 />
               </CardContent>
             </Card>
@@ -459,6 +581,7 @@ export default function BlogsPage() {
                 {imagePreview && (
                   <img
                     src={imagePreview}
+                    alt="Blog preview"
                     className="w-full h-48 object-cover rounded-lg"
                   />
                 )}
@@ -473,6 +596,13 @@ export default function BlogsPage() {
                     onChange={(e) => handleImage(e.target.files?.[0] || null)}
                   />
                 </label>
+                {formErrors.image ? (
+                  <p className="text-xs text-red-500">{formErrors.image}</p>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    Upload a featured image for new blog posts.
+                  </p>
+                )}
               </CardContent>
             </Card>
 

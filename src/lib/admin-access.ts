@@ -138,6 +138,8 @@ const PATH_PERMISSION_RULES: Record<
 > = {
   "/dashboard": {},
   "/doctors": { permissions: ["view_doctors", "manage_doctors"] },
+  "/specializations": { superAdminOnly: true },
+  "/honors": { superAdminOnly: true },
   "/patients": { permissions: ["view_users", "manage_users"] },
   "/appointments": {
     permissions: ["view_appointments", "manage_appointments"],
@@ -157,6 +159,7 @@ const PATH_PERMISSION_RULES: Record<
   },
   "/website-content": { superAdminOnly: true },
   "/website-pages": { superAdminOnly: true },
+  "/careers": { superAdminOnly: true },
   "/settings": { permissions: ["view_settings", "manage_settings"] },
   "/roles": {
     permissions: ["view_admin_staff", "manage_admin_staff"],

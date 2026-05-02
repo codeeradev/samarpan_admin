@@ -23,7 +23,13 @@ type ImageUploadFieldProps = {
   onPick: (file: File) => void;
 };
 
-function ImageUploadField({ id, label, hint, value, onPick }: ImageUploadFieldProps) {
+function ImageUploadField({
+  id,
+  label,
+  hint,
+  value,
+  onPick,
+}: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
@@ -40,7 +46,11 @@ function ImageUploadField({ id, label, hint, value, onPick }: ImageUploadFieldPr
           </div>
           <div className="min-w-0">
             <p className="text-sm font-medium text-[#1E293B]">
-              {value instanceof File ? value.name : value ? value.split("/").filter(Boolean).pop() ?? value : "No file selected"}
+              {value instanceof File
+                ? value.name
+                : value
+                  ? (value.split("/").filter(Boolean).pop() ?? value)
+                  : "No file selected"}
             </p>
             <p className="text-xs text-[#94A3B8] mt-1">{hint}</p>
           </div>
@@ -85,7 +95,9 @@ export function HeroSectionEditor({
         <div className="space-y-2">
           <Label>Section Status</Label>
           <div className="h-10 rounded-xl border border-slate-200 px-3 flex items-center justify-between">
-            <span className="text-sm text-[#475569]">Show this hero on the website</span>
+            <span className="text-sm text-[#475569]">
+              Show this hero on the website
+            </span>
             <Switch
               checked={form.isActive}
               onCheckedChange={(checked) => updateField("isActive", checked)}
@@ -108,7 +120,9 @@ export function HeroSectionEditor({
           <Label>Highlighted Title</Label>
           <Input
             value={form.titleHighlight}
-            onChange={(event) => updateField("titleHighlight", event.target.value)}
+            onChange={(event) =>
+              updateField("titleHighlight", event.target.value)
+            }
             placeholder="Women's Health &"
             className="rounded-xl"
           />
@@ -138,7 +152,9 @@ export function HeroSectionEditor({
           <Label>Primary CTA Text</Label>
           <Input
             value={form.primaryCtaText}
-            onChange={(event) => updateField("primaryCtaText", event.target.value)}
+            onChange={(event) =>
+              updateField("primaryCtaText", event.target.value)
+            }
             placeholder="Book Appointment"
             className="rounded-xl"
           />
@@ -147,7 +163,9 @@ export function HeroSectionEditor({
           <Label>Primary CTA Link</Label>
           <Input
             value={form.primaryCtaLink}
-            onChange={(event) => updateField("primaryCtaLink", event.target.value)}
+            onChange={(event) =>
+              updateField("primaryCtaLink", event.target.value)
+            }
             placeholder="/appointment"
             className="rounded-xl"
           />
@@ -156,7 +174,9 @@ export function HeroSectionEditor({
           <Label>Secondary CTA Text</Label>
           <Input
             value={form.secondaryCtaText}
-            onChange={(event) => updateField("secondaryCtaText", event.target.value)}
+            onChange={(event) =>
+              updateField("secondaryCtaText", event.target.value)
+            }
             placeholder="WhatsApp Us"
             className="rounded-xl"
           />
@@ -165,7 +185,9 @@ export function HeroSectionEditor({
           <Label>Secondary CTA Link</Label>
           <Input
             value={form.secondaryCtaLink}
-            onChange={(event) => updateField("secondaryCtaLink", event.target.value)}
+            onChange={(event) =>
+              updateField("secondaryCtaLink", event.target.value)
+            }
             placeholder="https://wa.me/..."
             className="rounded-xl"
           />
@@ -177,7 +199,9 @@ export function HeroSectionEditor({
           <Label>Support Card Title</Label>
           <Input
             value={form.supportTitle}
-            onChange={(event) => updateField("supportTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("supportTitle", event.target.value)
+            }
             placeholder="24/7"
             className="rounded-xl"
           />
@@ -186,7 +210,9 @@ export function HeroSectionEditor({
           <Label>Support Card Subtitle</Label>
           <Input
             value={form.supportSubtitle}
-            onChange={(event) => updateField("supportSubtitle", event.target.value)}
+            onChange={(event) =>
+              updateField("supportSubtitle", event.target.value)
+            }
             placeholder="Emergency Care"
             className="rounded-xl"
           />
@@ -195,7 +221,9 @@ export function HeroSectionEditor({
           <Label>Success Rate Value</Label>
           <Input
             value={form.successRateValue}
-            onChange={(event) => updateField("successRateValue", event.target.value)}
+            onChange={(event) =>
+              updateField("successRateValue", event.target.value)
+            }
             placeholder="99%"
             className="rounded-xl"
           />
@@ -204,7 +232,9 @@ export function HeroSectionEditor({
           <Label>Success Rate Label</Label>
           <Input
             value={form.successRateLabel}
-            onChange={(event) => updateField("successRateLabel", event.target.value)}
+            onChange={(event) =>
+              updateField("successRateLabel", event.target.value)
+            }
             placeholder="Success Rate"
             className="rounded-xl"
           />
@@ -216,7 +246,9 @@ export function HeroSectionEditor({
           <Label>Feature Point 1</Label>
           <Input
             value={form.featurePointOne}
-            onChange={(event) => updateField("featurePointOne", event.target.value)}
+            onChange={(event) =>
+              updateField("featurePointOne", event.target.value)
+            }
             placeholder="Safe & Hygienic"
             className="rounded-xl"
           />
@@ -225,7 +257,9 @@ export function HeroSectionEditor({
           <Label>Feature Point 2</Label>
           <Input
             value={form.featurePointTwo}
-            onChange={(event) => updateField("featurePointTwo", event.target.value)}
+            onChange={(event) =>
+              updateField("featurePointTwo", event.target.value)
+            }
             placeholder="20+ Years Expert"
             className="rounded-xl"
           />
@@ -234,7 +268,9 @@ export function HeroSectionEditor({
           <Label>Feature Point 3</Label>
           <Input
             value={form.featurePointThree}
-            onChange={(event) => updateField("featurePointThree", event.target.value)}
+            onChange={(event) =>
+              updateField("featurePointThree", event.target.value)
+            }
             placeholder="10,000+ Happy Patients"
             className="rounded-xl"
           />
@@ -290,7 +326,9 @@ export function HowItWorksSectionEditor({
         <div className="space-y-2">
           <Label>Section Status</Label>
           <div className="h-10 rounded-xl border border-slate-200 px-3 flex items-center justify-between">
-            <span className="text-sm text-[#475569]">Show this section on the website</span>
+            <span className="text-sm text-[#475569]">
+              Show this section on the website
+            </span>
             <Switch
               checked={form.isActive}
               onCheckedChange={(checked) => updateField("isActive", checked)}
@@ -337,7 +375,9 @@ export function HowItWorksSectionEditor({
           <Label>Step One Title</Label>
           <Input
             value={form.stepOneTitle}
-            onChange={(event) => updateField("stepOneTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("stepOneTitle", event.target.value)
+            }
             placeholder="Personalized Consultation"
             className="rounded-xl"
           />
@@ -346,7 +386,9 @@ export function HowItWorksSectionEditor({
           <Label>Step One Description</Label>
           <Textarea
             value={form.stepOneDescription}
-            onChange={(event) => updateField("stepOneDescription", event.target.value)}
+            onChange={(event) =>
+              updateField("stepOneDescription", event.target.value)
+            }
             placeholder="We understand your skin concerns and goals to build a plan around your needs."
             className="rounded-2xl min-h-[110px] resize-none"
           />
@@ -358,7 +400,9 @@ export function HowItWorksSectionEditor({
           <Label>Step Two Title</Label>
           <Input
             value={form.stepTwoTitle}
-            onChange={(event) => updateField("stepTwoTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("stepTwoTitle", event.target.value)
+            }
             placeholder="Tailored Treatment Plans"
             className="rounded-xl"
           />
@@ -367,7 +411,9 @@ export function HowItWorksSectionEditor({
           <Label>Step Two Description</Label>
           <Textarea
             value={form.stepTwoDescription}
-            onChange={(event) => updateField("stepTwoDescription", event.target.value)}
+            onChange={(event) =>
+              updateField("stepTwoDescription", event.target.value)
+            }
             placeholder="Our specialists design a treatment approach that matches your condition and comfort."
             className="rounded-2xl min-h-[110px] resize-none"
           />
@@ -379,7 +425,9 @@ export function HowItWorksSectionEditor({
           <Label>Step Three Title</Label>
           <Input
             value={form.stepThreeTitle}
-            onChange={(event) => updateField("stepThreeTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("stepThreeTitle", event.target.value)
+            }
             placeholder="Continuous Care & Follow-Up"
             className="rounded-xl"
           />
@@ -388,7 +436,9 @@ export function HowItWorksSectionEditor({
           <Label>Step Three Description</Label>
           <Textarea
             value={form.stepThreeDescription}
-            onChange={(event) => updateField("stepThreeDescription", event.target.value)}
+            onChange={(event) =>
+              updateField("stepThreeDescription", event.target.value)
+            }
             placeholder="Regular follow-ups help us monitor progress and keep your results on track."
             className="rounded-2xl min-h-[110px] resize-none"
           />
@@ -430,7 +480,9 @@ export function WhyChooseUsSectionEditor({
         <div className="space-y-2">
           <Label>Section Status</Label>
           <div className="h-10 rounded-xl border border-slate-200 px-3 flex items-center justify-between">
-            <span className="text-sm text-[#475569]">Show this section on the website</span>
+            <span className="text-sm text-[#475569]">
+              Show this section on the website
+            </span>
             <Switch
               checked={form.isActive}
               onCheckedChange={(checked) => updateField("isActive", checked)}
@@ -461,11 +513,30 @@ export function WhyChooseUsSectionEditor({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
+        <ImageUploadField
+          id="why-choose-us-section-image"
+          label="Section Image"
+          hint="Image shown on the right side of the Why Choose Us preview."
+          value={form.sectionImage}
+          onPick={(file) => updateField("sectionImage", file)}
+        />
+        <ImageUploadField
+          id="why-choose-us-secondary-image"
+          label="Secondary Image (Small)"
+          hint="Small image shown below the main section image."
+          value={form.secondaryImage}
+          onPick={(file) => updateField("secondaryImage", file)}
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label>Card One Title</Label>
           <Input
             value={form.cardOneTitle}
-            onChange={(event) => updateField("cardOneTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("cardOneTitle", event.target.value)
+            }
             placeholder="Expertise And Professionalism"
             className="rounded-xl"
           />
@@ -474,7 +545,9 @@ export function WhyChooseUsSectionEditor({
           <Label>Card One Description</Label>
           <Textarea
             value={form.cardOneDescription}
-            onChange={(event) => updateField("cardOneDescription", event.target.value)}
+            onChange={(event) =>
+              updateField("cardOneDescription", event.target.value)
+            }
             placeholder="Our team consists of highly trained and certified dermatology specialists."
             className="rounded-2xl min-h-[110px] resize-none"
           />
@@ -486,7 +559,9 @@ export function WhyChooseUsSectionEditor({
           <Label>Card Two Title</Label>
           <Input
             value={form.cardTwoTitle}
-            onChange={(event) => updateField("cardTwoTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("cardTwoTitle", event.target.value)
+            }
             placeholder="Advanced Technology"
             className="rounded-xl"
           />
@@ -495,7 +570,9 @@ export function WhyChooseUsSectionEditor({
           <Label>Card Two Description</Label>
           <Textarea
             value={form.cardTwoDescription}
-            onChange={(event) => updateField("cardTwoDescription", event.target.value)}
+            onChange={(event) =>
+              updateField("cardTwoDescription", event.target.value)
+            }
             placeholder="We utilize modern laser systems to provide safe and effective treatments."
             className="rounded-2xl min-h-[110px] resize-none"
           />
@@ -507,7 +584,9 @@ export function WhyChooseUsSectionEditor({
           <Label>Card Three Title</Label>
           <Input
             value={form.cardThreeTitle}
-            onChange={(event) => updateField("cardThreeTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("cardThreeTitle", event.target.value)
+            }
             placeholder="Personalized Care"
             className="rounded-xl"
           />
@@ -516,7 +595,9 @@ export function WhyChooseUsSectionEditor({
           <Label>Card Three Description</Label>
           <Textarea
             value={form.cardThreeDescription}
-            onChange={(event) => updateField("cardThreeDescription", event.target.value)}
+            onChange={(event) =>
+              updateField("cardThreeDescription", event.target.value)
+            }
             placeholder="Every treatment plan is personalized according to your skin goals."
             className="rounded-2xl min-h-[110px] resize-none"
           />
@@ -528,7 +609,9 @@ export function WhyChooseUsSectionEditor({
           <Label>Card Four Title</Label>
           <Input
             value={form.cardFourTitle}
-            onChange={(event) => updateField("cardFourTitle", event.target.value)}
+            onChange={(event) =>
+              updateField("cardFourTitle", event.target.value)
+            }
             placeholder="Safety And Standards"
             className="rounded-xl"
           />
@@ -537,7 +620,9 @@ export function WhyChooseUsSectionEditor({
           <Label>Card Four Description</Label>
           <Textarea
             value={form.cardFourDescription}
-            onChange={(event) => updateField("cardFourDescription", event.target.value)}
+            onChange={(event) =>
+              updateField("cardFourDescription", event.target.value)
+            }
             placeholder="We follow strict protocols and high-quality medical safety standards."
             className="rounded-2xl min-h-[110px] resize-none"
           />
@@ -569,7 +654,9 @@ export function AboutSectionEditor({
         <div className="space-y-2">
           <Label>Section Status</Label>
           <div className="h-10 rounded-xl border border-slate-200 px-3 flex items-center justify-between">
-            <span className="text-sm text-[#475569]">Show this section on the website</span>
+            <span className="text-sm text-[#475569]">
+              Show this section on the website
+            </span>
             <Switch
               checked={form.isActive}
               onCheckedChange={(checked) => updateField("isActive", checked)}
@@ -718,13 +805,22 @@ export function HeroPreview({ form }: { form: HeroFormState }) {
               </div>
 
               <div className="space-y-1">
-                <h2 className="text-4xl lg:text-5xl leading-none font-bold text-[#1B1B1B]" style={{ fontFamily: "Georgia, serif" }}>
+                <h2
+                  className="text-4xl lg:text-5xl leading-none font-bold text-[#1B1B1B]"
+                  style={{ fontFamily: "Georgia, serif" }}
+                >
                   {form.titlePrefix || "Your Trusted Partner in"}
                 </h2>
-                <h3 className="text-4xl lg:text-5xl leading-none font-bold text-[#C58972]" style={{ fontFamily: "Georgia, serif" }}>
+                <h3
+                  className="text-4xl lg:text-5xl leading-none font-bold text-[#C58972]"
+                  style={{ fontFamily: "Georgia, serif" }}
+                >
                   {form.titleHighlight || "Women's Health &"}
                 </h3>
-                <h4 className="text-4xl lg:text-5xl leading-none font-bold text-[#1B1B1B]" style={{ fontFamily: "Georgia, serif" }}>
+                <h4
+                  className="text-4xl lg:text-5xl leading-none font-bold text-[#1B1B1B]"
+                  style={{ fontFamily: "Georgia, serif" }}
+                >
                   {form.titleSuffix || "Aesthetic Care"}
                 </h4>
               </div>
@@ -746,7 +842,10 @@ export function HeroPreview({ form }: { form: HeroFormState }) {
               <div className="flex flex-wrap gap-3 pt-2">
                 {featurePoints.length > 0 ? (
                   featurePoints.map((point) => (
-                    <div key={point} className="inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-2 text-xs font-medium text-[#4B5563]">
+                    <div
+                      key={point}
+                      className="inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-2 text-xs font-medium text-[#4B5563]"
+                    >
                       <BadgeCheck size={14} className="text-[#C58972]" />
                       {point}
                     </div>
@@ -772,19 +871,31 @@ export function HeroPreview({ form }: { form: HeroFormState }) {
 
             <div className="relative flex items-end justify-center min-h-[360px]">
               <div className="absolute left-0 top-12 rounded-3xl bg-white px-4 py-3 shadow-sm border border-slate-100">
-                <p className="text-xl font-bold text-[#1E293B]">{form.supportTitle || "24/7"}</p>
-                <p className="text-xs text-[#64748B]">{form.supportSubtitle || "Emergency Care"}</p>
+                <p className="text-xl font-bold text-[#1E293B]">
+                  {form.supportTitle || "24/7"}
+                </p>
+                <p className="text-xs text-[#64748B]">
+                  {form.supportSubtitle || "Emergency Care"}
+                </p>
               </div>
 
               <div className="absolute right-0 top-2 rounded-3xl bg-white px-4 py-3 shadow-sm border border-slate-100">
-                <p className="text-xl font-bold text-[#C58972]">{form.successRateValue || "99%"}</p>
-                <p className="text-xs text-[#64748B]">{form.successRateLabel || "Success Rate"}</p>
+                <p className="text-xl font-bold text-[#C58972]">
+                  {form.successRateValue || "99%"}
+                </p>
+                <p className="text-xs text-[#64748B]">
+                  {form.successRateLabel || "Success Rate"}
+                </p>
               </div>
 
               <div className="relative w-full flex items-end justify-center">
                 <div className="w-[78%] max-w-[320px] rounded-[32px] border border-white/70 bg-white/90 shadow-lg overflow-hidden">
                   {primaryImageUrl ? (
-                    <img src={primaryImageUrl} alt="Primary doctor" className="h-[360px] w-full object-cover" />
+                    <img
+                      src={primaryImageUrl}
+                      alt="Primary doctor"
+                      className="h-[360px] w-full object-cover"
+                    />
                   ) : (
                     <div className="h-[360px] w-full flex items-center justify-center bg-[#F3E7DD] text-[#B9775B]">
                       <ImageIcon size={28} />
@@ -793,7 +904,11 @@ export function HeroPreview({ form }: { form: HeroFormState }) {
                 </div>
                 <div className="absolute -right-1 bottom-8 w-[42%] max-w-[160px] rounded-[24px] border border-white/70 bg-white/95 shadow-md overflow-hidden">
                   {secondaryImageUrl ? (
-                    <img src={secondaryImageUrl} alt="Secondary doctor" className="h-[190px] w-full object-cover" />
+                    <img
+                      src={secondaryImageUrl}
+                      alt="Secondary doctor"
+                      className="h-[190px] w-full object-cover"
+                    />
                   ) : (
                     <div className="h-[190px] w-full flex items-center justify-center bg-[#F8EFE8] text-[#B9775B]">
                       <ImageIcon size={22} />
@@ -811,11 +926,12 @@ export function HeroPreview({ form }: { form: HeroFormState }) {
 
 export function HowItWorksPreview({ form }: { form: HowItWorksFormState }) {
   const sectionImageUrl = resolveAssetUrl(form.sectionImage);
-
   return (
     <Card className="rounded-3xl overflow-hidden border-slate-100 shadow-sm bg-white">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm text-[#1E293B]">How We Work Preview</CardTitle>
+        <CardTitle className="text-sm text-[#1E293B]">
+          How We Work Preview
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-8 lg:grid-cols-[1.3fr_0.9fr] p-6 lg:p-8">
@@ -825,7 +941,8 @@ export function HowItWorksPreview({ form }: { form: HowItWorksFormState }) {
             </div>
             <div className="space-y-3">
               <h2 className="text-4xl font-bold text-[#1B1B1B]">
-                {form.heading || "How we work: a commitment to your skin health"}
+                {form.heading ||
+                  "How we work: a commitment to your skin health"}
               </h2>
               <p className="text-sm text-[#64748B] max-w-2xl">
                 {form.subheading ||
@@ -853,9 +970,16 @@ export function HowItWorksPreview({ form }: { form: HowItWorksFormState }) {
                     "Regular follow-ups help us monitor progress and keep your results on track.",
                 },
               ].map((step) => (
-                <div key={step.title} className="rounded-3xl border border-slate-200 bg-[#FEFBF7] p-5">
-                  <p className="text-lg font-semibold text-[#1B1B1B]">{step.title}</p>
-                  <p className="text-sm leading-7 text-[#64748B] mt-2">{step.description}</p>
+                <div
+                  key={step.title}
+                  className="rounded-3xl border border-slate-200 bg-[#FEFBF7] p-5"
+                >
+                  <p className="text-lg font-semibold text-[#1B1B1B]">
+                    {step.title}
+                  </p>
+                  <p className="text-sm leading-7 text-[#64748B] mt-2">
+                    {step.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -863,7 +987,11 @@ export function HowItWorksPreview({ form }: { form: HowItWorksFormState }) {
 
           <div className="rounded-[28px] overflow-hidden border border-slate-100 bg-[#F7EFE6]">
             {sectionImageUrl ? (
-              <img src={sectionImageUrl} alt="How we work" className="h-full min-h-[360px] w-full object-cover" />
+              <img
+                src={sectionImageUrl}
+                alt="How we work"
+                className="h-full min-h-[360px] w-full object-cover"
+              />
             ) : (
               <div className="flex h-full min-h-[360px] items-center justify-center text-[#B9775B]">
                 <ImageIcon size={28} />
@@ -877,6 +1005,8 @@ export function HowItWorksPreview({ form }: { form: HowItWorksFormState }) {
 }
 
 export function WhyChooseUsPreview({ form }: { form: WhyChooseUsFormState }) {
+  const sectionImageUrl = resolveAssetUrl(form.sectionImage);
+  const secondaryImageUrl = resolveAssetUrl(form.secondaryImage);
   const cards = [
     {
       title: form.cardOneTitle || "Expertise And Professionalism",
@@ -907,7 +1037,9 @@ export function WhyChooseUsPreview({ form }: { form: WhyChooseUsFormState }) {
   return (
     <Card className="rounded-3xl overflow-hidden border-slate-100 shadow-sm bg-white">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm text-[#1E293B]">Why Choose Us Preview</CardTitle>
+        <CardTitle className="text-sm text-[#1E293B]">
+          Why Choose Us Preview
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] p-6 lg:p-8">
@@ -926,15 +1058,42 @@ export function WhyChooseUsPreview({ form }: { form: WhyChooseUsFormState }) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {cards.map((card) => (
-                <div key={card.title} className="rounded-3xl border border-slate-200 bg-[#FEFBF7] p-5">
-                  <h3 className="text-lg font-semibold text-[#1B1B1B]">{card.title}</h3>
-                  <p className="text-sm leading-7 text-[#64748B] mt-2">{card.description}</p>
+                <div
+                  key={card.title}
+                  className="rounded-3xl border border-slate-200 bg-[#FEFBF7] p-5"
+                >
+                  <h3 className="text-lg font-semibold text-[#1B1B1B]">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm leading-7 text-[#64748B] mt-2">
+                    {card.description}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-[28px] border border-slate-100 bg-[#F7EFE6] p-10 text-center text-[#B9775B]">
-            <ImageIcon size={40} />
+          <div className="relative rounded-[28px] overflow-hidden border border-slate-100 bg-[#F7EFE6]">
+            {sectionImageUrl ? (
+              <img
+                src={sectionImageUrl}
+                alt="Why choose us"
+                className="h-full min-h-[360px] w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full min-h-[360px] items-center justify-center text-[#B9775B]">
+                <ImageIcon size={40} />
+              </div>
+            )}
+
+            {secondaryImageUrl && (
+              <div className="absolute top-28 right-1 w-[320px] h-[220px] rounded-2xl border border-white shadow-xl overflow-hidden z-50">
+                <img
+                  src={secondaryImageUrl}
+                  alt="Secondary"
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
@@ -954,7 +1113,11 @@ export function AboutPreview({ form }: { form: AboutFormState }) {
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] p-6 lg:p-8 items-center">
           <div className="rounded-[28px] overflow-hidden border border-slate-100 bg-[#F7EFE6]">
             {sectionImageUrl ? (
-              <img src={sectionImageUrl} alt="About section" className="h-full min-h-[360px] w-full object-cover" />
+              <img
+                src={sectionImageUrl}
+                alt="About section"
+                className="h-full min-h-[360px] w-full object-cover"
+              />
             ) : (
               <div className="flex h-full min-h-[360px] items-center justify-center text-[#B9775B]">
                 <ImageIcon size={28} />
@@ -981,12 +1144,17 @@ export function AboutPreview({ form }: { form: AboutFormState }) {
             </p>
             <div className="grid gap-3">
               {[
-                form.bulletOne || "State-of-the-art operation theaters & diagnostic labs",
+                form.bulletOne ||
+                  "State-of-the-art operation theaters & diagnostic labs",
                 form.bulletTwo || "Compassionate & experienced medical staff",
-                form.bulletThree || "Advanced laparoscopic & cosmetic facilities",
+                form.bulletThree ||
+                  "Advanced laparoscopic & cosmetic facilities",
                 form.bulletFour || "Personalized patient care programs",
               ].map((bullet) => (
-                <div key={bullet} className="flex items-start gap-3 text-sm text-[#475569]">
+                <div
+                  key={bullet}
+                  className="flex items-start gap-3 text-sm text-[#475569]"
+                >
                   <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#C58972]" />
                   <span>{bullet}</span>
                 </div>

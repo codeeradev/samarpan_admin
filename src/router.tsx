@@ -1,9 +1,11 @@
 import AdminLayout from "@/layouts/AdminLayout";
 import AppointmentsPage from "@/pages/AppointmentsPage";
+import CareerManagementPage from "@/pages/CareerManagementPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DoctorsPage from "@/pages/DoctorsPage";
 // import EnquiriesPage from "@/pages/EnquiriesPage";
 import GalleryPage from "@/pages/GalleryPage";
+import HonorsPage from "@/pages/HonorsPage";
 import LoginPage from "@/pages/LoginPage";
 import PatientsPage from "@/pages/PatientsPage";
 import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
@@ -22,6 +24,7 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import BlogsPage from "./pages/BlogPage";
+import SpecializationsPage from "./pages/Specialization";
 
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
@@ -96,6 +99,20 @@ const doctorsRoute = createRoute({
   component: DoctorsPage,
 });
 
+const specializationsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/specializations",
+  beforeLoad: () => checkPermission("/specializations"),
+  component: SpecializationsPage,
+});
+
+const honorsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/honors",
+  beforeLoad: () => checkPermission("/honors"),
+  component: HonorsPage,
+});
+
 const patientsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/patients",
@@ -152,6 +169,13 @@ const websitePagesRoute = createRoute({
   component: PagesPage,
 });
 
+const careersRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/careers",
+  beforeLoad: () => checkPermission("/careers"),
+  component: CareerManagementPage,
+});
+
 // const enquiriesRoute = createRoute({
 //   getParentRoute: () => adminLayoutRoute,
 //   path: "/enquiries",
@@ -180,6 +204,8 @@ const routeTree = rootRoute.addChildren([
   adminLayoutRoute.addChildren([
     dashboardRoute,
     doctorsRoute,
+    specializationsRoute,
+    honorsRoute,
     patientsRoute,
     appointmentsRoute,
     serviceManagementRoute,
@@ -188,6 +214,7 @@ const routeTree = rootRoute.addChildren([
     reviewsAndShortsRoute,
     websiteContentRoute,
     websitePagesRoute,
+    careersRoute,
     // enquiriesRoute,
     settingsRoute,
     rolesRoute,

@@ -7,6 +7,7 @@ import {
   updateDoctorApi,
 } from "@/apiCalls/doctors";
 import { BASE_URL } from "@/apis/endpoint";
+import { useSpecializations } from "@/hooks/useSpecializations";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import {
@@ -224,6 +225,8 @@ function buildPayload(
 
 export default function DoctorsPage() {
   const queryClient = useQueryClient();
+
+  const { data: specializations = [] } = useSpecializations({ isActive: true });
 
   const {
     data: doctors = [],
@@ -724,6 +727,7 @@ export default function DoctorsPage() {
             formErrors={formErrors}
             imageFileName={imageFileName}
             fileInputRef={fileInputRef}
+            specializations={specializations}
             onFieldChange={setField}
             onFileChange={handleFileChange}
             onFileClick={() => fileInputRef.current?.click()}
@@ -769,6 +773,7 @@ export default function DoctorsPage() {
             formErrors={formErrors}
             imageFileName={imageFileName}
             fileInputRef={fileInputRef}
+            specializations={specializations}
             onFieldChange={setField}
             onFileChange={handleFileChange}
             onFileClick={() => fileInputRef.current?.click()}
@@ -853,6 +858,7 @@ type DoctorFormProps = {
   formErrors: FormErrors;
   imageFileName: string;
   fileInputRef: RefObject<HTMLInputElement | null>;
+  specializations: any[];
   onFieldChange: <K extends keyof DoctorFormData>(
     key: K,
     value: DoctorFormData[K],
@@ -867,6 +873,7 @@ function DoctorForm({
   formErrors,
   imageFileName,
   fileInputRef,
+  specializations,
   onFieldChange,
   onFileChange,
   onFileClick,
@@ -981,9 +988,9 @@ function DoctorForm({
             <SelectValue placeholder="Select" />
           </SelectTrigger>
           <SelectContent>
-            {SPECIALIZATIONS.map((specialization) => (
-              <SelectItem key={specialization} value={specialization}>
-                {specialization}
+            {specializations.map((spec) => (
+              <SelectItem key={spec._id} value={spec.name}>
+                {spec.name}
               </SelectItem>
             ))}
           </SelectContent>

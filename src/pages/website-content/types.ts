@@ -70,6 +70,8 @@ export type WhyChooseUsFormState = {
   eyebrowText: string;
   heading: string;
   description: string;
+  sectionImage: File | string;
+  secondaryImage: File | string;
   cardOneTitle: string;
   cardOneDescription: string;
   cardTwoTitle: string;
@@ -138,6 +140,8 @@ export const EMPTY_WHY_CHOOSE_US_FORM: WhyChooseUsFormState = {
   eyebrowText: "",
   heading: "",
   description: "",
+  sectionImage: "",
+  secondaryImage: "",
   cardOneTitle: "",
   cardOneDescription: "",
   cardTwoTitle: "",
@@ -237,6 +241,8 @@ export function mapContentToWhyChooseUsForm(item: ContentItem | null): WhyChoose
     eyebrowText: readString(content.eyebrowText),
     heading: readString(content.heading),
     description: readString(content.description),
+    sectionImage: readString(content.sectionImage),
+    secondaryImage: readString(content.secondaryImage),
     cardOneTitle: readString(content.cardOneTitle),
     cardOneDescription: readString(content.cardOneDescription),
     cardTwoTitle: readString(content.cardTwoTitle),

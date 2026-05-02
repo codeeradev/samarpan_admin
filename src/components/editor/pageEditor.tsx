@@ -20,10 +20,8 @@ export default function PageEditor({ value, onChange }: Props) {
           menubar: true,
           toolbar_mode: "wrap",
           ui_mode: "split",
-
-          // FIX
-          fixed_toolbar_container: false,
-
+          branding: false,
+          promotion: false,
           zindex: 9999999,
 
           plugins: [
@@ -50,11 +48,43 @@ export default function PageEditor({ value, onChange }: Props) {
             "undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | code fullscreen preview",
 
           image_title: true,
+          image_advtab: true,
           automatic_uploads: true,
+          paste_data_images: true,
           file_picker_types: "image",
-
-          // MOST IMPORTANT
           dialog_type: "modal",
+          file_picker_callback: (callback, _value, meta) => {
+            if (meta.filetype !== "image") {
+              return;
+            }
+
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/*";
+
+            input.onchange = () => {
+              const file = input.files?.[0];
+
+              if (!file) {
+                return;
+              }
+
+              const reader = new FileReader();
+              reader.onload = () => {
+                const result = reader.result;
+
+                if (typeof result === "string") {
+                  callback(result, {
+                    alt: file.name,
+                    title: file.name,
+                  });
+                }
+              };
+              reader.readAsDataURL(file);
+            };
+
+            input.click();
+          },
         }}
       />
     </div>

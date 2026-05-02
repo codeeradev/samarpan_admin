@@ -1,5 +1,6 @@
 import { get, post } from "@/apis/apiClient";
 import { ENDPOINT } from "@/apis/endpoint";
+import { createApiRequestError } from "@/lib/api-errors";
 
 export type PageStatus = "draft" | "published";
 
@@ -65,31 +66,47 @@ function toRequestPayload(payload: PagePayload) {
 }
 
 export const getAllPagesApi = async (): Promise<PageItem[]> => {
-  const res = await get(ENDPOINT.GET_ALL_PAGES, { needAuth: true });
-  return (res?.data?.pages ?? []).map(normalizePageItem);
+  try {
+    const res = await get(ENDPOINT.GET_ALL_PAGES, { needAuth: true });
+    return (res?.data?.pages ?? []).map(normalizePageItem);
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to fetch pages");
+  }
 };
 
 export const addPageApi = async (payload: PagePayload): Promise<PageItem> => {
-  const res = await post(ENDPOINT.ADD_PAGE, toRequestPayload(payload), {
-    needAuth: true,
-  });
-  return normalizePageItem(res?.data?.page ?? {});
+  try {
+    const res = await post(ENDPOINT.ADD_PAGE, toRequestPayload(payload), {
+      needAuth: true,
+    });
+    return normalizePageItem(res?.data?.page ?? {});
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to create page");
+  }
 };
 
 export const updatePageApi = async (
   id: string,
   payload: PagePayload,
 ): Promise<PageItem> => {
-  const res = await post(
-    `${ENDPOINT.UPDATE_PAGE}/${id}`,
-    toRequestPayload(payload),
-    {
-      needAuth: true,
-    },
-  );
-  return normalizePageItem(res?.data?.page ?? {});
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_PAGE}/${id}`,
+      toRequestPayload(payload),
+      {
+        needAuth: true,
+      },
+    );
+    return normalizePageItem(res?.data?.page ?? {});
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to update page");
+  }
 };
 
 export const deletePageApi = async (id: string): Promise<void> => {
-  await post(`${ENDPOINT.DELETE_PAGE}/${id}`, undefined, { needAuth: true });
+  try {
+    await post(`${ENDPOINT.DELETE_PAGE}/${id}`, undefined, { needAuth: true });
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to delete page");
+  }
 };

@@ -13,6 +13,8 @@ import { canAccessPath } from "@/lib/admin-access";
 import { ROLE_LABELS, type UserRole } from "@/types";
 import { Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  Award,
+  Briefcase,
   Calendar,
   ChevronDown,
   FileImage,
@@ -69,6 +71,18 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/doctors",
   },
   {
+    label: "Specializations",
+    icon: Briefcase,
+    path: "/specializations",
+    permissionPath: "/specializations",
+  },
+  {
+    label: "Honors",
+    icon: Award,
+    path: "/honors",
+    permissionPath: "/honors",
+  },
+  {
     label: "Patients",
     icon: Users,
     path: "/patients",
@@ -109,6 +123,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: FileText,
     path: "/website-pages",
     permissionPath: "/website-pages",
+  },
+  {
+    label: "Careers",
+    icon: Briefcase,
+    path: "/careers",
+    permissionPath: "/careers",
   },
   // {
   //   label: "Enquiries",

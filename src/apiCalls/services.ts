@@ -1,5 +1,6 @@
 import { ENDPOINT } from "@/apis/endpoint";
 import { get, post } from "@/apis/apiClient";
+import { createApiRequestError } from "@/lib/api-errors";
 
 export interface ServicePayload {
   title: string;
@@ -49,9 +50,7 @@ export const getAllServicesApi = async (): Promise<ServiceItem[]> => {
     const res = await get(ENDPOINT.GET_ALL_SERVICES, { needAuth: true });
     return res?.data?.services ?? [];
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to fetch services",
-    );
+    throw createApiRequestError(error, "Failed to fetch services");
   }
 };
 
@@ -62,7 +61,7 @@ export const addServiceApi = async (
     const res = await post(ENDPOINT.ADD_SERVICE, toFormData(payload), { needAuth: true });
     return res?.data?.service;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to add service");
+    throw createApiRequestError(error, "Failed to add service");
   }
 };
 
@@ -78,9 +77,7 @@ export const updateServiceApi = async (
     );
     return res?.data?.service;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to update service",
-    );
+    throw createApiRequestError(error, "Failed to update service");
   }
 };
 
@@ -90,8 +87,6 @@ export const deleteServiceApi = async (id: string): Promise<void> => {
       needAuth: true,
     });
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to delete service",
-    );
+    throw createApiRequestError(error, "Failed to delete service");
   }
 };

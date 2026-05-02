@@ -127,6 +127,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   "super-admin": [
     "/dashboard",
     "/doctors",
+    "/specializations",
+    "/honors",
     "/patients",
     "/appointments",
     "/service-management",

@@ -37,16 +37,6 @@ body {
   pointer-events: auto !important;
 }
 
-/* Add this — the overlay itself must not block TinyMCE portals */
-[data-radix-dialog-overlay] {
-  pointer-events: none !important;
-}
-
-/* Keep the dialog content itself clickable */
-[data-radix-dialog-content] {
-  pointer-events: auto !important;
-}
-
 .tox-tinymce-aux,
 .tox-dialog,
 .tox-menu,

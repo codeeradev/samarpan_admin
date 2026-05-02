@@ -1,5 +1,6 @@
 import { get, post } from "@/apis/apiClient";
 import { ENDPOINT } from "@/apis/endpoint";
+import { createApiRequestError } from "@/lib/api-errors";
 
 export interface AdminStaffItem {
   _id: string;
@@ -41,9 +42,7 @@ export const getAdminStaffApi = async (): Promise<AdminStaffItem[]> => {
     const res = await get(ENDPOINT.GET_ADMIN_STAFF, { needAuth: true });
     return res?.data?.staff ?? [];
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to fetch admin staff",
-    );
+    throw createApiRequestError(error, "Failed to fetch admin staff");
   }
 };
 
@@ -63,7 +62,7 @@ export const addAdminStaffApi = async (
 
     return res?.data?.staff;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to add staff");
+    throw createApiRequestError(error, "Failed to add staff");
   }
 };
 
@@ -78,9 +77,7 @@ export const updateAdminStaffApi = async (
 
     return res?.data?.staff;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to update staff",
-    );
+    throw createApiRequestError(error, "Failed to update staff");
   }
 };
 
@@ -90,8 +87,6 @@ export const deleteAdminStaffApi = async (id: string): Promise<void> => {
       needAuth: true,
     });
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ?? "Failed to delete staff member",
-    );
+    throw createApiRequestError(error, "Failed to delete staff member");
   }
 };
