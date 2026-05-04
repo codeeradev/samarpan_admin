@@ -29,21 +29,18 @@ import { Award, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { toast } from "sonner";
+import { resolveAssetUrl } from "./website-content/types";
 
 type HonorFormState = {
   title: string;
-  organization: string;
-  year: string;
-  description: string;
+  image: File | string;
   sortOrder: string;
   isActive: boolean;
 };
 
 const emptyHonorForm: HonorFormState = {
   title: "",
-  organization: "",
-  year: "",
-  description: "",
+  image: "",
   sortOrder: "0",
   isActive: true,
 };
@@ -152,7 +149,8 @@ export default function HonorsPage() {
       setModalOpen(false);
       setFormData(emptyHonorForm);
     },
-    onError: (error) => toast.error(getApiErrorMessage(error, "Failed to add honor.")),
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "Failed to add honor.")),
   });
 
   const updateMutation = useMutation({
@@ -165,7 +163,8 @@ export default function HonorsPage() {
       setEditTarget(null);
       setFormData(emptyHonorForm);
     },
-    onError: (error) => toast.error(getApiErrorMessage(error, "Failed to update honor.")),
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "Failed to update honor.")),
   });
 
   const deleteMutation = useMutation({
@@ -189,9 +188,6 @@ export default function HonorsPage() {
     return data.filter((honor) =>
       [
         honor.title,
-        honor.organization,
-        honor.year,
-        honor.description,
         String(honor.sortOrder),
         honor.isActive ? "active" : "inactive",
       ].some((value) => value.toLowerCase().includes(query)),
@@ -214,9 +210,7 @@ export default function HonorsPage() {
     setEditTarget(honor);
     setFormData({
       title: honor.title,
-      organization: honor.organization,
-      year: honor.year,
-      description: honor.description,
+      image: honor.image || "",
       sortOrder: String(honor.sortOrder ?? 0),
       isActive: honor.isActive,
     });
@@ -242,9 +236,7 @@ export default function HonorsPage() {
     const sortOrder = Number.parseInt(formData.sortOrder, 10);
     const payload: HonorPayload = {
       title: formData.title,
-      organization: formData.organization,
-      year: formData.year,
-      description: formData.description,
+      image: formData.image,
       sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
       isActive: formData.isActive,
     };
@@ -271,9 +263,7 @@ export default function HonorsPage() {
         id: honor._id,
         payload: {
           title: honor.title,
-          organization: honor.organization,
-          year: honor.year,
-          description: honor.description,
+          image: honor.image,
           sortOrder: honor.sortOrder,
           isActive: !honor.isActive,
         },
@@ -288,30 +278,20 @@ export default function HonorsPage() {
       name: "Honor",
       grow: 1.3,
       cell: (honor) => (
-        <div className="min-w-0 py-3">
-          <p className="truncate text-sm font-semibold text-slate-900">
+        <div className="flex items-center gap-3 py-3">
+          {honor.image && typeof honor.image === "string" && (
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200 bg-white flex items-center justify-center">
+              <img
+                src={resolveAssetUrl(honor.image)}
+                className="w-full h-full object-contain"
+              />
+            </div>
+          )}
+
+          <p className="text-sm font-semibold text-slate-900 truncate">
             {honor.title}
           </p>
-          <p className="truncate text-xs text-slate-500">
-            {honor.organization || "No organization"}
-          </p>
         </div>
-      ),
-    },
-    {
-      name: "Year",
-      width: "110px",
-      cell: (honor) => (
-        <span className="text-sm text-slate-700">{honor.year || "—"}</span>
-      ),
-    },
-    {
-      name: "Description",
-      grow: 1.6,
-      cell: (honor) => (
-        <p className="line-clamp-2 py-3 text-sm text-slate-600">
-          {honor.description || "No description added."}
-        </p>
       ),
     },
     {
@@ -439,13 +419,16 @@ export default function HonorsPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={modalOpen} onOpenChange={(nextOpen) => !nextOpen && resetForm()}>
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(nextOpen) => !nextOpen && resetForm()}
+      >
         <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{editTarget ? "Edit honor" : "Add honor"}</DialogTitle>
             <DialogDescription>
-              Enter the details that should be available for both the website and
-              the admin listing.
+              Enter the details that should be available for both the website
+              and the admin listing.
             </DialogDescription>
           </DialogHeader>
 
@@ -460,38 +443,12 @@ export default function HonorsPage() {
               />
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="grid gap-2">
-                <Label htmlFor="honor-organization">Organization</Label>
-                <Input
-                  id="honor-organization"
-                  value={formData.organization}
-                  onChange={(event) =>
-                    setField("organization", event.target.value)
-                  }
-                  placeholder="Issuing organization"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="honor-year">Year</Label>
-                <Input
-                  id="honor-year"
-                  value={formData.year}
-                  onChange={(event) => setField("year", event.target.value)}
-                  placeholder="2026"
-                />
-              </div>
-            </div>
-
             <div className="grid gap-2">
-              <Label htmlFor="honor-description">Description</Label>
-              <Textarea
-                id="honor-description"
-                value={formData.description}
-                onChange={(event) => setField("description", event.target.value)}
-                placeholder="Short description for this honor"
-                className="min-h-28"
+              <Label htmlFor="honor-image-url">Image URL</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setField("image", e.target.files?.[0] ?? "")}
               />
             </div>
 
@@ -503,7 +460,9 @@ export default function HonorsPage() {
                   type="number"
                   min="0"
                   value={formData.sortOrder}
-                  onChange={(event) => setField("sortOrder", event.target.value)}
+                  onChange={(event) =>
+                    setField("sortOrder", event.target.value)
+                  }
                 />
               </div>
 

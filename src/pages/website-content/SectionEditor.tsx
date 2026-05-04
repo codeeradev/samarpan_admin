@@ -1072,29 +1072,29 @@ export function WhyChooseUsPreview({ form }: { form: WhyChooseUsFormState }) {
               ))}
             </div>
           </div>
-          <div className="relative rounded-[28px] overflow-hidden border border-slate-100 bg-[#F7EFE6]">
-            {sectionImageUrl ? (
-              <img
-                src={sectionImageUrl}
-                alt="Why choose us"
-                className="h-full min-h-[360px] w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full min-h-[360px] items-center justify-center text-[#B9775B]">
-                <ImageIcon size={40} />
-              </div>
-            )}
+          <div className="relative rounded-[28px] border border-slate-100 bg-[#F7EFE6]">
+  {sectionImageUrl ? (
+    <img
+      src={sectionImageUrl}
+      alt="Why choose us"
+      className="h-full min-h-[360px] w-full object-cover rounded-[28px]"
+    />
+  ) : (
+    <div className="flex h-full min-h-[360px] items-center justify-center text-[#B9775B]">
+      <ImageIcon size={40} />
+    </div>
+  )}
 
-            {secondaryImageUrl && (
-              <div className="absolute top-28 right-1 w-[320px] h-[220px] rounded-2xl border border-white shadow-xl overflow-hidden z-50">
-                <img
-                  src={secondaryImageUrl}
-                  alt="Secondary"
-                  className="w-full h-40 object-cover"
-                />
-              </div>
-            )}
-          </div>
+  {secondaryImageUrl && (
+    <div className="absolute left-6 bottom-6 w-[42%] max-w-[160px] rounded-[20px] border border-white shadow-2xl overflow-hidden z-20">
+      <img
+        src={secondaryImageUrl}
+        alt="Secondary"
+        className="w-full h-[160px] object-cover"
+      />
+    </div>
+  )}
+</div>
         </div>
       </CardContent>
     </Card>

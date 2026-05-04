@@ -42180,7 +42180,7 @@ function normalizeCareerItem(career) {
     updatedAt: career.updatedAt
   };
 }
-function toRequestPayload$2(payload) {
+function toRequestPayload$1(payload) {
   return {
     title: payload.title.trim(),
     slug: payload.slug.trim(),
@@ -42210,7 +42210,7 @@ const getAllCareersApi = async () => {
 const addCareerApi = async (payload) => {
   var _a2;
   try {
-    const res = await post(ENDPOINT.ADD_CAREER, toRequestPayload$2(payload), {
+    const res = await post(ENDPOINT.ADD_CAREER, toRequestPayload$1(payload), {
       needAuth: true
     });
     return normalizeCareerItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.career) ?? {});
@@ -42223,7 +42223,7 @@ const updateCareerApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_CAREER}/${id}`,
-      toRequestPayload$2(payload),
+      toRequestPayload$1(payload),
       {
         needAuth: true
       }
@@ -66459,24 +66459,11 @@ function normalizeHonorItem(honor) {
   return {
     _id: honor._id,
     title: honor.title || "",
-    organization: honor.organization || "",
-    year: honor.year || "",
-    description: honor.description || "",
+    image: honor.image || "",
     sortOrder: typeof honor.sortOrder === "number" ? honor.sortOrder : Number(honor.sortOrder) || 0,
     isActive: honor.isActive !== false,
     createdAt: honor.createdAt,
     updatedAt: honor.updatedAt
-  };
-}
-function toRequestPayload$1(payload) {
-  var _a2, _b2, _c2;
-  return {
-    title: payload.title.trim(),
-    organization: ((_a2 = payload.organization) == null ? void 0 : _a2.trim()) || "",
-    year: ((_b2 = payload.year) == null ? void 0 : _b2.trim()) || "",
-    description: ((_c2 = payload.description) == null ? void 0 : _c2.trim()) || "",
-    sortOrder: payload.sortOrder ?? 0,
-    isActive: payload.isActive ?? true
   };
 }
 const getAllHonorsApi = async () => {
@@ -66491,7 +66478,14 @@ const getAllHonorsApi = async () => {
 const addHonorApi = async (payload) => {
   var _a2;
   try {
-    const res = await post(ENDPOINT.ADD_HONOR, toRequestPayload$1(payload), {
+    const formData = new FormData();
+    formData.append("title", payload.title);
+    formData.append("sortOrder", String(payload.sortOrder ?? 0));
+    formData.append("isActive", String(payload.isActive ?? true));
+    if (payload.image instanceof File) {
+      formData.append("image", payload.image);
+    }
+    const res = await post(ENDPOINT.ADD_HONOR, formData, {
       needAuth: true
     });
     return normalizeHonorItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honor) ?? {});
@@ -66502,7 +66496,14 @@ const addHonorApi = async (payload) => {
 const updateHonorApi = async (id, payload) => {
   var _a2;
   try {
-    const res = await post(`${ENDPOINT.UPDATE_HONOR}/${id}`, toRequestPayload$1(payload), {
+    const formData = new FormData();
+    formData.append("title", payload.title);
+    formData.append("sortOrder", String(payload.sortOrder ?? 0));
+    formData.append("isActive", String(payload.isActive ?? true));
+    if (payload.image instanceof File) {
+      formData.append("image", payload.image);
+    }
+    const res = await post(`${ENDPOINT.UPDATE_HONOR}/${id}`, formData, {
       needAuth: true
     });
     return normalizeHonorItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honor) ?? {});
@@ -66684,11 +66685,187 @@ function Switch({
     }
   );
 }
+const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
+const SECTION_META = {
+  home_hero: {
+    title: "Home Hero Section",
+    description: "Manage the homepage hero content and images."
+  },
+  home_how_we_work: {
+    title: "How We Work Section",
+    description: "Manage the homepage How We Work area."
+  },
+  why_choose_us: {
+    title: "Why Choose Us Section",
+    description: "Manage the homepage Why Choose Us content."
+  },
+  about: {
+    title: "About Section",
+    description: "Manage the homepage About section content."
+  }
+};
+const EMPTY_HERO_FORM = {
+  eyebrowText: "",
+  titlePrefix: "",
+  titleHighlight: "",
+  titleSuffix: "",
+  description: "",
+  primaryCtaText: "",
+  primaryCtaLink: "",
+  secondaryCtaText: "",
+  secondaryCtaLink: "",
+  supportTitle: "",
+  supportSubtitle: "",
+  successRateValue: "",
+  successRateLabel: "",
+  featurePointOne: "",
+  featurePointTwo: "",
+  featurePointThree: "",
+  backgroundImage: "",
+  primaryImage: "",
+  secondaryImage: "",
+  isActive: true
+};
+const EMPTY_HOW_IT_WORK_FORM = {
+  eyebrowText: "",
+  heading: "",
+  subheading: "",
+  description: "",
+  stepOneTitle: "",
+  stepOneDescription: "",
+  stepTwoTitle: "",
+  stepTwoDescription: "",
+  stepThreeTitle: "",
+  stepThreeDescription: "",
+  sectionImage: "",
+  isActive: true
+};
+const EMPTY_WHY_CHOOSE_US_FORM = {
+  eyebrowText: "",
+  heading: "",
+  description: "",
+  sectionImage: "",
+  secondaryImage: "",
+  cardOneTitle: "",
+  cardOneDescription: "",
+  cardTwoTitle: "",
+  cardTwoDescription: "",
+  cardThreeTitle: "",
+  cardThreeDescription: "",
+  cardFourTitle: "",
+  cardFourDescription: "",
+  isActive: true
+};
+const EMPTY_ABOUT_FORM = {
+  eyebrowText: "",
+  heading: "",
+  subheading: "",
+  description: "",
+  bulletOne: "",
+  bulletTwo: "",
+  bulletThree: "",
+  bulletFour: "",
+  ctaText: "",
+  ctaLink: "",
+  sectionImage: "",
+  isActive: true
+};
+function readString(value) {
+  return typeof value === "string" ? value : "";
+}
+function readBoolean(value, fallback = true) {
+  return typeof value === "boolean" ? value : fallback;
+}
+function resolveAssetUrl(value) {
+  if (value instanceof File || !value) {
+    return "";
+  }
+  if (/^https?:\/\//.test(value)) {
+    return value;
+  }
+  return `${API_ASSET_ORIGIN}${value.startsWith("/") ? value : `/${value}`}`;
+}
+function mapContentToHeroForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    titlePrefix: readString(content.titlePrefix),
+    titleHighlight: readString(content.titleHighlight),
+    titleSuffix: readString(content.titleSuffix),
+    description: readString(content.description),
+    primaryCtaText: readString(content.primaryCtaText),
+    primaryCtaLink: readString(content.primaryCtaLink),
+    secondaryCtaText: readString(content.secondaryCtaText),
+    secondaryCtaLink: readString(content.secondaryCtaLink),
+    supportTitle: readString(content.supportTitle),
+    supportSubtitle: readString(content.supportSubtitle),
+    successRateValue: readString(content.successRateValue),
+    successRateLabel: readString(content.successRateLabel),
+    featurePointOne: readString(content.featurePointOne),
+    featurePointTwo: readString(content.featurePointTwo),
+    featurePointThree: readString(content.featurePointThree),
+    backgroundImage: readString(content.backgroundImage),
+    primaryImage: readString(content.primaryImage),
+    secondaryImage: readString(content.secondaryImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function mapContentToHowItWorksForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    heading: readString(content.heading),
+    subheading: readString(content.subheading),
+    description: readString(content.description),
+    stepOneTitle: readString(content.stepOneTitle),
+    stepOneDescription: readString(content.stepOneDescription),
+    stepTwoTitle: readString(content.stepTwoTitle),
+    stepTwoDescription: readString(content.stepTwoDescription),
+    stepThreeTitle: readString(content.stepThreeTitle),
+    stepThreeDescription: readString(content.stepThreeDescription),
+    sectionImage: readString(content.sectionImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function mapContentToWhyChooseUsForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    heading: readString(content.heading),
+    description: readString(content.description),
+    sectionImage: readString(content.sectionImage),
+    secondaryImage: readString(content.secondaryImage),
+    cardOneTitle: readString(content.cardOneTitle),
+    cardOneDescription: readString(content.cardOneDescription),
+    cardTwoTitle: readString(content.cardTwoTitle),
+    cardTwoDescription: readString(content.cardTwoDescription),
+    cardThreeTitle: readString(content.cardThreeTitle),
+    cardThreeDescription: readString(content.cardThreeDescription),
+    cardFourTitle: readString(content.cardFourTitle),
+    cardFourDescription: readString(content.cardFourDescription),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function mapContentToAboutForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    heading: readString(content.heading),
+    subheading: readString(content.subheading),
+    description: readString(content.description),
+    bulletOne: readString(content.bulletOne),
+    bulletTwo: readString(content.bulletTwo),
+    bulletThree: readString(content.bulletThree),
+    bulletFour: readString(content.bulletFour),
+    ctaText: readString(content.ctaText),
+    ctaLink: readString(content.ctaLink),
+    sectionImage: readString(content.sectionImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
 const emptyHonorForm = {
   title: "",
-  organization: "",
-  year: "",
-  description: "",
+  image: "",
   sortOrder: "0",
   isActive: true
 };
@@ -66815,9 +66992,6 @@ function HonorsPage() {
     return data.filter(
       (honor) => [
         honor.title,
-        honor.organization,
-        honor.year,
-        honor.description,
         String(honor.sortOrder),
         honor.isActive ? "active" : "inactive"
       ].some((value) => value.toLowerCase().includes(query))
@@ -66837,9 +67011,7 @@ function HonorsPage() {
     setEditTarget(honor);
     setFormData({
       title: honor.title,
-      organization: honor.organization,
-      year: honor.year,
-      description: honor.description,
+      image: honor.image || "",
       sortOrder: String(honor.sortOrder ?? 0),
       isActive: honor.isActive
     });
@@ -66859,9 +67031,7 @@ function HonorsPage() {
     const sortOrder = Number.parseInt(formData.sortOrder, 10);
     const payload = {
       title: formData.title,
-      organization: formData.organization,
-      year: formData.year,
-      description: formData.description,
+      image: formData.image,
       sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
       isActive: formData.isActive
     };
@@ -66883,9 +67053,7 @@ function HonorsPage() {
         id: honor._id,
         payload: {
           title: honor.title,
-          organization: honor.organization,
-          year: honor.year,
-          description: honor.description,
+          image: honor.image,
           sortOrder: honor.sortOrder,
           isActive: !honor.isActive
         }
@@ -66897,20 +67065,16 @@ function HonorsPage() {
     {
       name: "Honor",
       grow: 1.3,
-      cell: (honor) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 py-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-sm font-semibold text-slate-900", children: honor.title }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate text-xs text-slate-500", children: honor.organization || "No organization" })
+      cell: (honor) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 py-3", children: [
+        honor.image && typeof honor.image === "string" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full overflow-hidden border border-slate-200 bg-white flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: resolveAssetUrl(honor.image),
+            className: "w-full h-full object-contain"
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-slate-900 truncate", children: honor.title })
       ] })
-    },
-    {
-      name: "Year",
-      width: "110px",
-      cell: (honor) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-slate-700", children: honor.year || "—" })
-    },
-    {
-      name: "Description",
-      grow: 1.6,
-      cell: (honor) => /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "line-clamp-2 py-3 text-sm text-slate-600", children: honor.description || "No description added." })
     },
     {
       name: "Status",
@@ -67027,115 +67191,97 @@ function HonorsPage() {
         }
       ) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: modalOpen, onOpenChange: (nextOpen) => !nextOpen && resetForm(), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editTarget ? "Edit honor" : "Add honor" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: "Enter the details that should be available for both the website and the admin listing." })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-5 py-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-title", children: "Title" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              id: "honor-title",
-              value: formData.title,
-              onChange: (event) => setField("title", event.target.value),
-              placeholder: "Enter honor title"
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-organization", children: "Organization" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "honor-organization",
-                value: formData.organization,
-                onChange: (event) => setField("organization", event.target.value),
-                placeholder: "Issuing organization"
-              }
-            )
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: modalOpen,
+        onOpenChange: (nextOpen) => !nextOpen && resetForm(),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editTarget ? "Edit honor" : "Add honor" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: "Enter the details that should be available for both the website and the admin listing." })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-year", children: "Year" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "honor-year",
-                value: formData.year,
-                onChange: (event) => setField("year", event.target.value),
-                placeholder: "2026"
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-description", children: "Description" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Textarea,
-            {
-              id: "honor-description",
-              value: formData.description,
-              onChange: (event) => setField("description", event.target.value),
-              placeholder: "Short description for this honor",
-              className: "min-h-28"
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2 sm:items-end", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-sort-order", children: "Sort order" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "honor-sort-order",
-                type: "number",
-                min: "0",
-                value: formData.sortOrder,
-                onChange: (event) => setField("sortOrder", event.target.value)
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Active on website" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Turn this off to hide the honor from the public API." })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-5 py-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-title", children: "Title" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "honor-title",
+                  value: formData.title,
+                  onChange: (event) => setField("title", event.target.value),
+                  placeholder: "Enter honor title"
+                }
+              )
             ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-image-url", children: "Image URL" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  type: "file",
+                  accept: "image/*",
+                  onChange: (e3) => {
+                    var _a2;
+                    return setField("image", ((_a2 = e3.target.files) == null ? void 0 : _a2[0]) ?? "");
+                  }
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2 sm:items-end", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-sort-order", children: "Sort order" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "honor-sort-order",
+                    type: "number",
+                    min: "0",
+                    value: formData.sortOrder,
+                    onChange: (event) => setField("sortOrder", event.target.value)
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-slate-900", children: "Active on website" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500", children: "Turn this off to hide the honor from the public API." })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Switch,
+                  {
+                    checked: formData.isActive,
+                    onCheckedChange: (checked) => setField("isActive", checked)
+                  }
+                )
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Switch,
+              Button,
               {
-                checked: formData.isActive,
-                onCheckedChange: (checked) => setField("isActive", checked)
+                type: "button",
+                variant: "outline",
+                className: "rounded-xl border-slate-200",
+                onClick: resetForm,
+                children: "Cancel"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                type: "button",
+                className: "rounded-xl bg-[#D89F00]",
+                onClick: () => void handleSave(),
+                disabled: addMutation.isPending || updateMutation.isPending,
+                children: editTarget ? "Save changes" : "Add honor"
               }
             )
           ] })
         ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            type: "button",
-            variant: "outline",
-            className: "rounded-xl border-slate-200",
-            onClick: resetForm,
-            children: "Cancel"
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            type: "button",
-            className: "rounded-xl bg-[#D89F00]",
-            onClick: () => void handleSave(),
-            disabled: addMutation.isPending || updateMutation.isPending,
-            children: editTarget ? "Save changes" : "Add honor"
-          }
-        )
-      ] })
-    ] }) }),
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmDialog,
       {
@@ -72586,184 +72732,6 @@ const upsertContentApi = async (payload) => {
     );
   }
 };
-const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
-const SECTION_META = {
-  home_hero: {
-    title: "Home Hero Section",
-    description: "Manage the homepage hero content and images."
-  },
-  home_how_we_work: {
-    title: "How We Work Section",
-    description: "Manage the homepage How We Work area."
-  },
-  why_choose_us: {
-    title: "Why Choose Us Section",
-    description: "Manage the homepage Why Choose Us content."
-  },
-  about: {
-    title: "About Section",
-    description: "Manage the homepage About section content."
-  }
-};
-const EMPTY_HERO_FORM = {
-  eyebrowText: "",
-  titlePrefix: "",
-  titleHighlight: "",
-  titleSuffix: "",
-  description: "",
-  primaryCtaText: "",
-  primaryCtaLink: "",
-  secondaryCtaText: "",
-  secondaryCtaLink: "",
-  supportTitle: "",
-  supportSubtitle: "",
-  successRateValue: "",
-  successRateLabel: "",
-  featurePointOne: "",
-  featurePointTwo: "",
-  featurePointThree: "",
-  backgroundImage: "",
-  primaryImage: "",
-  secondaryImage: "",
-  isActive: true
-};
-const EMPTY_HOW_IT_WORK_FORM = {
-  eyebrowText: "",
-  heading: "",
-  subheading: "",
-  description: "",
-  stepOneTitle: "",
-  stepOneDescription: "",
-  stepTwoTitle: "",
-  stepTwoDescription: "",
-  stepThreeTitle: "",
-  stepThreeDescription: "",
-  sectionImage: "",
-  isActive: true
-};
-const EMPTY_WHY_CHOOSE_US_FORM = {
-  eyebrowText: "",
-  heading: "",
-  description: "",
-  sectionImage: "",
-  secondaryImage: "",
-  cardOneTitle: "",
-  cardOneDescription: "",
-  cardTwoTitle: "",
-  cardTwoDescription: "",
-  cardThreeTitle: "",
-  cardThreeDescription: "",
-  cardFourTitle: "",
-  cardFourDescription: "",
-  isActive: true
-};
-const EMPTY_ABOUT_FORM = {
-  eyebrowText: "",
-  heading: "",
-  subheading: "",
-  description: "",
-  bulletOne: "",
-  bulletTwo: "",
-  bulletThree: "",
-  bulletFour: "",
-  ctaText: "",
-  ctaLink: "",
-  sectionImage: "",
-  isActive: true
-};
-function readString(value) {
-  return typeof value === "string" ? value : "";
-}
-function readBoolean(value, fallback = true) {
-  return typeof value === "boolean" ? value : fallback;
-}
-function resolveAssetUrl(value) {
-  if (value instanceof File || !value) {
-    return "";
-  }
-  if (/^https?:\/\//.test(value)) {
-    return value;
-  }
-  return `${API_ASSET_ORIGIN}${value.startsWith("/") ? value : `/${value}`}`;
-}
-function mapContentToHeroForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    titlePrefix: readString(content.titlePrefix),
-    titleHighlight: readString(content.titleHighlight),
-    titleSuffix: readString(content.titleSuffix),
-    description: readString(content.description),
-    primaryCtaText: readString(content.primaryCtaText),
-    primaryCtaLink: readString(content.primaryCtaLink),
-    secondaryCtaText: readString(content.secondaryCtaText),
-    secondaryCtaLink: readString(content.secondaryCtaLink),
-    supportTitle: readString(content.supportTitle),
-    supportSubtitle: readString(content.supportSubtitle),
-    successRateValue: readString(content.successRateValue),
-    successRateLabel: readString(content.successRateLabel),
-    featurePointOne: readString(content.featurePointOne),
-    featurePointTwo: readString(content.featurePointTwo),
-    featurePointThree: readString(content.featurePointThree),
-    backgroundImage: readString(content.backgroundImage),
-    primaryImage: readString(content.primaryImage),
-    secondaryImage: readString(content.secondaryImage),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
-function mapContentToHowItWorksForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    heading: readString(content.heading),
-    subheading: readString(content.subheading),
-    description: readString(content.description),
-    stepOneTitle: readString(content.stepOneTitle),
-    stepOneDescription: readString(content.stepOneDescription),
-    stepTwoTitle: readString(content.stepTwoTitle),
-    stepTwoDescription: readString(content.stepTwoDescription),
-    stepThreeTitle: readString(content.stepThreeTitle),
-    stepThreeDescription: readString(content.stepThreeDescription),
-    sectionImage: readString(content.sectionImage),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
-function mapContentToWhyChooseUsForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    heading: readString(content.heading),
-    description: readString(content.description),
-    sectionImage: readString(content.sectionImage),
-    secondaryImage: readString(content.secondaryImage),
-    cardOneTitle: readString(content.cardOneTitle),
-    cardOneDescription: readString(content.cardOneDescription),
-    cardTwoTitle: readString(content.cardTwoTitle),
-    cardTwoDescription: readString(content.cardTwoDescription),
-    cardThreeTitle: readString(content.cardThreeTitle),
-    cardThreeDescription: readString(content.cardThreeDescription),
-    cardFourTitle: readString(content.cardFourTitle),
-    cardFourDescription: readString(content.cardFourDescription),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
-function mapContentToAboutForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    heading: readString(content.heading),
-    subheading: readString(content.subheading),
-    description: readString(content.description),
-    bulletOne: readString(content.bulletOne),
-    bulletTwo: readString(content.bulletTwo),
-    bulletThree: readString(content.bulletThree),
-    bulletFour: readString(content.bulletFour),
-    ctaText: readString(content.ctaText),
-    ctaLink: readString(content.ctaLink),
-    sectionImage: readString(content.sectionImage),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
 function ImageUploadField({
   id,
   label,

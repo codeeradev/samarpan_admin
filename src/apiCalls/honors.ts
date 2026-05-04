@@ -5,9 +5,7 @@ import { createApiRequestError } from "@/lib/api-errors";
 export interface HonorItem {
   _id: string;
   title: string;
-  organization: string;
-  year: string;
-  description: string;
+  image?: File | string;
   sortOrder: number;
   isActive: boolean;
   createdAt?: string;
@@ -16,9 +14,7 @@ export interface HonorItem {
 
 export interface HonorPayload {
   title: string;
-  organization?: string;
-  year?: string;
-  description?: string;
+  image?: File | string;
   sortOrder?: number;
   isActive?: boolean;
 }
@@ -27,9 +23,7 @@ function normalizeHonorItem(honor: Record<string, any>): HonorItem {
   return {
     _id: honor._id,
     title: honor.title || "",
-    organization: honor.organization || "",
-    year: honor.year || "",
-    description: honor.description || "",
+    image: honor.image || "",
     sortOrder:
       typeof honor.sortOrder === "number"
         ? honor.sortOrder
@@ -43,9 +37,7 @@ function normalizeHonorItem(honor: Record<string, any>): HonorItem {
 function toRequestPayload(payload: HonorPayload) {
   return {
     title: payload.title.trim(),
-    organization: payload.organization?.trim() || "",
-    year: payload.year?.trim() || "",
-    description: payload.description?.trim() || "",
+    image: payload.image instanceof File ? payload.image : payload.image?.trim() || "",
     sortOrder: payload.sortOrder ?? 0,
     isActive: payload.isActive ?? true,
   };
@@ -64,9 +56,20 @@ export const addHonorApi = async (
   payload: HonorPayload,
 ): Promise<HonorItem> => {
   try {
-    const res = await post(ENDPOINT.ADD_HONOR, toRequestPayload(payload), {
+    const formData = new FormData();
+
+    formData.append("title", payload.title);
+    formData.append("sortOrder", String(payload.sortOrder ?? 0));
+    formData.append("isActive", String(payload.isActive ?? true));
+
+    if (payload.image instanceof File) {
+      formData.append("image", payload.image);
+    }
+
+    const res = await post(ENDPOINT.ADD_HONOR, formData, {
       needAuth: true,
     });
+
     return normalizeHonorItem(res?.data?.honor ?? {});
   } catch (error) {
     throw createApiRequestError(error, "Failed to add honor");
@@ -78,9 +81,20 @@ export const updateHonorApi = async (
   payload: HonorPayload,
 ): Promise<HonorItem> => {
   try {
-    const res = await post(`${ENDPOINT.UPDATE_HONOR}/${id}`, toRequestPayload(payload), {
+    const formData = new FormData();
+
+    formData.append("title", payload.title);
+    formData.append("sortOrder", String(payload.sortOrder ?? 0));
+    formData.append("isActive", String(payload.isActive ?? true));
+
+    if (payload.image instanceof File) {
+      formData.append("image", payload.image);
+    }
+
+    const res = await post(`${ENDPOINT.UPDATE_HONOR}/${id}`, formData, {
       needAuth: true,
     });
+
     return normalizeHonorItem(res?.data?.honor ?? {});
   } catch (error) {
     throw createApiRequestError(error, "Failed to update honor");
