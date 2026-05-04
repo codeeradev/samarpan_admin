@@ -20,7 +20,9 @@ export type PermissionKey =
   | "view_settings"
   | "manage_settings"
   | "view_admin_staff"
-  | "manage_admin_staff";
+  | "manage_admin_staff"
+  | "view_themes"
+  | "manage_themes";
 
 export type PermissionRecord = Partial<Record<PermissionKey, boolean>>;
 
@@ -59,6 +61,8 @@ export const PERMISSION_LABELS: Record<PermissionKey, string> = {
   manage_settings: "Manage settings",
   view_admin_staff: "View admin staff",
   manage_admin_staff: "Manage admin staff",
+  manage_themes: "Manage themes",
+  view_themes: "View themes",
 };
 
 export const PERMISSION_GROUPS: Array<{
@@ -115,6 +119,11 @@ export const PERMISSION_GROUPS: Array<{
     title: "Settings",
     description: "Access and update business settings and CMS settings.",
     permissions: ["view_settings", "manage_settings"],
+  },
+  {
+    title: "Themes",
+    description: "Manage website themes and styling.",
+    permissions: ["view_themes", "manage_themes"],
   },
 ];
 

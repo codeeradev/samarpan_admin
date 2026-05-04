@@ -21952,7 +21952,9 @@ const ENDPOINT = {
   ADD_SPECIALIZATION: "/add-specialization",
   GET_ALL_SPECIALIZATIONS: "/get-all-specializations",
   UPDATE_SPECIALIZATION: "/update-specialization",
-  DELETE_SPECIALIZATION: "/delete-specialization"
+  DELETE_SPECIALIZATION: "/delete-specialization",
+  GET_THEMES: "/get-themes",
+  UPSERT_THEME: "/upsert-theme"
 };
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -22128,7 +22130,9 @@ const PERMISSION_LABELS = {
   view_settings: "View settings",
   manage_settings: "Manage settings",
   view_admin_staff: "View admin staff",
-  manage_admin_staff: "Manage admin staff"
+  manage_admin_staff: "Manage admin staff",
+  manage_themes: "Manage themes",
+  view_themes: "View themes"
 };
 const PERMISSION_GROUPS = [
   {
@@ -22180,6 +22184,11 @@ const PERMISSION_GROUPS = [
     title: "Settings",
     description: "Access and update business settings and CMS settings.",
     permissions: ["view_settings", "manage_settings"]
+  },
+  {
+    title: "Themes",
+    description: "Manage website themes and styling.",
+    permissions: ["view_themes", "manage_themes"]
   }
 ];
 const ALL_PERMISSION_KEYS = PERMISSION_GROUPS.flatMap(
@@ -36956,6 +36965,12 @@ const ALL_NAV_ITEMS = [
     icon: Star,
     path: "/shorts",
     permissionPath: "/reviews-shorts"
+  },
+  {
+    label: "Theme",
+    icon: Settings,
+    path: "/themes",
+    permissionPath: "/manage_themes"
   },
   {
     label: "Website Content",
@@ -69208,6 +69223,208 @@ function ReviewsAndShortsPage() {
     )
   ] });
 }
+function hexToHsl(hex2) {
+  let r2 = parseInt(hex2.slice(1, 3), 16) / 255;
+  let g2 = parseInt(hex2.slice(3, 5), 16) / 255;
+  let b2 = parseInt(hex2.slice(5, 7), 16) / 255;
+  const max2 = Math.max(r2, g2, b2), min2 = Math.min(r2, g2, b2);
+  let h2 = 0, s2 = 0, l2 = (max2 + min2) / 2;
+  if (max2 !== min2) {
+    const d2 = max2 - min2;
+    s2 = l2 > 0.5 ? d2 / (2 - max2 - min2) : d2 / (max2 + min2);
+    switch (max2) {
+      case r2:
+        h2 = (g2 - b2) / d2;
+        break;
+      case g2:
+        h2 = (b2 - r2) / d2 + 2;
+        break;
+      case b2:
+        h2 = (r2 - g2) / d2 + 4;
+        break;
+    }
+    h2 *= 60;
+  }
+  return `${Math.round(h2)} ${Math.round(s2 * 100)}% ${Math.round(l2 * 100)}%`;
+}
+function applyPanelTheme(colors) {
+  if (!colors) return;
+  const root2 = document.documentElement;
+  if (colors.primary)
+    root2.style.setProperty("--primary", hexToHsl(colors.primary));
+  if (colors.secondary)
+    root2.style.setProperty("--secondary", hexToHsl(colors.secondary));
+  if (colors.background)
+    root2.style.setProperty("--background", hexToHsl(colors.background));
+  if (colors.foreground)
+    root2.style.setProperty("--foreground", hexToHsl(colors.foreground));
+  if (colors.border)
+    root2.style.setProperty("--border", hexToHsl(colors.border));
+}
+const getThemeApi = async (name) => {
+  var _a2, _b2;
+  try {
+    const res = await get$3(`${ENDPOINT.GET_THEMES}?name=${name}`, {
+      needAuth: true
+    });
+    return ((_b2 = (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.themes) == null ? void 0 : _b2[0]) ?? null;
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to fetch theme");
+  }
+};
+const upsertThemeApi = async (name, colors) => {
+  var _a2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPSERT_THEME}?name=${name}`,
+      { colors },
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.theme;
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to save theme");
+  }
+};
+const DEFAULT_WEBSITE_THEME = {
+  primary: "#D89F00",
+  primary_deep: "#A67C00",
+  primary_light: "#F5D77A",
+  primary_soft: "#FFF8E1"
+};
+const DEFAULT_PANEL_THEME = {
+  primary: "#D89F00",
+  secondary: "#A67C00",
+  background: "#F8FAFC",
+  foreground: "#1E293B",
+  border: "#E2E8F0"
+};
+function ThemePage() {
+  const [activeTab, setActiveTab] = reactExports.useState("website");
+  const [colors, setColors] = reactExports.useState(DEFAULT_WEBSITE_THEME);
+  const [loading, setLoading] = reactExports.useState(false);
+  const [saving, setSaving] = reactExports.useState(false);
+  reactExports.useEffect(() => {
+    loadTheme(activeTab);
+  }, [activeTab]);
+  async function loadTheme(type) {
+    try {
+      setLoading(true);
+      const data = await getThemeApi(type);
+      if (data == null ? void 0 : data.colors) {
+        setColors(
+          type === "website" ? { ...DEFAULT_WEBSITE_THEME, ...data.colors } : { ...DEFAULT_PANEL_THEME, ...data.colors }
+        );
+      } else {
+        setColors(
+          type === "website" ? DEFAULT_WEBSITE_THEME : DEFAULT_PANEL_THEME
+        );
+      }
+    } catch (err) {
+      ue$2.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function handleSave() {
+    if (!colors.primary) {
+      ue$2.error("Primary color is required");
+      return;
+    }
+    try {
+      setSaving(true);
+      await upsertThemeApi(activeTab, colors);
+      ue$2.success("Theme saved successfully");
+    } catch (err) {
+      ue$2.error(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  function updateColor(key, value) {
+    const updated = {
+      ...colors,
+      [key]: value
+    };
+    setColors(updated);
+    if (activeTab === "panel") {
+      applyPanelTheme(updated);
+    }
+  }
+  const websiteFields = [
+    "primary",
+    "primary_deep",
+    "primary_light",
+    "primary_soft"
+  ];
+  const panelFields = [
+    "primary",
+    "secondary",
+    "background",
+    "foreground",
+    "border"
+  ];
+  const fields = activeTab === "website" ? websiteFields : panelFields;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Themes",
+        description: "Manage website and admin panel themes.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: handleSave,
+            disabled: saving || loading,
+            className: "gap-2",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
+              saving ? "Saving..." : "Save Theme"
+            ]
+          }
+        )
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Tabs,
+      {
+        value: activeTab,
+        onValueChange: (val) => setActiveTab(val),
+        className: "mb-6",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "bg-slate-100 p-2 rounded-2xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "website", children: "Website" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "panel", children: "Panel" })
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: activeTab === "website" ? "Website Theme" : "Admin Panel Theme" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: fields.map((field) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "capitalize", children: field }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              type: "color",
+              value: colors[field] || "#000000",
+              onChange: (e3) => updateColor(field, e3.target.value),
+              className: "w-14 h-10 p-1",
+              disabled: loading
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              value: colors[field] || "",
+              onChange: (e3) => updateColor(field, e3.target.value),
+              placeholder: "#000000",
+              disabled: loading
+            }
+          )
+        ] })
+      ] }, field)) })
+    ] })
+  ] });
+}
 function normalizePhone(value) {
   const digits = (value == null ? void 0 : value.replace(/\D/g, "")) ?? "";
   return digits || void 0;
@@ -73743,21 +73960,21 @@ function WhyChooseUsPreview({ form }) {
           card.title
         )) })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative rounded-[28px] overflow-hidden border border-slate-100 bg-[#F7EFE6]", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative rounded-[28px] border border-slate-100 bg-[#F7EFE6]", children: [
         sectionImageUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx(
           "img",
           {
             src: sectionImageUrl,
             alt: "Why choose us",
-            className: "h-full min-h-[360px] w-full object-cover"
+            className: "h-full min-h-[360px] w-full object-cover rounded-[28px]"
           }
         ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-full min-h-[360px] items-center justify-center text-[#B9775B]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { size: 40 }) }),
-        secondaryImageUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-28 right-1 w-[320px] h-[220px] rounded-2xl border border-white shadow-xl overflow-hidden z-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        secondaryImageUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute left-6 bottom-6 w-[42%] max-w-[160px] rounded-[20px] border border-white shadow-2xl overflow-hidden z-20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           "img",
           {
             src: secondaryImageUrl,
             alt: "Secondary",
-            className: "w-full h-40 object-cover"
+            className: "w-full h-[160px] object-cover"
           }
         ) })
       ] })
@@ -75006,6 +75223,12 @@ const reviewsAndShortsRoute = createRoute({
   beforeLoad: () => checkPermission("/reviews-shorts"),
   component: ReviewsAndShortsPage
 });
+const themeRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/themes",
+  beforeLoad: () => checkPermission("/themes"),
+  component: ThemePage
+});
 const websiteContentRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/website-content",
@@ -75049,6 +75272,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,
+    themeRoute,
     websiteContentRoute,
     websitePagesRoute,
     careersRoute,

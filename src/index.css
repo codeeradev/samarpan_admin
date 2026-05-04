@@ -4,11 +4,33 @@
 
 @layer base {
   :root {
-    --font-display: "Space Grotesk", sans-serif;
+    /* --font-display: "Space Grotesk", sans-serif;
     --font-body: "Plus Jakarta Sans", sans-serif;
     --font-mono: monospace;
     --radius: 0.625rem;
 
+    --primary: 42 100% 42%;
+    --secondary: 36 100% 40%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --border: 214 32% 91%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 45 100% 94%;
+    --accent-foreground: 222 47% 11%;
+
+    --input: 210 40% 96%;
+    --ring: 42 100% 42%; */
+
+    
     --background: 0.98 0.01 85;
     --foreground: 0.15 0.04 76;
     --card: 1.0 0 0;
@@ -105,11 +127,14 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .shadow-card {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.1),
+      0 1px 2px 0 rgba(0, 0, 0, 0.06);
   }
   .shadow-elevated {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px
-      rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 }
 

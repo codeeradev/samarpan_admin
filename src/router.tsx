@@ -9,6 +9,7 @@ import HonorsPage from "@/pages/HonorsPage";
 import LoginPage from "@/pages/LoginPage";
 import PatientsPage from "@/pages/PatientsPage";
 import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
+import ThemePage from "@/pages/ThemePage";
 import RoleManagementPage from "@/pages/RoleManagementPage";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import SettingsPage from "@/pages/SettingsPage";
@@ -155,6 +156,13 @@ const reviewsAndShortsRoute = createRoute({
   component: ReviewsAndShortsPage,
 });
 
+const themeRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/themes",
+  beforeLoad: () => checkPermission("/themes"),
+  component: ThemePage,
+});
+
 const websiteContentRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/website-content",
@@ -212,6 +220,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,
+    themeRoute,
     websiteContentRoute,
     websitePagesRoute,
     careersRoute,

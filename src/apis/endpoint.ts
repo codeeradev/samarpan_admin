@@ -55,4 +55,8 @@ export const ENDPOINT = {
   GET_ALL_SPECIALIZATIONS: "/get-all-specializations",
   UPDATE_SPECIALIZATION: "/update-specialization",
   DELETE_SPECIALIZATION: "/delete-specialization",
+
+  GET_THEMES: "/get-themes",
+  UPSERT_THEME: "/upsert-theme",
+
 };
