@@ -33,24 +33,24 @@ export function ConfirmDialog({
   return (
     <AlertDialog open={open} onOpenChange={(v) => !v && onCancel()}>
       <AlertDialogContent
-        className="rounded-2xl border border-slate-100 shadow-elevated"
+        className="rounded-2xl border border-border shadow-elevated"
         data-ocid="confirm.dialog"
       >
         <AlertDialogHeader>
           <AlertDialogTitle
-            className="text-[#1E293B]"
+            className="text-foreground"
             style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-[#64748B]">
+          <AlertDialogDescription className="text-muted-foreground">
             {message}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel
             onClick={onCancel}
-            className="rounded-xl border-slate-200 text-[#64748B] hover:bg-slate-50"
+            className="rounded-xl border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             data-ocid="confirm.cancel_button"
           >
             {cancelLabel}
@@ -60,8 +60,8 @@ export function ConfirmDialog({
             data-ocid="confirm.confirm_button"
             className={
               variant === "destructive"
-                ? "rounded-xl bg-red-500 hover:bg-red-600 text-white"
-                : "rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white"
+                ? "rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                : "rounded-xl bg-primary hover:bg-secondary text-primary-foreground"
             }
           >
             {confirmLabel}

@@ -33,6 +33,7 @@ import {
   getApiErrorMessage,
   mapApiErrorsToFields,
 } from "@/lib/api-errors";
+import { themeColor } from "@/lib/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -65,14 +66,14 @@ const pageTableStyles = {
   headRow: {
     style: {
       minHeight: "54px",
-      backgroundColor: "#F8FAFC",
+      backgroundColor: themeColor("muted"),
       borderBottomWidth: "1px",
-      borderBottomColor: "#E2E8F0",
+      borderBottomColor: themeColor("border"),
     },
   },
   headCells: {
     style: {
-      color: "#64748B",
+      color: themeColor("muted-foreground"),
       fontSize: "12px",
       fontWeight: 700,
       textTransform: "uppercase" as const,
@@ -85,25 +86,25 @@ const pageTableStyles = {
     style: {
       minHeight: "72px",
       borderBottomWidth: "1px",
-      borderBottomColor: "#F1F5F9",
-      backgroundColor: "#FFFFFF",
+      borderBottomColor: themeColor("border", 0.7),
+      backgroundColor: themeColor("card"),
     },
   },
   cells: {
     style: {
       paddingLeft: "16px",
       paddingRight: "16px",
-      color: "#1E293B",
+      color: themeColor("foreground"),
       fontSize: "14px",
     },
   },
   pagination: {
     style: {
       borderTopWidth: "1px",
-      borderTopColor: "#E2E8F0",
+      borderTopColor: themeColor("border"),
       minHeight: "60px",
-      color: "#475569",
-      backgroundColor: "#FFFFFF",
+      color: themeColor("muted-foreground"),
+      backgroundColor: themeColor("card"),
     },
   },
 };
@@ -174,8 +175,8 @@ function StatusBadge({ status }: { status: PageStatus }) {
     <Badge
       className={
         isPublished
-          ? "bg-emerald-50 text-emerald-700"
-          : "bg-amber-50 text-amber-700"
+          ? "bg-primary/10 text-primary"
+          : "bg-accent text-secondary"
       }
     >
       {isPublished ? "Published" : "Draft"}
@@ -349,10 +350,10 @@ export default function PagesPage() {
       grow: 1.4,
       cell: (page) => (
         <div className="min-w-0 py-3">
-          <p className="truncate text-sm font-semibold text-slate-900">
+          <p className="truncate text-sm font-semibold text-foreground">
             {page.title}
           </p>
-          <p className="truncate text-xs text-slate-500">/{page.slug}</p>
+          <p className="truncate text-xs text-muted-foreground">/{page.slug}</p>
         </div>
       ),
     },
@@ -366,10 +367,10 @@ export default function PagesPage() {
       grow: 1.4,
       cell: (page) => (
         <div className="min-w-0 py-3">
-          <p className="truncate text-sm text-slate-800">
+          <p className="truncate text-sm text-foreground">
             {page.seo.metaTitle || "No meta title"}
           </p>
-          <p className="line-clamp-2 text-xs text-slate-500">
+          <p className="line-clamp-2 text-xs text-muted-foreground">
             {page.seo.metaDescription || "No meta description"}
           </p>
         </div>
@@ -379,7 +380,7 @@ export default function PagesPage() {
       name: "Updated",
       width: "150px",
       cell: (page) => (
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-muted-foreground">
           {formatPageDate(page.updatedAt ?? page.createdAt)}
         </span>
       ),
@@ -394,7 +395,7 @@ export default function PagesPage() {
             type="button"
             variant="outline"
             size="sm"
-            className="rounded-xl border-slate-200"
+            className="rounded-xl border-border"
             onClick={() => openPreview(page)}
           >
             <Eye size={14} />
@@ -404,7 +405,7 @@ export default function PagesPage() {
             type="button"
             variant="ghost"
             size="icon"
-            className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
+            className="rounded-xl text-muted-foreground hover:bg-accent hover:text-secondary"
             onClick={() => openEdit(page)}
           >
             <Pencil size={15} />
@@ -413,7 +414,7 @@ export default function PagesPage() {
             type="button"
             variant="ghost"
             size="icon"
-            className="rounded-xl text-slate-500"
+            className="rounded-xl text-muted-foreground"
             onClick={() => setDeleteTarget(page)}
           >
             <Trash2 size={15} />
@@ -432,7 +433,7 @@ export default function PagesPage() {
           <Button
             type="button"
             onClick={openAdd}
-            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto bg-[#D89F00]"
+            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto bg-primary"
           >
             <Plus size={16} />
             Add page
@@ -440,14 +441,14 @@ export default function PagesPage() {
         }
       />
 
-      <Card className="rounded-3xl border-slate-100 shadow-sm">
-        <CardHeader className="gap-4 border-b border-slate-100 pb-5">
+      <Card className="rounded-3xl border-border shadow-sm">
+        <CardHeader className="gap-4 border-b border-border pb-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <CardTitle className="text-lg text-slate-900">
+              <CardTitle className="text-lg text-foreground">
                 Page Library
               </CardTitle>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Preview and manage custom website pages from one place.
               </p>
             </div>
@@ -455,16 +456,16 @@ export default function PagesPage() {
               <div className="relative w-full lg:w-80">
                 <Search
                   size={15}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 />
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search title, slug, content, SEO..."
-                  className="rounded-xl border-slate-200 !pl-9"
+                  className="rounded-xl border-border !pl-9"
                 />
               </div>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-600">
+              <div className="flex items-center rounded-xl border border-border bg-muted/60 px-4 text-sm font-medium text-muted-foreground">
                 {filteredPages.length} page
                 {filteredPages.length === 1 ? "" : "s"}
               </div>
@@ -473,7 +474,7 @@ export default function PagesPage() {
         </CardHeader>
 
         <CardContent className="p-5">
-          <div className="overflow-hidden rounded-2xl border border-slate-100">
+          <div className="overflow-hidden rounded-2xl border border-border">
             <DataTable
               columns={columns}
               data={filteredPages}
@@ -485,10 +486,10 @@ export default function PagesPage() {
               persistTableHead
               noDataComponent={
                 <div className="py-16 text-center">
-                  <p className="text-base font-semibold text-slate-900">
+                  <p className="text-base font-semibold text-foreground">
                     No pages found
                   </p>
-                  <p className="mt-2 text-sm text-slate-500">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     Add your first website page to see it here.
                   </p>
                 </div>
@@ -509,7 +510,7 @@ export default function PagesPage() {
         modal={false}
       >
         <DialogContent
-          className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-[1200px]"
+          className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-[1200px]"
           onInteractOutside={(e) => {
             const el = e.target as HTMLElement;
             if (
@@ -524,7 +525,7 @@ export default function PagesPage() {
           }}
         >
           <DialogHeader>
-            <DialogTitle className="text-xl text-slate-900">
+            <DialogTitle className="text-xl text-foreground">
               {editTarget ? "Edit Website Page" : "Add Website Page"}
             </DialogTitle>
             <DialogDescription>
@@ -536,17 +537,17 @@ export default function PagesPage() {
             <div className="grid gap-4 lg:grid-cols-3">
               <div className="space-y-2 lg:col-span-2">
                 <Label htmlFor="page-title">
-                  Page Title <span className="text-red-500">*</span>
+                  Page Title <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="page-title"
                   value={formData.title}
                   onChange={(event) => setField("title", event.target.value)}
                   placeholder="About Samarpan Hospital"
-                  className={`rounded-xl ${formErrors.title ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                  className={`rounded-xl ${formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 />
                 {formErrors.title ? (
-                  <p className="text-xs text-red-500">{formErrors.title}</p>
+                  <p className="text-xs text-destructive">{formErrors.title}</p>
                 ) : null}
               </div>
               <div className="space-y-2">
@@ -575,12 +576,12 @@ export default function PagesPage() {
                 value={formData.slug}
                 onChange={(event) => setField("slug", event.target.value)}
                 placeholder="about-samarpan"
-                className={`rounded-xl ${formErrors.slug ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                className={`rounded-xl ${formErrors.slug ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
               {formErrors.slug ? (
-                <p className="text-xs text-red-500">{formErrors.slug}</p>
+                <p className="text-xs text-destructive">{formErrors.slug}</p>
               ) : (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Leave it clean and short. We’ll save this as `/
                   {formData.slug.trim()
                     ? slugify(formData.slug)
@@ -590,12 +591,12 @@ export default function PagesPage() {
               )}
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+            <div className="rounded-3xl border border-border bg-muted/60 p-5">
               <div className="mb-4">
-                <h3 className="text-base font-semibold text-slate-900">
+                <h3 className="text-base font-semibold text-foreground">
                   SEO Details
                 </h3>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Add meta title and meta description for search and social
                   previews.
                 </p>
@@ -612,17 +613,17 @@ export default function PagesPage() {
                     }
                     placeholder="Samarpan Hospital | Expert Care in Hisar"
                     maxLength={60}
-                    className={`rounded-xl bg-white ${formErrors.metaTitle ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                    className={`rounded-xl bg-card ${formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : ""}`}
                   />
                   <div className="flex items-center justify-between gap-3 text-xs">
                     {formErrors.metaTitle ? (
-                      <p className="text-red-500">{formErrors.metaTitle}</p>
+                      <p className="text-destructive">{formErrors.metaTitle}</p>
                     ) : (
-                      <p className="text-slate-500">
+                      <p className="text-muted-foreground">
                         Aim for 50 to 60 characters.
                       </p>
                     )}
-                    <span className="text-slate-400">
+                    <span className="text-muted-foreground">
                       {formData.metaTitle.length}/60
                     </span>
                   </div>
@@ -641,19 +642,19 @@ export default function PagesPage() {
                     }
                     placeholder="Short SEO description for this page."
                     maxLength={160}
-                    className={`rounded-2xl bg-white ${formErrors.metaDescription ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                    className={`rounded-2xl bg-card ${formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : ""}`}
                   />
                   <div className="flex items-center justify-between gap-3 text-xs">
                     {formErrors.metaDescription ? (
-                      <p className="text-red-500">
+                      <p className="text-destructive">
                         {formErrors.metaDescription}
                       </p>
                     ) : (
-                      <p className="text-slate-500">
+                      <p className="text-muted-foreground">
                         Search descriptions usually fit within 160 characters.
                       </p>
                     )}
-                    <span className="text-slate-400">
+                    <span className="text-muted-foreground">
                       {formData.metaDescription.length}/160
                     </span>
                   </div>
@@ -708,7 +709,7 @@ export default function PagesPage() {
               </Button>
               <Button
                 type="button"
-                className="rounded-xl bg-[#D89F00]"
+                className="rounded-xl bg-primary"
                 onClick={handleSave}
                 disabled={addMutation.isPending || updateMutation.isPending}
               >
@@ -728,46 +729,46 @@ export default function PagesPage() {
           }
         }}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-5xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-5xl">
           <DialogHeader>
-            <DialogTitle className="text-xl text-slate-900">
+            <DialogTitle className="text-xl text-foreground">
               Page Preview
             </DialogTitle>
           </DialogHeader>
 
           {previewPage ? (
             <div className="space-y-4 px-1 pb-2">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <div className="rounded-3xl border border-border bg-muted/60 p-5">
                 <div className="flex flex-wrap items-center gap-3">
                   <StatusBadge status={previewPage.status} />
-                  <span className="text-sm text-slate-500">
+                  <span className="text-sm text-muted-foreground">
                     /{previewPage.slug}
                   </span>
                 </div>
-                <h2 className="mt-3 text-2xl font-semibold text-slate-900">
+                <h2 className="mt-3 text-2xl font-semibold text-foreground">
                   {previewPage.title || "Untitled page"}
                 </h2>
-                <div className="mt-4 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-2">
+                <div className="mt-4 grid gap-3 rounded-2xl border border-border bg-card p-4 md:grid-cols-2">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Meta Title
                     </p>
-                    <p className="mt-1 text-sm text-slate-700">
+                    <p className="mt-1 text-sm text-foreground">
                       {previewPage.seo.metaTitle || "No meta title"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Meta Description
                     </p>
-                    <p className="mt-1 text-sm text-slate-700">
+                    <p className="mt-1 text-sm text-foreground">
                       {previewPage.seo.metaDescription || "No meta description"}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 prose prose-slate max-w-full">
+              <div className="rounded-3xl border border-border bg-card p-6 prose prose-slate max-w-full">
                 <div
                   dangerouslySetInnerHTML={{
                     __html:
@@ -784,7 +785,7 @@ export default function PagesPage() {
         open={!!deleteTarget}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
       >
-        <DialogContent className="max-w-xl rounded-3xl border-slate-200">
+        <DialogContent className="max-w-xl rounded-3xl border-border">
           <DialogHeader>
             <DialogTitle>Delete page</DialogTitle>
             <DialogDescription>

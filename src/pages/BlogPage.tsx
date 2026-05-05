@@ -285,7 +285,7 @@ export default function BlogsPage() {
       header: "Blog",
       render: (blog) => (
         <div className="flex items-center gap-3 min-w-0">
-          <div className="h-10 w-12 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shrink-0">
+          <div className="h-10 w-12 overflow-hidden rounded-lg border border-border bg-muted/60 shrink-0">
             {blog.image ? (
               <img
                 src={resolveAssetUrl(blog.image)}
@@ -293,14 +293,14 @@ export default function BlogsPage() {
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="h-full w-full bg-slate-100" />
+              <div className="h-full w-full bg-muted" />
             )}
           </div>
           <div className="min-w-0">
-            <p className="font-medium text-[#1E293B] truncate">
+            <p className="font-medium text-foreground truncate">
               {blog.title || "Untitled"}
             </p>
-            <p className="text-xs text-slate-500 truncate">
+            <p className="text-xs text-muted-foreground truncate">
               {(() => {
                 const desc = blog.shortDescription ?? "";
                 return desc.length > 80
@@ -316,7 +316,7 @@ export default function BlogsPage() {
       key: "serviceId",
       header: "Service",
       render: (blog) => (
-        <span className="text-slate-600">
+        <span className="text-muted-foreground">
           {serviceById.get(blog.serviceId || "") || "—"}
         </span>
       ),
@@ -328,8 +328,8 @@ export default function BlogsPage() {
         <span
           className={
             blog.status === "draft"
-              ? "inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
-              : "inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+              ? "inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground"
+              : "inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary"
           }
         >
           {blog.status || "published"}
@@ -346,7 +346,7 @@ export default function BlogsPage() {
             type="button"
             size="sm"
             variant="outline"
-            className="rounded-lg border-slate-200"
+            className="rounded-lg border-border"
             onClick={() => setPreviewTarget(blog)}
           >
             <Eye size={14} />
@@ -378,7 +378,7 @@ export default function BlogsPage() {
         title="Blog Management"
         description="Manage blog content, SEO, and preview posts."
         action={
-          <Button onClick={openAdd} className="rounded-xl gap-2 bg-[#D89F00]">
+          <Button onClick={openAdd} className="rounded-xl gap-2 bg-primary">
             <Plus className="h-4 w-4" />
             Add Blog
           </Button>
@@ -422,27 +422,27 @@ export default function BlogsPage() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>
-                      Title <span className="text-red-500">*</span>
+                      Title <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       value={form.title}
                       onChange={(e) => setField("title", e.target.value)}
-                      className={formErrors.title ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                      className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : undefined}
                     />
                     {formErrors.title ? (
-                      <p className="text-xs text-red-500">{formErrors.title}</p>
+                      <p className="text-xs text-destructive">{formErrors.title}</p>
                     ) : null}
                   </div>
 
                   <div className="space-y-2">
                     <Label>
-                      Service <span className="text-red-500">*</span>
+                      Service <span className="text-destructive">*</span>
                     </Label>
                     <Select
                       value={form.serviceId}
                       onValueChange={(v) => setField("serviceId", v)}
                     >
-                      <SelectTrigger className={formErrors.serviceId ? "border-red-400 focus-visible:ring-red-400" : undefined}>
+                      <SelectTrigger className={formErrors.serviceId ? "border-destructive focus-visible:ring-destructive" : undefined}>
                         <SelectValue placeholder="Select Service" />
                       </SelectTrigger>
                       <SelectContent>
@@ -454,7 +454,7 @@ export default function BlogsPage() {
                       </SelectContent>
                     </Select>
                     {formErrors.serviceId ? (
-                      <p className="text-xs text-red-500">
+                      <p className="text-xs text-destructive">
                         {formErrors.serviceId}
                       </p>
                     ) : null}
@@ -493,19 +493,19 @@ export default function BlogsPage() {
                       setField("shortDescription", e.target.value)
                     }
                     maxLength={300}
-                    className={formErrors.shortDescription ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                    className={formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : undefined}
                   />
                   <div className="flex items-center justify-between gap-3 text-xs">
                     {formErrors.shortDescription ? (
-                      <p className="text-red-500">
+                      <p className="text-destructive">
                         {formErrors.shortDescription}
                       </p>
                     ) : (
-                      <p className="text-slate-500">
+                      <p className="text-muted-foreground">
                         Keep this concise for blog cards and listings.
                       </p>
                     )}
-                    <span className="text-slate-400">
+                    <span className="text-muted-foreground">
                       {form.shortDescription.length}/300
                     </span>
                   </div>
@@ -516,10 +516,10 @@ export default function BlogsPage() {
                   rows={8}
                   value={form.content}
                   onChange={(e) => setField("content", e.target.value)}
-                  className={formErrors.content ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  className={formErrors.content ? "border-destructive focus-visible:ring-destructive" : undefined}
                 />
                 {formErrors.content ? (
-                  <p className="text-xs text-red-500">{formErrors.content}</p>
+                  <p className="text-xs text-destructive">{formErrors.content}</p>
                 ) : null}
               </CardContent>
             </Card>
@@ -533,17 +533,17 @@ export default function BlogsPage() {
                   value={form.metaTitle}
                   onChange={(e) => setField("metaTitle", e.target.value)}
                   maxLength={60}
-                  className={formErrors.metaTitle ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  className={formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : undefined}
                 />
                 <div className="flex items-center justify-between gap-3 text-xs">
                   {formErrors.metaTitle ? (
-                    <p className="text-red-500">{formErrors.metaTitle}</p>
+                    <p className="text-destructive">{formErrors.metaTitle}</p>
                   ) : (
-                    <p className="text-slate-500">
+                    <p className="text-muted-foreground">
                       Search engines usually show about 60 characters.
                     </p>
                   )}
-                  <span className="text-slate-400">{form.metaTitle.length}/60</span>
+                  <span className="text-muted-foreground">{form.metaTitle.length}/60</span>
                 </div>
 
                 <Textarea
@@ -551,17 +551,17 @@ export default function BlogsPage() {
                   value={form.metaDescription}
                   onChange={(e) => setField("metaDescription", e.target.value)}
                   maxLength={160}
-                  className={formErrors.metaDescription ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  className={formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : undefined}
                 />
                 <div className="flex items-center justify-between gap-3 text-xs">
                   {formErrors.metaDescription ? (
-                    <p className="text-red-500">{formErrors.metaDescription}</p>
+                    <p className="text-destructive">{formErrors.metaDescription}</p>
                   ) : (
-                    <p className="text-slate-500">
+                    <p className="text-muted-foreground">
                       Search snippets usually fit within 160 characters.
                     </p>
                   )}
-                  <span className="text-slate-400">
+                  <span className="text-muted-foreground">
                     {form.metaDescription.length}/160
                   </span>
                 </div>
@@ -597,16 +597,16 @@ export default function BlogsPage() {
                   />
                 </label>
                 {formErrors.image ? (
-                  <p className="text-xs text-red-500">{formErrors.image}</p>
+                  <p className="text-xs text-destructive">{formErrors.image}</p>
                 ) : (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Upload a featured image for new blog posts.
                   </p>
                 )}
               </CardContent>
             </Card>
 
-            <Button onClick={handleSave} className="w-full bg-[#D89F00]">
+            <Button onClick={handleSave} className="w-full bg-primary">
               {mode === "edit" ? "Update Blog" : "Create Blog"}
             </Button>
           </div>
@@ -617,7 +617,7 @@ export default function BlogsPage() {
         open={!!previewTarget}
         onOpenChange={(nextOpen) => !nextOpen && setPreviewTarget(null)}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Blog Preview</DialogTitle>
           </DialogHeader>
@@ -625,7 +625,7 @@ export default function BlogsPage() {
           {previewTarget && (
             <div className="space-y-5">
               {previewTarget.image ? (
-                <div className="overflow-hidden rounded-2xl border bg-slate-50">
+                <div className="overflow-hidden rounded-2xl border bg-muted/60">
                   <img
                     src={resolveAssetUrl(previewTarget.image)}
                     alt={previewTarget.title || "Blog"}
@@ -635,22 +635,22 @@ export default function BlogsPage() {
               ) : null}
 
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {serviceById.get(previewTarget.serviceId || "") ||
                     "No service"}{" "}
                   · {previewTarget.status || "published"}
                 </p>
-                <h2 className="text-xl font-semibold text-slate-900">
+                <h2 className="text-xl font-semibold text-foreground">
                   {previewTarget.title || "Untitled"}
                 </h2>
-                <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                   {previewTarget.shortDescription || ""}
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-sm font-semibold text-slate-900">Content</p>
-                <p className="mt-2 text-sm leading-7 text-slate-700 whitespace-pre-wrap">
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <p className="text-sm font-semibold text-foreground">Content</p>
+                <p className="mt-2 text-sm leading-7 text-foreground whitespace-pre-wrap">
                   {previewTarget.content || "—"}
                 </p>
               </div>

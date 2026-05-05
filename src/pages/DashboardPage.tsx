@@ -4,6 +4,7 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getDashboardApi } from "@/apiCalls/dashboard";
+import { themeColor } from "@/lib/theme";
 import { formatDate } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -42,6 +43,12 @@ const SKELETON_CELL_KEYS = ["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5"];
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const gridColor = themeColor("border", 0.7);
+  const mutedTextColor = themeColor("muted-foreground");
+  const tooltipBorder = `1px solid ${themeColor("border")}`;
+  const lineColor = themeColor("chart-1");
+  const barColor = themeColor("chart-2");
+
   const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: getDashboardApi,
@@ -65,7 +72,7 @@ export default function DashboardPage() {
           SKELETON_STAT_KEYS.map((k) => (
             <Card
               key={k}
-              className="rounded-2xl shadow-card border border-slate-100"
+              className="rounded-2xl shadow-card border border-border"
             >
               <CardContent className="p-5 space-y-3">
                 <Skeleton className="h-11 w-11 rounded-xl" />
@@ -112,11 +119,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-4 sm:mb-6">
         {/* Line chart — Appointments This Week */}
         <Card
-          className="shadow-card border border-slate-100 rounded-2xl"
+          className="shadow-card border border-border rounded-2xl"
           data-ocid="dashboard.weekly_chart"
         >
           <CardHeader className="pb-2 px-4 sm:px-6">
-            <CardTitle className="text-sm sm:text-base font-semibold text-[#1E293B] font-display">
+            <CardTitle className="text-sm sm:text-base font-semibold text-foreground font-display">
               Appointments This Week
             </CardTitle>
           </CardHeader>
@@ -133,22 +140,22 @@ export default function DashboardPage() {
                     }))}
                     margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                     <XAxis
                       dataKey="day"
-                      tick={{ fontSize: 11, fill: "#94A3B8" }}
+                      tick={{ fontSize: 11, fill: mutedTextColor }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#94A3B8" }}
+                      tick={{ fontSize: 11, fill: mutedTextColor }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <Tooltip
                       contentStyle={{
                         borderRadius: "12px",
-                        border: "1px solid #E2E8F0",
+                        border: tooltipBorder,
                         boxShadow: "0 4px 6px rgba(0,0,0,0.07)",
                         fontSize: 12,
                       }}
@@ -156,9 +163,9 @@ export default function DashboardPage() {
                     <Line
                       type="monotone"
                       dataKey="appointments"
-                      stroke="#D89F00"
+                      stroke={lineColor}
                       strokeWidth={2.5}
-                      dot={{ fill: "#D89F00", r: 4, strokeWidth: 0 }}
+                      dot={{ fill: lineColor, r: 4, strokeWidth: 0 }}
                       activeDot={{ r: 6, strokeWidth: 0 }}
                       name="Appointments"
                     />
@@ -171,11 +178,11 @@ export default function DashboardPage() {
 
         {/* Bar chart — Patient Growth */}
         <Card
-          className="shadow-card border border-slate-100 rounded-2xl"
+          className="shadow-card border border-border rounded-2xl"
           data-ocid="dashboard.growth_chart"
         >
           <CardHeader className="pb-2 px-4 sm:px-6">
-            <CardTitle className="text-sm sm:text-base font-semibold text-[#1E293B] font-display">
+            <CardTitle className="text-sm sm:text-base font-semibold text-foreground font-display">
               Patient Growth
             </CardTitle>
           </CardHeader>
@@ -194,31 +201,31 @@ export default function DashboardPage() {
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="#F1F5F9"
+                      stroke={gridColor}
                       vertical={false}
                     />
                     <XAxis
                       dataKey="month"
-                      tick={{ fontSize: 11, fill: "#94A3B8" }}
+                      tick={{ fontSize: 11, fill: mutedTextColor }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#94A3B8" }}
+                      tick={{ fontSize: 11, fill: mutedTextColor }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <Tooltip
                       contentStyle={{
                         borderRadius: "12px",
-                        border: "1px solid #E2E8F0",
+                        border: tooltipBorder,
                         boxShadow: "0 4px 6px rgba(0,0,0,0.07)",
                         fontSize: 12,
                       }}
                     />
                     <Bar
                       dataKey="patients"
-                      fill="#A67C00"
+                      fill={barColor}
                       radius={[6, 6, 0, 0]}
                       name="New Patients"
                     />
@@ -232,19 +239,19 @@ export default function DashboardPage() {
 
       {/* ── Recent Appointments ─────────────────────────────────────────────── */}
       <Card
-        className="shadow-card border border-slate-100 rounded-2xl"
+        className="shadow-card border border-border rounded-2xl"
         data-ocid="dashboard.recent_appointments"
       >
         <CardHeader className="pb-2 flex flex-row items-center justify-between gap-2 px-4 sm:px-6">
           <div className="flex items-center gap-2 min-w-0">
-            <Clock size={16} className="text-[#D89F00] shrink-0" />
-            <CardTitle className="text-sm sm:text-base font-semibold text-[#1E293B] truncate font-display">
+            <Clock size={16} className="text-primary shrink-0" />
+            <CardTitle className="text-sm sm:text-base font-semibold text-foreground truncate font-display">
               Recent Appointments
             </CardTitle>
           </div>
           <a
             href="/appointments"
-            className="text-xs sm:text-sm font-medium text-[#D89F00] hover:text-[#A67C00] transition-colors shrink-0"
+            className="text-xs sm:text-sm font-medium text-primary hover:text-secondary transition-colors shrink-0"
             data-ocid="dashboard.view_all_appointments.link"
           >
             View All →
@@ -255,12 +262,12 @@ export default function DashboardPage() {
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-[#F8FAFC]">
+                <tr className="border-b border-border bg-muted">
                   {["Patient", "Doctor", "Date / Time", "Reason", "Status"].map(
                     (col) => (
                       <th
                         key={col}
-                        className="text-left text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-5 whitespace-nowrap"
+                        className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap"
                       >
                         {col}
                       </th>
@@ -271,7 +278,7 @@ export default function DashboardPage() {
               <tbody>
                 {apptLoading
                   ? SKELETON_ROW_KEYS.map((rk) => (
-                      <tr key={rk} className="border-b border-slate-50">
+                      <tr key={rk} className="border-b border-border/60">
                         {SKELETON_CELL_KEYS.map((ck) => (
                           <td key={ck} className="px-5 py-3">
                             <Skeleton className="h-4 w-3/4 rounded" />
@@ -282,19 +289,19 @@ export default function DashboardPage() {
                   : recent.map((appt, idx) => (
                       <tr
                         key={appt._id}
-                        className="border-b border-slate-50 hover:bg-[#F8FAFC] transition-colors"
+                        className="border-b border-border/60 hover:bg-muted transition-colors"
                         data-ocid={`dashboard.recent_appointments.item.${idx + 1}`}
                       >
-                        <td className="px-5 py-3 font-medium text-[#1E293B] whitespace-nowrap">
+                        <td className="px-5 py-3 font-medium text-foreground whitespace-nowrap">
                           {appt.fullName}
                         </td>
-                        <td className="px-5 py-3 text-[#475569] whitespace-nowrap">
+                        <td className="px-5 py-3 text-muted-foreground whitespace-nowrap">
                           {appt.doctorName}
                         </td>
-                        <td className="px-5 py-3 text-[#475569] whitespace-nowrap">
+                        <td className="px-5 py-3 text-muted-foreground whitespace-nowrap">
                           {formatDate(appt.appointmentDate)}
                         </td>
-                        <td className="px-5 py-3 text-[#475569] max-w-[200px] truncate">
+                        <td className="px-5 py-3 text-muted-foreground max-w-[200px] truncate">
                           {appt.reason}
                         </td>
                         <td className="px-5 py-3">
@@ -307,7 +314,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Mobile card list — visible only on small screens */}
-          <div className="md:hidden divide-y divide-slate-50">
+          <div className="md:hidden divide-y divide-border/60">
             {apptLoading
               ? SKELETON_ROW_KEYS.map((rk) => (
                   <div key={rk} className="px-4 py-3 space-y-2">
@@ -323,19 +330,19 @@ export default function DashboardPage() {
                     data-ocid={`dashboard.recent_appointments.item.${idx + 1}`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <span className="font-medium text-sm text-[#1E293B] truncate">
+                      <span className="font-medium text-sm text-foreground truncate">
                         {appt.fullName}
                       </span>
                       <StatusBadge status={appt.status} />
                     </div>
-                    <p className="text-xs text-[#475569]">
+                    <p className="text-xs text-muted-foreground">
                       <span className="font-medium">Dr.</span> {appt.doctorName}
                     </p>
-                    <p className="text-xs text-[#64748B]">
+                    <p className="text-xs text-muted-foreground">
                       {formatDate(appt.appointmentDate)}
                     </p>
                     {appt.reason && (
-                      <p className="text-xs text-[#94A3B8] truncate">
+                      <p className="text-xs text-muted-foreground truncate">
                         {appt.reason}
                       </p>
                     )}
@@ -351,7 +358,7 @@ export default function DashboardPage() {
           SKELETON_STAT_KEYS.map((k) => (
             <Card
               key={`content-${k}`}
-              className="rounded-2xl shadow-card border border-slate-100"
+              className="rounded-2xl shadow-card border border-border"
             >
               <CardContent className="p-5 space-y-3">
                 <Skeleton className="h-11 w-11 rounded-xl" />

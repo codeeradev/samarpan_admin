@@ -18,29 +18,29 @@ const colorMap: Record<
   { bg: string; iconBg: string; iconColor: string }
 > = {
   gold: {
-    bg: "bg-amber-50",
-    iconBg: "bg-amber-100",
-    iconColor: "text-[#D89F00]",
+    bg: "bg-primary/10",
+    iconBg: "bg-primary/20",
+    iconColor: "text-primary",
   },
   "gold-deep": {
-    bg: "bg-yellow-50",
-    iconBg: "bg-yellow-100",
-    iconColor: "text-[#A67C00]",
+    bg: "bg-secondary/10",
+    iconBg: "bg-secondary/20",
+    iconColor: "text-secondary",
   },
   green: {
-    bg: "bg-[#F0FDF4]",
-    iconBg: "bg-[#DCFCE7]",
-    iconColor: "text-[#16A34A]",
+    bg: "bg-[oklch(var(--chart-4)/0.12)]",
+    iconBg: "bg-[oklch(var(--chart-4)/0.2)]",
+    iconColor: "text-[oklch(var(--chart-4))]",
   },
   orange: {
-    bg: "bg-[#FFF7ED]",
-    iconBg: "bg-[#FFEDD5]",
-    iconColor: "text-[#EA580C]",
+    bg: "bg-[oklch(var(--chart-5)/0.12)]",
+    iconBg: "bg-[oklch(var(--chart-5)/0.2)]",
+    iconColor: "text-[oklch(var(--chart-5))]",
   },
   purple: {
-    bg: "bg-[#FAF5FF]",
-    iconBg: "bg-[#EDE9FE]",
-    iconColor: "text-[#7C3AED]",
+    bg: "bg-[oklch(var(--chart-2)/0.12)]",
+    iconBg: "bg-[oklch(var(--chart-2)/0.2)]",
+    iconColor: "text-[oklch(var(--chart-2))]",
   },
 };
 
@@ -56,11 +56,11 @@ export function StatCard({
   const isPositive = trend !== undefined && trend >= 0;
 
   return (
-    <Card className="shadow-card border border-slate-100 rounded-2xl overflow-hidden hover:shadow-elevated transition-colors duration-200">
+    <Card className="shadow-card border border-border rounded-2xl overflow-hidden hover:shadow-elevated transition-colors duration-200">
       <CardContent className="p-4 sm:p-5">
         <div className="flex items-start justify-between gap-2">
           <div
-            className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl ${styles.iconBg} flex items-center justify-center flex-shrink-0`}
+            className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl ${styles.bg} ${styles.iconBg} flex items-center justify-center flex-shrink-0`}
           >
             <Icon size={18} className={styles.iconColor} />
           </div>
@@ -68,8 +68,8 @@ export function StatCard({
             <span
               className={`flex items-center gap-0.5 text-xs font-medium px-1.5 sm:px-2 py-1 rounded-lg flex-shrink-0 ${
                 isPositive
-                  ? "bg-green-50 text-green-600"
-                  : "bg-red-50 text-red-500"
+                  ? "bg-primary/10 text-primary"
+                  : "bg-destructive/10 text-destructive"
               }`}
             >
               {isPositive ? (
@@ -86,14 +86,14 @@ export function StatCard({
         </div>
 
         <div className="mt-3 sm:mt-4">
-          <p className="text-xs sm:text-sm font-medium text-[#64748B] leading-snug">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground leading-snug">
             {label}
           </p>
-          <p className="text-xl sm:text-2xl font-bold text-[#1E293B] mt-0.5 sm:mt-1 font-display tabular-nums">
+          <p className="text-xl sm:text-2xl font-bold text-foreground mt-0.5 sm:mt-1 font-display tabular-nums">
             {value}
           </p>
           {subtitle && (
-            <p className="text-xs text-[#94A3B8] mt-0.5 sm:mt-1 leading-snug">
+            <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1 leading-snug">
               {subtitle}
             </p>
           )}

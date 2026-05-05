@@ -86,7 +86,7 @@ function GenderBadge({ gender }: { gender: PatientGender }) {
   const styles: Record<PatientGender, string> = {
     male: "bg-primary/10 text-primary border-primary/20",
     female: "bg-pink-50 text-pink-700 border-pink-200",
-    other: "bg-amber-50 text-[#A67C00] border-amber-200",
+    other: "bg-accent text-secondary border-secondary/20",
   };
 
   return (
@@ -108,7 +108,7 @@ function PatientStatusBadge({ patient }: { patient: PatientItem }) {
     return (
       <Badge
         variant="outline"
-        className="rounded-lg border-amber-200 bg-amber-50 text-amber-700"
+        className="rounded-lg border-secondary/20 bg-accent text-secondary"
       >
         Discharged
       </Badge>
@@ -118,7 +118,7 @@ function PatientStatusBadge({ patient }: { patient: PatientItem }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-lg border-emerald-200 bg-emerald-50 text-emerald-700"
+      className="rounded-lg border-primary/20 bg-primary/10 text-primary"
     >
       Active
     </Badge>
@@ -149,7 +149,7 @@ function PatientFormModal({
         data-ocid="patients.edit_dialog"
       >
         <DialogHeader>
-          <DialogTitle className="text-[#1E293B] text-lg font-semibold">
+          <DialogTitle className="text-foreground text-lg font-semibold">
             Edit Patient
           </DialogTitle>
         </DialogHeader>
@@ -158,16 +158,16 @@ function PatientFormModal({
           <div className="col-span-1 sm:col-span-2 space-y-1.5">
             <Label
               htmlFor="pt-name"
-              className="text-sm font-medium text-[#374151]"
+              className="text-sm font-medium text-foreground"
             >
-              Full Name <span className="text-red-500">*</span>
+              Full Name <span className="text-destructive">*</span>
             </Label>
             <Input
               id="pt-name"
               placeholder="e.g. Arjun Verma"
               value={form.name}
               onChange={(e) => onFormChange({ name: e.target.value })}
-              className="rounded-xl border-[#E2E8F0] focus-visible:ring-primary/30"
+              className="rounded-xl border-border focus-visible:ring-primary/30"
               data-ocid="patients.form.name_input"
             />
           </div>
@@ -175,16 +175,16 @@ function PatientFormModal({
           <div className="space-y-1.5">
             <Label
               htmlFor="pt-phone"
-              className="text-sm font-medium text-[#374151]"
+              className="text-sm font-medium text-foreground"
             >
-              Phone <span className="text-red-500">*</span>
+              Phone <span className="text-destructive">*</span>
             </Label>
             <Input
               id="pt-phone"
               placeholder="+91 9XXXXXXXXX"
               value={form.phone}
               onChange={(e) => onFormChange({ phone: e.target.value })}
-              className="rounded-xl border-[#E2E8F0] focus-visible:ring-primary/30"
+              className="rounded-xl border-border focus-visible:ring-primary/30"
               data-ocid="patients.form.phone_input"
             />
           </div>
@@ -192,9 +192,9 @@ function PatientFormModal({
           <div className="space-y-1.5">
             <Label
               htmlFor="pt-age"
-              className="text-sm font-medium text-[#374151]"
+              className="text-sm font-medium text-foreground"
             >
-              Age <span className="text-red-500">*</span>
+              Age <span className="text-destructive">*</span>
             </Label>
             <Input
               id="pt-age"
@@ -204,14 +204,14 @@ function PatientFormModal({
               max={150}
               value={form.age}
               onChange={(e) => onFormChange({ age: e.target.value })}
-              className="rounded-xl border-[#E2E8F0] focus-visible:ring-primary/30"
+              className="rounded-xl border-border focus-visible:ring-primary/30"
               data-ocid="patients.form.age_input"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-[#374151]">
-              Gender <span className="text-red-500">*</span>
+            <Label className="text-sm font-medium text-foreground">
+              Gender <span className="text-destructive">*</span>
             </Label>
             <Select
               value={form.gender}
@@ -220,7 +220,7 @@ function PatientFormModal({
               }
             >
               <SelectTrigger
-                className="rounded-xl border-[#E2E8F0] focus:ring-primary/30"
+                className="rounded-xl border-border focus:ring-primary/30"
                 data-ocid="patients.form.gender_select"
               >
                 <SelectValue placeholder="Select gender" />
@@ -234,15 +234,15 @@ function PatientFormModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-[#374151]">
-              Blood Group <span className="text-red-500">*</span>
+            <Label className="text-sm font-medium text-foreground">
+              Blood Group <span className="text-destructive">*</span>
             </Label>
             <Select
               value={form.bloodGroup}
               onValueChange={(value) => onFormChange({ bloodGroup: value })}
             >
               <SelectTrigger
-                className="rounded-xl border-[#E2E8F0] focus:ring-primary/30"
+                className="rounded-xl border-border focus:ring-primary/30"
                 data-ocid="patients.form.blood_group_select"
               >
                 <SelectValue placeholder="Select blood group" />
@@ -260,9 +260,9 @@ function PatientFormModal({
           <div className="col-span-1 sm:col-span-2 space-y-1.5">
             <Label
               htmlFor="pt-address"
-              className="text-sm font-medium text-[#374151]"
+              className="text-sm font-medium text-foreground"
             >
-              Address <span className="text-red-500">*</span>
+              Address <span className="text-destructive">*</span>
             </Label>
             <Textarea
               id="pt-address"
@@ -270,7 +270,7 @@ function PatientFormModal({
               rows={2}
               value={form.address}
               onChange={(e) => onFormChange({ address: e.target.value })}
-              className="rounded-xl border-[#E2E8F0] focus-visible:ring-primary/30 resize-none"
+              className="rounded-xl border-border focus-visible:ring-primary/30 resize-none"
               data-ocid="patients.form.address_textarea"
             />
           </div>
@@ -278,10 +278,10 @@ function PatientFormModal({
           <div className="col-span-1 sm:col-span-2 space-y-1.5">
             <Label
               htmlFor="pt-history"
-              className="text-sm font-medium text-[#374151]"
+              className="text-sm font-medium text-foreground"
             >
               Medical History{" "}
-              <span className="text-[#94A3B8] font-normal">(optional)</span>
+              <span className="text-muted-foreground font-normal">(optional)</span>
             </Label>
             <Textarea
               id="pt-history"
@@ -289,7 +289,7 @@ function PatientFormModal({
               rows={2}
               value={form.medicalHistory}
               onChange={(e) => onFormChange({ medicalHistory: e.target.value })}
-              className="rounded-xl border-[#E2E8F0] focus-visible:ring-primary/30 resize-none"
+              className="rounded-xl border-border focus-visible:ring-primary/30 resize-none"
               data-ocid="patients.form.medical_history_textarea"
             />
           </div>
@@ -301,7 +301,7 @@ function PatientFormModal({
             variant="outline"
             onClick={onClose}
             disabled={isSaving}
-            className="w-full sm:w-auto rounded-xl border-[#E2E8F0] text-[#64748B] hover:bg-amber-50"
+            className="w-full sm:w-auto rounded-xl border-border text-muted-foreground hover:bg-accent"
             data-ocid="patients.form.cancel_button"
           >
             Cancel
@@ -310,7 +310,7 @@ function PatientFormModal({
             type="button"
             onClick={onSave}
             disabled={isSaving}
-            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white bg-[#D89F00]"
+            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white bg-primary"
             data-ocid="patients.form.submit_button"
           >
             {isSaving ? "Updating..." : "Update Patient"}
@@ -566,27 +566,27 @@ export default function PatientsPage() {
       />
 
       <div className="grid gap-3 mb-5 md:grid-cols-3" data-ocid="patients.summary">
-        <div className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#94A3B8]">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Total Patients
           </p>
-          <p className="mt-2 text-2xl font-semibold text-[#1E293B]">
+          <p className="mt-2 text-2xl font-semibold text-foreground">
             {patientMetrics.total}
           </p>
         </div>
-        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-600">
+        <div className="rounded-2xl border border-primary/20 bg-primary/10/50 p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
             Active
           </p>
-          <p className="mt-2 text-2xl font-semibold text-emerald-700">
+          <p className="mt-2 text-2xl font-semibold text-primary">
             {patientMetrics.active}
           </p>
         </div>
-        <div className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-amber-600">
+        <div className="rounded-2xl border border-secondary/20 bg-accent/60 p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-secondary">
             Discharged
           </p>
-          <p className="mt-2 text-2xl font-semibold text-amber-700">
+          <p className="mt-2 text-2xl font-semibold text-secondary">
             {patientMetrics.discharged}
           </p>
         </div>
@@ -599,13 +599,13 @@ export default function PatientsPage() {
         <div className="relative w-full xl:flex-1">
           <Search
             size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <Input
             placeholder="Search by name or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 rounded-xl border-[#E2E8F0] bg-white focus-visible:ring-primary/30 text-sm"
+            className="pl-9 rounded-xl border-border bg-card focus-visible:ring-primary/30 text-sm"
             data-ocid="patients.search_input"
           />
         </div>
@@ -614,7 +614,7 @@ export default function PatientsPage() {
           onValueChange={(value) => setGenderFilter(value as PatientGender | "all")}
         >
           <SelectTrigger
-            className="w-full sm:w-44 rounded-xl border-[#E2E8F0] bg-white focus:ring-primary/30 text-sm"
+            className="w-full sm:w-44 rounded-xl border-border bg-card focus:ring-primary/30 text-sm"
             data-ocid="patients.gender_filter_select"
           >
             <SelectValue placeholder="All Genders" />
@@ -631,7 +631,7 @@ export default function PatientsPage() {
           onValueChange={(value) => setStatusFilter(value as PatientStatusFilter)}
         >
           <SelectTrigger
-            className="w-full sm:w-44 rounded-xl border-[#E2E8F0] bg-white focus:ring-primary/30 text-sm"
+            className="w-full sm:w-44 rounded-xl border-border bg-card focus:ring-primary/30 text-sm"
             data-ocid="patients.status_filter_select"
           >
             <SelectValue placeholder="All Statuses" />
@@ -645,35 +645,35 @@ export default function PatientsPage() {
       </div>
 
       <div
-        className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden"
+        className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden"
         data-ocid="patients.table"
       >
         <div className="hidden md:block">
           <Table>
             <TableHeader>
-              <TableRow className="bg-[#F8FAFC] hover:bg-[#F8FAFC]">
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide pl-5">
+              <TableRow className="bg-muted hover:bg-muted">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pl-5">
                   Name
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   Phone
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   Age
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   Gender
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide max-w-[160px]">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide max-w-[160px]">
                   Address
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   Status
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   Registered
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-[#64748B] uppercase tracking-wide text-right pr-5">
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide text-right pr-5">
                   Actions
                 </TableHead>
               </TableRow>
@@ -712,7 +712,7 @@ export default function PatientsPage() {
                 <TableRow>
                   <TableCell
                     colSpan={8}
-                    className="text-center py-12 text-[#94A3B8] text-sm"
+                    className="text-center py-12 text-muted-foreground text-sm"
                     data-ocid="patients.empty_state"
                   >
                     {isError
@@ -727,30 +727,30 @@ export default function PatientsPage() {
                   return (
                     <TableRow
                       key={patient._id}
-                      className="hover:bg-[#F8FAFC] transition-colors"
+                      className="hover:bg-muted transition-colors"
                       data-ocid={`patients.item.${idx + 1}`}
                     >
                       <TableCell className="pl-5">
-                        <p className="font-semibold text-[#1E293B] text-sm">
+                        <p className="font-semibold text-foreground text-sm">
                           {getPatientName(patient)}
                         </p>
                       </TableCell>
-                      <TableCell className="text-sm text-[#475569]">
+                      <TableCell className="text-sm text-muted-foreground">
                         {getPatientPhone(patient)}
                       </TableCell>
-                      <TableCell className="text-sm text-[#475569]">
+                      <TableCell className="text-sm text-muted-foreground">
                         {getPatientAgeLabel(patient)}
                       </TableCell>
                       <TableCell>
                         {gender ? (
                           <GenderBadge gender={gender} />
                         ) : (
-                          <span className="text-xs text-[#94A3B8]">Not set</span>
+                          <span className="text-xs text-muted-foreground">Not set</span>
                         )}
                       </TableCell>
                       <TableCell className="max-w-[160px]">
                         <p
-                          className="text-sm text-[#475569] truncate"
+                          className="text-sm text-muted-foreground truncate"
                           title={getPatientAddress(patient)}
                         >
                           {getPatientAddress(patient)}
@@ -760,13 +760,13 @@ export default function PatientsPage() {
                         <div className="space-y-1">
                           <PatientStatusBadge patient={patient} />
                           {isPatientDischarged(patient) ? (
-                            <p className="text-xs text-[#94A3B8]">
+                            <p className="text-xs text-muted-foreground">
                               {getPatientDischargeLabel(patient)}
                             </p>
                           ) : null}
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-[#475569]">
+                      <TableCell className="text-sm text-muted-foreground">
                         {formatDate(getPatientRegisteredAt(patient))}
                       </TableCell>
                       <TableCell className="pr-5 text-right">
@@ -775,7 +775,7 @@ export default function PatientsPage() {
                             size="icon"
                             variant="ghost"
                             type="button"
-                            className="h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10"
+                            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
                             onClick={() => openEdit(patient)}
                             data-ocid={`patients.edit_button.${idx + 1}`}
                             aria-label={`Edit ${getPatientName(patient)}`}
@@ -787,7 +787,7 @@ export default function PatientsPage() {
                               type="button"
                               variant="outline"
                               size="sm"
-                              className="h-8 rounded-lg border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                              className="h-8 rounded-lg border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
                               onClick={() => setPatientToDischarge(patient)}
                               data-ocid={`patients.discharge_button.${idx + 1}`}
                             >
@@ -809,7 +809,7 @@ export default function PatientsPage() {
             SKELETON_ROWS.map((key) => (
               <div
                 key={key}
-                className="p-4 border-b border-[#E2E8F0] last:border-0"
+                className="p-4 border-b border-border last:border-0"
               >
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-36 rounded-lg" />
@@ -823,7 +823,7 @@ export default function PatientsPage() {
             ))
           ) : filteredPatients.length === 0 ? (
             <div
-              className="text-center py-12 text-[#94A3B8] text-sm"
+              className="text-center py-12 text-muted-foreground text-sm"
               data-ocid="patients.empty_state"
             >
               {isError
@@ -837,19 +837,19 @@ export default function PatientsPage() {
               return (
                 <div
                   key={patient._id}
-                  className="p-4 border-b border-[#E2E8F0] last:border-0 hover:bg-[#F8FAFC] transition-colors"
+                  className="p-4 border-b border-border last:border-0 hover:bg-muted transition-colors"
                   data-ocid={`patients.item.${idx + 1}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-semibold text-[#1E293B] text-sm truncate">
+                      <p className="font-semibold text-foreground text-sm truncate">
                         {getPatientName(patient)}
                       </p>
-                      <p className="text-xs text-[#64748B] mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {getPatientPhone(patient)}
                       </p>
                       <div className="flex flex-wrap items-center gap-2 mt-2">
-                        <span className="text-xs text-[#64748B]">
+                        <span className="text-xs text-muted-foreground">
                           {getPatientAgeLabel(patient)}
                         </span>
                         {gender ? (
@@ -857,7 +857,7 @@ export default function PatientsPage() {
                         ) : (
                           <Badge
                             variant="outline"
-                            className="text-xs rounded-lg text-[#94A3B8] border-slate-200"
+                            className="text-xs rounded-lg text-muted-foreground border-border"
                           >
                             Gender not set
                           </Badge>
@@ -865,22 +865,22 @@ export default function PatientsPage() {
                         <PatientStatusBadge patient={patient} />
                         <Badge
                           variant="outline"
-                          className="text-xs rounded-lg bg-red-50 text-red-600 border-red-200"
+                          className="text-xs rounded-lg bg-destructive/10 text-destructive border-destructive/20"
                         >
                           {getPatientBloodGroup(patient)}
                         </Badge>
                       </div>
                       <p
-                        className="text-xs text-[#94A3B8] mt-1 truncate"
+                        className="text-xs text-muted-foreground mt-1 truncate"
                         title={getPatientAddress(patient)}
                       >
                         {getPatientAddress(patient)}
                       </p>
-                      <p className="text-xs text-[#94A3B8] mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         Reg: {formatDate(getPatientRegisteredAt(patient))}
                       </p>
                       {isPatientDischarged(patient) ? (
-                        <p className="text-xs text-amber-600 mt-0.5">
+                        <p className="text-xs text-secondary mt-0.5">
                           Discharged: {getPatientDischargeLabel(patient)}
                         </p>
                       ) : null}
@@ -890,7 +890,7 @@ export default function PatientsPage() {
                         size="icon"
                         variant="ghost"
                         type="button"
-                        className="h-8 w-8 rounded-lg text-[#64748B] hover:text-primary hover:bg-primary/10"
+                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
                         onClick={() => openEdit(patient)}
                         data-ocid={`patients.edit_button.${idx + 1}`}
                         aria-label={`Edit ${getPatientName(patient)}`}
@@ -905,7 +905,7 @@ export default function PatientsPage() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="rounded-lg border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        className="rounded-lg border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
                         onClick={() => setPatientToDischarge(patient)}
                         data-ocid={`patients.discharge_button.${idx + 1}`}
                       >
@@ -921,7 +921,7 @@ export default function PatientsPage() {
       </div>
 
       {!isLoading && filteredPatients.length > 0 && (
-        <p className="text-xs text-[#94A3B8] mt-3 px-1">
+        <p className="text-xs text-muted-foreground mt-3 px-1">
           Showing {filteredPatients.length} of {roleScopedPatients.length} patients
         </p>
       )}

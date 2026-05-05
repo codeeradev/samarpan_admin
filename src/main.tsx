@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { initializeTheme } from "./lib/theme";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
@@ -15,6 +16,8 @@ declare global {
 }
 
 const queryClient = new QueryClient();
+
+initializeTheme();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>

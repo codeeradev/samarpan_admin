@@ -91,48 +91,48 @@ function AppointmentCard({
   const isInactive = appt.status === "completed" || appt.status === "cancelled";
   return (
     <div
-      className={`bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-sm ${isInactive ? "opacity-60" : ""}`}
+      className={`bg-card border border-border rounded-2xl p-4 shadow-sm ${isInactive ? "opacity-60" : ""}`}
       data-ocid={`appointments.item.${idx + 1}`}
     >
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="min-w-0">
-          <p className="font-semibold text-[#1E293B] text-sm leading-tight truncate">
+          <p className="font-semibold text-foreground text-sm leading-tight truncate">
             {appt.fullName}
           </p>
-          <p className="text-xs text-[#94A3B8] mt-0.5">{appt.serviceName}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{appt.serviceName}</p>
         </div>
         <StatusBadge status={appt.status} />
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
         <div>
-          <span className="text-[#94A3B8] block">Doctor</span>
-          <span className="font-medium text-[#334155] truncate block">
+          <span className="text-muted-foreground block">Doctor</span>
+          <span className="font-medium text-foreground truncate block">
             {appt.doctorName}
           </span>
         </div>
         <div>
-          <span className="text-[#94A3B8] block">Date &amp; Time</span>
-          <span className="font-medium text-[#334155] block">
+          <span className="text-muted-foreground block">Date &amp; Time</span>
+          <span className="font-medium text-foreground block">
             {formatDate(appt.appointmentDate)}
           </span>
         </div>
       </div>
 
       {appt.reason && (
-        <p className="text-xs text-[#64748B] mb-3 line-clamp-2">
+        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
           {appt.reason}
         </p>
       )}
 
       {!isInactive && (
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E2E8F0]">
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
           {appt.status === "pending" && (
             <>
               <Button
                 type="button"
                 size="sm"
-                className="h-8 px-3 text-xs bg-green-500 hover:bg-green-600 text-white rounded-xl gap-1 flex-1 sm:flex-none"
+                className="h-8 px-3 text-xs bg-primary hover:bg-secondary text-white rounded-xl gap-1 flex-1 sm:flex-none"
                 onClick={onApprove}
                 disabled={isUpdating}
                 data-ocid={`appointments.approve_button.${idx + 1}`}
@@ -144,7 +144,7 @@ function AppointmentCard({
                 type="button"
                 size="sm"
                 variant="outline"
-                className="h-8 px-3 text-xs text-rose-500 border-rose-200 hover:bg-rose-50 rounded-xl gap-1 flex-1 sm:flex-none"
+                className="h-8 px-3 text-xs text-destructive border-destructive/20 hover:bg-destructive/10 rounded-xl gap-1 flex-1 sm:flex-none"
                 onClick={onReject}
                 disabled={isUpdating}
                 data-ocid={`appointments.reject_button.${idx + 1}`}
@@ -263,8 +263,8 @@ export default function AppointmentsPage() {
       sortable: true,
       cell: (row: Appointment) => (
         <div>
-          <p className="font-semibold text-[#1E293B] text-sm">{row.fullName}</p>
-          <p className="text-xs text-[#94A3B8]">{row.email}</p>
+          <p className="font-semibold text-foreground text-sm">{row.fullName}</p>
+          <p className="text-xs text-muted-foreground">{row.email}</p>
         </div>
       ),
     },
@@ -281,7 +281,7 @@ export default function AppointmentsPage() {
         const date = new Date(row.appointmentDate);
         const isValidDate = !isNaN(date.getTime());
         return (
-          <p className="text-sm text-[#334155] font-medium">
+          <p className="text-sm text-foreground font-medium">
             {isValidDate ? formatDate(date) : 'TBD'}
           </p>
         );
@@ -291,7 +291,7 @@ export default function AppointmentsPage() {
       name: 'Reason',
       selector: (row: Appointment) => row.reason || "",
       cell: (row: Appointment) => (
-        <p className="text-sm text-[#64748B] max-w-[180px] truncate">{row.reason}</p>
+        <p className="text-sm text-muted-foreground max-w-[180px] truncate">{row.reason}</p>
       ),
     },
     {
@@ -311,7 +311,7 @@ export default function AppointmentsPage() {
                 <Button
                   type="button"
                   size="sm"
-                  className="h-7 px-2.5 text-xs bg-green-500 hover:bg-green-600 text-white rounded-lg gap-1"
+                  className="h-7 px-2.5 text-xs bg-primary hover:bg-secondary text-white rounded-lg gap-1"
                   onClick={() => triggerAction(row._id, "approve", row.fullName)}
                   disabled={updateMutation.isPending}
                 >
@@ -322,7 +322,7 @@ export default function AppointmentsPage() {
                   type="button"
                   size="sm"
                   variant="outline"
-                  className="h-7 px-2.5 text-xs text-rose-500 border-rose-200 hover:bg-rose-50 rounded-lg gap-1"
+                  className="h-7 px-2.5 text-xs text-destructive border-destructive/20 hover:bg-destructive/10 rounded-lg gap-1"
                   onClick={() => triggerAction(row._id, "reject", row.fullName)}
                   disabled={updateMutation.isPending}
                 >
@@ -356,7 +356,7 @@ export default function AppointmentsPage() {
                 </Button>
               </>
             )}
-            {isInactive && <span className="text-[#CBD5E1] text-sm select-none pr-1">—</span>}
+            {isInactive && <span className="text-border text-sm select-none pr-1">—</span>}
           </div>
         );
       },
@@ -440,13 +440,13 @@ export default function AppointmentsPage() {
         <div className="relative flex-1 max-w-full sm:max-w-sm">
           <Search
             size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search patient or doctor…"
-            className="pl-9 h-9 rounded-xl border-[#E2E8F0] bg-white text-sm focus-visible:ring-primary/30"
+            className="pl-9 h-9 rounded-xl border-border bg-card text-sm focus-visible:ring-primary/30"
             data-ocid="appointments.search_input"
           />
         </div>
@@ -456,7 +456,7 @@ export default function AppointmentsPage() {
           onValueChange={(v) => setStatusFilter(v as "all" | AppointmentStatus)}
         >
           <SelectTrigger
-            className="w-full sm:w-44 h-9 rounded-xl border-[#E2E8F0] bg-white text-sm"
+            className="w-full sm:w-44 h-9 rounded-xl border-border bg-card text-sm"
             data-ocid="appointments.status_filter.select"
           >
             <SelectValue placeholder="Filter by status" />
@@ -482,7 +482,7 @@ export default function AppointmentsPage() {
           SKELETON_ROWS.map((key) => (
             <div
               key={key}
-              className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-sm space-y-3"
+              className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3"
             >
               <div className="flex items-start justify-between">
                 <div className="space-y-1.5">
@@ -500,10 +500,10 @@ export default function AppointmentsPage() {
           ))
         ) : filtered.length === 0 ? (
           <div
-            className="bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center shadow-sm"
+            className="bg-card border border-border rounded-2xl p-10 text-center shadow-sm"
             data-ocid="appointments.empty_state"
           >
-            <p className="text-[#94A3B8] text-sm">
+            <p className="text-muted-foreground text-sm">
               No appointments found matching your filters.
             </p>
           </div>
@@ -530,13 +530,13 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Desktop table (hidden on small screens) */}
-      <div className="hidden md:block bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         <DataTable
           columns={columns}
           data={filtered}
           progressPending={isLoading}
           progressComponent={<Skeleton className="h-4 w-full" />}
-          noDataComponent={<p className="text-[#94A3B8] text-sm py-16 text-center">No appointments found matching your filters.</p>}
+          noDataComponent={<p className="text-muted-foreground text-sm py-16 text-center">No appointments found matching your filters.</p>}
           pagination
           responsive
           highlightOnHover
@@ -563,11 +563,11 @@ export default function AppointmentsPage() {
         onOpenChange={(open) => !open && setRescheduleTarget(null)}
       >
         <DialogContent
-          className="max-w-[95vw] sm:max-w-md rounded-2xl border border-[#E2E8F0] shadow-xl max-h-[90vh] overflow-y-auto"
+          className="max-w-[95vw] sm:max-w-md rounded-2xl border border-border shadow-xl max-h-[90vh] overflow-y-auto"
           data-ocid="appointments.reschedule.dialog"
         >
           <DialogHeader>
-            <DialogTitle className="text-[#1E293B] text-lg font-semibold">
+            <DialogTitle className="text-foreground text-lg font-semibold">
               Reschedule Appointment
             </DialogTitle>
           </DialogHeader>
@@ -575,13 +575,13 @@ export default function AppointmentsPage() {
           <div className="space-y-4 py-1">
             {/* Patient (read-only) */}
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-[#64748B]">
+              <Label className="text-sm font-medium text-muted-foreground">
                 Patient
               </Label>
               <Input
                 value={rescheduleTarget?.fullName ?? ""}
                 readOnly
-                className="h-9 rounded-xl border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] text-sm cursor-default"
+                className="h-9 rounded-xl border-border bg-muted text-muted-foreground text-sm cursor-default"
                 data-ocid="appointments.reschedule.patient_input"
               />
             </div>
@@ -591,7 +591,7 @@ export default function AppointmentsPage() {
               <div className="space-y-1.5">
                 <Label
                   htmlFor="reschedule-date"
-                  className="text-sm font-medium text-[#64748B]"
+                  className="text-sm font-medium text-muted-foreground"
                 >
                   Date
                 </Label>
@@ -602,14 +602,14 @@ export default function AppointmentsPage() {
                   onChange={(e) =>
                     setRescheduleForm((f) => ({ ...f, date: e.target.value }))
                   }
-                  className="h-9 w-full rounded-xl border-[#E2E8F0] text-sm"
+                  className="h-9 w-full rounded-xl border-border text-sm"
                   data-ocid="appointments.reschedule.date_input"
                 />
               </div>
               <div className="space-y-1.5">
                 <Label
                   htmlFor="reschedule-time"
-                  className="text-sm font-medium text-[#64748B]"
+                  className="text-sm font-medium text-muted-foreground"
                 >
                   Time
                 </Label>
@@ -620,7 +620,7 @@ export default function AppointmentsPage() {
                   onChange={(e) =>
                     setRescheduleForm((f) => ({ ...f, time: e.target.value }))
                   }
-                  className="h-9 w-full rounded-xl border-[#E2E8F0] text-sm"
+                  className="h-9 w-full rounded-xl border-border text-sm"
                   data-ocid="appointments.reschedule.time_input"
                 />
               </div>
@@ -628,7 +628,7 @@ export default function AppointmentsPage() {
 
             {/* Doctor */}
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-[#64748B]">
+              <Label className="text-sm font-medium text-muted-foreground">
                 Doctor
               </Label>
               <Select
@@ -638,7 +638,7 @@ export default function AppointmentsPage() {
                 }
               >
                 <SelectTrigger
-                  className="h-9 rounded-xl border-[#E2E8F0] text-sm"
+                  className="h-9 rounded-xl border-border text-sm"
                   data-ocid="appointments.reschedule.doctor_select"
                 >
                   <SelectValue placeholder="Select doctor" />
@@ -647,7 +647,7 @@ export default function AppointmentsPage() {
                   {doctors.map((d) => (
                     <SelectItem key={d._id} value={d._id} className="text-sm">
                       {d.name}
-                      <span className="text-[#94A3B8] ml-1 text-xs">
+                      <span className="text-muted-foreground ml-1 text-xs">
                         · {d.specialization ?? "Doctor"}
                       </span>
                     </SelectItem>
@@ -660,7 +660,7 @@ export default function AppointmentsPage() {
             <div className="space-y-1.5">
               <Label
                 htmlFor="reschedule-reason"
-                className="text-sm font-medium text-[#64748B]"
+                className="text-sm font-medium text-muted-foreground"
               >
                 Reason
               </Label>
@@ -672,7 +672,7 @@ export default function AppointmentsPage() {
                 }
                 rows={3}
                 placeholder="Reason for visit…"
-                className="rounded-xl border-[#E2E8F0] text-sm resize-none focus-visible:ring-primary/30 min-h-[80px]"
+                className="rounded-xl border-border text-sm resize-none focus-visible:ring-primary/30 min-h-[80px]"
                 data-ocid="appointments.reschedule.reason_textarea"
               />
             </div>
@@ -682,7 +682,7 @@ export default function AppointmentsPage() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-xl border-[#E2E8F0] text-[#64748B] hover:bg-amber-50 w-full sm:w-auto"
+              className="rounded-xl border-border text-muted-foreground hover:bg-accent w-full sm:w-auto"
               onClick={() => setRescheduleTarget(null)}
               data-ocid="appointments.reschedule.cancel_button"
             >

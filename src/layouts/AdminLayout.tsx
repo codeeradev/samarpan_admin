@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { canAccessPath } from "@/lib/admin-access";
 import { ROLE_LABELS, type UserRole } from "@/types";
 import { Outlet, useLocation, useNavigate } from "@tanstack/react-router";
@@ -24,7 +25,6 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  MessageSquare,
   Settings,
   Shield,
   Star,
@@ -113,6 +113,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/reviews-shorts",
   },
   {
+    label: "Theme",
+    icon: Settings,
+    path: "/themes",
+    permissionPath: "/manage_themes",
+  },
+  {
     label: "Website Content",
     icon: FileImage,
     path: "/website-content",
@@ -174,8 +180,8 @@ function SidebarNav({
             }}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200 ${
               isActive
-                ? "bg-[#D89F00] text-white shadow-sm"
-                : "text-[#475569] hover:bg-[#FFF8E1] hover:text-[#A67C00]"
+                ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             }`}
             type="button"
           >
@@ -192,6 +198,7 @@ function SidebarNav({
 
 export default function AdminLayout() {
   const { admin, logout } = useAuth();
+  useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -218,11 +225,11 @@ export default function AdminLayout() {
   const roleLabel = role ? ROLE_LABELS[role] : "Admin";
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground flex overflow-x-hidden">
       {/* ── Desktop Sidebar ─────────────────────────────────────── */}
-      <aside className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-full bg-white border-r border-slate-200 z-30">
+      <aside className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-full bg-sidebar border-r border-sidebar-border z-30">
         {/* Logo */}
-        <div className="flex justify-center items-center px-5 py-6 border-b border-slate-100">
+        <div className="flex justify-center items-center px-5 py-6 border-b border-sidebar-border">
           <img
             src="/assets/images/samrpanlogo.webp"
             alt="Samarpan"
@@ -235,18 +242,20 @@ export default function AdminLayout() {
         />
 
         {/* Bottom admin info */}
-        <div className="px-4 py-4 border-t border-slate-100">
-          <div className="flex items-center gap-3 p-2 rounded-xl bg-[#F8FAFC]">
+        <div className="px-4 py-4 border-t border-sidebar-border">
+          <div className="flex items-center gap-3 p-2 rounded-xl bg-accent/40">
             <Avatar className="h-8 w-8 flex-shrink-0">
-              <AvatarFallback className="bg-[#D89F00] text-white text-xs font-semibold">
+              <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-xs font-semibold">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#1E293B] truncate">
+              <p className="text-sm font-semibold text-sidebar-foreground truncate">
                 {admin?.name}
               </p>
-              <p className="text-xs text-[#64748B] truncate">{roleLabel}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {roleLabel}
+              </p>
             </div>
           </div>
         </div>
@@ -255,7 +264,7 @@ export default function AdminLayout() {
       {/* ── Main Wrapper ─────────────────────────────────────────── */}
       <div className="flex-1 min-w-0 flex flex-col md:ml-64">
         {/* ── Topbar ──────────────────────────────────────────────── */}
-        <header className="fixed top-0 right-0 left-0 md:left-64 bg-white border-b border-slate-200 z-20">
+        <header className="fixed top-0 right-0 left-0 md:left-64 bg-card border-b border-border z-20">
           <div className="flex items-center h-14 md:h-16 px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3">
             {/* Mobile hamburger */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -272,19 +281,19 @@ export default function AdminLayout() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 max-w-[85vw]">
-                <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-100">
+                <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border bg-sidebar text-sidebar-foreground">
                   <img
                     src="/assets/images/samrpanlogo.webp"
                     alt="Samarpan"
                     className="h-10 w-auto object-contain"
                   />
-                  <span className="text-lg font-bold text-[#1E293B] font-display">
+                  <span className="text-lg font-bold text-sidebar-foreground font-display">
                     Samarpan
                   </span>
                   <button
                     type="button"
                     onClick={() => setMobileOpen(false)}
-                    className="ml-auto text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+                    className="ml-auto text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-accent transition-colors"
                     aria-label="Close menu"
                   >
                     <X size={18} />
@@ -312,25 +321,25 @@ export default function AdminLayout() {
                     type="button"
                   >
                     <Avatar className="h-7 w-7 flex-shrink-0">
-                      <AvatarFallback className="bg-[#D89F00] text-white text-xs font-semibold">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:block text-sm font-medium text-[#1E293B] max-w-[100px] truncate">
+                    <span className="hidden sm:block text-sm font-medium text-foreground max-w-[100px] truncate">
                       {admin?.name}
                     </span>
                     <ChevronDown
                       size={14}
-                      className="text-slate-400 flex-shrink-0"
+                      className="text-muted-foreground flex-shrink-0"
                     />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <div className="px-2 py-1.5">
-                    <p className="text-xs font-medium text-[#1E293B] truncate">
+                    <p className="text-xs font-medium text-foreground truncate">
                       {admin?.name}
                     </p>
-                    <p className="text-xs text-[#64748B]">{roleLabel}</p>
+                    <p className="text-xs text-muted-foreground">{roleLabel}</p>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -343,7 +352,7 @@ export default function AdminLayout() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-red-600 focus:text-red-600"
+                    className="text-destructive focus:text-destructive"
                     data-ocid="topbar.logout_button"
                   >
                     <LogOut size={14} className="mr-2" />

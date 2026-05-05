@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, HeartPulse } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -47,48 +47,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-8"
-      style={{ background: "#F8FAFC" }}
-    >
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         {/* Logo / Branding */}
         <div className="flex flex-col items-center mb-6 sm:mb-8">
-          {/* <div
-            className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-elevated mb-3 sm:mb-4"
-            style={{
-              background: "linear-gradient(135deg, #D89F00 0%, #A67C00 100%)",
-            }}
-          > */}
-<img
-    src="/assets/images/samrpanlogo.webp"
-    alt="Samarpan"
-    className="h-24 w-auto object-contain mr-[10%]"
-  />
-          {/* </div> */}
-          {/* <h1
-            className="text-xl sm:text-2xl font-bold"
-            style={{
-              color: "#1E293B",
-              fontFamily: "Space Grotesk, sans-serif",
-            }}
-          >
-            Samarpan Hospital
-          </h1> */}
-          {/* <p className="text-xs sm:text-sm mt-1" style={{ color: "#64748B" }}>
-            Admin Portal
-          </p> */}
+          <img
+            src="/assets/images/samrpanlogo.webp"
+            alt="Samarpan"
+            className="h-24 w-auto object-contain mr-[10%]"
+          />
         </div>
 
-        <Card className="shadow-elevated border-0 rounded-2xl">
+        <Card className="shadow-elevated border border-border rounded-2xl bg-card">
           <CardContent className="p-6 sm:p-8">
-            <h2
-              className="text-base sm:text-lg font-semibold mb-5 sm:mb-6"
-              style={{
-                color: "#1E293B",
-                fontFamily: "Space Grotesk, sans-serif",
-              }}
-            >
+            <h2 className="text-base sm:text-lg font-semibold mb-5 sm:mb-6 text-foreground font-display">
               Sign in to your account
             </h2>
 
@@ -99,22 +71,14 @@ export default function LoginPage() {
             >
               {/* Role Selector */}
               <div className="space-y-1.5">
-                <Label
-                  htmlFor="role"
-                  className="text-sm font-medium"
-                  style={{ color: "#374151" }}
-                >
+                <Label htmlFor="role" className="text-sm font-medium text-foreground">
                   Sign in as
                 </Label>
               </div>
 
               {/* Email */}
               <div className="space-y-1.5">
-                <Label
-                  htmlFor="email"
-                  className="text-sm font-medium"
-                  style={{ color: "#374151" }}
-                >
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">
                   Email Address
                 </Label>
                 <Input
@@ -127,16 +91,13 @@ export default function LoginPage() {
                     if (errors.email)
                       setErrors((prev) => ({ ...prev, email: undefined }));
                   }}
-                  className="h-11 rounded-xl text-sm"
-                  style={{
-                    borderColor: errors.email ? "#EF4444" : "#E2E8F0",
-                  }}
+                  className={`h-11 rounded-xl text-sm ${errors.email ? "border-destructive focus-visible:ring-destructive" : "border-border"}`}
                   data-ocid="login.email_input"
                   autoComplete="email"
                 />
                 {errors.email && (
                   <p
-                    className="text-xs text-red-500 mt-1 break-words"
+                    className="text-xs text-destructive mt-1 break-words"
                     data-ocid="login.email_field_error"
                   >
                     {errors.email}
@@ -148,8 +109,7 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <Label
                   htmlFor="password"
-                  className="text-sm font-medium"
-                  style={{ color: "#374151" }}
+                  className="text-sm font-medium text-foreground"
                 >
                   Password
                 </Label>
@@ -164,18 +124,14 @@ export default function LoginPage() {
                       if (errors.password)
                         setErrors((prev) => ({ ...prev, password: undefined }));
                     }}
-                    className="h-11 rounded-xl pr-10 text-sm"
-                    style={{
-                      borderColor: errors.password ? "#EF4444" : "#E2E8F0",
-                    }}
+                    className={`h-11 rounded-xl pr-10 text-sm ${errors.password ? "border-destructive focus-visible:ring-destructive" : "border-border"}`}
                     data-ocid="login.password_input"
                     autoComplete="current-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors p-1"
-                    style={{ color: "#94A3B8" }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors p-1 text-muted-foreground hover:text-foreground"
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
@@ -186,7 +142,7 @@ export default function LoginPage() {
                 </div>
                 {errors.password && (
                   <p
-                    className="text-xs text-red-500 mt-1 break-words"
+                    className="text-xs text-destructive mt-1 break-words"
                     data-ocid="login.password_field_error"
                   >
                     {errors.password}
@@ -195,17 +151,10 @@ export default function LoginPage() {
               </div>
 
               {/* Submit */}
-              <button
+              <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 rounded-xl font-semibold text-sm transition-smooth mt-2 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{
-                  background: isLoading
-                    ? "#A67C00"
-                    : "linear-gradient(135deg, #D89F00 0%, #A67C00 100%)",
-                  color: "#FFFFFF",
-                  boxShadow: "0 2px 8px rgba(216, 159, 0, 0.35)",
-                }}
+                className="w-full h-11 rounded-xl font-semibold text-sm transition-smooth mt-2 gap-2 bg-primary hover:bg-secondary text-primary-foreground disabled:opacity-70"
                 data-ocid="login.submit_button"
               >
                 {isLoading ? (
@@ -236,14 +185,11 @@ export default function LoginPage() {
                 ) : (
                   "Sign In"
                 )}
-              </button>
+              </Button>
             </form>
           </CardContent>
         </Card>
-        <p
-          className="text-center text-xs mt-5 sm:mt-6"
-          style={{ color: "#94A3B8" }}
-        >
+        <p className="text-center text-xs mt-5 sm:mt-6 text-muted-foreground">
           © {new Date().getFullYear()} Samarpan Hospital. All rights reserved.
         </p>
       </div>

@@ -131,17 +131,17 @@ function FaqRow({
   onRemove: (index: number) => void;
 }) {
   return (
-    <div className="border border-slate-200 rounded-xl p-3 space-y-2 relative">
+    <div className="border border-border rounded-xl p-3 space-y-2 relative">
       <button
         type="button"
         onClick={() => onRemove(index)}
-        className="absolute top-2 right-2 text-slate-400 hover:text-red-500 transition-colors"
+        className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors"
         aria-label="Remove FAQ"
       >
         <X size={14} />
       </button>
       <div className="space-y-1 pr-6">
-        <Label className="text-xs text-slate-500">Question</Label>
+        <Label className="text-xs text-muted-foreground">Question</Label>
         <Input
           value={faq.question}
           onChange={(e) => onChange(index, "question", e.target.value)}
@@ -150,7 +150,7 @@ function FaqRow({
         />
       </div>
       <div className="space-y-1">
-        <Label className="text-xs text-slate-500">Answer</Label>
+        <Label className="text-xs text-muted-foreground">Answer</Label>
         <Textarea
           value={faq.answer}
           onChange={(e) => onChange(index, "answer", e.target.value)}
@@ -365,7 +365,7 @@ export default function ServiceManagementPage() {
         action={
           <Button
             onClick={openAdd}
-            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 bg-[#D89F00]"
+            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 bg-primary"
             data-ocid="service_management.add_button"
           >
             <Plus size={15} /> Add Service
@@ -384,7 +384,7 @@ export default function ServiceManagementPage() {
       </div>
 
       {/* ── Table ──────────────────────────────────────────────────────────── */}
-      <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -442,7 +442,7 @@ export default function ServiceManagementPage() {
                 ))}
             {!isLoading && filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-12 text-slate-500">
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
                   No services found.
                 </TableCell>
               </TableRow>
@@ -481,17 +481,17 @@ export default function ServiceManagementPage() {
               {/* Title */}
               <div className="space-y-1">
                 <Label htmlFor="svc-title">
-                  Title <span className="text-red-500">*</span>
+                  Title <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="svc-title"
                   value={formData.title}
                   onChange={(e) => setField("title", e.target.value)}
                   placeholder="e.g. Emergency Care"
-                  className={formErrors.title ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : undefined}
                 />
                 {formErrors.title ? (
-                  <p className="text-xs text-red-500">{formErrors.title}</p>
+                  <p className="text-xs text-destructive">{formErrors.title}</p>
                 ) : null}
               </div>
 
@@ -503,12 +503,12 @@ export default function ServiceManagementPage() {
                   value={formData.slug}
                   onChange={(e) => setField("slug", e.target.value)}
                   placeholder="Auto-generated from title if left empty"
-                  className={formErrors.slug ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  className={formErrors.slug ? "border-destructive focus-visible:ring-destructive" : undefined}
                 />
                 {formErrors.slug ? (
-                  <p className="text-xs text-red-500">{formErrors.slug}</p>
+                  <p className="text-xs text-destructive">{formErrors.slug}</p>
                 ) : (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Saved as `/
                     {formData.slug.trim()
                       ? slugify(formData.slug)
@@ -521,18 +521,18 @@ export default function ServiceManagementPage() {
               {/* Short Description */}
               <div className="space-y-1">
                 <Label htmlFor="svc-short-desc">
-                  Short Description <span className="text-red-500">*</span>
+                  Short Description <span className="text-destructive">*</span>
                 </Label>
                 <Textarea
                   id="svc-short-desc"
                   value={formData.shortDescription}
                   onChange={(e) => setField("shortDescription", e.target.value)}
                   placeholder="Brief summary shown in listings"
-                  className={`resize-none min-h-[80px] ${formErrors.shortDescription ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                  className={`resize-none min-h-[80px] ${formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : ""}`}
                   rows={3}
                 />
                 {formErrors.shortDescription ? (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {formErrors.shortDescription}
                   </p>
                 ) : null}
@@ -554,11 +554,11 @@ export default function ServiceManagementPage() {
               {/* Image */}
               <div className="space-y-1">
                 <Label>
-                  Service Image <span className="text-red-500">*</span>
+                  Service Image <span className="text-destructive">*</span>
                 </Label>
                 {/* Preview existing image URL when editing */}
                 {editTarget && typeof formData.image === "string" && formData.image && (
-                  <p className="text-xs text-slate-500 truncate mb-1">
+                  <p className="text-xs text-muted-foreground truncate mb-1">
                     Current: {formData.image}
                   </p>
                 )}
@@ -566,16 +566,16 @@ export default function ServiceManagementPage() {
                   ref={imageRef}
                   type="file"
                   accept="image/*"
-                  className={formErrors.image ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  className={formErrors.image ? "border-destructive focus-visible:ring-destructive" : undefined}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) setField("image", file);
                   }}
                 />
                 {formErrors.image ? (
-                  <p className="text-xs text-red-500">{formErrors.image}</p>
+                  <p className="text-xs text-destructive">{formErrors.image}</p>
                 ) : (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Upload a service image for new entries.
                   </p>
                 )}
@@ -584,10 +584,10 @@ export default function ServiceManagementPage() {
               {/* Icon */}
               <div className="space-y-1">
                 <Label>
-                  Service Icon <span className="text-red-500">*</span>
+                  Service Icon <span className="text-destructive">*</span>
                 </Label>
                 {editTarget && typeof formData.icon === "string" && formData.icon && (
-                  <p className="text-xs text-slate-500 truncate mb-1">
+                  <p className="text-xs text-muted-foreground truncate mb-1">
                     Current: {formData.icon}
                   </p>
                 )}
@@ -595,16 +595,16 @@ export default function ServiceManagementPage() {
                   ref={iconRef}
                   type="file"
                   accept="image/*,.svg"
-                  className={formErrors.icon ? "border-red-400 focus-visible:ring-red-400" : undefined}
+                  className={formErrors.icon ? "border-destructive focus-visible:ring-destructive" : undefined}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) setField("icon", file);
                   }}
                 />
                 {formErrors.icon ? (
-                  <p className="text-xs text-red-500">{formErrors.icon}</p>
+                  <p className="text-xs text-destructive">{formErrors.icon}</p>
                 ) : (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Upload a service icon for cards and listings.
                   </p>
                 )}
@@ -622,7 +622,7 @@ export default function ServiceManagementPage() {
                   placeholder="Write detailed content about this service. HTML is supported."
                   className="resize-y min-h-[280px] font-mono text-sm"
                 />
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted-foreground">
                   Supports plain text or HTML markup.
                 </p>
               </div>
@@ -631,7 +631,7 @@ export default function ServiceManagementPage() {
             {/* ── Tab 3: FAQs ───────────────────────────────────────────── */}
             <TabsContent value="faqs" className="mt-0 space-y-3">
               {(formData.faqs || []).length === 0 && (
-                <p className="text-sm text-slate-400 text-center py-6">
+                <p className="text-sm text-muted-foreground text-center py-6">
                   No FAQs added yet. Click below to add one.
                 </p>
               )}
@@ -654,7 +654,7 @@ export default function ServiceManagementPage() {
                 <Plus size={14} /> Add FAQ
               </Button>
               {formErrors.faqs ? (
-                <p className="text-xs text-red-500">{formErrors.faqs}</p>
+                <p className="text-xs text-destructive">{formErrors.faqs}</p>
               ) : null}
             </TabsContent>
 
@@ -669,7 +669,7 @@ export default function ServiceManagementPage() {
                   placeholder="Page title for search engines"
                   maxLength={60}
                 />
-                <p className="text-xs text-slate-400 text-right">
+                <p className="text-xs text-muted-foreground text-right">
                   {(formData.seo?.metaTitle || "").length}/60
                 </p>
               </div>
@@ -685,7 +685,7 @@ export default function ServiceManagementPage() {
                   rows={3}
                   maxLength={160}
                 />
-                <p className="text-xs text-slate-400 text-right">
+                <p className="text-xs text-muted-foreground text-right">
                   {(formData.seo?.metaDescription || "").length}/160
                 </p>
               </div>
@@ -706,7 +706,7 @@ export default function ServiceManagementPage() {
             <Button variant="outline" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isBusy} className="bg-[#D89F00]">
+            <Button onClick={handleSave} disabled={isBusy} className="bg-primary">
               {isBusy
                 ? editTarget ? "Updating…" : "Adding…"
                 : editTarget ? "Update Service" : "Add Service"}

@@ -305,7 +305,7 @@ export default function SettingsPage() {
                       newPass: !prev.newPass,
                     }))
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                   aria-label={
                     showPasswords.newPass ? "Hide password" : "Show password"
                   }
@@ -341,7 +341,7 @@ export default function SettingsPage() {
                       confirm: !prev.confirm,
                     }))
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                   aria-label={
                     showPasswords.confirm ? "Hide password" : "Show password"
                   }
@@ -558,9 +558,9 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-destructive/20 bg-destructive/10">
           <CardHeader>
-            <CardTitle className="text-red-600 flex gap-2">
+            <CardTitle className="text-destructive flex gap-2">
               <AlertTriangle size={16} />
               Danger Zone
             </CardTitle>
@@ -569,7 +569,7 @@ export default function SettingsPage() {
           <CardContent>
             <Button
               variant="outline"
-              className="border-red-300 text-red-600"
+              className="border-destructive/40 text-destructive"
               onClick={logout}
             >
               <LogOut size={14} /> Logout

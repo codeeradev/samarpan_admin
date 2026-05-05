@@ -179,14 +179,14 @@ function ShortPreviewCard({
 }) {
   if (!short) {
     return (
-      <div className="rounded-[28px] border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm">
-          <Video className="text-rose-500" size={22} />
+      <div className="rounded-[28px] border border-dashed border-border bg-muted/60 p-8 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-card shadow-sm">
+          <Video className="text-destructive" size={22} />
         </div>
-        <p className="mt-4 text-base font-semibold text-slate-900">
+        <p className="mt-4 text-base font-semibold text-foreground">
           Short preview will appear here
         </p>
-        <p className="mt-2 text-sm leading-6 text-slate-500">
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Paste a YouTube Shorts link and the preview will automatically pull a
           thumbnail when one is available.
         </p>
@@ -197,8 +197,8 @@ function ShortPreviewCard({
   const thumbnail = getShortThumbnail(short);
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_25px_70px_-42px_rgba(15,23,42,0.5)]">
-      <div className="relative h-[340px] bg-slate-950">
+    <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-[0_25px_70px_-42px_rgba(15,23,42,0.5)]">
+      <div className="relative h-[340px] bg-foreground">
         {thumbnail ? (
           <img
             src={thumbnail}
@@ -206,22 +206,22 @@ function ShortPreviewCard({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-500 via-orange-500 to-amber-400" />
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary via-secondary to-accent" />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-slate-950/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/10 to-foreground/20" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur">
-            <Play className="ml-1 text-rose-500" size={28} />
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-card/90 shadow-lg backdrop-blur">
+            <Play className="ml-1 text-destructive" size={28} />
           </div>
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <div className="flex items-center gap-2">
-            <Badge className="bg-white/15 text-white backdrop-blur-sm">
+            <Badge className="bg-card/15 text-white backdrop-blur-sm">
               {short.isActive === false ? "Hidden" : "Live"}
             </Badge>
-            <Badge className="bg-white/15 text-white backdrop-blur-sm">
+            <Badge className="bg-card/15 text-white backdrop-blur-sm">
               #{short.sortOrder ?? 0}
             </Badge>
           </div>
@@ -403,8 +403,8 @@ export default function ReviewsAndShortsPage() {
       header: "Title",
       render: (short) => (
         <div className="min-w-0">
-          <p className="font-medium text-[#1E293B] truncate">{short.title}</p>
-          <p className="text-xs text-slate-500 truncate">
+          <p className="font-medium text-foreground truncate">{short.title}</p>
+          <p className="text-xs text-muted-foreground truncate">
             {getShortHost(short.shortUrl)}
           </p>
         </div>
@@ -414,7 +414,7 @@ export default function ReviewsAndShortsPage() {
       key: "sortOrder",
       header: "Order",
       render: (short) => (
-        <span className="text-sm text-slate-600">#{short.sortOrder ?? 0}</span>
+        <span className="text-sm text-muted-foreground">#{short.sortOrder ?? 0}</span>
       ),
     },
     {
@@ -425,8 +425,8 @@ export default function ReviewsAndShortsPage() {
           <Badge
             className={
               short.isActive === false
-                ? "bg-slate-100 text-slate-600"
-                : "bg-emerald-50 text-emerald-700"
+                ? "bg-muted text-muted-foreground"
+                : "bg-primary/10 text-primary"
             }
           >
             {short.isActive === false ? "Hidden" : "Live"}
@@ -451,7 +451,7 @@ export default function ReviewsAndShortsPage() {
             type="button"
             size="sm"
             variant="outline"
-            className="rounded-lg border-slate-200"
+            className="rounded-lg border-border"
             onClick={() => setShortPreviewTarget(short)}
           >
             <Eye size={14} />
@@ -461,7 +461,7 @@ export default function ReviewsAndShortsPage() {
             type="button"
             size="icon"
             variant="ghost"
-            className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
+            className="rounded-xl text-muted-foreground hover:bg-accent hover:text-secondary"
             onClick={() => openEditShort(short)}
           >
             <Pencil size={15} />
@@ -470,7 +470,7 @@ export default function ReviewsAndShortsPage() {
             type="button"
             size="icon"
             variant="ghost"
-            className="rounded-xl text-slate-500"
+            className="rounded-xl text-muted-foreground"
             onClick={() => setShortDeleteTarget(short)}
           >
             <Trash2 size={15} />
@@ -488,7 +488,7 @@ export default function ReviewsAndShortsPage() {
         action={
           <Button
             type="button"
-            className="rounded-xl bg-[#D89F00] text-white shadow-sm hover:bg-rose-600"
+            className="rounded-xl bg-primary text-white shadow-sm hover:bg-destructive/90"
             onClick={openAddShort}
             data-ocid="reviews_shorts.add_short_button"
           >
@@ -503,10 +503,10 @@ export default function ReviewsAndShortsPage() {
         className="space-y-6"
       >
         <div className="overflow-x-auto">
-          <TabsList className="inline-flex min-w-max rounded-2xl bg-slate-100 p-1.5">
+          <TabsList className="inline-flex min-w-max rounded-2xl bg-muted p-1.5">
             <TabsTrigger
               value="shorts"
-              className="rounded-xl px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
+              className="rounded-xl px-4 py-2 text-sm font-medium data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm"
               data-ocid="reviews_shorts.shorts_tab"
             >
               <Video size={14} className="mr-2" />
@@ -517,27 +517,27 @@ export default function ReviewsAndShortsPage() {
 
         <TabsContent value="shorts" className="mt-0">
           <div className="grid gap-6">
-            <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="gap-4 border-b border-slate-100 pb-5">
+            <Card className="border-border shadow-sm">
+              <CardHeader className="gap-4 border-b border-border pb-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                   <div>
-                    <CardTitle className="text-lg text-slate-900">
+                    <CardTitle className="text-lg text-foreground">
                       Shorts Library
                     </CardTitle>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       Search, edit, preview, and publish shorts.
                     </p>
                   </div>
                   <div className="relative w-full lg:w-80">
                     <Search
                       size={15}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                     />
                     <Input
                       value={shortSearch}
                       onChange={(event) => setShortSearch(event.target.value)}
                       placeholder="Search by title or link..."
-                      className="rounded-xl border-slate-200 pl-9"
+                      className="rounded-xl border-border pl-9"
                       data-ocid="reviews_shorts.short_search_input"
                     />
                   </div>
@@ -548,15 +548,15 @@ export default function ReviewsAndShortsPage() {
                 {isShortsLoading ? (
                   <Skeleton className="h-56 w-full rounded-2xl" />
                 ) : isShortsError ? (
-                  <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-600">
+                  <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-5 text-sm text-destructive">
                     {shortsError?.message || "Unable to load shorts."}
                   </div>
                 ) : filteredShorts.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
-                    <p className="text-base font-semibold text-slate-900">
+                  <div className="rounded-2xl border border-dashed border-border bg-muted/60 p-10 text-center">
+                    <p className="text-base font-semibold text-foreground">
                       No shorts found
                     </p>
-                    <p className="mt-2 text-sm text-slate-500">
+                    <p className="mt-2 text-sm text-muted-foreground">
                       Paste your first short URL to start building the video
                       showcase.
                     </p>
@@ -577,9 +577,9 @@ export default function ReviewsAndShortsPage() {
       </Tabs>
 
       <Dialog open={shortDialogOpen} onOpenChange={setShortDialogOpen}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl text-slate-900">
+            <DialogTitle className="text-xl text-foreground">
               {shortDialogMode === "edit" ? "Edit Short" : "Add Short"}
             </DialogTitle>
           </DialogHeader>
@@ -595,7 +595,7 @@ export default function ReviewsAndShortsPage() {
                 className="rounded-xl"
               />
               {shortErrors.title ? (
-                <p className="text-xs text-red-500">{shortErrors.title}</p>
+                <p className="text-xs text-destructive">{shortErrors.title}</p>
               ) : null}
             </div>
 
@@ -611,7 +611,7 @@ export default function ReviewsAndShortsPage() {
                 className="rounded-xl"
               />
               {shortErrors.shortUrl ? (
-                <p className="text-xs text-red-500">{shortErrors.shortUrl}</p>
+                <p className="text-xs text-destructive">{shortErrors.shortUrl}</p>
               ) : null}
             </div>
 
@@ -627,9 +627,9 @@ export default function ReviewsAndShortsPage() {
                 className="rounded-xl"
               />
               {shortErrors.thumbnail ? (
-                <p className="text-xs text-red-500">{shortErrors.thumbnail}</p>
+                <p className="text-xs text-destructive">{shortErrors.thumbnail}</p>
               ) : (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Leave this empty for YouTube Shorts and the panel will try to
                   use the video thumbnail automatically.
                 </p>
@@ -650,18 +650,18 @@ export default function ReviewsAndShortsPage() {
                   className="rounded-xl"
                 />
                 {shortErrors.sortOrder ? (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {shortErrors.sortOrder}
                   </p>
                 ) : null}
               </div>
 
-              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <div className="flex items-center justify-between rounded-2xl border border-border bg-muted/60 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">
+                  <p className="text-sm font-medium text-foreground">
                     Publish on website
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Keep it off if you want to prepare content first.
                   </p>
                 </div>
@@ -701,7 +701,7 @@ export default function ReviewsAndShortsPage() {
               </Button>
               <Button
                 type="button"
-                className="rounded-xl bg-rose-500 text-white hover:bg-rose-600 bg-[#D89F00]"
+                className="rounded-xl bg-primary text-primary-foreground hover:bg-secondary"
                 onClick={handleSaveShort}
                 disabled={isShortBusy}
               >
@@ -716,9 +716,9 @@ export default function ReviewsAndShortsPage() {
         open={!!shortPreviewTarget}
         onOpenChange={(open) => !open && setShortPreviewTarget(null)}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="text-xl text-slate-900">
+            <DialogTitle className="text-xl text-foreground">
               Short Preview
             </DialogTitle>
           </DialogHeader>

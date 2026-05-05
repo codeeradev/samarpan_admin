@@ -6,22 +6,96 @@ import { createApiRequestError } from "@/lib/api-errors";
 
 export type ThemeType = "panel" | "website";
 
-export interface ThemeColors {
-  primary: string;
-  primary_deep?: string;
-  primary_light?: string;
-  primary_soft?: string;
+/* =========================
+   PANEL THEME TYPES
+========================= */
+
+export interface ThemeBaseColors {
+  background: string;
+  foreground: string;
+  border: string;
+  input: string;
+  ring: string;
 }
+
+export interface ThemeInteractiveColors {
+  primary: string;
+  primaryForeground: string;
+  secondary: string;
+  secondaryForeground: string;
+  accent: string;
+  accentForeground: string;
+  destructive: string;
+  destructiveForeground: string;
+}
+
+export interface ThemeComponentColors {
+  card: string;
+  cardForeground: string;
+  popover: string;
+  popoverForeground: string;
+  muted: string;
+  mutedForeground: string;
+}
+
+export interface ThemeSidebarColors {
+  background: string;
+  foreground: string;
+  primary: string;
+  primaryForeground: string;
+  accent: string;
+  accentForeground: string;
+  border: string;
+  ring: string;
+}
+
+export interface ThemeChartColors {
+  1: string;
+  2: string;
+  3: string;
+  4: string;
+  5: string;
+}
+
+export interface ThemeModeColors {
+  base: ThemeBaseColors;
+  interactive: ThemeInteractiveColors;
+  components: ThemeComponentColors;
+  sidebar: ThemeSidebarColors;
+  charts: ThemeChartColors;
+}
+
+export interface ThemeColors {
+  light: ThemeModeColors;
+  dark: ThemeModeColors;
+}
+
+/* =========================
+   WEBSITE THEME TYPES (FLAT)
+========================= */
+
+export interface WebsiteThemeColors {
+  primary: string;
+  primary_deep: string;
+  primary_light: string;
+  primary_soft: string;
+}
+
+/* =========================
+   THEME ITEM (UNION)
+========================= */
 
 export interface ThemeItem {
   _id: string;
   name: ThemeType;
-  colors: ThemeColors;
+  colors: ThemeColors | WebsiteThemeColors;
 }
 
-// ─── API Calls ────────────────────────────────────────────────────────────
+/* =========================
+   API Calls
+========================= */
 
-// ✅ Get Theme (auto-fill)
+// ✅ Get Theme
 export const getThemeApi = async (
   name: ThemeType,
 ): Promise<ThemeItem | null> => {
@@ -30,17 +104,16 @@ export const getThemeApi = async (
       needAuth: true,
     });
 
-    // ⚠️ backend returns array → take first
     return res?.data?.themes?.[0] ?? null;
   } catch (error: any) {
     throw createApiRequestError(error, "Failed to fetch theme");
   }
 };
 
-// ✅ Upsert Theme (create/update)
+// ✅ Upsert Theme (supports BOTH panel + website)
 export const upsertThemeApi = async (
   name: ThemeType,
-  colors: ThemeColors,
+  colors: ThemeColors | WebsiteThemeColors,
 ): Promise<ThemeItem> => {
   try {
     const res = await post(

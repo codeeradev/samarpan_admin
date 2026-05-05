@@ -60,10 +60,10 @@ const ADDABLE_ROLES: UserRole[] = ["nurse", "receptionist"];
 
 const ROLE_BADGE_STYLES: Record<UserRole, string> = {
   "super-admin":
-    "bg-amber-50 text-amber-700 border border-amber-200 font-semibold",
-  doctor: "bg-yellow-50 text-yellow-700 border border-yellow-200 font-semibold",
+    "bg-accent text-secondary border border-secondary/20 font-semibold",
+  doctor: "bg-accent text-secondary border border-secondary/20 font-semibold",
   receptionist:
-    "bg-orange-50 text-orange-700 border border-orange-200 font-semibold",
+    "bg-secondary/10 text-secondary border border-secondary/20 font-semibold",
   nurse: "bg-stone-100 text-stone-600 border border-stone-200 font-semibold",
 };
 
@@ -166,13 +166,13 @@ function PermissionEditor({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-100 bg-[#F8FAFC] p-4">
+      <div className="rounded-2xl border border-border bg-muted p-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#1E293B]">
+            <p className="text-sm font-semibold text-foreground">
               Permission access
             </p>
-            <p className="text-xs text-[#64748B] mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {enabledCount} enabled for {ROLE_LABELS[selectedRole]}
             </p>
           </div>
@@ -181,7 +181,7 @@ function PermissionEditor({
               type="button"
               size="sm"
               variant="outline"
-              className="rounded-xl border-slate-200"
+              className="rounded-xl border-border"
               onClick={onRoleDefaults}
             >
               <WandSparkles size={14} /> Role defaults
@@ -190,7 +190,7 @@ function PermissionEditor({
               type="button"
               size="sm"
               variant="outline"
-              className="rounded-xl border-slate-200"
+              className="rounded-xl border-border"
               onClick={onGrantAll}
             >
               Grant all
@@ -199,7 +199,7 @@ function PermissionEditor({
               type="button"
               size="sm"
               variant="outline"
-              className="rounded-xl border-slate-200"
+              className="rounded-xl border-border"
               onClick={onClearAll}
             >
               Clear all
@@ -212,13 +212,13 @@ function PermissionEditor({
         {PERMISSION_GROUPS.map((group) => (
           <div
             key={group.title}
-            className="rounded-2xl border border-slate-100 bg-white p-4"
+            className="rounded-2xl border border-border bg-card p-4"
           >
             <div className="mb-3">
-              <p className="text-sm font-semibold text-[#1E293B]">
+              <p className="text-sm font-semibold text-foreground">
                 {group.title}
               </p>
-              <p className="text-xs text-[#64748B] mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {group.description}
               </p>
             </div>
@@ -226,13 +226,13 @@ function PermissionEditor({
               {group.permissions.map((permission) => (
                 <div
                   key={permission}
-                  className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 bg-[#FCFDFE] px-3 py-3"
+                  className="flex items-start justify-between gap-4 rounded-xl border border-border bg-muted/40 px-3 py-3"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#1E293B]">
+                    <p className="text-sm font-medium text-foreground">
                       {PERMISSION_LABELS[permission]}
                     </p>
-                    <p className="text-xs text-[#94A3B8] mt-1 break-all">
+                    <p className="text-xs text-muted-foreground mt-1 break-all">
                       {permission}
                     </p>
                   </div>
@@ -330,17 +330,17 @@ function AddStaffDialog({
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <DialogContent className="!w-[95vw] !max-w-[80vw] max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-base font-bold text-[#1E293B]">
+          <DialogTitle className="text-base font-bold text-foreground">
             Add Staff Member
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5 py-1">
-          <div className="rounded-2xl border border-slate-100 bg-[#F8FAFC] p-4">
-            <p className="text-sm font-semibold text-[#1E293B]">
+          <div className="rounded-2xl border border-border bg-muted p-4">
+            <p className="text-sm font-semibold text-foreground">
               Quick staff onboarding
             </p>
-            <p className="text-xs text-[#64748B] mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Doctors are still created from the Doctors page. Use this flow for
               nurses and reception staff, then fine-tune page access before
               saving.
@@ -358,7 +358,7 @@ function AddStaffDialog({
                 className="rounded-xl"
               />
               {errors.name && (
-                <p className="text-xs text-red-500">{errors.name}</p>
+                <p className="text-xs text-destructive">{errors.name}</p>
               )}
             </div>
 
@@ -373,7 +373,7 @@ function AddStaffDialog({
                 className="rounded-xl"
               />
               {errors.email && (
-                <p className="text-xs text-red-500">{errors.email}</p>
+                <p className="text-xs text-destructive">{errors.email}</p>
               )}
             </div>
 
@@ -390,7 +390,7 @@ function AddStaffDialog({
                 className="rounded-xl"
               />
               {errors.password && (
-                <p className="text-xs text-red-500">{errors.password}</p>
+                <p className="text-xs text-destructive">{errors.password}</p>
               )}
             </div>
 
@@ -404,7 +404,7 @@ function AddStaffDialog({
                 className="rounded-xl"
               />
               {errors.phone && (
-                <p className="text-xs text-red-500">{errors.phone}</p>
+                <p className="text-xs text-destructive">{errors.phone}</p>
               )}
             </div>
           </div>
@@ -424,7 +424,7 @@ function AddStaffDialog({
               </SelectContent>
             </Select>
             {errors.role && (
-              <p className="text-xs text-red-500">{errors.role}</p>
+              <p className="text-xs text-destructive">{errors.role}</p>
             )}
           </div>
 
@@ -469,7 +469,7 @@ function AddStaffDialog({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="w-full sm:w-auto rounded-xl border-slate-200"
+            className="w-full sm:w-auto rounded-xl border-border"
           >
             Cancel
           </Button>
@@ -477,7 +477,7 @@ function AddStaffDialog({
             type="button"
             onClick={handleSubmit}
             disabled={isSaving}
-            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white bg-[#D89F00]"
+            className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white bg-primary"
           >
             {isSaving ? "Adding..." : "Add Staff Member"}
           </Button>
@@ -532,30 +532,30 @@ function EditStaffDialog({
     <Dialog open={!!staff} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <DialogContent className="w-[98vw] !max-w-[80vw] max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-base font-bold text-[#1E293B]">
+          <DialogTitle className="text-base font-bold text-foreground">
             Manage Staff Access
           </DialogTitle>
         </DialogHeader>
 
         {staff && (
           <div className="space-y-5 py-1">
-            <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-[#F8FAFC] p-4 md:flex-row md:items-start md:justify-between">
+            <div className="flex flex-col gap-4 rounded-2xl border border-border bg-muted p-4 md:flex-row md:items-start md:justify-between">
               <div className="flex items-start gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <ShieldCheck size={18} className="text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#1E293B] truncate">
+                  <p className="text-sm font-semibold text-foreground truncate">
                     {staff.name}
                   </p>
-                  <p className="text-xs text-[#64748B] truncate mt-1">
+                  <p className="text-xs text-muted-foreground truncate mt-1">
                     {staff.email}
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <RoleBadge role={getStaffRole(staff)} />
                     <Badge
                       variant="outline"
-                      className="rounded-lg border-slate-200 text-xs text-[#64748B]"
+                      className="rounded-lg border-border text-xs text-muted-foreground"
                     >
                       {countEnabledPermissions(permissions)} permissions
                     </Badge>
@@ -563,7 +563,7 @@ function EditStaffDialog({
                 </div>
               </div>
 
-              <div className="text-xs text-[#64748B] space-y-1">
+              <div className="text-xs text-muted-foreground space-y-1">
                 <p>Phone: {getStaffPhone(staff)}</p>
                 <p>Joined: {formatDate(staff.createdAt)}</p>
               </div>
@@ -620,7 +620,7 @@ function EditStaffDialog({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="w-full sm:w-auto rounded-xl border-slate-200"
+            className="w-full sm:w-auto rounded-xl border-border"
           >
             Cancel
           </Button>
@@ -715,9 +715,9 @@ export default function RoleManagementPage() {
               </span>
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-[#1E293B] truncate">{row.name}</p>
+              <p className="font-medium text-foreground truncate">{row.name}</p>
               {isCurrentAccount && (
-                <p className="text-xs text-[#A67C00] mt-0.5">Current account</p>
+                <p className="text-xs text-secondary mt-0.5">Current account</p>
               )}
             </div>
           </div>
@@ -728,7 +728,7 @@ export default function RoleManagementPage() {
       key: "email",
       header: "Email",
       render: (row) => (
-        <span className="text-[#64748B] truncate">{row.email}</span>
+        <span className="text-muted-foreground truncate">{row.email}</span>
       ),
     },
     {
@@ -742,7 +742,7 @@ export default function RoleManagementPage() {
       render: (row) => (
         <Badge
           variant="outline"
-          className="rounded-lg border-slate-200 text-xs font-medium text-[#475569]"
+          className="rounded-lg border-border text-xs font-medium text-muted-foreground"
         >
           {countEnabledPermissions(normalizePermissions(row.permissions))} enabled
         </Badge>
@@ -752,7 +752,7 @@ export default function RoleManagementPage() {
       key: "joinedDate",
       header: "Joined Date",
       render: (row) => (
-        <span className="text-[#64748B]">{formatDate(row.createdAt)}</span>
+        <span className="text-muted-foreground">{formatDate(row.createdAt)}</span>
       ),
     },
     {
@@ -769,7 +769,7 @@ export default function RoleManagementPage() {
               variant="outline"
               disabled={isCurrentAccount}
               onClick={() => setEditingStaff(row)}
-              className="rounded-lg text-xs border-[#D89F00] text-[#A67C00] hover:bg-amber-50 hover:text-[#A67C00]"
+              className="rounded-lg text-xs border-primary text-secondary hover:bg-accent hover:text-secondary"
             >
               Edit Access
             </Button>
@@ -779,7 +779,7 @@ export default function RoleManagementPage() {
               variant="ghost"
               disabled={isCurrentAccount}
               onClick={() => setDeleteTarget(row)}
-              className="h-8 w-8 rounded-lg text-[#64748B]"
+              className="h-8 w-8 rounded-lg text-muted-foreground"
               aria-label="Delete staff member"
             >
               <Trash2 size={14} />
@@ -796,7 +796,7 @@ export default function RoleManagementPage() {
 
     return (
       <Card
-        className="shadow-card border border-slate-100 rounded-xl overflow-hidden"
+        className="shadow-card border border-border rounded-xl overflow-hidden"
         data-ocid={`role-management.item.${index + 1}`}
       >
         <CardContent className="p-4 space-y-3">
@@ -808,16 +808,16 @@ export default function RoleManagementPage() {
                 </span>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-[#1E293B] truncate">
+                <p className="text-sm font-semibold text-foreground truncate">
                   {item.name}
                 </p>
-                <p className="text-xs text-[#64748B] truncate">{item.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{item.email}</p>
               </div>
             </div>
             <RoleBadge role={getStaffRole(item)} />
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-xs text-[#64748B]">
+          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
             <span>
               {countEnabledPermissions(normalizePermissions(item.permissions))} permissions
             </span>
@@ -825,7 +825,7 @@ export default function RoleManagementPage() {
           </div>
 
           {isCurrentAccount ? (
-            <div className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-[#A67C00]">
+            <div className="rounded-xl bg-accent px-3 py-2 text-xs text-secondary">
               Current account access is locked here for safety.
             </div>
           ) : (
@@ -835,7 +835,7 @@ export default function RoleManagementPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setEditingStaff(item)}
-                className="flex-1 rounded-lg text-xs border-[#D89F00] text-[#A67C00] hover:bg-amber-50"
+                className="flex-1 rounded-lg text-xs border-primary text-secondary hover:bg-accent"
               >
                 Edit Access
               </Button>
@@ -844,7 +844,7 @@ export default function RoleManagementPage() {
                 size="icon"
                 variant="ghost"
                 onClick={() => setDeleteTarget(item)}
-                className="h-9 w-9 rounded-lg text-[#64748B]"
+                className="h-9 w-9 rounded-lg text-muted-foreground"
                 aria-label="Delete staff member"
               >
                 <Trash2 size={14} />
@@ -864,7 +864,7 @@ export default function RoleManagementPage() {
         action={
           <Button
             onClick={() => setIsAddDialogOpen(true)}
-            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto bg-[#D89F00]"
+            className="bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm w-full sm:w-auto bg-primary"
           >
             <ShieldPlus size={15} /> Add Staff
           </Button>
@@ -875,13 +875,13 @@ export default function RoleManagementPage() {
         {staffCounts.map(({ role, count }) => (
           <Card
             key={role}
-            className="shadow-card border border-slate-100 rounded-xl"
+            className="shadow-card border border-border rounded-xl"
           >
             <CardContent className="p-3 sm:p-4 flex flex-col gap-1">
-              <p className="text-xs text-[#64748B] font-medium uppercase tracking-wide">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                 {ROLE_LABELS[role]}
               </p>
-              <p className="text-xl font-bold text-[#1E293B] font-display">
+              <p className="text-xl font-bold text-foreground font-display">
                 {isLoading ? "..." : count}
               </p>
             </CardContent>
@@ -890,8 +890,8 @@ export default function RoleManagementPage() {
       </div>
 
       {isError && (
-        <Card className="mb-4 border border-red-100 bg-red-50">
-          <CardContent className="p-4 text-sm text-red-600">
+        <Card className="mb-4 border border-destructive/20 bg-destructive/10">
+          <CardContent className="p-4 text-sm text-destructive">
             {error?.message ?? "Unable to load staff right now."}
           </CardContent>
         </Card>

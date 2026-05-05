@@ -87,7 +87,7 @@ export default function GalleryPage() {
       key: "image",
       header: "Image",
       render: (item) => (
-        <div className="h-14 w-20 overflow-hidden rounded-lg border border-slate-100 bg-slate-50">
+        <div className="h-14 w-20 overflow-hidden rounded-lg border border-border bg-muted/60">
           <img
             src={resolveAssetUrl(item.image)}
             alt="Gallery"
@@ -100,7 +100,7 @@ export default function GalleryPage() {
       key: "createdAt",
       header: "Uploaded",
       render: (item) => (
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-muted-foreground">
           {item.createdAt ? new Date(item.createdAt).toLocaleString() : "—"}
         </span>
       ),
@@ -115,7 +115,7 @@ export default function GalleryPage() {
             type="button"
             size="sm"
             variant="outline"
-            className="rounded-lg border-slate-200"
+            className="rounded-lg border-border"
             onClick={() => setPreviewTarget(item)}
           >
             <Eye size={14} />
@@ -142,7 +142,7 @@ export default function GalleryPage() {
         action={
           <Button
             onClick={() => setOpen(true)}
-            className="rounded-xl gap-2 bg-[#D89F00]"
+            className="rounded-xl gap-2 bg-primary"
           >
             <Plus size={14} /> Add Image
           </Button>
@@ -168,7 +168,7 @@ export default function GalleryPage() {
           <div className="space-y-4">
             <Input type="file" accept="image/*" onChange={handleImageChange} />
             {previewUrl && (
-              <div className="overflow-hidden rounded-2xl border bg-slate-100">
+              <div className="overflow-hidden rounded-2xl border bg-muted">
                 <img
                   src={previewUrl}
                   alt="Preview"
@@ -187,16 +187,16 @@ export default function GalleryPage() {
         open={!!previewTarget}
         onOpenChange={(nextOpen) => !nextOpen && setPreviewTarget(null)}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-3xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Gallery Preview</DialogTitle>
           </DialogHeader>
           {previewTarget && (
-            <div className="overflow-hidden rounded-2xl border bg-slate-50">
+            <div className="overflow-hidden rounded-2xl border bg-muted/60">
               <img
                 src={resolveAssetUrl(previewTarget.image)}
                 alt="Gallery preview"
-                className="w-full max-h-[70vh] object-contain bg-white"
+                className="w-full max-h-[70vh] object-contain bg-card"
               />
             </div>
           )}

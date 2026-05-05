@@ -72,13 +72,13 @@ export function DataTable<T>({
         <div className="relative w-full md:max-w-sm">
           <Search
             size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <Input
             placeholder="Search…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-9 text-sm border-slate-200 rounded-xl w-full"
+            className="pl-8 h-9 text-sm border-border rounded-xl w-full"
             data-ocid={
               dataOcid ? `${dataOcid}.search_input` : "table.search_input"
             }
@@ -92,7 +92,7 @@ export function DataTable<T>({
           SKELETON_IDS.map((sk) => (
             <Card
               key={sk}
-              className="shadow-card border border-slate-100 rounded-xl"
+              className="shadow-card border border-border rounded-xl"
             >
               <CardContent className="p-4 space-y-2">
                 <Skeleton className="h-4 w-3/4 rounded-md" />
@@ -102,8 +102,8 @@ export function DataTable<T>({
             </Card>
           ))
         ) : filtered.length === 0 ? (
-          <Card className="shadow-card border border-slate-100 rounded-xl">
-            <CardContent className="p-8 text-center text-[#94A3B8] text-sm">
+          <Card className="shadow-card border border-border rounded-xl">
+            <CardContent className="p-8 text-center text-muted-foreground text-sm">
               {emptyText}
             </CardContent>
           </Card>
@@ -119,7 +119,7 @@ export function DataTable<T>({
             ) : (
               <Card
                 key={rowKey(row)}
-                className="shadow-card border border-slate-100 rounded-xl overflow-hidden"
+                className="shadow-card border border-border rounded-xl overflow-hidden"
                 data-ocid={dataOcid ? `${dataOcid}.item.${idx + 1}` : undefined}
               >
                 <CardContent className="p-4">
@@ -129,10 +129,10 @@ export function DataTable<T>({
                         key={String(col.key)}
                         className="flex items-start gap-2 min-w-0"
                       >
-                        <dt className="text-xs font-semibold text-[#64748B] uppercase tracking-wide w-28 flex-shrink-0 pt-0.5">
+                        <dt className="text-xs font-semibold text-muted-foreground uppercase tracking-wide w-28 flex-shrink-0 pt-0.5">
                           {col.header}
                         </dt>
-                        <dd className="text-sm text-[#1E293B] flex-1 min-w-0 break-words">
+                        <dd className="text-sm text-foreground flex-1 min-w-0 break-words">
                           {col.render
                             ? col.render(row)
                             : getCellValue(row, col.key)}
@@ -148,16 +148,16 @@ export function DataTable<T>({
       </div>
 
       {/* ── Desktop/tablet table view (≥ md) ─────────────────────── */}
-      <Card className="hidden md:block shadow-card border border-slate-100 rounded-2xl overflow-hidden">
+      <Card className="hidden md:block shadow-card border border-border rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-[#F8FAFC] hover:bg-[#F8FAFC] border-b border-slate-100">
+                <TableRow className="bg-muted hover:bg-muted border-b border-border">
                   {columns.map((col) => (
                     <TableHead
                       key={String(col.key)}
-                      className={`text-xs font-semibold text-[#64748B] uppercase tracking-wide py-3 px-4 ${col.className ?? ""}`}
+                      className={`text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-4 ${col.className ?? ""}`}
                     >
                       {col.header}
                     </TableHead>
@@ -167,7 +167,7 @@ export function DataTable<T>({
               <TableBody>
                 {isLoading ? (
                   SKELETON_IDS.map((sk) => (
-                    <TableRow key={sk} className="border-b border-slate-50">
+                    <TableRow key={sk} className="border-b border-border/60">
                       {columns.map((col) => (
                         <TableCell key={String(col.key)} className="px-4 py-3">
                           <Skeleton className="h-4 w-3/4 rounded-md" />
@@ -179,7 +179,7 @@ export function DataTable<T>({
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="text-center py-12 text-[#94A3B8] text-sm"
+                      className="text-center py-12 text-muted-foreground text-sm"
                     >
                       {emptyText}
                     </TableCell>
@@ -188,7 +188,7 @@ export function DataTable<T>({
                   filtered.map((row, idx) => (
                     <TableRow
                       key={rowKey(row)}
-                      className="border-b border-slate-50 hover:bg-[#F8FAFC] transition-colors"
+                      className="border-b border-border/60 hover:bg-muted/60 transition-colors"
                       data-ocid={
                         dataOcid ? `${dataOcid}.item.${idx + 1}` : undefined
                       }
@@ -196,7 +196,7 @@ export function DataTable<T>({
                       {columns.map((col) => (
                         <TableCell
                           key={String(col.key)}
-                          className={`px-4 py-3 text-sm text-[#1E293B] ${col.className ?? ""}`}
+                          className={`px-4 py-3 text-sm text-foreground ${col.className ?? ""}`}
                         >
                           {col.render
                             ? col.render(row)

@@ -419,7 +419,7 @@ export default function DoctorsPage() {
     return (
       <Avatar className={`${sizeClass} shrink-0`}>
         {imageSrc && <AvatarImage src={imageSrc} alt={doctor.name} />}
-        <AvatarFallback className="bg-amber-100 text-[#A67C00] text-xs font-bold">
+        <AvatarFallback className="bg-accent text-secondary text-xs font-bold">
           {getInitials(doctor.name)}
         </AvatarFallback>
       </Avatar>
@@ -430,7 +430,7 @@ export default function DoctorsPage() {
     return (
       <div
         key={doctor._id}
-        className="p-4 border-b border-[#E2E8F0] last:border-0 hover:bg-[#F8FAFC] transition-colors"
+        className="p-4 border-b border-border last:border-0 hover:bg-muted transition-colors"
         data-ocid={`doctors.item.${idx + 1}`}
       >
         <div className="flex items-start gap-3">
@@ -440,10 +440,10 @@ export default function DoctorsPage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="font-semibold text-[#1E293B] text-sm truncate">
+                <p className="font-semibold text-foreground text-sm truncate">
                   {doctor.name}
                 </p>
-                <p className="text-xs text-[#64748B] truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {doctor.qualification || "No qualification set"}
                 </p>
               </div>
@@ -452,7 +452,7 @@ export default function DoctorsPage() {
                   size="icon"
                   variant="ghost"
                   type="button"
-                  className="h-8 w-8 text-[#64748B] hover:text-[#D89F00] hover:bg-amber-50 rounded-lg"
+                  className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg"
                   onClick={() => openEdit(doctor)}
                   aria-label={`Edit ${doctor.name}`}
                   data-ocid={`doctors.edit_button.${idx + 1}`}
@@ -463,7 +463,7 @@ export default function DoctorsPage() {
                   size="icon"
                   variant="ghost"
                   type="button"
-                  className="h-8 w-8 text-[#64748B] rounded-lg"
+                  className="h-8 w-8 text-muted-foreground rounded-lg"
                   onClick={() => openDelete(doctor)}
                   aria-label={`Delete ${doctor.name}`}
                   data-ocid={`doctors.delete_button.${idx + 1}`}
@@ -473,15 +473,15 @@ export default function DoctorsPage() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="text-xs bg-amber-50 text-[#A67C00] px-2 py-0.5 rounded-md font-medium">
+              <span className="text-xs bg-accent text-secondary px-2 py-0.5 rounded-md font-medium">
                 {doctor.specialization || "No specialization"}
               </span>
-              <span className="text-xs text-[#64748B]">
+              <span className="text-xs text-muted-foreground">
                 {getDoctorExperience(doctor)}
               </span>
               <StatusBadge status={getDoctorAvailability(doctor)} />
             </div>
-            <p className="text-xs text-[#94A3B8] mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {getDoctorPhone(doctor)}
             </p>
           </div>
@@ -500,7 +500,7 @@ export default function DoctorsPage() {
         action={
           <Button
             onClick={openAdd}
-            className="w-full sm:w-auto bg-[#D89F00] hover:bg-[#A67C00] text-white rounded-xl gap-2 shadow-sm"
+            className="w-full sm:w-auto bg-primary hover:bg-secondary text-white rounded-xl gap-2 shadow-sm"
             data-ocid="doctors.add_button"
           >
             <Plus size={15} /> Add Doctor
@@ -512,40 +512,40 @@ export default function DoctorsPage() {
       <div className="relative w-full sm:max-w-sm">
         <Search
           size={15}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
         />
         <Input
           placeholder="Search by name, email, specialization…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 rounded-xl bg-white border-[#E2E8F0] text-sm"
+          className="pl-9 rounded-xl bg-card border-border text-sm"
           data-ocid="doctors.search_input"
         />
       </div>
 
       {/* Doctors table — desktop */}
-      <div className="bg-white rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
+      <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
         {/* Desktop table */}
         <div className="hidden md:block">
           <Table data-ocid="doctors.table">
             <TableHeader>
-              <TableRow className="bg-[#F8FAFC] hover:bg-[#F8FAFC]">
-                <TableHead className="text-[#64748B] font-semibold text-xs uppercase tracking-wide">
+              <TableRow className="bg-muted hover:bg-muted">
+                <TableHead className="text-muted-foreground font-semibold text-xs uppercase tracking-wide">
                   Doctor
                 </TableHead>
-                <TableHead className="text-[#64748B] font-semibold text-xs uppercase tracking-wide">
+                <TableHead className="text-muted-foreground font-semibold text-xs uppercase tracking-wide">
                   Specialization
                 </TableHead>
-                <TableHead className="text-[#64748B] font-semibold text-xs uppercase tracking-wide">
+                <TableHead className="text-muted-foreground font-semibold text-xs uppercase tracking-wide">
                   Experience
                 </TableHead>
-                <TableHead className="text-[#64748B] font-semibold text-xs uppercase tracking-wide">
+                <TableHead className="text-muted-foreground font-semibold text-xs uppercase tracking-wide">
                   Phone
                 </TableHead>
-                <TableHead className="text-[#64748B] font-semibold text-xs uppercase tracking-wide">
+                <TableHead className="text-muted-foreground font-semibold text-xs uppercase tracking-wide">
                   Availability
                 </TableHead>
-                <TableHead className="text-[#64748B] font-semibold text-xs uppercase tracking-wide text-right">
+                <TableHead className="text-muted-foreground font-semibold text-xs uppercase tracking-wide text-right">
                   Actions
                 </TableHead>
               </TableRow>
@@ -587,7 +587,7 @@ export default function DoctorsPage() {
                 <TableRow>
                   <TableCell
                     colSpan={6}
-                    className="text-center py-16 text-[#94A3B8]"
+                    className="text-center py-16 text-muted-foreground"
                     data-ocid="doctors.empty_state"
                   >
                     <p className="font-medium text-sm">
@@ -606,29 +606,29 @@ export default function DoctorsPage() {
                 filtered.map((doctor, idx) => (
                   <TableRow
                     key={doctor._id}
-                    className="hover:bg-[#F8FAFC] transition-colors"
+                    className="hover:bg-muted transition-colors"
                     data-ocid={`doctors.item.${idx + 1}`}
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         {renderDoctorAvatar(doctor)}
                         <div className="min-w-0">
-                          <p className="font-semibold text-[#1E293B] text-sm truncate">
+                          <p className="font-semibold text-foreground text-sm truncate">
                             {doctor.name}
                           </p>
-                          <p className="text-xs text-[#64748B] truncate">
+                          <p className="text-xs text-muted-foreground truncate">
                             {doctor.qualification || "No qualification set"}
                           </p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-[#1E293B] text-sm">
+                    <TableCell className="text-foreground text-sm">
                       {doctor.specialization || "Not set"}
                     </TableCell>
-                    <TableCell className="text-[#64748B] text-sm">
+                    <TableCell className="text-muted-foreground text-sm">
                       {getDoctorExperience(doctor)}
                     </TableCell>
-                    <TableCell className="text-[#64748B] text-sm">
+                    <TableCell className="text-muted-foreground text-sm">
                       {getDoctorPhone(doctor)}
                     </TableCell>
                     <TableCell>
@@ -640,7 +640,7 @@ export default function DoctorsPage() {
                           size="icon"
                           variant="ghost"
                           type="button"
-                          className="h-8 w-8 text-[#64748B] hover:text-[#D89F00] hover:bg-amber-50 rounded-lg"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg"
                           onClick={() => openEdit(doctor)}
                           aria-label={`Edit ${doctor.name}`}
                           data-ocid={`doctors.edit_button.${idx + 1}`}
@@ -651,7 +651,7 @@ export default function DoctorsPage() {
                           size="icon"
                           variant="ghost"
                           type="button"
-                          className="h-8 w-8 text-[#64748B] rounded-lg"
+                          className="h-8 w-8 text-muted-foreground rounded-lg"
                           onClick={() => openDelete(doctor)}
                           aria-label={`Delete ${doctor.name}`}
                           data-ocid={`doctors.delete_button.${idx + 1}`}
@@ -673,7 +673,7 @@ export default function DoctorsPage() {
             SKELETON_ROWS.map((key) => (
               <div
                 key={key}
-                className="p-4 border-b border-[#E2E8F0] last:border-0"
+                className="p-4 border-b border-border last:border-0"
               >
                 <div className="flex items-start gap-3">
                   <Skeleton className="h-10 w-10 rounded-full shrink-0" />
@@ -690,7 +690,7 @@ export default function DoctorsPage() {
             ))
           ) : filtered.length === 0 ? (
             <div
-              className="text-center py-16 text-[#94A3B8]"
+              className="text-center py-16 text-muted-foreground"
               data-ocid="doctors.empty_state"
             >
               <p className="font-medium text-sm">
@@ -717,7 +717,7 @@ export default function DoctorsPage() {
           data-ocid="doctors.dialog"
         >
           <DialogHeader>
-            <DialogTitle className="text-[#1E293B] text-lg font-semibold">
+            <DialogTitle className="text-foreground text-lg font-semibold">
               Add New Doctor
             </DialogTitle>
           </DialogHeader>
@@ -736,7 +736,7 @@ export default function DoctorsPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full sm:w-auto rounded-xl border-[#E2E8F0]"
+              className="w-full sm:w-auto rounded-xl border-border"
               onClick={() => setIsAddModalOpen(false)}
               disabled={isSaving}
               data-ocid="doctors.cancel_button"
@@ -745,7 +745,7 @@ export default function DoctorsPage() {
             </Button>
             <Button
               type="button"
-              className="w-full sm:w-auto rounded-xl bg-[#D89F00] hover:bg-[#A67C00] text-white"
+              className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white"
               onClick={handleAdd}
               disabled={isSaving}
               data-ocid="doctors.submit_button"
@@ -763,7 +763,7 @@ export default function DoctorsPage() {
           data-ocid="doctors.dialog"
         >
           <DialogHeader>
-            <DialogTitle className="text-[#1E293B] text-lg font-semibold">
+            <DialogTitle className="text-foreground text-lg font-semibold">
               Edit Doctor
             </DialogTitle>
           </DialogHeader>
@@ -782,7 +782,7 @@ export default function DoctorsPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full sm:w-auto rounded-xl border-[#E2E8F0]"
+              className="w-full sm:w-auto rounded-xl border-border"
               onClick={() => setIsEditModalOpen(false)}
               disabled={isSaving}
               data-ocid="doctors.cancel_button"
@@ -791,7 +791,7 @@ export default function DoctorsPage() {
             </Button>
             <Button
               type="button"
-              className="w-full sm:w-auto rounded-xl bg-[#D89F00] hover:bg-[#A67C00] text-white"
+              className="w-full sm:w-auto rounded-xl bg-primary hover:bg-secondary text-white"
               onClick={handleUpdate}
               disabled={isSaving}
               data-ocid="doctors.save_button"
@@ -812,12 +812,12 @@ export default function DoctorsPage() {
           data-ocid="doctors.dialog"
         >
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#1E293B]">
+            <AlertDialogTitle className="text-foreground">
               Delete Doctor
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[#64748B]">
+            <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to delete{" "}
-              <span className="font-semibold text-[#1E293B]">
+              <span className="font-semibold text-foreground">
                 {selectedDoctor?.name ?? "this doctor"}
               </span>
               ? This action cannot be undone.
@@ -833,7 +833,7 @@ export default function DoctorsPage() {
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="w-full sm:w-auto rounded-xl bg-red-500 hover:bg-red-600 text-white"
+              className="w-full sm:w-auto rounded-xl bg-destructive/100 hover:bg-destructive/90 text-white"
               onClick={(event) => {
                 event.preventDefault();
                 handleDelete();
@@ -882,19 +882,19 @@ function DoctorForm({
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
       {/* Full Name */}
       <div className="col-span-1 sm:col-span-2 space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Full Name <span className="text-red-500">*</span>
+        <Label className="text-sm font-medium text-foreground">
+          Full Name <span className="text-destructive">*</span>
         </Label>
         <Input
           value={formData.name}
           onChange={(e) => onFieldChange("name", e.target.value)}
           placeholder="Dr. Full Name"
-          className={`rounded-xl ${formErrors.name ? "border-red-400 focus-visible:ring-red-400" : "border-[#E2E8F0]"}`}
+          className={`rounded-xl ${formErrors.name ? "border-destructive focus-visible:ring-destructive" : "border-border"}`}
           data-ocid="doctors.name_input"
         />
         {formErrors.name && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.name_input.field_error"
           >
             {formErrors.name}
@@ -904,20 +904,20 @@ function DoctorForm({
 
       {/* Email */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Email <span className="text-red-500">*</span>
+        <Label className="text-sm font-medium text-foreground">
+          Email <span className="text-destructive">*</span>
         </Label>
         <Input
           type="email"
           value={formData.email}
           onChange={(e) => onFieldChange("email", e.target.value)}
           placeholder="doctor@samarpan.com"
-          className={`rounded-xl ${formErrors.email ? "border-red-400" : "border-[#E2E8F0]"}`}
+          className={`rounded-xl ${formErrors.email ? "border-destructive" : "border-border"}`}
           data-ocid="doctors.email_input"
         />
         {formErrors.email && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.email_input.field_error"
           >
             {formErrors.email}
@@ -927,8 +927,8 @@ function DoctorForm({
 
       {/* Password */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Password {mode === "add" && <span className="text-red-500">*</span>}
+        <Label className="text-sm font-medium text-foreground">
+          Password {mode === "add" && <span className="text-destructive">*</span>}
         </Label>
         <Input
           type="password"
@@ -937,12 +937,12 @@ function DoctorForm({
           placeholder={
             mode === "add" ? "Set login password" : "Leave blank to keep"
           }
-          className={`rounded-xl ${formErrors.password ? "border-red-400" : "border-[#E2E8F0]"}`}
+          className={`rounded-xl ${formErrors.password ? "border-destructive" : "border-border"}`}
           data-ocid="doctors.password_input"
         />
         {formErrors.password && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.password_input.field_error"
           >
             {formErrors.password}
@@ -952,19 +952,19 @@ function DoctorForm({
 
       {/* Phone */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Phone <span className="text-red-500">*</span>
+        <Label className="text-sm font-medium text-foreground">
+          Phone <span className="text-destructive">*</span>
         </Label>
         <Input
           value={formData.phone}
           onChange={(e) => onFieldChange("phone", e.target.value)}
           placeholder="9876543210"
-          className={`rounded-xl ${formErrors.phone ? "border-red-400" : "border-[#E2E8F0]"}`}
+          className={`rounded-xl ${formErrors.phone ? "border-destructive" : "border-border"}`}
           data-ocid="doctors.phone_input"
         />
         {formErrors.phone && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.phone_input.field_error"
           >
             {formErrors.phone}
@@ -974,15 +974,15 @@ function DoctorForm({
 
       {/* Specialization */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Specialization <span className="text-red-500">*</span>
+        <Label className="text-sm font-medium text-foreground">
+          Specialization <span className="text-destructive">*</span>
         </Label>
         <Select
           value={formData.specialization}
           onValueChange={(v) => onFieldChange("specialization", v)}
         >
           <SelectTrigger
-            className={`rounded-xl ${formErrors.specialization ? "border-red-400" : "border-[#E2E8F0]"}`}
+            className={`rounded-xl ${formErrors.specialization ? "border-destructive" : "border-border"}`}
             data-ocid="doctors.specialization_select"
           >
             <SelectValue placeholder="Select" />
@@ -997,7 +997,7 @@ function DoctorForm({
         </Select>
         {formErrors.specialization && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.specialization_select.field_error"
           >
             {formErrors.specialization}
@@ -1007,8 +1007,8 @@ function DoctorForm({
 
       {/* Experience */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Experience (years) <span className="text-red-500">*</span>
+        <Label className="text-sm font-medium text-foreground">
+          Experience (years) <span className="text-destructive">*</span>
         </Label>
         <Input
           type="number"
@@ -1016,12 +1016,12 @@ function DoctorForm({
           value={formData.experience}
           onChange={(e) => onFieldChange("experience", e.target.value)}
           placeholder="8"
-          className={`rounded-xl ${formErrors.experience ? "border-red-400" : "border-[#E2E8F0]"}`}
+          className={`rounded-xl ${formErrors.experience ? "border-destructive" : "border-border"}`}
           data-ocid="doctors.experience_input"
         />
         {formErrors.experience && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.experience_input.field_error"
           >
             {formErrors.experience}
@@ -1031,19 +1031,19 @@ function DoctorForm({
 
       {/* Qualification */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Qualification <span className="text-red-500">*</span>
+        <Label className="text-sm font-medium text-foreground">
+          Qualification <span className="text-destructive">*</span>
         </Label>
         <Input
           value={formData.qualification}
           onChange={(e) => onFieldChange("qualification", e.target.value)}
           placeholder="MD, DM Cardiology"
-          className={`rounded-xl ${formErrors.qualification ? "border-red-400" : "border-[#E2E8F0]"}`}
+          className={`rounded-xl ${formErrors.qualification ? "border-destructive" : "border-border"}`}
           data-ocid="doctors.qualification_input"
         />
         {formErrors.qualification && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.qualification_input.field_error"
           >
             {formErrors.qualification}
@@ -1053,7 +1053,7 @@ function DoctorForm({
 
       {/* Availability */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
+        <Label className="text-sm font-medium text-foreground">
           Availability
         </Label>
         <Select
@@ -1063,7 +1063,7 @@ function DoctorForm({
           }
         >
           <SelectTrigger
-            className="rounded-xl border-[#E2E8F0]"
+            className="rounded-xl border-border"
             data-ocid="doctors.availability_select"
           >
             <SelectValue />
@@ -1078,19 +1078,19 @@ function DoctorForm({
 
       {/* Description */}
       <div className="col-span-1 sm:col-span-2 space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
-          Description <span className="text-red-500">*</span>
+        <Label className="text-sm font-medium text-foreground">
+          Description <span className="text-destructive">*</span>
         </Label>
         <Textarea
           value={formData.description}
           onChange={(e) => onFieldChange("description", e.target.value)}
           placeholder="Short professional bio shown on the website"
-          className={`rounded-xl min-h-[90px] resize-none ${formErrors.description ? "border-red-400" : "border-[#E2E8F0]"}`}
+          className={`rounded-xl min-h-[90px] resize-none ${formErrors.description ? "border-destructive" : "border-border"}`}
           data-ocid="doctors.description_textarea"
         />
         {formErrors.description && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.description_textarea.field_error"
           >
             {formErrors.description}
@@ -1100,41 +1100,41 @@ function DoctorForm({
 
       {/* Expertise */}
       <div className="col-span-1 sm:col-span-2 space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">Expertise</Label>
+        <Label className="text-sm font-medium text-foreground">Expertise</Label>
         <Textarea
           value={formData.expertise}
           onChange={(e) => onFieldChange("expertise", e.target.value)}
           placeholder="Cardiac surgery, Angioplasty, Preventive cardiology"
-          className="rounded-xl min-h-[70px] resize-none border-[#E2E8F0]"
+          className="rounded-xl min-h-[70px] resize-none border-border"
           data-ocid="doctors.expertise_textarea"
         />
       </div>
 
       {/* Profile Image Upload */}
       <div className="col-span-1 sm:col-span-2 space-y-1.5">
-        <Label className="text-sm font-medium text-[#374151]">
+        <Label className="text-sm font-medium text-foreground">
           Profile Image{" "}
-          {mode === "add" && <span className="text-red-500">*</span>}
+          {mode === "add" && <span className="text-destructive">*</span>}
         </Label>
         <button
           type="button"
           onClick={onFileClick}
-          className={`w-full border-2 border-dashed rounded-xl py-4 px-4 flex flex-col items-center gap-2 hover:border-[#D89F00] hover:bg-amber-50/30 transition-colors cursor-pointer text-center ${
-            formErrors.image ? "border-red-300" : "border-[#CBD5E1]"
+          className={`w-full border-2 border-dashed rounded-xl py-4 px-4 flex flex-col items-center gap-2 hover:border-primary hover:bg-accent/30 transition-colors cursor-pointer text-center ${
+            formErrors.image ? "border-destructive/40" : "border-border"
           }`}
           data-ocid="doctors.upload_button"
         >
-          <Upload size={20} className="text-[#94A3B8]" />
+          <Upload size={20} className="text-muted-foreground" />
           {imageFileName ? (
-            <span className="text-sm text-[#D89F00] font-medium truncate max-w-full px-2">
+            <span className="text-sm text-primary font-medium truncate max-w-full px-2">
               {imageFileName}
             </span>
           ) : (
             <>
-              <span className="text-sm text-[#64748B] font-medium">
+              <span className="text-sm text-muted-foreground font-medium">
                 Click to upload photo
               </span>
-              <span className="text-xs text-[#94A3B8]">PNG, JPG up to 2MB</span>
+              <span className="text-xs text-muted-foreground">PNG, JPG up to 2MB</span>
             </>
           )}
         </button>
@@ -1147,7 +1147,7 @@ function DoctorForm({
         />
         {formErrors.image && (
           <p
-            className="text-xs text-red-500 mt-1"
+            className="text-xs text-destructive mt-1"
             data-ocid="doctors.upload_button.field_error"
           >
             {formErrors.image}

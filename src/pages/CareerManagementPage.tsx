@@ -33,6 +33,7 @@ import {
   getApiErrorMessage,
   mapApiErrorsToFields,
 } from "@/lib/api-errors";
+import { themeColor } from "@/lib/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -87,14 +88,14 @@ const tableStyles = {
   headRow: {
     style: {
       minHeight: "54px",
-      backgroundColor: "#F8FAFC",
+      backgroundColor: themeColor("muted"),
       borderBottomWidth: "1px",
-      borderBottomColor: "#E2E8F0",
+      borderBottomColor: themeColor("border"),
     },
   },
   headCells: {
     style: {
-      color: "#64748B",
+      color: themeColor("muted-foreground"),
       fontSize: "12px",
       fontWeight: 700,
       textTransform: "uppercase" as const,
@@ -107,25 +108,25 @@ const tableStyles = {
     style: {
       minHeight: "72px",
       borderBottomWidth: "1px",
-      borderBottomColor: "#F1F5F9",
-      backgroundColor: "#FFFFFF",
+      borderBottomColor: themeColor("border", 0.7),
+      backgroundColor: themeColor("card"),
     },
   },
   cells: {
     style: {
       paddingLeft: "16px",
       paddingRight: "16px",
-      color: "#1E293B",
+      color: themeColor("foreground"),
       fontSize: "14px",
     },
   },
   pagination: {
     style: {
       borderTopWidth: "1px",
-      borderTopColor: "#E2E8F0",
+      borderTopColor: themeColor("border"),
       minHeight: "60px",
-      color: "#475569",
-      backgroundColor: "#FFFFFF",
+      color: themeColor("muted-foreground"),
+      backgroundColor: themeColor("card"),
     },
   },
 };
@@ -217,10 +218,10 @@ function validateCareerForm(
 function CareerStatusBadge({ status }: { status: CareerStatus }) {
   const className =
     status === "open"
-      ? "bg-emerald-50 text-emerald-700"
+      ? "bg-primary/10 text-primary"
       : status === "closed"
-        ? "bg-amber-50 text-amber-700"
-        : "bg-slate-100 text-slate-600";
+        ? "bg-accent text-secondary"
+        : "bg-muted text-muted-foreground";
 
   return (
     <Badge className={className}>
@@ -421,10 +422,10 @@ export default function CareerManagementPage() {
       grow: 1.4,
       cell: (career) => (
         <div className="min-w-0 py-3">
-          <p className="truncate text-sm font-semibold text-slate-900">
+          <p className="truncate text-sm font-semibold text-foreground">
             {career.title}
           </p>
-          <p className="truncate text-xs text-slate-500">/{career.slug}</p>
+          <p className="truncate text-xs text-muted-foreground">/{career.slug}</p>
         </div>
       ),
     },
@@ -433,7 +434,7 @@ export default function CareerManagementPage() {
       grow: 1.2,
       cell: (career) => (
         <div className="min-w-0 py-3">
-          <p className="truncate text-xs text-slate-500">
+          <p className="truncate text-xs text-muted-foreground">
             {[career.employmentType, career.experience]
               .filter(Boolean)
               .join(" • ") || "No employment details"}
@@ -451,10 +452,10 @@ export default function CareerManagementPage() {
       grow: 1.1,
       cell: (career) => (
         <div className="min-w-0 py-3">
-          <p className="truncate text-sm text-slate-800">
+          <p className="truncate text-sm text-foreground">
             {career.applyEmail || "No email"}
           </p>
-          <p className="truncate text-xs text-slate-500">
+          <p className="truncate text-xs text-muted-foreground">
             {career.applyLink || "No apply link"}
           </p>
         </div>
@@ -464,7 +465,7 @@ export default function CareerManagementPage() {
       name: "Updated",
       width: "140px",
       cell: (career) => (
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-muted-foreground">
           {formatDate(career.updatedAt ?? career.createdAt)}
         </span>
       ),
@@ -479,7 +480,7 @@ export default function CareerManagementPage() {
             type="button"
             variant="ghost"
             size="icon"
-            className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
+            className="rounded-xl text-muted-foreground hover:bg-accent hover:text-secondary"
             onClick={() => openEdit(career)}
           >
             <Pencil size={15} />
@@ -488,7 +489,7 @@ export default function CareerManagementPage() {
             type="button"
             variant="ghost"
             size="icon"
-            className="rounded-xl text-slate-500"
+            className="rounded-xl text-muted-foreground"
             onClick={() => setDeleteTarget(career)}
           >
             <Trash2 size={15} />
@@ -507,7 +508,7 @@ export default function CareerManagementPage() {
           <Button
             type="button"
             onClick={openAdd}
-            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto bg-[#D89F00]"
+            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto bg-primary"
           >
             <Plus size={16} />
             Add career
@@ -515,14 +516,14 @@ export default function CareerManagementPage() {
         }
       />
 
-      <Card className="rounded-3xl border-slate-100 shadow-sm">
-        <CardHeader className="gap-4 border-b border-slate-100 pb-5">
+      <Card className="rounded-3xl border-border shadow-sm">
+        <CardHeader className="gap-4 border-b border-border pb-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <CardTitle className="text-lg text-slate-900">
+              <CardTitle className="text-lg text-foreground">
                 Career Openings
               </CardTitle>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Keep published, closed, and draft roles organized in one place.
               </p>
             </div>
@@ -530,16 +531,16 @@ export default function CareerManagementPage() {
               <div className="relative w-full lg:w-80">
                 <Search
                   size={15}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 />
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search title, type..."
-                  className="rounded-xl border-slate-200 !pl-9"
+                  className="rounded-xl border-border !pl-9"
                 />
               </div>
-              <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-600">
+              <div className="flex items-center rounded-xl border border-border bg-muted/60 px-4 text-sm font-medium text-muted-foreground">
                 {filteredCareers.length} role
                 {filteredCareers.length === 1 ? "" : "s"}
               </div>
@@ -548,7 +549,7 @@ export default function CareerManagementPage() {
         </CardHeader>
 
         <CardContent className="p-5">
-          <div className="overflow-hidden rounded-2xl border border-slate-100">
+          <div className="overflow-hidden rounded-2xl border border-border">
             <DataTable
               columns={columns}
               data={filteredCareers}
@@ -560,10 +561,10 @@ export default function CareerManagementPage() {
               persistTableHead
               noDataComponent={
                 <div className="py-16 text-center">
-                  <p className="text-base font-semibold text-slate-900">
+                  <p className="text-base font-semibold text-foreground">
                     No career roles found
                   </p>
-                  <p className="mt-2 text-sm text-slate-500">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     Add your first opening to start managing careers here.
                   </p>
                 </div>
@@ -582,9 +583,9 @@ export default function CareerManagementPage() {
           }
         }}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-4xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-xl text-slate-900">
+            <DialogTitle className="text-xl text-foreground">
               {editTarget ? "Edit Career" : "Add Career"}
             </DialogTitle>
             <DialogDescription>
@@ -597,17 +598,17 @@ export default function CareerManagementPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="career-title">
-                  Role Title <span className="text-red-500">*</span>
+                  Role Title <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="career-title"
                   value={formData.title}
                   onChange={(event) => setField("title", event.target.value)}
                   placeholder="Senior Staff Nurse"
-                  className={`rounded-xl ${formErrors.title ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                  className={`rounded-xl ${formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 />
                 {formErrors.title ? (
-                  <p className="text-xs text-red-500">{formErrors.title}</p>
+                  <p className="text-xs text-destructive">{formErrors.title}</p>
                 ) : null}
               </div>
               <div className="space-y-2">
@@ -638,12 +639,12 @@ export default function CareerManagementPage() {
                   value={formData.slug}
                   onChange={(event) => setField("slug", event.target.value)}
                   placeholder="senior-staff-nurse"
-                  className={`rounded-xl ${formErrors.slug ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                  className={`rounded-xl ${formErrors.slug ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 />
                 {formErrors.slug ? (
-                  <p className="text-xs text-red-500">{formErrors.slug}</p>
+                  <p className="text-xs text-destructive">{formErrors.slug}</p>
                 ) : (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     This will be saved as `/
                     {formData.slug.trim()
                       ? slugify(formData.slug)
@@ -660,10 +661,10 @@ export default function CareerManagementPage() {
                   value={formData.sortOrder}
                   onChange={(event) => setField("sortOrder", event.target.value)}
                   placeholder="0"
-                  className={`rounded-xl ${formErrors.sortOrder ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                  className={`rounded-xl ${formErrors.sortOrder ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 />
                 {formErrors.sortOrder ? (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {formErrors.sortOrder}
                   </p>
                 ) : null}
@@ -771,10 +772,10 @@ export default function CareerManagementPage() {
                     setField("applyEmail", event.target.value)
                   }
                   placeholder="careers@samarpanhospital.com"
-                  className={`rounded-xl ${formErrors.applyEmail ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                  className={`rounded-xl ${formErrors.applyEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 />
                 {formErrors.applyEmail ? (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {formErrors.applyEmail}
                   </p>
                 ) : null}
@@ -788,10 +789,10 @@ export default function CareerManagementPage() {
                     setField("applyLink", event.target.value)
                   }
                   placeholder="https://forms.gle/..."
-                  className={`rounded-xl ${formErrors.applyLink ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+                  className={`rounded-xl ${formErrors.applyLink ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 />
                 {formErrors.applyLink ? (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {formErrors.applyLink}
                   </p>
                 ) : null}
@@ -810,7 +811,7 @@ export default function CareerManagementPage() {
             </Button>
             <Button
               type="button"
-              className="rounded-xl bg-[#D89F00]"
+              className="rounded-xl bg-primary"
               onClick={handleSave}
               disabled={addMutation.isPending || updateMutation.isPending}
             >
@@ -824,7 +825,7 @@ export default function CareerManagementPage() {
         open={!!deleteTarget}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
       >
-        <DialogContent className="max-w-xl rounded-3xl border-slate-200">
+        <DialogContent className="max-w-xl rounded-3xl border-border">
           <DialogHeader>
             <DialogTitle>Delete career</DialogTitle>
             <DialogDescription>

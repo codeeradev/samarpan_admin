@@ -166,6 +166,7 @@ const PATH_PERMISSION_RULES: Record<
       "manage_shorts",
     ],
   },
+  "/themes": { permissions: ["view_themes", "manage_themes"] },
   "/website-content": { superAdminOnly: true },
   "/website-pages": { superAdminOnly: true },
   "/careers": { superAdminOnly: true },

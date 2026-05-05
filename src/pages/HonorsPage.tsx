@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { themeColor } from "@/lib/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Award, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -54,14 +55,14 @@ const tableStyles = {
   headRow: {
     style: {
       minHeight: "54px",
-      backgroundColor: "#F8FAFC",
+      backgroundColor: themeColor("muted"),
       borderBottomWidth: "1px",
-      borderBottomColor: "#E2E8F0",
+      borderBottomColor: themeColor("border"),
     },
   },
   headCells: {
     style: {
-      color: "#64748B",
+      color: themeColor("muted-foreground"),
       fontSize: "12px",
       fontWeight: 700,
       textTransform: "uppercase" as const,
@@ -74,25 +75,25 @@ const tableStyles = {
     style: {
       minHeight: "72px",
       borderBottomWidth: "1px",
-      borderBottomColor: "#F1F5F9",
-      backgroundColor: "#FFFFFF",
+      borderBottomColor: themeColor("border", 0.7),
+      backgroundColor: themeColor("card"),
     },
   },
   cells: {
     style: {
       paddingLeft: "16px",
       paddingRight: "16px",
-      color: "#1E293B",
+      color: themeColor("foreground"),
       fontSize: "14px",
     },
   },
   pagination: {
     style: {
       borderTopWidth: "1px",
-      borderTopColor: "#E2E8F0",
+      borderTopColor: themeColor("border"),
       minHeight: "60px",
-      color: "#475569",
-      backgroundColor: "#FFFFFF",
+      color: themeColor("muted-foreground"),
+      backgroundColor: themeColor("card"),
     },
   },
 };
@@ -119,8 +120,8 @@ function HonorStatusBadge({ isActive }: { isActive: boolean }) {
     <Badge
       className={
         isActive
-          ? "bg-emerald-50 text-emerald-700"
-          : "bg-slate-100 text-slate-600"
+          ? "bg-primary/10 text-primary"
+          : "bg-muted text-muted-foreground"
       }
     >
       {isActive ? "Active" : "Inactive"}
@@ -280,7 +281,7 @@ export default function HonorsPage() {
       cell: (honor) => (
         <div className="flex items-center gap-3 py-3">
           {honor.image && typeof honor.image === "string" && (
-            <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200 bg-white flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-border bg-card flex items-center justify-center">
               <img
                 src={resolveAssetUrl(honor.image)}
                 className="w-full h-full object-contain"
@@ -288,7 +289,7 @@ export default function HonorsPage() {
             </div>
           )}
 
-          <p className="text-sm font-semibold text-slate-900 truncate">
+          <p className="text-sm font-semibold text-foreground truncate">
             {honor.title}
           </p>
         </div>
@@ -312,7 +313,7 @@ export default function HonorsPage() {
       name: "Updated",
       width: "140px",
       cell: (honor) => (
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-muted-foreground">
           {formatDate(honor.updatedAt ?? honor.createdAt)}
         </span>
       ),
@@ -327,7 +328,7 @@ export default function HonorsPage() {
             type="button"
             variant="ghost"
             size="icon"
-            className="rounded-xl text-slate-500 hover:bg-amber-50 hover:text-amber-700"
+            className="rounded-xl text-muted-foreground hover:bg-accent hover:text-secondary"
             onClick={() => openEdit(honor)}
           >
             <Pencil size={15} />
@@ -336,7 +337,7 @@ export default function HonorsPage() {
             type="button"
             variant="ghost"
             size="icon"
-            className="rounded-xl text-slate-500"
+            className="rounded-xl text-muted-foreground"
             onClick={() => setDeleteTarget(honor)}
           >
             <Trash2 size={15} />
@@ -355,7 +356,7 @@ export default function HonorsPage() {
           <Button
             type="button"
             onClick={openAdd}
-            className="w-full gap-2 rounded-xl bg-[#D89F00] shadow-sm sm:w-auto"
+            className="w-full gap-2 rounded-xl bg-primary shadow-sm sm:w-auto"
           >
             <Plus size={16} />
             Add honor
@@ -363,14 +364,14 @@ export default function HonorsPage() {
         }
       />
 
-      <Card className="rounded-3xl border-slate-100 shadow-sm">
-        <CardHeader className="gap-4 border-b border-slate-100 pb-5">
+      <Card className="rounded-3xl border-border shadow-sm">
+        <CardHeader className="gap-4 border-b border-border pb-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <CardTitle className="text-xl text-slate-900">
+              <CardTitle className="text-xl text-foreground">
                 Honors list
               </CardTitle>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Active honors appear on the website API, while this admin list
                 includes inactive records too.
               </p>
@@ -379,13 +380,13 @@ export default function HonorsPage() {
             <div className="relative w-full max-w-md">
               <Search
                 size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               />
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search honors..."
-                className="h-11 rounded-xl border-slate-200 pl-9"
+                className="h-11 rounded-xl border-border pl-9"
               />
             </div>
           </div>
@@ -402,14 +403,14 @@ export default function HonorsPage() {
             customStyles={tableStyles}
             noDataComponent={
               <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-                <div className="rounded-full bg-amber-50 p-4 text-amber-600">
+                <div className="rounded-full bg-accent p-4 text-secondary">
                   <Award size={24} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-foreground">
                     No honors found
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     Add the first honor to populate this section.
                   </p>
                 </div>
@@ -423,7 +424,7 @@ export default function HonorsPage() {
         open={modalOpen}
         onOpenChange={(nextOpen) => !nextOpen && resetForm()}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-slate-200 sm:max-w-2xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{editTarget ? "Edit honor" : "Add honor"}</DialogTitle>
             <DialogDescription>
@@ -466,12 +467,12 @@ export default function HonorsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3">
+              <div className="flex items-center justify-between rounded-2xl border border-border px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">
+                  <p className="text-sm font-medium text-foreground">
                     Active on website
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Turn this off to hide the honor from the public API.
                   </p>
                 </div>
@@ -487,14 +488,14 @@ export default function HonorsPage() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-xl border-slate-200"
+              className="rounded-xl border-border"
               onClick={resetForm}
             >
               Cancel
             </Button>
             <Button
               type="button"
-              className="rounded-xl bg-[#D89F00]"
+              className="rounded-xl bg-primary"
               onClick={() => void handleSave()}
               disabled={addMutation.isPending || updateMutation.isPending}
             >
