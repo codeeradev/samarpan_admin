@@ -384,16 +384,31 @@ export function loadCachedTheme(): ThemeColors | null {
   }
 
   try {
-    const parsed = JSON.parse(rawTheme) as ThemeColors | ThemeItem;
-    const themeColors: Partial<ThemeColors> =
+    const parsed = JSON.parse(rawTheme);
+    
+    // Handle ThemeItem format (has colors property)
+    if (
       typeof parsed === "object" &&
       parsed !== null &&
       "colors" in parsed &&
-      parsed.colors
-        ? parsed.colors
-        : (parsed as ThemeColors);
+      typeof parsed.colors === "object" &&
+      parsed.colors !== null &&
+      "light" in parsed.colors
+    ) {
+      return normalizeThemeColors(parsed.colors as Partial<ThemeColors>);
+    }
+    
+    // Handle direct ThemeColors format
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      "light" in parsed &&
+      "dark" in parsed
+    ) {
+      return normalizeThemeColors(parsed as Partial<ThemeColors>);
+    }
 
-    return normalizeThemeColors(themeColors);
+    return null;
   } catch {
     return null;
   }

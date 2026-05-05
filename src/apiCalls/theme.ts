@@ -88,6 +88,8 @@ export interface WebsiteThemeColors {
 export interface ThemeItem {
   _id: string;
   name: ThemeType;
+  logo?: string;
+  favicon?: string;
   colors: ThemeColors | WebsiteThemeColors;
 }
 
@@ -114,13 +116,25 @@ export const getThemeApi = async (
 export const upsertThemeApi = async (
   name: ThemeType,
   colors: ThemeColors | WebsiteThemeColors,
+  logoFile?: File | null,
+  faviconFile?: File | null
 ): Promise<ThemeItem> => {
   try {
-    const res = await post(
-      `${ENDPOINT.UPSERT_THEME}?name=${name}`,
-      { colors },
-      { needAuth: true },
-    );
+    const formData = new FormData();
+
+    formData.append("colors", JSON.stringify(colors));
+
+    if (logoFile) {
+      formData.append("logo", logoFile);
+    }
+
+    if (faviconFile) {
+      formData.append("favicon", faviconFile);
+    }
+
+    const res = await post(`${ENDPOINT.UPSERT_THEME}?name=${name}`, formData, {
+      needAuth: true,
+    });
 
     return res?.data?.theme;
   } catch (error: any) {

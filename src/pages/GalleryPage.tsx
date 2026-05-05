@@ -15,11 +15,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { BASE_URL } from "@/apis/endpoint";
 
-import { Eye, Plus, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import {
   addGalleryApi,
   deleteGalleryApi,
   getAllGalleryApi,
+  updateGalleryApi,
   type GalleryItem,
 } from "@/apiCalls/gallery";
 
@@ -28,17 +29,29 @@ const GALLERY_QUERY_KEY = ["gallery"];
 export default function GalleryPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [caption, setCaption] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewTarget, setPreviewTarget] = useState<GalleryItem | null>(null);
+
+  const [editTarget, setEditTarget] = useState<GalleryItem | null>(null);
+  const [editCaption, setEditCaption] = useState("");
 
   const { data: gallery = [], isLoading } = useQuery({
     queryKey: GALLERY_QUERY_KEY,
     queryFn: getAllGalleryApi,
   });
 
-  const addMutation = useMutation({ mutationFn: addGalleryApi });
+  const addMutation = useMutation({
+    mutationFn: ({ image, caption }: { image: File; caption: string }) =>
+      addGalleryApi(image, caption),
+  });
   const deleteMutation = useMutation({ mutationFn: deleteGalleryApi });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, caption }: { id: string; caption: string }) =>
+      updateGalleryApi(id, caption),
+  });
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
@@ -61,12 +74,13 @@ export default function GalleryPage() {
     }
 
     try {
-      await addMutation.mutateAsync(image);
+      await addMutation.mutateAsync({ image, caption });
       toast.success("Gallery image added");
       queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
       setOpen(false);
       setImage(null);
       setPreviewUrl(null);
+      setCaption("");
     } catch (error) {
       toast.error("Unable to upload image.");
     }
@@ -83,6 +97,11 @@ export default function GalleryPage() {
   const galleryRows = useMemo(() => gallery, [gallery]);
 
   const columns: Column<GalleryItem>[] = [
+    {
+      key: "caption",
+      header: "Caption",
+      render: (item) => <span className="text-sm">{item.caption || "—"}</span>,
+    },
     {
       key: "image",
       header: "Image",
@@ -124,6 +143,16 @@ export default function GalleryPage() {
           <Button
             size="icon"
             variant="ghost"
+            onClick={() => {
+              setEditTarget(item);
+              setEditCaption(item.caption || "");
+            }}
+          >
+            <Pencil size={14} />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
             onClick={() => handleDelete(item._id)}
             aria-label="Delete image"
           >
@@ -154,7 +183,7 @@ export default function GalleryPage() {
         data={galleryRows}
         isLoading={isLoading}
         searchable
-        searchKeys={["image"] as (keyof GalleryItem)[]}
+        searchKeys={["image", "caption"] as (keyof GalleryItem)[]}
         emptyText="No images uploaded yet."
         rowKey={(row) => row._id}
         data-ocid="gallery.table"
@@ -165,6 +194,13 @@ export default function GalleryPage() {
           <DialogHeader>
             <DialogTitle>Add Gallery Image</DialogTitle>
           </DialogHeader>
+
+          <Input
+            type="text"
+            placeholder="Enter caption"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+          />
           <div className="space-y-4">
             <Input type="file" accept="image/*" onChange={handleImageChange} />
             {previewUrl && (
@@ -200,6 +236,41 @@ export default function GalleryPage() {
               />
             </div>
           )}
+
+          {previewTarget?.caption && (
+            <p className="mt-3 text-sm text-muted-foreground text-center">
+              {previewTarget.caption}
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!editTarget} onOpenChange={() => setEditTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Caption</DialogTitle>
+          </DialogHeader>
+
+          <Input
+            value={editCaption}
+            onChange={(e) => setEditCaption(e.target.value)}
+          />
+
+          <Button
+            onClick={async () => {
+              if (!editTarget) return;
+
+              await updateMutation.mutateAsync({
+                id: editTarget._id,
+                caption: editCaption,
+              });
+
+              toast.success("Caption updated");
+              queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+              setEditTarget(null);
+            }}
+          >
+            Update
+          </Button>
         </DialogContent>
       </Dialog>
     </div>

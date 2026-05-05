@@ -18,6 +18,7 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import DOMPurify from "dompurify";
 import {
   Select,
   SelectContent,
@@ -33,14 +34,12 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  getApiErrorMessage,
-  mapApiErrorsToFields,
-} from "@/lib/api-errors";
+import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
 
 import { toast } from "sonner";
 import { Eye, Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import PageEditor from "@/components/editor/pageEditor";
 
 const BLOG_QUERY_KEY = ["blogs"];
 const SERVICES_QUERY_KEY = ["services"];
@@ -59,7 +58,13 @@ type BlogFormState = {
 
 type BlogFormErrors = Partial<
   Record<
-    "title" | "serviceId" | "shortDescription" | "content" | "metaTitle" | "metaDescription" | "image",
+    | "title"
+    | "serviceId"
+    | "shortDescription"
+    | "content"
+    | "metaTitle"
+    | "metaDescription"
+    | "image",
     string
   >
 >;
@@ -96,7 +101,7 @@ function validateBlogForm(
     errors.shortDescription = "Short description cannot exceed 300 characters.";
   }
 
-  if (!form.content.trim()) {
+  if (!form.content) {
     errors.content = "Content is required.";
   }
 
@@ -105,7 +110,8 @@ function validateBlogForm(
   }
 
   if (form.metaDescription.trim().length > 160) {
-    errors.metaDescription = "Meta description should stay within 160 characters.";
+    errors.metaDescription =
+      "Meta description should stay within 160 characters.";
   }
 
   if (mode === "add" && !form.image) {
@@ -427,10 +433,16 @@ export default function BlogsPage() {
                     <Input
                       value={form.title}
                       onChange={(e) => setField("title", e.target.value)}
-                      className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : undefined}
+                      className={
+                        formErrors.title
+                          ? "border-destructive focus-visible:ring-destructive"
+                          : undefined
+                      }
                     />
                     {formErrors.title ? (
-                      <p className="text-xs text-destructive">{formErrors.title}</p>
+                      <p className="text-xs text-destructive">
+                        {formErrors.title}
+                      </p>
                     ) : null}
                   </div>
 
@@ -442,7 +454,13 @@ export default function BlogsPage() {
                       value={form.serviceId}
                       onValueChange={(v) => setField("serviceId", v)}
                     >
-                      <SelectTrigger className={formErrors.serviceId ? "border-destructive focus-visible:ring-destructive" : undefined}>
+                      <SelectTrigger
+                        className={
+                          formErrors.serviceId
+                            ? "border-destructive focus-visible:ring-destructive"
+                            : undefined
+                        }
+                      >
                         <SelectValue placeholder="Select Service" />
                       </SelectTrigger>
                       <SelectContent>
@@ -493,7 +511,11 @@ export default function BlogsPage() {
                       setField("shortDescription", e.target.value)
                     }
                     maxLength={300}
-                    className={formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : undefined}
+                    className={
+                      formErrors.shortDescription
+                        ? "border-destructive focus-visible:ring-destructive"
+                        : undefined
+                    }
                   />
                   <div className="flex items-center justify-between gap-3 text-xs">
                     {formErrors.shortDescription ? (
@@ -511,15 +533,15 @@ export default function BlogsPage() {
                   </div>
                 </div>
 
-                <Textarea
-                  placeholder="Blog Content"
-                  rows={8}
+                <PageEditor
                   value={form.content}
-                  onChange={(e) => setField("content", e.target.value)}
-                  className={formErrors.content ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  onChange={(val) => setField("content", val)}
+                  // className={formErrors.content ? "border-destructive focus-visible:ring-destructive" : undefined}
                 />
                 {formErrors.content ? (
-                  <p className="text-xs text-destructive">{formErrors.content}</p>
+                  <p className="text-xs text-destructive">
+                    {formErrors.content}
+                  </p>
                 ) : null}
               </CardContent>
             </Card>
@@ -533,7 +555,11 @@ export default function BlogsPage() {
                   value={form.metaTitle}
                   onChange={(e) => setField("metaTitle", e.target.value)}
                   maxLength={60}
-                  className={formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={
+                    formErrors.metaTitle
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
                 />
                 <div className="flex items-center justify-between gap-3 text-xs">
                   {formErrors.metaTitle ? (
@@ -543,7 +569,9 @@ export default function BlogsPage() {
                       Search engines usually show about 60 characters.
                     </p>
                   )}
-                  <span className="text-muted-foreground">{form.metaTitle.length}/60</span>
+                  <span className="text-muted-foreground">
+                    {form.metaTitle.length}/60
+                  </span>
                 </div>
 
                 <Textarea
@@ -551,11 +579,17 @@ export default function BlogsPage() {
                   value={form.metaDescription}
                   onChange={(e) => setField("metaDescription", e.target.value)}
                   maxLength={160}
-                  className={formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={
+                    formErrors.metaDescription
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
                 />
                 <div className="flex items-center justify-between gap-3 text-xs">
                   {formErrors.metaDescription ? (
-                    <p className="text-destructive">{formErrors.metaDescription}</p>
+                    <p className="text-destructive">
+                      {formErrors.metaDescription}
+                    </p>
                   ) : (
                     <p className="text-muted-foreground">
                       Search snippets usually fit within 160 characters.
@@ -650,9 +684,11 @@ export default function BlogsPage() {
 
               <div className="rounded-2xl border border-border bg-card p-4">
                 <p className="text-sm font-semibold text-foreground">Content</p>
-                <p className="mt-2 text-sm leading-7 text-foreground whitespace-pre-wrap">
-                  {previewTarget.content || "—"}
-                </p>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(previewTarget.content || ""),
+                  }}
+                />
               </div>
             </div>
           )}

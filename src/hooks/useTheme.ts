@@ -5,41 +5,82 @@ import {
   applyThemeColors,
   cachePanelTheme,
   getDefaultPanelTheme,
+  loadCachedTheme,
 } from "@/lib/theme";
 
 /**
  * Hook to load and apply panel theme
  * Should be called after authentication check
+ * Listens to localStorage changes and applies theme on mount and tab focus
  */
 export function useTheme() {
   const { admin } = useAuth();
 
   useEffect(() => {
-    if (!admin) return;
-
+    // Initial theme load from cache/API
     const loadAndApplyTheme = async () => {
       try {
-        // Fetch theme from API
+        // Try to fetch fresh theme from API
         const themeData = await getThemeApi("panel");
 
         if (themeData?.colors) {
-          // Apply fetched theme
-          applyThemeColors(themeData.colors);
-          // Cache in localStorage
-          cachePanelTheme(themeData.colors);
-        } else {
-          // Fallback to default if API returns nothing
-          const defaultTheme = getDefaultPanelTheme();
-          applyThemeColors(defaultTheme.colors);
+          applyThemeColors(themeData.colors as any);
+          cachePanelTheme(themeData.colors as any);
+          return;
         }
       } catch (error) {
-        console.warn("Failed to load theme from API, using default:", error);
-        // Fallback to default on error
-        const defaultTheme = getDefaultPanelTheme();
-        applyThemeColors(defaultTheme.colors);
+        // If API fails, try cached theme
+      }
+
+      // Fallback to cached theme
+      const cachedTheme = loadCachedTheme();
+      if (cachedTheme) {
+        applyThemeColors(cachedTheme);
+        return;
+      }
+
+      // Last resort - use default
+      const defaultTheme = getDefaultPanelTheme();
+      applyThemeColors(defaultTheme.colors);
+    };
+
+    if (admin) {
+      loadAndApplyTheme();
+    }
+  }, [admin]);
+
+  // Listen for storage changes (theme saved in another tab or the theme page)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "panel-theme" && e.newValue) {
+        try {
+          const cachedTheme = loadCachedTheme();
+          if (cachedTheme) {
+            applyThemeColors(cachedTheme);
+          }
+        } catch (error) {
+          console.warn("Failed to apply theme from storage:", error);
+        }
       }
     };
 
-    loadAndApplyTheme();
-  }, [admin]);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Re-apply theme when tab regains focus (ensures sidebar colors update)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        const cachedTheme = loadCachedTheme();
+        if (cachedTheme) {
+          applyThemeColors(cachedTheme);
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 }

@@ -24,6 +24,7 @@ import {
 import { RotateCcw, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { resolveAssetUrl } from "./website-content/types";
 
 type ThemeMode = "light" | "dark";
 type ThemeSectionKey = keyof ThemeColors["light"];
@@ -54,11 +55,11 @@ const THEME_SECTIONS = [
     title: "Base",
     description: "Main surface, text, inputs, outlines and focus states.",
     fields: [
-      { key: "background", label: "Background" },
-      { key: "foreground", label: "Foreground" },
-      { key: "border", label: "Border" },
-      { key: "input", label: "Input" },
-      { key: "ring", label: "Ring" },
+      { key: "background", label: "Page Background Color" },
+      { key: "foreground", label: "Main Text Color" },
+      { key: "border", label: "Border / Divider Color" },
+      { key: "input", label: "Input Field Background" },
+      { key: "ring", label: "Focus Highlight (when clicking input)" },
     ],
   },
   {
@@ -66,12 +67,27 @@ const THEME_SECTIONS = [
     title: "Interactive",
     description: "Buttons, badges, accents and destructive actions.",
     fields: [
-      { key: "primary", label: "Primary" },
-      { key: "primaryForeground", label: "Primary Foreground" },
-      { key: "secondary", label: "Secondary" },
-      { key: "secondaryForeground", label: "Secondary Foreground" },
-      { key: "accent", label: "Accent" },
-      { key: "accentForeground", label: "Accent Foreground" },
+      { key: "primary", label: "Main Button Color" },
+      { key: "primaryForeground", label: "Main Button Text" },
+      { key: "secondary", label: "Secondary Button Color" },
+      { key: "secondaryForeground", label: "Secondary Button Text" },
+      { key: "accent", label: "Highlight / Special Color" },
+      { key: "accentForeground", label: "Highlight Text" },
+    ],
+  },
+  {
+    key: "sidebar",
+    title: "Sidebar",
+    description: "Navigation-specific colors for the admin shell.",
+    fields: [
+      { key: "background", label: "Sidebar Background" },
+      { key: "foreground", label: "Sidebar Text" },
+      { key: "primary", label: "Active Menu Item" },
+      { key: "primaryForeground", label: "Active Menu Text" },
+      { key: "accent", label: "Hover Color" },
+      { key: "accentForeground", label: "Hover Text" },
+      { key: "border", label: "Sidebar Border" },
+      { key: "ring", label: "Focus Highlight" },
     ],
   },
 ] as const;
@@ -89,6 +105,10 @@ export default function ThemePage() {
   const [websiteColors, setWebsiteColors] =
     useState<WebsiteColors>(defaultWebsiteColors);
 
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -101,6 +121,17 @@ export default function ThemePage() {
     [activeMode, colors],
   );
 
+  function getLogoSrc(path?: string | null) {
+    if (!path) return "";
+
+    // blob or full URL → direct use
+    if (path.startsWith("blob:") || path.startsWith("http")) {
+      return path;
+    }
+
+    // backend relative path
+    return resolveAssetUrl(path);
+  }
   /* =========================
      LOAD THEME
   ========================= */
@@ -114,10 +145,20 @@ export default function ThemePage() {
           ...defaultWebsiteColors,
           ...(data?.colors || {}),
         });
+
+        if (data?.logo) {
+          setLogoPreview(data.logo);
+        }
+
+        if (data?.favicon) {
+          setFaviconPreview(data.favicon);
+        }
+
         return;
       }
 
-      const panelColors = (data?.colors as ThemeColors) ?? getDefaultThemeColors(type);
+      const panelColors =
+        (data?.colors as ThemeColors) ?? getDefaultThemeColors(type);
       const nextColors = normalizeThemeColors(panelColors);
 
       setColors(nextColors);
@@ -133,7 +174,7 @@ export default function ThemePage() {
      PANEL UPDATE (UNCHANGED)
   ========================= */
   function updateColor(
-    sectionKey: "base" | "interactive",
+    sectionKey: ThemeSectionKey,
     fieldKey: string,
     value: string,
   ) {
@@ -173,6 +214,10 @@ export default function ThemePage() {
   function handleReset() {
     if (activeTab === "website") {
       setWebsiteColors(defaultWebsiteColors);
+      setLogoFile(null);
+      setLogoPreview(null);
+      setFaviconFile(null);
+      setFaviconPreview(null);
       return;
     }
 
@@ -197,7 +242,12 @@ export default function ThemePage() {
           }
         }
 
-        await upsertThemeApi("website", websiteColors as any);
+        await upsertThemeApi(
+          "website",
+          websiteColors as any,
+          logoFile,
+          faviconFile,
+        );
 
         toast.success("Website theme saved");
         return;
@@ -208,6 +258,16 @@ export default function ThemePage() {
 
       applyThemeColors(normalized);
       cachePanelTheme(normalized);
+
+      // Trigger storage event so other listeners know theme changed
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: "panel-theme",
+          newValue: JSON.stringify(normalized),
+          oldValue: null,
+          storageArea: localStorage,
+        }),
+      );
 
       toast.success("Panel theme saved");
     } catch (error: any) {
@@ -370,7 +430,9 @@ export default function ThemePage() {
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-4">
                   {section.fields.map((field) => {
-                    const value = (colors[activeMode] as any)[section.key][field.key] as string;
+                    const value = (colors[activeMode] as any)[section.key][
+                      field.key
+                    ] as string;
 
                     return (
                       <div key={field.key}>
@@ -419,6 +481,97 @@ export default function ThemePage() {
           </CardHeader>
 
           <CardContent className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <Label className="mb-2 block">Website Logo</Label>
+
+              <div className="border-2 border-dashed rounded-2xl p-4 text-center relative hover:border-primary transition cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setLogoFile(file);
+                    setLogoPreview(file ? URL.createObjectURL(file) : null);
+                  }}
+                />
+
+                {!logoPreview ? (
+                  <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+                    <p className="text-sm font-medium">
+                      Click or drag image to upload
+                    </p>
+                    <p className="text-xs">PNG, JPG (recommended 200x80)</p>
+                  </div>
+                ) : (
+                  <div className="relative flex flex-col items-center gap-3">
+                    <img
+                      src={getLogoSrc(logoPreview)}
+                      alt="Logo preview"
+                      className="h-16 object-contain"
+                    />
+
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setLogoFile(null);
+                          setLogoPreview(null);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="col-span-2">
+              <Label className="mb-2 block">Favicon</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                This icon appears in browser tabs
+              </p>
+              <div className="border-2 border-dashed rounded-2xl p-4 text-center relative hover:border-primary transition cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setFaviconFile(file);
+                    setFaviconPreview(file ? URL.createObjectURL(file) : null);
+                  }}
+                />
+
+                {!faviconPreview ? (
+                  <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+                    <p className="text-sm font-medium">Upload favicon</p>
+                    <p className="text-xs">Recommended 32x32 or 64x64</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3">
+                    <img
+                      src={getLogoSrc(faviconPreview)}
+                      alt="Favicon preview"
+                      className="h-10 w-10 object-contain"
+                    />
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setFaviconFile(null);
+                        setFaviconPreview(null);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
             {Object.entries(websiteColors).map(([key, value]) => (
               <div key={key}>
                 <Label className="capitalize">{key.replace("_", " ")}</Label>
@@ -432,7 +585,7 @@ export default function ThemePage() {
                         e.target.value,
                       )
                     }
-                    className="h-11 w-16 rounded-xl p-1"
+                    className="h-11 w-16 mt-2 rounded-xl p-1"
                   />
                   <Input
                     value={value}
