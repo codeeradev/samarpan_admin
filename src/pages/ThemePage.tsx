@@ -117,10 +117,8 @@ export default function ThemePage() {
         return;
       }
 
-      const nextColors = normalizeThemeColors(
-        data?.colors as ThemeColors | undefined,
-        getDefaultThemeColors(type),
-      );
+      const panelColors = (data?.colors as ThemeColors) ?? getDefaultThemeColors(type);
+      const nextColors = normalizeThemeColors(panelColors);
 
       setColors(nextColors);
       applyThemeColors(nextColors);
