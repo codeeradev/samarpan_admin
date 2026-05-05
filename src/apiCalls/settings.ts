@@ -22,6 +22,7 @@ export interface SettingsItem {
   term_and_condition?: string;
   privacy_policy?: string;
   about_us?: string;
+  website_logo?: string;
   google_reviews?: {
     place_id?: string;
     api_key?: string;
@@ -62,22 +63,35 @@ export const getSettingsApi = async (): Promise<SettingsItem> => {
 
 export const updateSettingsApi = async (
   payload: Partial<SettingsItem>,
+  files?: { logo?: File | null }
 ): Promise<SettingsItem> => {
   try {
-    const body: any = { ...payload };
+    const formData = new FormData();
 
-    if (payload.social_links) {
-      body.social_links = JSON.stringify(payload.social_links);
+    // normal fields
+    Object.keys(payload).forEach((key) => {
+      const value = payload[key as keyof SettingsItem];
+
+      if (key === "social_links") {
+        formData.append(key, JSON.stringify(value));
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
+    // file
+    if (files?.logo) {
+      formData.append("image", files.logo);
     }
 
-    const res = await post(ENDPOINT.UPDATE_SETTINGS, body, {
+    const res = await post(ENDPOINT.UPDATE_SETTINGS, formData, {
       needAuth: true,
     });
 
     return res?.data?.data;
   } catch (error: any) {
     throw new Error(
-      error.response?.data?.message ?? "Failed to update settings",
+      error.response?.data?.message ?? "Failed to update settings"
     );
   }
 };

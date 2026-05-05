@@ -71977,14 +71977,22 @@ const getSettingsApi = async () => {
     );
   }
 };
-const updateSettingsApi = async (payload) => {
+const updateSettingsApi = async (payload, files) => {
   var _a2, _b2, _c2;
   try {
-    const body = { ...payload };
-    if (payload.social_links) {
-      body.social_links = JSON.stringify(payload.social_links);
+    const formData = new FormData();
+    Object.keys(payload).forEach((key) => {
+      const value = payload[key];
+      if (key === "social_links") {
+        formData.append(key, JSON.stringify(value));
+      } else if (value !== void 0 && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+    if (files == null ? void 0 : files.logo) {
+      formData.append("image", files.logo);
     }
-    const res = await post(ENDPOINT.UPDATE_SETTINGS, body, {
+    const res = await post(ENDPOINT.UPDATE_SETTINGS, formData, {
       needAuth: true
     });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.data;
@@ -72015,6 +72023,8 @@ function SettingsPage() {
   const [settingsSaving, setSettingsSaving] = reactExports.useState(false);
   const [accountSaving, setAccountSaving] = reactExports.useState(false);
   const [passwordSaving, setPasswordSaving] = reactExports.useState(false);
+  const [logoFile, setLogoFile] = reactExports.useState(null);
+  const [logoPreview, setLogoPreview] = reactExports.useState(null);
   const [accountForm, setAccountForm] = reactExports.useState({
     name: "",
     email: "",
@@ -72043,18 +72053,25 @@ function SettingsPage() {
       setLoading(true);
       const data = await getSettingsApi();
       setSettings(data);
+      if (data == null ? void 0 : data.website_logo) {
+        setLogoPreview(data.website_logo);
+      }
     } catch (err) {
       ue$2.error(err.message);
     } finally {
       setLoading(false);
     }
   }
-  async function saveSettings(payload) {
+  async function saveSettings(payload, files) {
     try {
       setSettingsSaving(true);
       const body = payload ?? settings;
-      const updated = await updateSettingsApi(body ?? {});
+      const updated = await updateSettingsApi(body ?? {}, files);
       setSettings(updated);
+      if (updated.website_logo) {
+        setLogoPreview(updated.website_logo);
+        setLogoFile(null);
+      }
       ue$2.success("Business settings updated successfully.");
     } catch (err) {
       ue$2.error(err.message);
@@ -72337,6 +72354,63 @@ function SettingsPage() {
             }
           )
         ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "Website Logo" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Upload logo used across the website." })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "mb-2 block", children: "Website Logo" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-2 border-dashed rounded-2xl p-4 text-center relative hover:border-primary transition cursor-pointer", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "file",
+                accept: "image/*",
+                className: "absolute inset-0 opacity-0 cursor-pointer",
+                onChange: (e3) => {
+                  var _a3;
+                  const file = ((_a3 = e3.target.files) == null ? void 0 : _a3[0]) || null;
+                  setLogoFile(file);
+                  setLogoPreview(file ? URL.createObjectURL(file) : null);
+                }
+              }
+            ),
+            !logoPreview ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "py-6 text-muted-foreground", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium", children: "Click or drag image to upload" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs", children: "PNG, JPG (recommended 200x80)" })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: logoPreview.startsWith("blob") ? logoPreview : resolveAssetUrl(logoPreview),
+                  className: "h-16 object-contain"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  size: "sm",
+                  variant: "outline",
+                  onClick: () => {
+                    setLogoFile(null);
+                    setLogoPreview(null);
+                  },
+                  children: "Remove"
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              className: "mt-4",
+              onClick: () => saveSettings({}, { logo: logoFile }),
+              children: "Save Logo"
+            }
+          )
+        ] }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [

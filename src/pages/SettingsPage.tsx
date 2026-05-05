@@ -34,6 +34,7 @@ import {
   updateSettingsApi,
   type SettingsItem,
 } from "@/apiCalls/settings";
+import { resolveAssetUrl } from "./website-content/types";
 
 type AccountFormState = {
   name: string;
@@ -49,6 +50,8 @@ export default function SettingsPage() {
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [accountSaving, setAccountSaving] = useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const [accountForm, setAccountForm] = useState<AccountFormState>({
     name: "",
@@ -83,6 +86,11 @@ export default function SettingsPage() {
       setLoading(true);
       const data = await getSettingsApi();
       setSettings(data);
+
+      if (data?.website_logo) {
+        setLogoPreview(data.website_logo);
+      }
+      
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -90,12 +98,21 @@ export default function SettingsPage() {
     }
   }
 
-  async function saveSettings(payload?: Partial<SettingsItem>) {
+  async function saveSettings(
+    payload?: Partial<SettingsItem>,
+    files?: { logo?: File | null },
+  ) {
     try {
       setSettingsSaving(true);
       const body = payload ?? settings;
-      const updated = await updateSettingsApi(body ?? {});
+      const updated = await updateSettingsApi(body ?? {}, files);
       setSettings(updated);
+
+      if (updated.website_logo) {
+        setLogoPreview(updated.website_logo);
+        setLogoFile(null);
+      }
+
       toast.success("Business settings updated successfully.");
     } catch (err: any) {
       toast.error(err.message);
@@ -426,6 +443,72 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle>Website Logo</CardTitle>
+            <CardDescription>
+              Upload logo used across the website.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <div>
+              <Label className="mb-2 block">Website Logo</Label>
+
+              <div className="border-2 border-dashed rounded-2xl p-4 text-center relative hover:border-primary transition cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setLogoFile(file);
+                    setLogoPreview(file ? URL.createObjectURL(file) : null);
+                  }}
+                />
+
+                {!logoPreview ? (
+                  <div className="py-6 text-muted-foreground">
+                    <p className="text-sm font-medium">
+                      Click or drag image to upload
+                    </p>
+                    <p className="text-xs">PNG, JPG (recommended 200x80)</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3">
+                    <img
+                      src={
+                        logoPreview.startsWith("blob")
+                          ? logoPreview
+                          : resolveAssetUrl(logoPreview)
+                      }
+                      className="h-16 object-contain"
+                    />
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setLogoFile(null);
+                        setLogoPreview(null);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <Button
+                className="mt-4"
+                onClick={() => saveSettings({}, { logo: logoFile })}
+              >
+                Save Logo
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Social Links</CardTitle>
             <CardDescription>
               Website footer, contact, and social CTA links.
@@ -503,7 +586,7 @@ export default function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
-        
+
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>CMS Content</CardTitle>
