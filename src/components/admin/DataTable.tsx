@@ -9,8 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Search,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface Column<T> {
   key: keyof T | string;
@@ -27,15 +33,18 @@ interface DataTableProps<T> {
   searchKeys?: (keyof T)[];
   emptyText?: string;
   rowKey: (row: T) => string;
-  /** Optional: custom mobile card renderer per row */
   mobileCardRender?: (item: T, idx: number) => React.ReactNode;
+  pageSize?: number;
+  pageSizeOptions?: number[];
   "data-ocid"?: string;
 }
 
 function getCellValue<T>(row: T, key: keyof T | string): React.ReactNode {
   const value = row[key as keyof T];
+
   if (value === null || value === undefined) return "—";
   if (typeof value === "boolean") return value ? "Yes" : "No";
+
   return String(value);
 }
 
@@ -50,13 +59,19 @@ export function DataTable<T>({
   emptyText = "No records found.",
   rowKey,
   mobileCardRender,
+  pageSize = 10,
+  pageSizeOptions = [10, 20, 50, 100],
   "data-ocid": dataOcid,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(pageSize);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filtered = useMemo(() => {
     if (!searchable || !search.trim()) return data;
+
     const q = search.toLowerCase();
+
     return data.filter((row) =>
       searchKeys.some((k) =>
         String(row[k] ?? "")
@@ -66,6 +81,26 @@ export function DataTable<T>({
     );
   }, [data, search, searchable, searchKeys]);
 
+  const totalPages = Math.ceil(filtered.length / rowsPerPage);
+
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filtered.slice(start, end);
+  }, [filtered, currentPage, rowsPerPage]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
+
+  const startRow =
+    filtered.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+
+  const endRow = Math.min(currentPage * rowsPerPage, filtered.length);
+
   return (
     <div className="space-y-3" data-ocid={dataOcid}>
       {searchable && (
@@ -74,10 +109,14 @@ export function DataTable<T>({
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
+
           <Input
-            placeholder="Search…"
+            placeholder="Search..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             className="pl-8 h-9 text-sm border-border rounded-xl w-full"
             data-ocid={
               dataOcid ? `${dataOcid}.search_input` : "table.search_input"
@@ -86,7 +125,7 @@ export function DataTable<T>({
         </div>
       )}
 
-      {/* ── Mobile card view (< md) ───────────────────────────────── */}
+      {/* MOBILE */}
       <div className="md:hidden space-y-2">
         {isLoading ? (
           SKELETON_IDS.map((sk) => (
@@ -101,38 +140,35 @@ export function DataTable<T>({
               </CardContent>
             </Card>
           ))
-        ) : filtered.length === 0 ? (
+        ) : paginatedData.length === 0 ? (
           <Card className="shadow-card border border-border rounded-xl">
             <CardContent className="p-8 text-center text-muted-foreground text-sm">
               {emptyText}
             </CardContent>
           </Card>
         ) : (
-          filtered.map((row, idx) =>
+          paginatedData.map((row, idx) =>
             mobileCardRender ? (
-              <div
-                key={rowKey(row)}
-                data-ocid={dataOcid ? `${dataOcid}.item.${idx + 1}` : undefined}
-              >
+              <div key={rowKey(row)}>
                 {mobileCardRender(row, idx)}
               </div>
             ) : (
               <Card
                 key={rowKey(row)}
                 className="shadow-card border border-border rounded-xl overflow-hidden"
-                data-ocid={dataOcid ? `${dataOcid}.item.${idx + 1}` : undefined}
               >
                 <CardContent className="p-4">
                   <dl className="space-y-2">
                     {columns.map((col) => (
                       <div
                         key={String(col.key)}
-                        className="flex items-start gap-2 min-w-0"
+                        className="flex items-start gap-2"
                       >
-                        <dt className="text-xs font-semibold text-muted-foreground uppercase tracking-wide w-28 flex-shrink-0 pt-0.5">
+                        <dt className="text-xs font-semibold text-muted-foreground uppercase tracking-wide w-28 flex-shrink-0">
                           {col.header}
                         </dt>
-                        <dd className="text-sm text-foreground flex-1 min-w-0 break-words">
+
+                        <dd className="text-sm text-foreground flex-1 break-words">
                           {col.render
                             ? col.render(row)
                             : getCellValue(row, col.key)}
@@ -147,7 +183,7 @@ export function DataTable<T>({
         )}
       </div>
 
-      {/* ── Desktop/tablet table view (≥ md) ─────────────────────── */}
+      {/* DESKTOP */}
       <Card className="hidden md:block shadow-card border border-border rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -157,38 +193,44 @@ export function DataTable<T>({
                   {columns.map((col) => (
                     <TableHead
                       key={String(col.key)}
-                      className={`text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-4 ${col.className ?? ""}`}
+                      className={`text-xs font-semibold text-muted-foreground uppercase tracking-wide py-4 px-4 ${
+                        col.className ?? ""
+                      }`}
                     >
                       {col.header}
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
+
               <TableBody>
                 {isLoading ? (
                   SKELETON_IDS.map((sk) => (
-                    <TableRow key={sk} className="border-b border-border/60">
+                    <TableRow key={sk}>
                       {columns.map((col) => (
-                        <TableCell key={String(col.key)} className="px-4 py-3">
+                        <TableCell
+                          key={String(col.key)}
+                          className="px-4 py-4"
+                        >
                           <Skeleton className="h-4 w-3/4 rounded-md" />
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
-                ) : filtered.length === 0 ? (
+                ) : paginatedData.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="text-center py-12 text-muted-foreground text-sm"
+                      className="text-center py-14 text-muted-foreground text-sm"
                     >
                       {emptyText}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filtered.map((row, idx) => (
+                  paginatedData.map((row, idx) => (
                     <TableRow
                       key={rowKey(row)}
-                      className="border-b border-border/60 hover:bg-muted/60 transition-colors"
+                      className="border-b border-border/60 hover:bg-muted/40 transition-colors"
                       data-ocid={
                         dataOcid ? `${dataOcid}.item.${idx + 1}` : undefined
                       }
@@ -196,7 +238,9 @@ export function DataTable<T>({
                       {columns.map((col) => (
                         <TableCell
                           key={String(col.key)}
-                          className={`px-4 py-3 text-sm text-foreground ${col.className ?? ""}`}
+                          className={`px-4 py-4 text-sm text-foreground ${
+                            col.className ?? ""
+                          }`}
                         >
                           {col.render
                             ? col.render(row)
@@ -209,6 +253,76 @@ export function DataTable<T>({
               </TableBody>
             </Table>
           </div>
+
+          {/* PAGINATION */}
+          {!isLoading && filtered.length > 0 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-background">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Rows per page:</span>
+
+                <select
+                  value={rowsPerPage}
+                  onChange={(e) => {
+                    setRowsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="bg-transparent outline-none border-none text-foreground"
+                >
+                  {pageSizeOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <p className="text-sm text-muted-foreground">
+                  {startRow}-{endRow} of {filtered.length}
+                </p>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted disabled:opacity-40"
+                  >
+                    <ChevronsLeft size={18} />
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted disabled:opacity-40"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, totalPages),
+                      )
+                    }
+                    disabled={currentPage === totalPages}
+                    className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted disabled:opacity-40"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted disabled:opacity-40"
+                  >
+                    <ChevronsRight size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

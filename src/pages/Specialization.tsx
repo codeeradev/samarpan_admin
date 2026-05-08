@@ -7,7 +7,7 @@ import {
   useAddSpecialization,
   useDeleteSpecialization,
   useSpecializations,
-  useUpdateSpecialization
+  useUpdateSpecialization,
 } from "@/hooks/useSpecializations";
 
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -16,14 +16,11 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -37,11 +34,10 @@ interface FormState {
 const EMPTY_FORM: FormState = {
   name: "",
   sortOrder: 0,
-  isActive: true
+  isActive: true,
 };
 
 export default function SpecializationsPage() {
-
   const { data = [], isLoading } = useSpecializations();
 
   const addMutation = useAddSpecialization();
@@ -54,6 +50,8 @@ export default function SpecializationsPage() {
 
   const [search, setSearch] = useState("");
 
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+
   function openCreate() {
     setForm(EMPTY_FORM);
     setEditingId(null);
@@ -64,7 +62,7 @@ export default function SpecializationsPage() {
     setForm({
       name: item.name,
       sortOrder: item.sortOrder,
-      isActive: item.isActive
+      isActive: item.isActive,
     });
     setEditingId(item._id);
     setOpen(true);
@@ -77,70 +75,68 @@ export default function SpecializationsPage() {
   }
 
   function handleSubmit() {
-
     const payload = {
       name: form.name.trim(),
       sortOrder: form.sortOrder,
-      isActive: form.isActive
+      isActive: form.isActive,
     };
 
     if (editingId) {
-
       updateMutation.mutate(
         { id: editingId, payload },
         {
           onSuccess: () => {
             toast.success("Specialization updated");
             reset();
-          }
-        }
+          },
+        },
       );
-
     } else {
-
       addMutation.mutate(payload, {
         onSuccess: () => {
           toast.success("Specialization added");
           reset();
-        }
+        },
       });
-
     }
   }
 
-  function handleDelete(id: string) {
+  function handleDelete() {
+    if (!deleteTarget?._id) return;
 
-    if (!confirm("Delete specialization?")) return;
+    deleteMutation.mutate(deleteTarget._id, {
+      onSuccess: () => {
+        toast.success("Deleted successfully");
+        setDeleteTarget(null);
+      },
 
-    deleteMutation.mutate(id, {
-      onSuccess: () => toast.success("Deleted successfully")
+      onError: () => {
+        toast.error("Failed to delete specialization");
+      },
     });
-
   }
 
   function toggleStatus(item: any) {
-
     updateMutation.mutate({
       id: item._id,
-      payload: { isActive: !item.isActive }
+      payload: { isActive: !item.isActive },
     });
-
   }
 
   const filtered = data.filter((item: any) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
+    item.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   const columns = [
     {
       name: "Name",
       selector: (row: any) => row.name,
-      sortable: true
+      sortable: true,
     },
     {
       name: "Sort",
       selector: (row: any) => row.sortOrder,
-      sortable: true
+      sortable: true,
     },
     {
       name: "Status",
@@ -149,146 +145,128 @@ export default function SpecializationsPage() {
           checked={row.isActive}
           onCheckedChange={() => toggleStatus(row)}
         />
-      )
+      ),
     },
     {
       name: "Actions",
       right: true,
       cell: (row: any) => (
         <div className="flex gap-2">
-
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => openEdit(row)}
-          >
+          <Button size="icon" variant="ghost" onClick={() => openEdit(row)}>
             <Pencil size={16} />
           </Button>
 
           <Button
             size="icon"
             variant="ghost"
-            onClick={() => handleDelete(row._id)}
+            onClick={() => setDeleteTarget(row)}
           >
             <Trash2 size={16} />
           </Button>
-
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
+    <>
+      <div>
+        <PageHeader
+          title="Specializations"
+          description="Manage doctor specializations"
+          action={
+            <Button onClick={openCreate}>
+              <Plus size={16} /> Add Specialization
+            </Button>
+          }
+        />
 
-    <div>
-
-      <PageHeader
-        title="Specializations"
-        description="Manage doctor specializations"
-        action={
-          <Button onClick={openCreate}>
-            <Plus size={16}/> Add Specialization
-          </Button>
-        }
-      />
-
-      <Card className="rounded-3xl shadow-sm">
-
-        <CardHeader className="flex flex-row items-center justify-between">
-
-          <CardTitle>All Specializations</CardTitle>
-
-          <Input
-            placeholder="Search specialization..."
-            className="max-w-xs"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-        </CardHeader>
-
-        <CardContent>
-
-          <DataTable
-            columns={columns}
-            data={filtered}
-            progressPending={isLoading}
-            pagination
-            highlightOnHover
-            striped
-            responsive
-          />
-
-        </CardContent>
-
-      </Card>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-
-        <DialogContent className="rounded-2xl">
-
-          <DialogHeader>
-            <DialogTitle>
-              {editingId ? "Edit Specialization" : "Add Specialization"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
+        <Card className="rounded-3xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>All Specializations</CardTitle>
 
             <Input
-              placeholder="Specialization name"
-              value={form.name}
-              onChange={(e) =>
-                setForm((p) => ({
-                  ...p,
-                  name: e.target.value
-                }))
-              }
+              placeholder="Search specialization..."
+              className="max-w-xs"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
+          </CardHeader>
 
-            <Input
-              type="number"
-              placeholder="Sort order"
-              value={form.sortOrder}
-              onChange={(e) =>
-                setForm((p) => ({
-                  ...p,
-                  sortOrder: Number(e.target.value)
-                }))
-              }
+          <CardContent>
+            <DataTable
+              columns={columns}
+              data={filtered}
+              progressPending={isLoading}
+              pagination
+              highlightOnHover
+              striped
+              responsive
             />
+          </CardContent>
+        </Card>
 
-            <div className="flex items-center justify-between">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="rounded-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {editingId ? "Edit Specialization" : "Add Specialization"}
+              </DialogTitle>
+            </DialogHeader>
 
-              <span>Status</span>
-
-              <Switch
-                checked={form.isActive}
-                onCheckedChange={(v) =>
+            <div className="space-y-4">
+              <Input
+                placeholder="Specialization name"
+                value={form.name}
+                onChange={(e) =>
                   setForm((p) => ({
                     ...p,
-                    isActive: v
+                    name: e.target.value,
                   }))
                 }
               />
 
+              <Input
+                type="number"
+                placeholder="Sort order"
+                value={form.sortOrder}
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    sortOrder: Number(e.target.value),
+                  }))
+                }
+              />
+
+              <div className="flex items-center justify-between">
+                <span>Status</span>
+
+                <Switch
+                  checked={form.isActive}
+                  onCheckedChange={(v) =>
+                    setForm((p) => ({
+                      ...p,
+                      isActive: v,
+                    }))
+                  }
+                />
+              </div>
+
+              <Button className="w-full" onClick={handleSubmit}>
+                {editingId ? "Update" : "Create"}
+              </Button>
             </div>
-
-            <Button
-              className="w-full"
-              onClick={handleSubmit}
-            >
-              {editingId ? "Update" : "Create"}
-            </Button>
-
-          </div>
-
-        </DialogContent>
-
-      </Dialog>
-
-    </div>
-
+          </DialogContent>
+        </Dialog>
+      </div>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Specialization"
+        message={`Delete "${deleteTarget?.name ?? "this specialization"}"? This action cannot be undone.`}
+        confirmLabel={deleteMutation.isPending ? "Deleting..." : "Delete"}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
+    </>
   );
-
 }

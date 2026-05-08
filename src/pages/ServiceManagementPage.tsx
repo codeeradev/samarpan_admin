@@ -22,10 +22,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  getApiErrorMessage,
-  mapApiErrorsToFields,
-} from "@/lib/api-errors";
+import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
 import {
   addServiceApi,
   deleteServiceApi,
@@ -38,6 +35,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import PageEditor from "@/components/editor/pageEditor";
+import "./pages-editor.css";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -53,7 +52,10 @@ function slugify(value: string): string {
 type ServiceFormMode = "add" | "edit";
 
 type ServiceFormErrors = Partial<
-  Record<"title" | "slug" | "shortDescription" | "image" | "icon" | "faqs", string>
+  Record<
+    "title" | "slug" | "shortDescription" | "image" | "icon" | "faqs",
+    string
+  >
 >;
 
 function validateServiceForm(
@@ -127,7 +129,11 @@ function FaqRow({
 }: {
   index: number;
   faq: { question: string; answer: string };
-  onChange: (index: number, field: "question" | "answer", value: string) => void;
+  onChange: (
+    index: number,
+    field: "question" | "answer",
+    value: string,
+  ) => void;
   onRemove: (index: number) => void;
 }) {
   return (
@@ -193,8 +199,13 @@ export default function ServiceManagementPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: Partial<ServicePayload> }) =>
-      updateServiceApi(id, payload),
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: Partial<ServicePayload>;
+    }) => updateServiceApi(id, payload),
     onSuccess: () => {
       toast.success("Service updated successfully.");
       queryClient.invalidateQueries({ queryKey: ["service-management"] });
@@ -209,7 +220,8 @@ export default function ServiceManagementPage() {
       queryClient.invalidateQueries({ queryKey: ["service-management"] });
       setDeleteTarget(null);
     },
-    onError: (error) => toast.error(getApiErrorMessage(error, "Failed to delete service.")),
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "Failed to delete service.")),
   });
 
   const filtered = useMemo(() => {
@@ -255,7 +267,10 @@ export default function ServiceManagementPage() {
 
   // ─── Field helpers ───────────────────────────────────────────────────────────
 
-  function setField<K extends keyof ServicePayload>(key: K, value: ServicePayload[K]) {
+  function setField<K extends keyof ServicePayload>(
+    key: K,
+    value: ServicePayload[K],
+  ) {
     setFormData((prev) => ({ ...prev, [key]: value }));
     setFormErrors((prev) => ({
       ...prev,
@@ -263,7 +278,10 @@ export default function ServiceManagementPage() {
     }));
   }
 
-  function setSeoField(key: keyof NonNullable<ServicePayload["seo"]>, value: string) {
+  function setSeoField(
+    key: keyof NonNullable<ServicePayload["seo"]>,
+    value: string,
+  ) {
     setFormData((prev) => ({
       ...prev,
       seo: { ...prev.seo, [key]: value },
@@ -278,7 +296,11 @@ export default function ServiceManagementPage() {
     setFormErrors((prev) => ({ ...prev, faqs: undefined }));
   }
 
-  function updateFaq(index: number, field: "question" | "answer", value: string) {
+  function updateFaq(
+    index: number,
+    field: "question" | "answer",
+    value: string,
+  ) {
     setFormData((prev) => {
       const faqs = [...(prev.faqs || [])];
       faqs[index] = { ...faqs[index], [field]: value };
@@ -311,7 +333,9 @@ export default function ServiceManagementPage() {
 
     const payload: ServicePayload = {
       ...formData,
-      slug: formData.slug?.trim() ? slugify(formData.slug) : slugify(formData.title),
+      slug: formData.slug?.trim()
+        ? slugify(formData.slug)
+        : slugify(formData.title),
       features: featuresInput
         .split(",")
         .map((f) => f.trim())
@@ -333,16 +357,17 @@ export default function ServiceManagementPage() {
 
       await addMutation.mutateAsync(payload);
     } catch (error) {
-      const backendErrors = mapApiErrorsToFields<
-        keyof ServiceFormErrors
-      >(error, {
-        title: /title/i,
-        slug: /slug/i,
-        shortDescription: /short description/i,
-        image: /\bimage\b/i,
-        icon: /\bicon\b/i,
-        faqs: /\bfaq\b/i,
-      });
+      const backendErrors = mapApiErrorsToFields<keyof ServiceFormErrors>(
+        error,
+        {
+          title: /title/i,
+          slug: /slug/i,
+          shortDescription: /short description/i,
+          image: /\bimage\b/i,
+          icon: /\bicon\b/i,
+          faqs: /\bfaq\b/i,
+        },
+      );
 
       if (Object.keys(backendErrors).length > 0) {
         setFormErrors((prev) => ({ ...prev, ...backendErrors }));
@@ -353,7 +378,9 @@ export default function ServiceManagementPage() {
   }
 
   const isBusy =
-    addMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
+    addMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   // ─── Render ──────────────────────────────────────────────────────────────────
 
@@ -399,21 +426,35 @@ export default function ServiceManagementPage() {
             {isLoading
               ? [1, 2, 3].map((row) => (
                   <TableRow key={row}>
-                    <TableCell><Skeleton className="h-4 w-36" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-56" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-8 ml-auto rounded-lg" /></TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-36" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-56" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-8 w-8 ml-auto rounded-lg" />
+                    </TableCell>
                   </TableRow>
                 ))
               : filtered.map((service) => (
                   <TableRow key={service._id}>
-                    <TableCell className="font-medium">{service.title}</TableCell>
+                    <TableCell className="font-medium">
+                      {service.title}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="secondary">{service.slug}</Badge>
                     </TableCell>
                     <TableCell className="max-w-[420px]">
-                      <span className="line-clamp-2">{service.shortDescription}</span>
+                      <span className="line-clamp-2">
+                        {service.shortDescription}
+                      </span>
                     </TableCell>
                     <TableCell>{service.features?.length || 0}</TableCell>
                     <TableCell className="text-right">
@@ -442,7 +483,10 @@ export default function ServiceManagementPage() {
                 ))}
             {!isLoading && filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-12 text-muted-foreground"
+                >
                   No services found.
                 </TableCell>
               </TableRow>
@@ -460,8 +504,24 @@ export default function ServiceManagementPage() {
             setFormErrors({});
           }
         }}
+        modal={false}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          className="max-w-2xl max-h-[90vh] sm:max-w-[900px] overflow-y-auto"
+          onInteractOutside={(e) => {
+            const el = e.target as HTMLElement;
+
+            if (
+              el.closest(".tox-tinymce-aux") ||
+              el.closest(".tox-dialog") ||
+              el.closest(".tox-menu") ||
+              el.closest(".tox-pop") ||
+              document.querySelector(".tox-dialog")
+            ) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>
               {editTarget ? "Update Service" : "Add Service"}
@@ -470,10 +530,18 @@ export default function ServiceManagementPage() {
 
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="w-full mb-2">
-              <TabsTrigger value="basic" className="flex-1">Basic Info</TabsTrigger>
-              <TabsTrigger value="content" className="flex-1">Content</TabsTrigger>
-              <TabsTrigger value="faqs" className="flex-1">FAQs</TabsTrigger>
-              <TabsTrigger value="seo" className="flex-1">SEO</TabsTrigger>
+              <TabsTrigger value="basic" className="flex-1">
+                Basic Info
+              </TabsTrigger>
+              <TabsTrigger value="content" className="flex-1">
+                Content
+              </TabsTrigger>
+              <TabsTrigger value="faqs" className="flex-1">
+                FAQs
+              </TabsTrigger>
+              <TabsTrigger value="seo" className="flex-1">
+                SEO
+              </TabsTrigger>
             </TabsList>
 
             {/* ── Tab 1: Basic Info ─────────────────────────────────────── */}
@@ -488,7 +556,11 @@ export default function ServiceManagementPage() {
                   value={formData.title}
                   onChange={(e) => setField("title", e.target.value)}
                   placeholder="e.g. Emergency Care"
-                  className={formErrors.title ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={
+                    formErrors.title
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
                 />
                 {formErrors.title ? (
                   <p className="text-xs text-destructive">{formErrors.title}</p>
@@ -503,7 +575,11 @@ export default function ServiceManagementPage() {
                   value={formData.slug}
                   onChange={(e) => setField("slug", e.target.value)}
                   placeholder="Auto-generated from title if left empty"
-                  className={formErrors.slug ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={
+                    formErrors.slug
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
                 />
                 {formErrors.slug ? (
                   <p className="text-xs text-destructive">{formErrors.slug}</p>
@@ -554,19 +630,26 @@ export default function ServiceManagementPage() {
               {/* Image */}
               <div className="space-y-1">
                 <Label>
-                  Service Image (1150 × 1000) <span className="text-destructive">*</span>
+                  Service Image (1150 × 1000){" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 {/* Preview existing image URL when editing */}
-                {editTarget && typeof formData.image === "string" && formData.image && (
-                  <p className="text-xs text-muted-foreground truncate mb-1">
-                    Current: {formData.image}
-                  </p>
-                )}
+                {editTarget &&
+                  typeof formData.image === "string" &&
+                  formData.image && (
+                    <p className="text-xs text-muted-foreground truncate mb-1">
+                      Current: {formData.image}
+                    </p>
+                  )}
                 <Input
                   ref={imageRef}
                   type="file"
                   accept="image/*"
-                  className={formErrors.image ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={
+                    formErrors.image
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) setField("image", file);
@@ -584,18 +667,25 @@ export default function ServiceManagementPage() {
               {/* Icon */}
               <div className="space-y-1">
                 <Label>
-                  Service Icon (128 × 128) <span className="text-destructive">*</span>
+                  Service Icon (128 × 128){" "}
+                  <span className="text-destructive">*</span>
                 </Label>
-                {editTarget && typeof formData.icon === "string" && formData.icon && (
-                  <p className="text-xs text-muted-foreground truncate mb-1">
-                    Current: {formData.icon}
-                  </p>
-                )}
+                {editTarget &&
+                  typeof formData.icon === "string" &&
+                  formData.icon && (
+                    <p className="text-xs text-muted-foreground truncate mb-1">
+                      Current: {formData.icon}
+                    </p>
+                  )}
                 <Input
                   ref={iconRef}
                   type="file"
                   accept="image/*,.svg"
-                  className={formErrors.icon ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={
+                    formErrors.icon
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) setField("icon", file);
@@ -613,17 +703,19 @@ export default function ServiceManagementPage() {
 
             {/* ── Tab 2: Content ────────────────────────────────────────── */}
             <TabsContent value="content" className="mt-0">
-              <div className="space-y-1">
-                <Label htmlFor="svc-content">Full Content / Body</Label>
-                <Textarea
-                  id="svc-content"
-                  value={formData.content}
-                  onChange={(e) => setField("content", e.target.value)}
-                  placeholder="Write detailed content about this service. HTML is supported."
-                  className="resize-y min-h-[280px] font-mono text-sm"
-                />
+              <div className="space-y-2">
+                <Label>Full Content / Body</Label>
+
+                <div className="website-page-editor">
+                  <PageEditor
+                    value={formData.content || ""}
+                    onChange={(content) => setField("content", content)}
+                  />
+                </div>
+
                 <p className="text-xs text-muted-foreground">
-                  Supports plain text or HTML markup.
+                  Add formatted service content with images, headings, SEO
+                  content, tables, and embedded media.
                 </p>
               </div>
             </TabsContent>
@@ -679,7 +771,9 @@ export default function ServiceManagementPage() {
                 <Textarea
                   id="svc-meta-desc"
                   value={formData.seo?.metaDescription || ""}
-                  onChange={(e) => setSeoField("metaDescription", e.target.value)}
+                  onChange={(e) =>
+                    setSeoField("metaDescription", e.target.value)
+                  }
                   placeholder="Brief description for search engine results"
                   className="resize-none min-h-[80px]"
                   rows={3}
@@ -706,10 +800,18 @@ export default function ServiceManagementPage() {
             <Button variant="outline" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isBusy} className="bg-primary">
+            <Button
+              onClick={handleSave}
+              disabled={isBusy}
+              className="bg-primary"
+            >
               {isBusy
-                ? editTarget ? "Updating…" : "Adding…"
-                : editTarget ? "Update Service" : "Add Service"}
+                ? editTarget
+                  ? "Updating…"
+                  : "Adding…"
+                : editTarget
+                  ? "Update Service"
+                  : "Add Service"}
             </Button>
           </DialogFooter>
         </DialogContent>
