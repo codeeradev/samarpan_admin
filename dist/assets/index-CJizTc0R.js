@@ -66929,7 +66929,7 @@ function DoctorForm({
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Profile Image",
+        "Profile Image (1380 × 1000)",
         " ",
         mode === "add" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
       ] }),
@@ -66943,7 +66943,7 @@ function DoctorForm({
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 20, className: "text-muted-foreground" }),
             imageFileName ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-primary font-medium truncate max-w-full px-2", children: imageFileName }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground font-medium", children: "Click to upload photo" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground font-medium", children: "Click to upload photo (1380 × 1000)" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: "PNG, JPG up to 2MB" })
             ] })
           ]
@@ -67304,7 +67304,7 @@ function GalleryPage() {
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Gallery Image" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Gallery Image (1170 × 1560)" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Input,
         {
@@ -68134,7 +68134,7 @@ function HonorsPage() {
               )
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-image-url", children: "Image URL" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "honor-image-url", children: "Image (600 × 300)" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Input,
                 {
@@ -71814,7 +71814,7 @@ function ServiceManagementPage() {
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                  "Service Image ",
+                  "Service Image (1150 × 1000) ",
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
                 ] }),
                 editTarget && typeof formData.image === "string" && formData.image && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground truncate mb-1", children: [
@@ -71839,7 +71839,7 @@ function ServiceManagementPage() {
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                  "Service Icon ",
+                  "Service Icon (128 × 128) ",
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
                 ] }),
                 editTarget && typeof formData.icon === "string" && formData.icon && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground truncate mb-1", children: [
@@ -72502,62 +72502,6 @@ function SettingsPage() {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
                 " ",
                 settingsSaving ? "Saving..." : "Save Google Settings"
-              ]
-            }
-          )
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "lg:col-span-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: "CMS Content" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Legal pages and informational copy that still belongs to the settings document." })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Textarea,
-            {
-              placeholder: "About Us",
-              value: safeSettings.about_us ?? "",
-              onChange: (event) => updateField("about_us", event.target.value),
-              disabled: loading
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Textarea,
-            {
-              placeholder: "Privacy Policy",
-              value: safeSettings.privacy_policy ?? "",
-              onChange: (event) => updateField("privacy_policy", event.target.value),
-              disabled: loading
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Textarea,
-            {
-              placeholder: "Terms & Conditions",
-              value: safeSettings.term_and_condition ?? "",
-              onChange: (event) => updateField("term_and_condition", event.target.value),
-              disabled: loading
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Textarea,
-            {
-              placeholder: "Contact Us",
-              value: safeSettings.contact_us ?? "",
-              onChange: (event) => updateField("contact_us", event.target.value),
-              disabled: loading
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              disabled: settingsSaving || loading,
-              onClick: () => saveSettings(),
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { size: 14 }),
-                " ",
-                settingsSaving ? "Saving..." : "Save CMS Content"
               ]
             }
           )
@@ -74424,7 +74368,7 @@ function HeroSectionEditor({
         ImageUploadField,
         {
           id: "hero-background-image",
-          label: "Background Image",
+          label: "Background Image (1920 × 1080)",
           hint: "Used behind the hero copy.",
           value: form.backgroundImage,
           onPick: (file) => updateField("backgroundImage", file)
@@ -74434,7 +74378,7 @@ function HeroSectionEditor({
         ImageUploadField,
         {
           id: "hero-primary-image",
-          label: "Primary Doctor Image",
+          label: "Primary Doctor Image (900 × 1000)",
           hint: "Main portrait shown in the hero.",
           value: form.primaryImage,
           onPick: (file) => updateField("primaryImage", file)
@@ -74444,7 +74388,7 @@ function HeroSectionEditor({
         ImageUploadField,
         {
           id: "hero-secondary-image",
-          label: "Secondary Doctor Image",
+          label: "Secondary Doctor Image (850 × 1000)",
           hint: "Smaller supporting portrait card.",
           value: form.secondaryImage,
           onPick: (file) => updateField("secondaryImage", file)
@@ -74605,7 +74549,7 @@ function HowItWorksSectionEditor({
       ImageUploadField,
       {
         id: "how-work-section-image",
-        label: "Section Image",
+        label: "Section Image (1245 × 1000)",
         hint: "Right-side image shown in the section preview.",
         value: form.sectionImage,
         onPick: (file) => updateField("sectionImage", file)
@@ -74676,7 +74620,7 @@ function WhyChooseUsSectionEditor({
         ImageUploadField,
         {
           id: "why-choose-us-section-image",
-          label: "Section Image",
+          label: "Section Image (1080 × 1260)",
           hint: "Image shown on the right side of the Why Choose Us preview.",
           value: form.sectionImage,
           onPick: (file) => updateField("sectionImage", file)
@@ -74686,7 +74630,7 @@ function WhyChooseUsSectionEditor({
         ImageUploadField,
         {
           id: "why-choose-us-secondary-image",
-          label: "Secondary Image (Small)",
+          label: "Secondary Image (880 × 510)",
           hint: "Small image shown below the main section image.",
           value: form.secondaryImage,
           onPick: (file) => updateField("secondaryImage", file)
@@ -74951,7 +74895,7 @@ function AboutSectionEditor({
       ImageUploadField,
       {
         id: "about-section-image",
-        label: "Section Image",
+        label: "Section Image (820 × 1000)",
         hint: "Image shown in the about section preview.",
         value: form.sectionImage,
         onPick: (file) => updateField("sectionImage", file)
@@ -77124,7 +77068,7 @@ function BlogsPage() {
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image (1215 × 576)" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "input",
                   {
@@ -77420,11 +77364,12 @@ function appendValue(fd, key, value) {
   fd.append(key, String(value));
 }
 function toFormData(payload) {
-  var _a2, _b2, _c2;
+  var _a2, _b2, _c2, _d2;
   const fd = new FormData();
   appendValue(fd, "title", (_a2 = payload.title) == null ? void 0 : _a2.trim());
   appendValue(fd, "slug", (_b2 = payload.slug) == null ? void 0 : _b2.trim());
   appendValue(fd, "content", (_c2 = payload.content) == null ? void 0 : _c2.trim());
+  appendValue(fd, "shortDescription", (_d2 = payload.shortDescription) == null ? void 0 : _d2.trim());
   if (payload.sortOrder !== void 0) {
     appendValue(fd, "sortOrder", payload.sortOrder);
   }
@@ -77507,6 +77452,7 @@ const deleteProcedureApi = async (id) => {
 const PROCEDURE_QUERY_KEY = ["procedures"];
 const EMPTY_FORM = {
   title: "",
+  shortDescription: "",
   slug: "",
   content: "",
   metaTitle: "",
@@ -77520,6 +77466,11 @@ function validateProcedureForm(form, mode) {
   const errors = {};
   if (!form.title.trim()) {
     errors.title = "Title is required.";
+  }
+  if (!form.shortDescription.trim()) {
+    errors.shortDescription = "Short description is required.";
+  } else if (form.shortDescription.trim().length > 300) {
+    errors.shortDescription = "Short description cannot exceed 300 characters.";
   }
   if (!form.content) {
     errors.content = "Content is required.";
@@ -77581,6 +77532,7 @@ function ProceduresPage() {
     setImagePreview(procedure.image ? resolveAssetUrl2(procedure.image) : null);
     setForm({
       title: procedure.title || "",
+      shortDescription: procedure.shortDescription || "",
       slug: procedure.slug || "",
       content: procedure.content || "",
       metaTitle: ((_a2 = procedure.seo) == null ? void 0 : _a2.metaTitle) || "",
@@ -77624,6 +77576,7 @@ function ProceduresPage() {
     };
     const payload = {
       title: form.title,
+      shortDescription: form.shortDescription,
       slug: form.slug,
       content: form.content,
       seo,
@@ -77651,6 +77604,7 @@ function ProceduresPage() {
         error,
         {
           title: /title/i,
+          shortDescription: /short description/i,
           slug: /slug/i,
           content: /content/i,
           metaTitle: /meta title/i,
@@ -77867,6 +77821,25 @@ function ProceduresPage() {
               ] })
             ] }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Textarea,
+                  {
+                    placeholder: "Short Description",
+                    value: form.shortDescription,
+                    onChange: (e3) => setField("shortDescription", e3.target.value),
+                    maxLength: 300,
+                    className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
+                  formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for cards and listings." }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                    form.shortDescription.length,
+                    "/300"
+                  ] })
+                ] })
+              ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 PageEditor,

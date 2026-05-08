@@ -192,7 +192,7 @@ export default function GalleryPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Gallery Image</DialogTitle>
+            <DialogTitle>Add Gallery Image (1170 × 1560)</DialogTitle>
           </DialogHeader>
 
           <Input

@@ -280,21 +280,21 @@ export function HeroSectionEditor({
       <div className="grid gap-4 md:grid-cols-3">
         <ImageUploadField
           id="hero-background-image"
-          label="Background Image"
+          label="Background Image (1920 × 1080)"
           hint="Used behind the hero copy."
           value={form.backgroundImage}
           onPick={(file) => updateField("backgroundImage", file)}
         />
         <ImageUploadField
           id="hero-primary-image"
-          label="Primary Doctor Image"
+          label="Primary Doctor Image (900 × 1000)"
           hint="Main portrait shown in the hero."
           value={form.primaryImage}
           onPick={(file) => updateField("primaryImage", file)}
         />
         <ImageUploadField
           id="hero-secondary-image"
-          label="Secondary Doctor Image"
+          label="Secondary Doctor Image (850 × 1000)"
           hint="Smaller supporting portrait card."
           value={form.secondaryImage}
           onPick={(file) => updateField("secondaryImage", file)}
@@ -448,7 +448,7 @@ export function HowItWorksSectionEditor({
       <div className="grid gap-4 md:grid-cols-2">
         <ImageUploadField
           id="how-work-section-image"
-          label="Section Image"
+          label="Section Image (1245 × 1000)"
           hint="Right-side image shown in the section preview."
           value={form.sectionImage}
           onPick={(file) => updateField("sectionImage", file)}
@@ -515,14 +515,14 @@ export function WhyChooseUsSectionEditor({
       <div className="grid gap-4 md:grid-cols-2">
         <ImageUploadField
           id="why-choose-us-section-image"
-          label="Section Image"
+          label="Section Image (1080 × 1260)"
           hint="Image shown on the right side of the Why Choose Us preview."
           value={form.sectionImage}
           onPick={(file) => updateField("sectionImage", file)}
         />
         <ImageUploadField
           id="why-choose-us-secondary-image"
-          label="Secondary Image (Small)"
+          label="Secondary Image (880 × 510)"
           hint="Small image shown below the main section image."
           value={form.secondaryImage}
           onPick={(file) => updateField("secondaryImage", file)}
@@ -761,7 +761,7 @@ export function AboutSectionEditor({
       <div className="grid gap-4 md:grid-cols-2">
         <ImageUploadField
           id="about-section-image"
-          label="Section Image"
+          label="Section Image (820 × 1000)"
           hint="Image shown in the about section preview."
           value={form.sectionImage}
           onPick={(file) => updateField("sectionImage", file)}

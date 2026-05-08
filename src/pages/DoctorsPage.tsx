@@ -1113,7 +1113,7 @@ function DoctorForm({
       {/* Profile Image Upload */}
       <div className="col-span-1 sm:col-span-2 space-y-1.5">
         <Label className="text-sm font-medium text-foreground">
-          Profile Image{" "}
+          Profile Image (1380 × 1000){" "}
           {mode === "add" && <span className="text-destructive">*</span>}
         </Label>
         <button
@@ -1132,7 +1132,7 @@ function DoctorForm({
           ) : (
             <>
               <span className="text-sm text-muted-foreground font-medium">
-                Click to upload photo
+                Click to upload photo (1380 × 1000)
               </span>
               <span className="text-xs text-muted-foreground">PNG, JPG up to 2MB</span>
             </>

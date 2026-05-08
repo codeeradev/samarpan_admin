@@ -554,7 +554,7 @@ export default function ServiceManagementPage() {
               {/* Image */}
               <div className="space-y-1">
                 <Label>
-                  Service Image <span className="text-destructive">*</span>
+                  Service Image (1150 × 1000) <span className="text-destructive">*</span>
                 </Label>
                 {/* Preview existing image URL when editing */}
                 {editTarget && typeof formData.image === "string" && formData.image && (
@@ -584,7 +584,7 @@ export default function ServiceManagementPage() {
               {/* Icon */}
               <div className="space-y-1">
                 <Label>
-                  Service Icon <span className="text-destructive">*</span>
+                  Service Icon (128 × 128) <span className="text-destructive">*</span>
                 </Label>
                 {editTarget && typeof formData.icon === "string" && formData.icon && (
                   <p className="text-xs text-muted-foreground truncate mb-1">

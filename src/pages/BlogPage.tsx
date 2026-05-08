@@ -622,7 +622,7 @@ export default function BlogsPage() {
 
                 <label className="flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted">
                   <Upload size={16} />
-                  <span className="text-sm">Upload Image</span>
+                  <span className="text-sm">Upload Image (1215 × 576)</span>
                   <input
                     type="file"
                     accept="image/*"

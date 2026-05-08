@@ -445,7 +445,7 @@ export default function HonorsPage() {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="honor-image-url">Image URL</Label>
+              <Label htmlFor="honor-image-url">Image (600 × 300)</Label>
               <Input
                 type="file"
                 accept="image/*"
