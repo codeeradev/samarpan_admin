@@ -587,60 +587,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>CMS Content</CardTitle>
-            <CardDescription>
-              Legal pages and informational copy that still belongs to the
-              settings document.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <Textarea
-              placeholder="About Us"
-              value={safeSettings.about_us ?? ""}
-              onChange={(event) => updateField("about_us", event.target.value)}
-              disabled={loading}
-            />
-
-            <Textarea
-              placeholder="Privacy Policy"
-              value={safeSettings.privacy_policy ?? ""}
-              onChange={(event) =>
-                updateField("privacy_policy", event.target.value)
-              }
-              disabled={loading}
-            />
-
-            <Textarea
-              placeholder="Terms & Conditions"
-              value={safeSettings.term_and_condition ?? ""}
-              onChange={(event) =>
-                updateField("term_and_condition", event.target.value)
-              }
-              disabled={loading}
-            />
-
-            <Textarea
-              placeholder="Contact Us"
-              value={safeSettings.contact_us ?? ""}
-              onChange={(event) =>
-                updateField("contact_us", event.target.value)
-              }
-              disabled={loading}
-            />
-
-            <Button
-              disabled={settingsSaving || loading}
-              onClick={() => saveSettings()}
-            >
-              <Save size={14} />{" "}
-              {settingsSaving ? "Saving..." : "Save CMS Content"}
-            </Button>
-          </CardContent>
-        </Card>
-
         <Card className="border-destructive/20 bg-destructive/10">
           <CardHeader>
             <CardTitle className="text-destructive flex gap-2">

@@ -26,6 +26,7 @@ import {
 } from "@tanstack/react-router";
 import BlogsPage from "./pages/BlogPage";
 import SpecializationsPage from "./pages/Specialization";
+import ProcedurePage from "./pages/ProcedurePage";
 
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
@@ -119,6 +120,13 @@ const patientsRoute = createRoute({
   path: "/patients",
   beforeLoad: () => checkPermission("/patients"),
   component: PatientsPage,
+});
+
+const procedureRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/procedures",
+  beforeLoad: () => checkPermission("/procedures"),
+  component: ProcedurePage,
 });
 
 const appointmentsRoute = createRoute({
@@ -215,6 +223,7 @@ const routeTree = rootRoute.addChildren([
     specializationsRoute,
     honorsRoute,
     patientsRoute,
+    procedureRoute,
     appointmentsRoute,
     serviceManagementRoute,
     blogsRoute,

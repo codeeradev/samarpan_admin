@@ -1,6 +1,6 @@
 export const BASE_URL =
   import.meta.env.VITE_API_URL || "https://samarpanapi.codeeratech.com/admin";
-// import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
+  // import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
 
 export const ENDPOINT = {
   LOGIN: "/admin-login",
@@ -60,4 +60,8 @@ export const ENDPOINT = {
   GET_THEMES: "/get-themes",
   UPSERT_THEME: "/upsert-theme",
 
+  GET_ALL_PROCEDURES: "/get-procedure",
+  ADD_PROCEDURE: "/add-procedure",
+  UPDATE_PROCEDURE: "/update-procedure",
+  DELETE_PROCEDURE: "/delete-procedure",
 };

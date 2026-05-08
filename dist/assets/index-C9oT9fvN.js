@@ -19718,7 +19718,7 @@ function isFlatArray(arr) {
 const predicates = utils$1.toFlatObject(utils$1, {}, null, function filter(prop) {
   return /^is[A-Z]/.test(prop);
 });
-function toFormData$5(obj, formData, options) {
+function toFormData$6(obj, formData, options) {
   if (!utils$1.isObject(obj)) {
     throw new TypeError("target must be an object");
   }
@@ -19830,7 +19830,7 @@ function encode$2(str) {
 }
 function AxiosURLSearchParams(params, options) {
   this._pairs = [];
-  params && toFormData$5(params, this, options);
+  params && toFormData$6(params, this, options);
 }
 const prototype = AxiosURLSearchParams.prototype;
 prototype.append = function append(name, value) {
@@ -19972,7 +19972,7 @@ const platform$1 = {
   ...platform$2
 };
 function toURLEncodedForm(data, options) {
-  return toFormData$5(data, new platform$1.classes.URLSearchParams(), {
+  return toFormData$6(data, new platform$1.classes.URLSearchParams(), {
     visitor: function(value, key, path, helpers) {
       if (platform$1.isNode && utils$1.isBuffer(value)) {
         this.append(key, value.toString("base64"));
@@ -20078,7 +20078,7 @@ const defaults$1 = {
         }
         if ((isFileList2 = utils$1.isFileList(data)) || contentType.indexOf("multipart/form-data") > -1) {
           const _FormData = this.env && this.env.FormData;
-          return toFormData$5(
+          return toFormData$6(
             isFileList2 ? { "files[]": data } : data,
             _FormData && new _FormData(),
             this.formSerializer
@@ -21815,7 +21815,7 @@ axios.CanceledError = CanceledError$1;
 axios.CancelToken = CancelToken$1;
 axios.isCancel = isCancel$1;
 axios.VERSION = VERSION$1;
-axios.toFormData = toFormData$5;
+axios.toFormData = toFormData$6;
 axios.AxiosError = AxiosError$1;
 axios.Cancel = axios.CanceledError;
 axios.all = function all(promises) {
@@ -21840,7 +21840,7 @@ const {
   Cancel: Cancel$1,
   isAxiosError,
   spread,
-  toFormData: toFormData$4,
+  toFormData: toFormData$5,
   AxiosHeaders: AxiosHeaders2,
   HttpStatusCode,
   formToJSON,
@@ -21902,7 +21902,11 @@ const ENDPOINT = {
   UPDATE_SPECIALIZATION: "/update-specialization",
   DELETE_SPECIALIZATION: "/delete-specialization",
   GET_THEMES: "/get-themes",
-  UPSERT_THEME: "/upsert-theme"
+  UPSERT_THEME: "/upsert-theme",
+  GET_ALL_PROCEDURES: "/get-procedure",
+  ADD_PROCEDURE: "/add-procedure",
+  UPDATE_PROCEDURE: "/update-procedure",
+  DELETE_PROCEDURE: "/delete-procedure"
 };
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -37677,6 +37681,12 @@ const ALL_NAV_ITEMS = [
     permissionPath: "/appointments"
   },
   {
+    label: "Cosmetic Procedures",
+    icon: Calendar,
+    path: "/procedures",
+    permissionPath: "/procedures"
+  },
+  {
     label: "Blogs",
     icon: FileImage,
     path: "/blogs",
@@ -40018,7 +40028,7 @@ const updateAppointmentApi = async (id, payload) => {
   );
   return response.data;
 };
-function appendValue$1(fd, key, value) {
+function appendValue$2(fd, key, value) {
   if (value === void 0 || value === null) return;
   if (typeof value === "string" && value.trim() === "") return;
   fd.append(key, String(value));
@@ -40027,19 +40037,19 @@ function normalizePhone$3(value) {
   const digits = (value == null ? void 0 : value.replace(/\D/g, "")) ?? "";
   return digits || void 0;
 }
-function toFormData$3(payload) {
+function toFormData$4(payload) {
   var _a2, _b2, _c2, _d2, _e3, _f2, _g2;
   const fd = new FormData();
-  appendValue$1(fd, "name", (_a2 = payload.name) == null ? void 0 : _a2.trim());
-  appendValue$1(fd, "email", (_b2 = payload.email) == null ? void 0 : _b2.trim());
-  appendValue$1(fd, "password", (_c2 = payload.password) == null ? void 0 : _c2.trim());
-  appendValue$1(fd, "phone", normalizePhone$3(payload.phone));
-  appendValue$1(fd, "specialization", (_d2 = payload.specialization) == null ? void 0 : _d2.trim());
-  appendValue$1(fd, "description", (_e3 = payload.description) == null ? void 0 : _e3.trim());
-  appendValue$1(fd, "experience", (_f2 = payload.experience) == null ? void 0 : _f2.trim());
-  appendValue$1(fd, "qualification", (_g2 = payload.qualification) == null ? void 0 : _g2.trim());
-  appendValue$1(fd, "status", payload.status);
-  appendValue$1(fd, "isActive", payload.isActive);
+  appendValue$2(fd, "name", (_a2 = payload.name) == null ? void 0 : _a2.trim());
+  appendValue$2(fd, "email", (_b2 = payload.email) == null ? void 0 : _b2.trim());
+  appendValue$2(fd, "password", (_c2 = payload.password) == null ? void 0 : _c2.trim());
+  appendValue$2(fd, "phone", normalizePhone$3(payload.phone));
+  appendValue$2(fd, "specialization", (_d2 = payload.specialization) == null ? void 0 : _d2.trim());
+  appendValue$2(fd, "description", (_e3 = payload.description) == null ? void 0 : _e3.trim());
+  appendValue$2(fd, "experience", (_f2 = payload.experience) == null ? void 0 : _f2.trim());
+  appendValue$2(fd, "qualification", (_g2 = payload.qualification) == null ? void 0 : _g2.trim());
+  appendValue$2(fd, "status", payload.status);
+  appendValue$2(fd, "isActive", payload.isActive);
   if (payload.image instanceof File) {
     fd.append("image", payload.image);
   }
@@ -40063,7 +40073,7 @@ const getAllDoctorsApi = async () => {
 const addDoctorApi = async (payload) => {
   var _a2;
   try {
-    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$3(payload), {
+    const res = await post(ENDPOINT.ADD_DOCTOR, toFormData$4(payload), {
       needAuth: true
     });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
@@ -40076,7 +40086,7 @@ const updateDoctorApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_DOCTOR}/${id}`,
-      toFormData$3(payload),
+      toFormData$4(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.doctor;
@@ -68429,7 +68439,7 @@ const dischargePatientApi = async (id) => {
     );
   }
 };
-const EMPTY_FORM$2 = {
+const EMPTY_FORM$3 = {
   name: "",
   phone: "",
   age: "",
@@ -68775,7 +68785,7 @@ function PatientsPage() {
   const [patientToDischarge, setPatientToDischarge] = reactExports.useState(
     null
   );
-  const [form, setForm] = reactExports.useState(EMPTY_FORM$2);
+  const [form, setForm] = reactExports.useState(EMPTY_FORM$3);
   const {
     data: patients = [],
     isLoading,
@@ -68834,7 +68844,7 @@ function PatientsPage() {
       ue$2.success("Patient updated successfully.");
       queryClient2.invalidateQueries({ queryKey: ["patients"] });
       setEditPatient(null);
-      setForm(EMPTY_FORM$2);
+      setForm(EMPTY_FORM$3);
     },
     onError: (mutationError) => ue$2.error(mutationError.message)
   });
@@ -69207,7 +69217,7 @@ function PatientsPage() {
         onSave: handleSaveEdit,
         onClose: () => {
           setEditPatient(null);
-          setForm(EMPTY_FORM$2);
+          setForm(EMPTY_FORM$3);
         }
       }
     ),
@@ -71336,7 +71346,7 @@ function RoleManagementPage() {
     )
   ] });
 }
-function toFormData$2(payload) {
+function toFormData$3(payload) {
   const fd = new FormData();
   if (payload.title) fd.append("title", payload.title);
   if (payload.slug) fd.append("slug", payload.slug);
@@ -71362,7 +71372,7 @@ const getAllServicesApi = async () => {
 const addServiceApi = async (payload) => {
   var _a2;
   try {
-    const res = await post(ENDPOINT.ADD_SERVICE, toFormData$2(payload), { needAuth: true });
+    const res = await post(ENDPOINT.ADD_SERVICE, toFormData$3(payload), { needAuth: true });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.service;
   } catch (error) {
     throw createApiRequestError(error, "Failed to add service");
@@ -71373,7 +71383,7 @@ const updateServiceApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_SERVICE}/${id}`,
-      toFormData$2(payload),
+      toFormData$3(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.service;
@@ -74095,7 +74105,7 @@ function PagesPage() {
     )
   ] });
 }
-function toFormData$1(payload) {
+function toFormData$2(payload) {
   var _a2;
   const formData = new FormData();
   formData.append("modelKey", payload.modelKey);
@@ -74132,7 +74142,7 @@ const getContentByModelKeyApi = async (modelKey) => {
 const upsertContentApi = async (payload) => {
   var _a2, _b2, _c2;
   try {
-    const res = await post(ENDPOINT.UPSERT_CONTENT, toFormData$1(payload), {
+    const res = await post(ENDPOINT.UPSERT_CONTENT, toFormData$2(payload), {
       needAuth: true
     });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.content;
@@ -75530,19 +75540,19 @@ function WebsiteContentPageImpl() {
     ] }) })
   ] });
 }
-function appendValue(fd, key, value) {
+function appendValue$1(fd, key, value) {
   if (value === void 0 || value === null) return;
   if (typeof value === "string" && value.trim() === "") return;
   fd.append(key, String(value));
 }
-function toFormData(payload) {
+function toFormData$1(payload) {
   var _a2, _b2, _c2;
   const fd = new FormData();
-  appendValue(fd, "title", (_a2 = payload.title) == null ? void 0 : _a2.trim());
-  appendValue(fd, "serviceId", payload.serviceId);
-  appendValue(fd, "shortDescription", (_b2 = payload.shortDescription) == null ? void 0 : _b2.trim());
-  appendValue(fd, "content", (_c2 = payload.content) == null ? void 0 : _c2.trim());
-  appendValue(fd, "status", payload.status);
+  appendValue$1(fd, "title", (_a2 = payload.title) == null ? void 0 : _a2.trim());
+  appendValue$1(fd, "serviceId", payload.serviceId);
+  appendValue$1(fd, "shortDescription", (_b2 = payload.shortDescription) == null ? void 0 : _b2.trim());
+  appendValue$1(fd, "content", (_c2 = payload.content) == null ? void 0 : _c2.trim());
+  appendValue$1(fd, "status", payload.status);
   if (payload.seo) {
     fd.append("seo", JSON.stringify(payload.seo));
   }
@@ -75567,7 +75577,7 @@ const addBlogApi = async (payload) => {
   try {
     const res = await post(
       ENDPOINT.ADD_BLOG,
-      toFormData(payload),
+      toFormData$1(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.blog;
@@ -75580,7 +75590,7 @@ const updateBlogApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_BLOG}/${id}`,
-      toFormData(payload),
+      toFormData$1(payload),
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.blog;
@@ -76678,7 +76688,7 @@ function createDOMPurify() {
 var purify = createDOMPurify();
 const BLOG_QUERY_KEY = ["blogs"];
 const SERVICES_QUERY_KEY = ["services"];
-const EMPTY_FORM$1 = {
+const EMPTY_FORM$2 = {
   title: "",
   shortDescription: "",
   content: "",
@@ -76724,7 +76734,7 @@ function BlogsPage() {
   const [previewTarget, setPreviewTarget] = reactExports.useState(null);
   const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
   const [imagePreview, setImagePreview] = reactExports.useState(null);
-  const [form, setForm] = reactExports.useState(EMPTY_FORM$1);
+  const [form, setForm] = reactExports.useState(EMPTY_FORM$2);
   const [formErrors, setFormErrors] = reactExports.useState({});
   const { data: blogs = [], isLoading } = useQuery({
     queryKey: BLOG_QUERY_KEY,
@@ -76753,7 +76763,7 @@ function BlogsPage() {
     setMode2("add");
     setSelected(null);
     setImagePreview(null);
-    setForm(EMPTY_FORM$1);
+    setForm(EMPTY_FORM$2);
     setFormErrors({});
     setOpen(true);
   };
@@ -77196,7 +77206,7 @@ function BlogsPage() {
     )
   ] });
 }
-const EMPTY_FORM = {
+const EMPTY_FORM$1 = {
   name: "",
   sortOrder: 0,
   isActive: true
@@ -77208,10 +77218,10 @@ function SpecializationsPage() {
   const deleteMutation = useDeleteSpecialization();
   const [open, setOpen] = reactExports.useState(false);
   const [editingId, setEditingId] = reactExports.useState(null);
-  const [form, setForm] = reactExports.useState(EMPTY_FORM);
+  const [form, setForm] = reactExports.useState(EMPTY_FORM$1);
   const [search, setSearch] = reactExports.useState("");
   function openCreate() {
-    setForm(EMPTY_FORM);
+    setForm(EMPTY_FORM$1);
     setEditingId(null);
     setOpen(true);
   }
@@ -77225,7 +77235,7 @@ function SpecializationsPage() {
     setOpen(true);
   }
   function reset() {
-    setForm(EMPTY_FORM);
+    setForm(EMPTY_FORM$1);
     setEditingId(null);
     setOpen(false);
   }
@@ -77404,6 +77414,587 @@ function SpecializationsPage() {
     ] }) })
   ] });
 }
+function appendValue(fd, key, value) {
+  if (value === void 0 || value === null) return;
+  if (typeof value === "string" && value.trim() === "") return;
+  fd.append(key, String(value));
+}
+function toFormData(payload) {
+  var _a2, _b2, _c2;
+  const fd = new FormData();
+  appendValue(fd, "title", (_a2 = payload.title) == null ? void 0 : _a2.trim());
+  appendValue(fd, "slug", (_b2 = payload.slug) == null ? void 0 : _b2.trim());
+  appendValue(fd, "content", (_c2 = payload.content) == null ? void 0 : _c2.trim());
+  if (payload.sortOrder !== void 0) {
+    appendValue(fd, "sortOrder", payload.sortOrder);
+  }
+  if (payload.isActive !== void 0) {
+    appendValue(fd, "isActive", payload.isActive);
+  }
+  if (payload.seo) {
+    fd.append("seo", JSON.stringify(payload.seo));
+  }
+  if (payload.image instanceof File) {
+    fd.append("image", payload.image);
+  }
+  return fd;
+}
+const getAllProceduresApi = async () => {
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_PROCEDURES, {
+      needAuth: true
+    });
+    return (res == null ? void 0 : res.data) ?? [];
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to fetch procedures"
+    );
+  }
+};
+const addProcedureApi = async (payload) => {
+  var _a2;
+  try {
+    const res = await post(
+      ENDPOINT.ADD_PROCEDURE,
+      toFormData(payload),
+      {
+        needAuth: true
+      }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.procedure;
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to add procedure"
+    );
+  }
+};
+const updateProcedureApi = async (id, payload) => {
+  var _a2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_PROCEDURE}/${id}`,
+      toFormData(payload),
+      {
+        needAuth: true
+      }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.procedure;
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to update procedure"
+    );
+  }
+};
+const deleteProcedureApi = async (id) => {
+  try {
+    await post(
+      `${ENDPOINT.DELETE_PROCEDURE}/${id}`,
+      void 0,
+      {
+        needAuth: true
+      }
+    );
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to delete procedure"
+    );
+  }
+};
+const PROCEDURE_QUERY_KEY = ["procedures"];
+const EMPTY_FORM = {
+  title: "",
+  slug: "",
+  content: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: "",
+  sortOrder: 0,
+  isActive: true,
+  image: null
+};
+function validateProcedureForm(form, mode) {
+  const errors = {};
+  if (!form.title.trim()) {
+    errors.title = "Title is required.";
+  }
+  if (!form.content) {
+    errors.content = "Content is required.";
+  }
+  if (form.metaTitle.trim().length > 60) {
+    errors.metaTitle = "Meta title should stay within 60 characters.";
+  }
+  if (form.metaDescription.trim().length > 160) {
+    errors.metaDescription = "Meta description should stay within 160 characters.";
+  }
+  if (mode === "add" && !form.image) {
+    errors.image = "Featured image is required.";
+  }
+  return errors;
+}
+function ProceduresPage() {
+  const queryClient2 = useQueryClient();
+  const [open, setOpen] = reactExports.useState(false);
+  const [mode, setMode2] = reactExports.useState("add");
+  const [selected, setSelected] = reactExports.useState(null);
+  const [previewTarget, setPreviewTarget] = reactExports.useState(
+    null
+  );
+  const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
+  const [imagePreview, setImagePreview] = reactExports.useState(null);
+  const [form, setForm] = reactExports.useState(EMPTY_FORM);
+  const [formErrors, setFormErrors] = reactExports.useState({});
+  const { data: procedures = [], isLoading } = useQuery({
+    queryKey: PROCEDURE_QUERY_KEY,
+    queryFn: getAllProceduresApi
+  });
+  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
+  const addMutation = useMutation({
+    mutationFn: addProcedureApi
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }) => updateProcedureApi(id, payload)
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteProcedureApi
+  });
+  function resolveAssetUrl2(path) {
+    if (!path) return "";
+    if (/^https?:\/\//.test(path)) return path;
+    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+  const openAdd = () => {
+    setMode2("add");
+    setSelected(null);
+    setImagePreview(null);
+    setForm(EMPTY_FORM);
+    setFormErrors({});
+    setOpen(true);
+  };
+  const openEdit = (procedure) => {
+    var _a2, _b2, _c2, _d2;
+    setMode2("edit");
+    setSelected(procedure);
+    setImagePreview(procedure.image ? resolveAssetUrl2(procedure.image) : null);
+    setForm({
+      title: procedure.title || "",
+      slug: procedure.slug || "",
+      content: procedure.content || "",
+      metaTitle: ((_a2 = procedure.seo) == null ? void 0 : _a2.metaTitle) || "",
+      metaDescription: ((_b2 = procedure.seo) == null ? void 0 : _b2.metaDescription) || "",
+      keywords: ((_d2 = (_c2 = procedure.seo) == null ? void 0 : _c2.keywords) == null ? void 0 : _d2.join(", ")) || "",
+      sortOrder: procedure.sortOrder || 0,
+      isActive: procedure.isActive !== void 0 ? procedure.isActive : true,
+      image: null
+    });
+    setFormErrors({});
+    setOpen(true);
+  };
+  const handleImage = (file) => {
+    if (!file) return;
+    setField("image", file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+  function setField(key, value) {
+    setForm((prev2) => ({
+      ...prev2,
+      [key]: value
+    }));
+    setFormErrors((prev2) => ({
+      ...prev2,
+      [key]: void 0
+    }));
+  }
+  const handleSave = async () => {
+    const errors = validateProcedureForm(form, mode);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      ue$2.error(
+        Object.values(errors)[0] ?? "Please correct the highlighted fields."
+      );
+      return;
+    }
+    const seo = {
+      metaTitle: form.metaTitle,
+      metaDescription: form.metaDescription,
+      keywords: form.keywords.split(",").map((k2) => k2.trim()).filter(Boolean)
+    };
+    const payload = {
+      title: form.title,
+      slug: form.slug,
+      content: form.content,
+      seo,
+      sortOrder: form.sortOrder,
+      isActive: form.isActive,
+      image: form.image || void 0
+    };
+    try {
+      if (mode === "edit" && selected) {
+        await updateMutation.mutateAsync({
+          id: selected._id,
+          payload
+        });
+        ue$2.success("Procedure updated");
+      } else {
+        await addMutation.mutateAsync(payload);
+        ue$2.success("Procedure created");
+      }
+      queryClient2.invalidateQueries({
+        queryKey: PROCEDURE_QUERY_KEY
+      });
+      setOpen(false);
+    } catch (error) {
+      const backendErrors = mapApiErrorsToFields(
+        error,
+        {
+          title: /title/i,
+          slug: /slug/i,
+          content: /content/i,
+          metaTitle: /meta title/i,
+          metaDescription: /meta description/i,
+          image: /\bimage\b/i
+        }
+      );
+      if (Object.keys(backendErrors).length > 0) {
+        setFormErrors((prev2) => ({
+          ...prev2,
+          ...backendErrors
+        }));
+      }
+      ue$2.error(getApiErrorMessage(error, "Failed to save procedure."));
+    }
+  };
+  const toggleProcedureStatus = async (procedure, checked) => {
+    try {
+      await updateMutation.mutateAsync({
+        id: procedure._id,
+        payload: {
+          isActive: checked
+        }
+      });
+      queryClient2.invalidateQueries({
+        queryKey: PROCEDURE_QUERY_KEY
+      });
+      ue$2.success(checked ? "Procedure activated" : "Procedure deactivated");
+    } catch (error) {
+      ue$2.error(getApiErrorMessage(error, "Failed to update status."));
+    }
+  };
+  const handleDelete = async (id) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      queryClient2.invalidateQueries({
+        queryKey: PROCEDURE_QUERY_KEY
+      });
+      ue$2.success("Deleted");
+    } catch (error) {
+      ue$2.error(getApiErrorMessage(error, "Failed to delete procedure."));
+    }
+  };
+  const columns = [
+    {
+      key: "title",
+      header: "Procedure",
+      render: (procedure) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-12 overflow-hidden rounded-lg border border-border bg-muted/60 shrink-0", children: procedure.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: resolveAssetUrl2(procedure.image),
+            alt: procedure.title || "Procedure",
+            className: "h-full w-full object-cover"
+          }
+        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full w-full bg-muted" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-foreground truncate", children: procedure.title || "Untitled" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground truncate", children: procedure.slug || "No slug" })
+        ] })
+      ] })
+    },
+    {
+      key: "sortOrder",
+      header: "Sort Order",
+      render: (procedure) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: procedure.sortOrder ?? 0 })
+    },
+    {
+      key: "isActive",
+      header: "Status",
+      render: (procedure) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Switch,
+          {
+            checked: procedure.isActive !== false,
+            onCheckedChange: (checked) => toggleProcedureStatus(procedure, checked),
+            disabled: updateMutation.isPending
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: procedure.isActive ? "default" : "secondary", children: procedure.isActive ? "Active" : "Inactive" })
+      ] })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (procedure) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-lg border-border",
+            onClick: () => setPreviewTarget(procedure),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "outline",
+            className: "rounded-lg",
+            onClick: () => openEdit(procedure),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 16 })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "ghost",
+            onClick: () => setDeleteTarget(procedure),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+          }
+        )
+      ] })
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Procedure Management",
+        description: "Manage procedures, SEO, and preview content.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: openAdd, className: "rounded-xl gap-2 bg-primary", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "h-4 w-4" }),
+          "Add Procedure"
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataTable,
+      {
+        columns,
+        data: procedures,
+        isLoading,
+        searchable: true,
+        searchKeys: ["title", "slug"],
+        emptyText: "No procedures found.",
+        rowKey: (row) => row._id
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open,
+        onOpenChange: (nextOpen) => {
+          setOpen(nextOpen);
+          if (!nextOpen) {
+            setFormErrors({});
+          }
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: mode === "edit" ? "Edit Procedure" : "Create Procedure" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                    "Title ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      value: form.title,
+                      onChange: (e3) => setField("title", e3.target.value)
+                    }
+                  ),
+                  formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      value: form.slug,
+                      onChange: (e3) => setField("slug", e3.target.value)
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Sort Order" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "number",
+                      value: form.sortOrder,
+                      onChange: (e3) => setField("sortOrder", Number(e3.target.value))
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "select",
+                    {
+                      value: form.isActive ? "active" : "inactive",
+                      onChange: (e3) => setField("isActive", e3.target.value === "active"),
+                      className: "w-full border rounded-md px-3 py-2 bg-background",
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: "Active" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: "Inactive" })
+                      ]
+                    }
+                  )
+                ] })
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                PageEditor,
+                {
+                  value: form.content,
+                  onChange: (val) => setField("content", val)
+                }
+              ),
+              formErrors.content ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.content }) : null
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  placeholder: "Meta Title",
+                  value: form.metaTitle,
+                  onChange: (e3) => setField("metaTitle", e3.target.value)
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Textarea,
+                {
+                  placeholder: "Meta Description",
+                  value: form.metaDescription,
+                  onChange: (e3) => setField("metaDescription", e3.target.value)
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  placeholder: "Keywords (comma separated)",
+                  value: form.keywords,
+                  onChange: (e3) => setField("keywords", e3.target.value)
+                }
+              )
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
+              imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: imagePreview,
+                  alt: "Procedure preview",
+                  className: "w-full h-48 object-cover rounded-lg"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "file",
+                    accept: "image/*",
+                    hidden: true,
+                    onChange: (e3) => {
+                      var _a2;
+                      return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
+                    }
+                  }
+                )
+              ] }),
+              formErrors.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.image }) : null
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full bg-primary", children: mode === "edit" ? "Update Procedure" : "Create Procedure" })
+          ] })
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Dialog,
+      {
+        open: !!previewTarget,
+        onOpenChange: (nextOpen) => !nextOpen && setPreviewTarget(null),
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Procedure Preview" }) }),
+            previewTarget && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
+              previewTarget.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted/60", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: resolveAssetUrl2(previewTarget.image),
+                  alt: previewTarget.title || "Procedure",
+                  className: "h-56 w-full object-cover"
+                }
+              ) }) : null,
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-semibold text-foreground", children: previewTarget.title || "Untitled" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-muted-foreground", children: [
+                  "Slug: ",
+                  previewTarget.slug || "No slug"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-border bg-card p-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-foreground", children: "Content" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    dangerouslySetInnerHTML: {
+                      __html: purify.sanitize(previewTarget.content || "")
+                    }
+                  }
+                )
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ConfirmDialog,
+            {
+              open: !!deleteTarget,
+              title: "Delete this procedure?",
+              message: "This procedure will be permanently removed.",
+              confirmLabel: "Delete Procedure",
+              onConfirm: () => {
+                if (deleteTarget) {
+                  handleDelete(deleteTarget._id);
+                  setDeleteTarget(null);
+                }
+              },
+              onCancel: () => setDeleteTarget(null)
+            }
+          )
+        ]
+      }
+    )
+  ] });
+}
 function getAuthState() {
   return loadAuthState();
 }
@@ -77474,6 +78065,12 @@ const patientsRoute = createRoute({
   path: "/patients",
   beforeLoad: () => checkPermission("/patients"),
   component: PatientsPage
+});
+const procedureRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/procedures",
+  beforeLoad: () => checkPermission("/procedures"),
+  component: ProceduresPage
 });
 const appointmentsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
@@ -77549,6 +78146,7 @@ const routeTree = rootRoute.addChildren([
     specializationsRoute,
     honorsRoute,
     patientsRoute,
+    procedureRoute,
     appointmentsRoute,
     serviceManagementRoute,
     blogsRoute,

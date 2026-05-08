@@ -95,6 +95,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/appointments",
   },
   {
+    label: "Cosmetic Procedures",
+    icon: Calendar,
+    path: "/procedures",
+    permissionPath: "/procedures",
+  },
+  {
     label: "Blogs",
     icon: FileImage,
     path: "/blogs",

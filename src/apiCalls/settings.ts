@@ -18,10 +18,6 @@ export interface SettingsItem {
   address?: string;
   working_hours?: string;
   password?: string;
-  contact_us?: string;
-  term_and_condition?: string;
-  privacy_policy?: string;
-  about_us?: string;
   website_logo?: string;
   google_reviews?: {
     place_id?: string;
