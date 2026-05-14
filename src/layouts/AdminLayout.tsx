@@ -39,10 +39,11 @@ import { useState } from "react";
 
 interface NavItem {
   label: string;
-  icon: React.ElementType;
-  path: string;
+  icon?: React.ElementType;
+  path?: string;
   /** The route path used to check backend-driven access rules */
   permissionPath: string;
+  children?: NavItem[];
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
@@ -52,12 +53,24 @@ const ALL_NAV_ITEMS: NavItem[] = [
     path: "/dashboard",
     permissionPath: "/dashboard",
   },
-  {
+    {
     label: "Services",
     icon: HeartPulse,
-    path: "/service-management",
     permissionPath: "/service-management",
+    children: [
+      {
+        label: "Service Management",
+        path: "/service-management",
+        permissionPath: "/service-management",
+      },
+      {
+        label: "Service Features",
+        path: "/service-features",
+        permissionPath: "/service-features",
+      },
+    ],
   },
+
   {
     label: "Roles",
     icon: Shield,
@@ -171,17 +184,87 @@ function SidebarNav({
 }: SidebarNavProps) {
   const navigate = useNavigate();
 
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
+    Services: true,
+  });
+
+  function toggleMenu(label: string) {
+    setOpenMenus((prev) => ({
+      ...prev,
+      [label]: !prev[label],
+    }));
+  }
+
   return (
     <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
       {visibleItems.map((item) => {
+        // submenu
+        if (item.children?.length) {
+          return (
+            <div key={item.label}>
+              <button
+                type="button"
+                onClick={() => toggleMenu(item.label)}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-sidebar-accent"
+              >
+                <div className="flex items-center gap-3">
+                  {item.icon && <item.icon size={18} />}
+                  {item.label}
+                </div>
+
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${
+                    openMenus[item.label]
+                      ? "rotate-180"
+                      : ""
+                  }`}
+                />
+              </button>
+
+              {openMenus[item.label] && (
+                <div className="ml-6 mt-1 space-y-1">
+                  {item.children.map((child) => {
+                    const isActive =
+                      currentPath === child.path;
+
+                    return (
+                      <button
+                        key={child.path}
+                        type="button"
+                        onClick={() => {
+                          navigate({
+                            to: child.path!,
+                          });
+
+                          onNavigate?.();
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${
+                          isActive
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                            : "hover:bg-sidebar-accent"
+                        }`}
+                      >
+                        {child.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // normal menu
         const isActive =
-          currentPath === item.path || currentPath.startsWith(`${item.path}/`);
+          currentPath === item.path ||
+          currentPath.startsWith(`${item.path}/`);
+
         return (
           <button
             key={item.path}
-            data-ocid={`nav.${item.label.toLowerCase().replace(/\s+/g, "_")}_link`}
             onClick={() => {
-              navigate({ to: item.path });
+              navigate({ to: item.path! });
               onNavigate?.();
             }}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200 ${
@@ -191,7 +274,7 @@ function SidebarNav({
             }`}
             type="button"
           >
-            <item.icon size={18} />
+            {item.icon && <item.icon size={18} />}
             {item.label}
           </button>
         );

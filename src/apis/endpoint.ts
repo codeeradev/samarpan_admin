@@ -19,10 +19,12 @@ export const ENDPOINT = {
   GET_ALL_SHORTS: "/get-all-shorts",
   UPDATE_SHORT: "/update-short",
   DELETE_SHORT: "/delete-short",
+
   GET_ALL_BLOGS: "/get-all-blogs",
   ADD_BLOG: "/add-blog",
   UPDATE_BLOG: "/update-blog",
   DELETE_BLOG: "/delete-blog",
+
   GET_ALL_GALLERY: "/get-all-gallery",
   ADD_GALLERY: "/add-gallery",
   UPDATE_GALLERY: "/update-gallery",
@@ -64,4 +66,9 @@ export const ENDPOINT = {
   ADD_PROCEDURE: "/add-procedure",
   UPDATE_PROCEDURE: "/update-procedure",
   DELETE_PROCEDURE: "/delete-procedure",
+
+  ADD_SERVICE_FEATURE: "/add-service-feature",
+  UPDATE_SERVICE_FEATURE: "/update-service-feature",
+  DELETE_SERVICE_FEATURE: "/delete-service-feature",
+  GET_SERVICE_FEATURES: "/get-service-feature",
 };

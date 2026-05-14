@@ -21906,7 +21906,11 @@ const ENDPOINT = {
   GET_ALL_PROCEDURES: "/get-procedure",
   ADD_PROCEDURE: "/add-procedure",
   UPDATE_PROCEDURE: "/update-procedure",
-  DELETE_PROCEDURE: "/delete-procedure"
+  DELETE_PROCEDURE: "/delete-procedure",
+  ADD_SERVICE_FEATURE: "/add-service-feature",
+  UPDATE_SERVICE_FEATURE: "/update-service-feature",
+  DELETE_SERVICE_FEATURE: "/delete-service-feature",
+  GET_SERVICE_FEATURES: "/get-service-feature"
 };
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -37679,8 +37683,19 @@ const ALL_NAV_ITEMS = [
   {
     label: "Services",
     icon: HeartPulse,
-    path: "/service-management",
-    permissionPath: "/service-management"
+    permissionPath: "/service-management",
+    children: [
+      {
+        label: "Service Management",
+        path: "/service-management",
+        permissionPath: "/service-management"
+      },
+      {
+        label: "Service Features",
+        path: "/service-features",
+        permissionPath: "/service-features"
+      }
+    ]
   },
   {
     label: "Roles",
@@ -37785,12 +37800,64 @@ function SidebarNav({
   onNavigate
 }) {
   const navigate = useNavigate();
+  const [openMenus, setOpenMenus] = reactExports.useState({
+    Services: true
+  });
+  function toggleMenu(label) {
+    setOpenMenus((prev2) => ({
+      ...prev2,
+      [label]: !prev2[label]
+    }));
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "flex-1 px-3 py-4 space-y-1 overflow-y-auto", children: visibleItems.map((item) => {
+    var _a2;
+    if ((_a2 = item.children) == null ? void 0 : _a2.length) {
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            type: "button",
+            onClick: () => toggleMenu(item.label),
+            className: "w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-sidebar-accent",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                item.icon && /* @__PURE__ */ jsxRuntimeExports.jsx(item.icon, { size: 18 }),
+                item.label
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                ChevronDown,
+                {
+                  size: 16,
+                  className: `transition-transform ${openMenus[item.label] ? "rotate-180" : ""}`
+                }
+              )
+            ]
+          }
+        ),
+        openMenus[item.label] && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "ml-6 mt-1 space-y-1", children: item.children.map((child) => {
+          const isActive2 = currentPath === child.path;
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                navigate({
+                  to: child.path
+                });
+                onNavigate == null ? void 0 : onNavigate();
+              },
+              className: `w-full text-left px-3 py-2 rounded-lg text-sm transition ${isActive2 ? "bg-sidebar-primary text-sidebar-primary-foreground" : "hover:bg-sidebar-accent"}`,
+              children: child.label
+            },
+            child.path
+          );
+        }) })
+      ] }, item.label);
+    }
     const isActive = currentPath === item.path || currentPath.startsWith(`${item.path}/`);
     return /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "button",
       {
-        "data-ocid": `nav.${item.label.toLowerCase().replace(/\s+/g, "_")}_link`,
         onClick: () => {
           navigate({ to: item.path });
           onNavigate == null ? void 0 : onNavigate();
@@ -37798,7 +37865,7 @@ function SidebarNav({
         className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200 ${isActive ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`,
         type: "button",
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(item.icon, { size: 18 }),
+          item.icon && /* @__PURE__ */ jsxRuntimeExports.jsx(item.icon, { size: 18 }),
           item.label
         ]
       },
@@ -43051,26 +43118,43 @@ function normalizeCareerItem(career) {
     sortOrder: typeof career.sortOrder === "number" ? career.sortOrder : Number(career.sortOrder) || 0,
     isActive: career.isActive,
     createdAt: career.createdAt,
-    updatedAt: career.updatedAt
+    updatedAt: career.updatedAt,
+    image: career.image || ""
   };
 }
-function toRequestPayload$1(payload) {
-  return {
-    title: payload.title.trim(),
-    slug: payload.slug.trim(),
-    department: payload.department.trim(),
-    employmentType: payload.employmentType.trim(),
-    experience: payload.experience.trim(),
-    summary: payload.summary.trim(),
-    description: payload.description.trim(),
-    requirements: payload.requirements,
-    responsibilities: payload.responsibilities,
-    applyEmail: payload.applyEmail.trim(),
-    applyLink: payload.applyLink.trim(),
-    status: payload.status,
-    sortOrder: payload.sortOrder,
-    isActive: payload.status !== "draft"
-  };
+function createCareerFormData(payload) {
+  const formData = new FormData();
+  formData.append("title", payload.title.trim());
+  formData.append("slug", payload.slug.trim());
+  formData.append("department", payload.department.trim());
+  formData.append(
+    "employmentType",
+    payload.employmentType.trim()
+  );
+  formData.append("experience", payload.experience.trim());
+  formData.append("summary", payload.summary.trim());
+  formData.append("description", payload.description.trim());
+  payload.requirements.forEach((item) => {
+    formData.append("requirements", item);
+  });
+  payload.responsibilities.forEach((item) => {
+    formData.append("responsibilities", item);
+  });
+  formData.append("applyEmail", payload.applyEmail.trim());
+  formData.append("applyLink", payload.applyLink.trim());
+  formData.append("status", payload.status);
+  formData.append(
+    "sortOrder",
+    String(payload.sortOrder)
+  );
+  formData.append(
+    "isActive",
+    String(payload.status !== "draft")
+  );
+  if (payload.image) {
+    formData.append("image", payload.image);
+  }
+  return formData;
 }
 const getAllCareersApi = async () => {
   var _a2;
@@ -43084,7 +43168,7 @@ const getAllCareersApi = async () => {
 const addCareerApi = async (payload) => {
   var _a2;
   try {
-    const res = await post(ENDPOINT.ADD_CAREER, toRequestPayload$1(payload), {
+    const res = await post(ENDPOINT.ADD_CAREER, createCareerFormData(payload), {
       needAuth: true
     });
     return normalizeCareerItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.career) ?? {});
@@ -43097,7 +43181,7 @@ const updateCareerApi = async (id, payload) => {
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_CAREER}/${id}`,
-      toRequestPayload$1(payload),
+      createCareerFormData(payload),
       {
         needAuth: true
       }
@@ -43172,6 +43256,184 @@ function CardContent({ className, ...props }) {
     }
   );
 }
+const API_ASSET_ORIGIN$1 = BASE_URL.replace(/\/admin\/?$/, "");
+const SECTION_META = {
+  home_hero: {
+    title: "Home Hero Section",
+    description: "Manage the homepage hero content and images."
+  },
+  home_how_we_work: {
+    title: "How We Work Section",
+    description: "Manage the homepage How We Work area."
+  },
+  why_choose_us: {
+    title: "Why Choose Us Section",
+    description: "Manage the homepage Why Choose Us content."
+  },
+  about: {
+    title: "About Section",
+    description: "Manage the homepage About section content."
+  }
+};
+const EMPTY_HERO_FORM = {
+  eyebrowText: "",
+  titlePrefix: "",
+  titleHighlight: "",
+  titleSuffix: "",
+  description: "",
+  primaryCtaText: "",
+  primaryCtaLink: "",
+  secondaryCtaText: "",
+  secondaryCtaLink: "",
+  supportTitle: "",
+  supportSubtitle: "",
+  successRateValue: "",
+  successRateLabel: "",
+  featurePointOne: "",
+  featurePointTwo: "",
+  featurePointThree: "",
+  backgroundImage: "",
+  primaryImage: "",
+  secondaryImage: "",
+  isActive: true
+};
+const EMPTY_HOW_IT_WORK_FORM = {
+  eyebrowText: "",
+  heading: "",
+  subheading: "",
+  description: "",
+  stepOneTitle: "",
+  stepOneDescription: "",
+  stepTwoTitle: "",
+  stepTwoDescription: "",
+  stepThreeTitle: "",
+  stepThreeDescription: "",
+  sectionImage: "",
+  isActive: true
+};
+const EMPTY_WHY_CHOOSE_US_FORM = {
+  eyebrowText: "",
+  heading: "",
+  description: "",
+  sectionImage: "",
+  secondaryImage: "",
+  cardOneTitle: "",
+  cardOneDescription: "",
+  cardTwoTitle: "",
+  cardTwoDescription: "",
+  cardThreeTitle: "",
+  cardThreeDescription: "",
+  cardFourTitle: "",
+  cardFourDescription: "",
+  isActive: true
+};
+const EMPTY_ABOUT_FORM = {
+  eyebrowText: "",
+  heading: "",
+  subheading: "",
+  description: "",
+  bulletOne: "",
+  bulletTwo: "",
+  bulletThree: "",
+  bulletFour: "",
+  ctaText: "",
+  ctaLink: "",
+  sectionImage: "",
+  isActive: true
+};
+function readString(value) {
+  return typeof value === "string" ? value : "";
+}
+function readBoolean(value, fallback = true) {
+  return typeof value === "boolean" ? value : fallback;
+}
+function resolveAssetUrl$1(value) {
+  if (value instanceof File || !value) {
+    return "";
+  }
+  if (/^https?:\/\//.test(value)) {
+    return value;
+  }
+  return `${API_ASSET_ORIGIN$1}${value.startsWith("/") ? value : `/${value}`}`;
+}
+function mapContentToHeroForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    titlePrefix: readString(content.titlePrefix),
+    titleHighlight: readString(content.titleHighlight),
+    titleSuffix: readString(content.titleSuffix),
+    description: readString(content.description),
+    primaryCtaText: readString(content.primaryCtaText),
+    primaryCtaLink: readString(content.primaryCtaLink),
+    secondaryCtaText: readString(content.secondaryCtaText),
+    secondaryCtaLink: readString(content.secondaryCtaLink),
+    supportTitle: readString(content.supportTitle),
+    supportSubtitle: readString(content.supportSubtitle),
+    successRateValue: readString(content.successRateValue),
+    successRateLabel: readString(content.successRateLabel),
+    featurePointOne: readString(content.featurePointOne),
+    featurePointTwo: readString(content.featurePointTwo),
+    featurePointThree: readString(content.featurePointThree),
+    backgroundImage: readString(content.backgroundImage),
+    primaryImage: readString(content.primaryImage),
+    secondaryImage: readString(content.secondaryImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function mapContentToHowItWorksForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    heading: readString(content.heading),
+    subheading: readString(content.subheading),
+    description: readString(content.description),
+    stepOneTitle: readString(content.stepOneTitle),
+    stepOneDescription: readString(content.stepOneDescription),
+    stepTwoTitle: readString(content.stepTwoTitle),
+    stepTwoDescription: readString(content.stepTwoDescription),
+    stepThreeTitle: readString(content.stepThreeTitle),
+    stepThreeDescription: readString(content.stepThreeDescription),
+    sectionImage: readString(content.sectionImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function mapContentToWhyChooseUsForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    heading: readString(content.heading),
+    description: readString(content.description),
+    sectionImage: readString(content.sectionImage),
+    secondaryImage: readString(content.secondaryImage),
+    cardOneTitle: readString(content.cardOneTitle),
+    cardOneDescription: readString(content.cardOneDescription),
+    cardTwoTitle: readString(content.cardTwoTitle),
+    cardTwoDescription: readString(content.cardTwoDescription),
+    cardThreeTitle: readString(content.cardThreeTitle),
+    cardThreeDescription: readString(content.cardThreeDescription),
+    cardFourTitle: readString(content.cardFourTitle),
+    cardFourDescription: readString(content.cardFourDescription),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function mapContentToAboutForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    eyebrowText: readString(content.eyebrowText),
+    heading: readString(content.heading),
+    subheading: readString(content.subheading),
+    description: readString(content.description),
+    bulletOne: readString(content.bulletOne),
+    bulletTwo: readString(content.bulletTwo),
+    bulletThree: readString(content.bulletThree),
+    bulletFour: readString(content.bulletFour),
+    ctaText: readString(content.ctaText),
+    ctaLink: readString(content.ctaLink),
+    sectionImage: readString(content.sectionImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
 const emptyCareerForm = {
   title: "",
   slug: "",
@@ -43185,7 +43447,8 @@ const emptyCareerForm = {
   applyEmail: "",
   applyLink: "",
   status: "open",
-  sortOrder: "0"
+  sortOrder: "0",
+  image: null
 };
 const tableStyles$1 = {
   table: {
@@ -43238,7 +43501,7 @@ const tableStyles$1 = {
     }
   }
 };
-function slugify$2(value) {
+function slugify$3(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
 function formatDate$1(value) {
@@ -43268,7 +43531,7 @@ function isValidUrl(value) {
 }
 function validateCareerForm(form, careers, currentId) {
   const errors = {};
-  const nextSlug = form.slug.trim() ? slugify$2(form.slug) : slugify$2(form.title);
+  const nextSlug = form.slug.trim() ? slugify$3(form.slug) : slugify$3(form.title);
   const duplicateSlug = careers.find(
     (career) => career.slug === nextSlug && career._id !== currentId
   );
@@ -43306,6 +43569,7 @@ function CareerManagementPage() {
   const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
   const [formData, setFormData] = reactExports.useState(emptyCareerForm);
   const [formErrors, setFormErrors] = reactExports.useState({});
+  const [imagePreview, setImagePreview] = reactExports.useState("");
   const { data = [], isLoading } = useQuery({
     queryKey: ["careers"],
     queryFn: getAllCareersApi
@@ -43366,10 +43630,12 @@ function CareerManagementPage() {
     setEditTarget(null);
     setFormData(emptyCareerForm);
     setFormErrors({});
+    setImagePreview("");
     setModalOpen(true);
   }
   function openEdit(career) {
     setEditTarget(career);
+    setImagePreview(career.image || "");
     setFormData({
       title: career.title,
       slug: career.slug,
@@ -43383,7 +43649,8 @@ function CareerManagementPage() {
       applyEmail: career.applyEmail,
       applyLink: career.applyLink,
       status: career.status,
-      sortOrder: String(career.sortOrder ?? 0)
+      sortOrder: String(career.sortOrder ?? 0),
+      image: null
     });
     setFormErrors({});
     setModalOpen(true);
@@ -43410,7 +43677,7 @@ function CareerManagementPage() {
     const sortOrder = Number.parseInt(formData.sortOrder, 10);
     const payload = {
       title: formData.title.trim(),
-      slug: formData.slug.trim() ? slugify$2(formData.slug) : slugify$2(formData.title),
+      slug: formData.slug.trim() ? slugify$3(formData.slug) : slugify$3(formData.title),
       department: formData.department.trim(),
       employmentType: formData.employmentType.trim(),
       experience: formData.experience.trim(),
@@ -43421,7 +43688,8 @@ function CareerManagementPage() {
       applyEmail: formData.applyEmail.trim(),
       applyLink: formData.applyLink.trim(),
       status: formData.status,
-      sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0
+      sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
+      image: formData.image
     };
     try {
       if (editTarget == null ? void 0 : editTarget._id) {
@@ -43453,6 +43721,18 @@ function CareerManagementPage() {
     deleteMutation.mutate(deleteTarget._id);
   }
   const columns = [
+    {
+      name: "Image",
+      width: "110px",
+      cell: (career) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "py-2", children: career.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "img",
+        {
+          src: resolveAssetUrl$1(career.image),
+          alt: career.title,
+          className: "h-14 w-14 rounded-xl border object-cover"
+        }
+      ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex h-14 w-14 items-center justify-center rounded-xl border text-xs text-muted-foreground", children: "No Img" }) })
+    },
     {
       name: "Role",
       grow: 1.4,
@@ -43655,7 +43935,7 @@ function CareerManagementPage() {
                 ),
                 formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
                   "This will be saved as `/",
-                  formData.slug.trim() ? slugify$2(formData.slug) : slugify$2(formData.title) || "career-role",
+                  formData.slug.trim() ? slugify$3(formData.slug) : slugify$3(formData.title) || "career-role",
                   "`."
                 ] })
               ] }),
@@ -43674,6 +43954,34 @@ function CareerManagementPage() {
                 ),
                 formErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.sortOrder }) : null
               ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-image", children: "Career Image" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "career-image",
+                  type: "file",
+                  accept: "image/*",
+                  onChange: (event) => {
+                    var _a2;
+                    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) || null;
+                    setField("image", file);
+                    if (file) {
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  },
+                  className: "rounded-xl"
+                }
+              ),
+              imagePreview ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: imagePreview,
+                  alt: "Preview",
+                  className: "mt-3 h-28 w-28 rounded-2xl border object-cover"
+                }
+              ) : null
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2 lg:grid-cols-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
@@ -66097,8 +66405,8 @@ function TableCell({ className, ...props }) {
   );
 }
 const SKELETON_ROWS$1 = ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5"];
-const API_ASSET_ORIGIN$1 = BASE_URL.replace(/\/admin\/?$/, "");
-const emptyForm$1 = {
+const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
+const emptyForm$2 = {
   name: "",
   specialization: "",
   experience: "",
@@ -66131,10 +66439,10 @@ function availabilityToFlags(availability) {
 function splitCommaList(value) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
-function resolveAssetUrl$1(path) {
+function resolveAssetUrl(path) {
   if (!path) return void 0;
   if (/^https?:\/\//.test(path)) return path;
-  return `${API_ASSET_ORIGIN$1}${path.startsWith("/") ? path : `/${path}`}`;
+  return `${API_ASSET_ORIGIN}${path.startsWith("/") ? path : `/${path}`}`;
 }
 function getImageLabel(value) {
   if (value instanceof File) return value.name;
@@ -66206,7 +66514,7 @@ function DoctorsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = reactExports.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = reactExports.useState(false);
   const [selectedDoctor, setSelectedDoctor] = reactExports.useState(null);
-  const [formData, setFormData] = reactExports.useState(emptyForm$1);
+  const [formData, setFormData] = reactExports.useState(emptyForm$2);
   const [formErrors, setFormErrors] = reactExports.useState({});
   const [imageFileName, setImageFileName] = reactExports.useState("");
   const fileInputRef = reactExports.useRef(null);
@@ -66262,7 +66570,7 @@ function DoctorsPage() {
     );
   }, [doctors, searchQuery]);
   function resetForm() {
-    setFormData(emptyForm$1);
+    setFormData(emptyForm$2);
     setFormErrors({});
     setImageFileName("");
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -66339,7 +66647,7 @@ function DoctorsPage() {
     }
   }
   function renderDoctorAvatar(doctor, sizeClass = "h-9 w-9") {
-    const imageSrc = resolveAssetUrl$1(doctor.image);
+    const imageSrc = resolveAssetUrl(doctor.image);
     return /* @__PURE__ */ jsxRuntimeExports.jsxs(Avatar, { className: `${sizeClass} shrink-0`, children: [
       imageSrc && /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarImage, { src: imageSrc, alt: doctor.name }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "bg-accent text-secondary text-xs font-bold", children: getInitials(doctor.name) })
@@ -67729,184 +68037,6 @@ function Switch({
     }
   );
 }
-const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
-const SECTION_META = {
-  home_hero: {
-    title: "Home Hero Section",
-    description: "Manage the homepage hero content and images."
-  },
-  home_how_we_work: {
-    title: "How We Work Section",
-    description: "Manage the homepage How We Work area."
-  },
-  why_choose_us: {
-    title: "Why Choose Us Section",
-    description: "Manage the homepage Why Choose Us content."
-  },
-  about: {
-    title: "About Section",
-    description: "Manage the homepage About section content."
-  }
-};
-const EMPTY_HERO_FORM = {
-  eyebrowText: "",
-  titlePrefix: "",
-  titleHighlight: "",
-  titleSuffix: "",
-  description: "",
-  primaryCtaText: "",
-  primaryCtaLink: "",
-  secondaryCtaText: "",
-  secondaryCtaLink: "",
-  supportTitle: "",
-  supportSubtitle: "",
-  successRateValue: "",
-  successRateLabel: "",
-  featurePointOne: "",
-  featurePointTwo: "",
-  featurePointThree: "",
-  backgroundImage: "",
-  primaryImage: "",
-  secondaryImage: "",
-  isActive: true
-};
-const EMPTY_HOW_IT_WORK_FORM = {
-  eyebrowText: "",
-  heading: "",
-  subheading: "",
-  description: "",
-  stepOneTitle: "",
-  stepOneDescription: "",
-  stepTwoTitle: "",
-  stepTwoDescription: "",
-  stepThreeTitle: "",
-  stepThreeDescription: "",
-  sectionImage: "",
-  isActive: true
-};
-const EMPTY_WHY_CHOOSE_US_FORM = {
-  eyebrowText: "",
-  heading: "",
-  description: "",
-  sectionImage: "",
-  secondaryImage: "",
-  cardOneTitle: "",
-  cardOneDescription: "",
-  cardTwoTitle: "",
-  cardTwoDescription: "",
-  cardThreeTitle: "",
-  cardThreeDescription: "",
-  cardFourTitle: "",
-  cardFourDescription: "",
-  isActive: true
-};
-const EMPTY_ABOUT_FORM = {
-  eyebrowText: "",
-  heading: "",
-  subheading: "",
-  description: "",
-  bulletOne: "",
-  bulletTwo: "",
-  bulletThree: "",
-  bulletFour: "",
-  ctaText: "",
-  ctaLink: "",
-  sectionImage: "",
-  isActive: true
-};
-function readString(value) {
-  return typeof value === "string" ? value : "";
-}
-function readBoolean(value, fallback = true) {
-  return typeof value === "boolean" ? value : fallback;
-}
-function resolveAssetUrl(value) {
-  if (value instanceof File || !value) {
-    return "";
-  }
-  if (/^https?:\/\//.test(value)) {
-    return value;
-  }
-  return `${API_ASSET_ORIGIN}${value.startsWith("/") ? value : `/${value}`}`;
-}
-function mapContentToHeroForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    titlePrefix: readString(content.titlePrefix),
-    titleHighlight: readString(content.titleHighlight),
-    titleSuffix: readString(content.titleSuffix),
-    description: readString(content.description),
-    primaryCtaText: readString(content.primaryCtaText),
-    primaryCtaLink: readString(content.primaryCtaLink),
-    secondaryCtaText: readString(content.secondaryCtaText),
-    secondaryCtaLink: readString(content.secondaryCtaLink),
-    supportTitle: readString(content.supportTitle),
-    supportSubtitle: readString(content.supportSubtitle),
-    successRateValue: readString(content.successRateValue),
-    successRateLabel: readString(content.successRateLabel),
-    featurePointOne: readString(content.featurePointOne),
-    featurePointTwo: readString(content.featurePointTwo),
-    featurePointThree: readString(content.featurePointThree),
-    backgroundImage: readString(content.backgroundImage),
-    primaryImage: readString(content.primaryImage),
-    secondaryImage: readString(content.secondaryImage),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
-function mapContentToHowItWorksForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    heading: readString(content.heading),
-    subheading: readString(content.subheading),
-    description: readString(content.description),
-    stepOneTitle: readString(content.stepOneTitle),
-    stepOneDescription: readString(content.stepOneDescription),
-    stepTwoTitle: readString(content.stepTwoTitle),
-    stepTwoDescription: readString(content.stepTwoDescription),
-    stepThreeTitle: readString(content.stepThreeTitle),
-    stepThreeDescription: readString(content.stepThreeDescription),
-    sectionImage: readString(content.sectionImage),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
-function mapContentToWhyChooseUsForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    heading: readString(content.heading),
-    description: readString(content.description),
-    sectionImage: readString(content.sectionImage),
-    secondaryImage: readString(content.secondaryImage),
-    cardOneTitle: readString(content.cardOneTitle),
-    cardOneDescription: readString(content.cardOneDescription),
-    cardTwoTitle: readString(content.cardTwoTitle),
-    cardTwoDescription: readString(content.cardTwoDescription),
-    cardThreeTitle: readString(content.cardThreeTitle),
-    cardThreeDescription: readString(content.cardThreeDescription),
-    cardFourTitle: readString(content.cardFourTitle),
-    cardFourDescription: readString(content.cardFourDescription),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
-function mapContentToAboutForm(item) {
-  const content = (item == null ? void 0 : item.content) ?? {};
-  return {
-    eyebrowText: readString(content.eyebrowText),
-    heading: readString(content.heading),
-    subheading: readString(content.subheading),
-    description: readString(content.description),
-    bulletOne: readString(content.bulletOne),
-    bulletTwo: readString(content.bulletTwo),
-    bulletThree: readString(content.bulletThree),
-    bulletFour: readString(content.bulletFour),
-    ctaText: readString(content.ctaText),
-    ctaLink: readString(content.ctaLink),
-    sectionImage: readString(content.sectionImage),
-    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
-  };
-}
 const emptyHonorForm = {
   title: "",
   image: "",
@@ -68113,7 +68243,7 @@ function HonorsPage() {
         honor.image && typeof honor.image === "string" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full overflow-hidden border border-border bg-card flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           "img",
           {
-            src: resolveAssetUrl(honor.image),
+            src: resolveAssetUrl$1(honor.image),
             className: "w-full h-full object-contain"
           }
         ) }),
@@ -70272,7 +70402,7 @@ function ThemePage() {
     if (path.startsWith("blob:") || path.startsWith("http")) {
       return path;
     }
-    return resolveAssetUrl(path);
+    return resolveAssetUrl$1(path);
   }
   async function loadTheme(type) {
     try {
@@ -71480,7 +71610,6 @@ function toFormData$3(payload) {
   if (payload.content) fd.append("content", payload.content);
   if (payload.image instanceof File) fd.append("image", payload.image);
   if (payload.icon instanceof File) fd.append("icon", payload.icon);
-  if (payload.features) fd.append("features", JSON.stringify(payload.features));
   if (payload.faqs) fd.append("faqs", JSON.stringify(payload.faqs));
   if (payload.seo) fd.append("seo", JSON.stringify(payload.seo));
   return fd;
@@ -72300,12 +72429,12 @@ function PageEditor({ value, onChange }) {
     }
   ) });
 }
-function slugify$1(value) {
+function slugify$2(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
 function validateServiceForm(form, mode, services, currentId) {
   const errors = {};
-  const nextSlug = form.slug.trim() ? slugify$1(form.slug) : slugify$1(form.title);
+  const nextSlug = form.slug.trim() ? slugify$2(form.slug) : slugify$2(form.title);
   const duplicateSlug = services.find(
     (service) => service.slug === nextSlug && service._id !== currentId
   );
@@ -72336,13 +72465,12 @@ function validateServiceForm(form, mode, services, currentId) {
   }
   return errors;
 }
-const emptyForm = {
+const emptyForm$1 = {
   title: "",
   slug: "",
   shortDescription: "",
   image: "",
   icon: "",
-  features: [],
   content: "",
   faqs: [],
   seo: { metaTitle: "", metaDescription: "", keywords: [] }
@@ -72398,9 +72526,8 @@ function ServiceManagementPage() {
   const [modalOpen, setModalOpen] = reactExports.useState(false);
   const [editTarget, setEditTarget] = reactExports.useState(null);
   const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
-  const [formData, setFormData] = reactExports.useState(emptyForm);
+  const [formData, setFormData] = reactExports.useState(emptyForm$1);
   const [formErrors, setFormErrors] = reactExports.useState({});
-  const [featuresInput, setFeaturesInput] = reactExports.useState("");
   const [keywordsInput, setKeywordsInput] = reactExports.useState("");
   const imageRef = reactExports.useRef(null);
   const iconRef = reactExports.useRef(null);
@@ -72445,9 +72572,8 @@ function ServiceManagementPage() {
   }, [data, search]);
   function openAdd() {
     setEditTarget(null);
-    setFormData(emptyForm);
+    setFormData(emptyForm$1);
     setFormErrors({});
-    setFeaturesInput("");
     setKeywordsInput("");
     setModalOpen(true);
   }
@@ -72460,13 +72586,11 @@ function ServiceManagementPage() {
       shortDescription: service.shortDescription,
       image: service.image || "",
       icon: service.icon || "",
-      features: service.features || [],
       content: service.content || "",
       faqs: service.faqs || [],
       seo: service.seo || { metaTitle: "", metaDescription: "", keywords: [] }
     });
     setFormErrors({});
-    setFeaturesInput((service.features || []).join(", "));
     setKeywordsInput((((_a3 = service.seo) == null ? void 0 : _a3.keywords) || []).join(", "));
     setModalOpen(true);
   }
@@ -72518,8 +72642,7 @@ function ServiceManagementPage() {
     }
     const payload = {
       ...formData,
-      slug: ((_a3 = formData.slug) == null ? void 0 : _a3.trim()) ? slugify$1(formData.slug) : slugify$1(formData.title),
-      features: featuresInput.split(",").map((f2) => f2.trim()).filter(Boolean),
+      slug: ((_a3 = formData.slug) == null ? void 0 : _a3.trim()) ? slugify$2(formData.slug) : slugify$2(formData.title),
       seo: {
         ...formData.seo,
         keywords: keywordsInput.split(",").map((k2) => k2.trim()).filter(Boolean)
@@ -72585,7 +72708,6 @@ function ServiceManagementPage() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Title" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Slug" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Features" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: "Actions" })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(TableBody, { children: [
@@ -72593,45 +72715,40 @@ function ServiceManagementPage() {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-56" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20 rounded-full" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 ml-auto rounded-lg" }) })
-        ] }, row)) : filtered.map((service) => {
-          var _a3;
-          return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: service.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: service.slug }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "max-w-[420px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "line-clamp-2", children: service.shortDescription }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: ((_a3 = service.features) == null ? void 0 : _a3.length) || 0 }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  size: "icon",
-                  variant: "ghost",
-                  onClick: () => openEdit(service),
-                  "aria-label": "Edit service",
-                  "data-ocid": "service_management.edit_button",
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  size: "icon",
-                  variant: "ghost",
-                  onClick: () => setDeleteTarget(service),
-                  "aria-label": "Delete service",
-                  "data-ocid": "service_management.delete_button",
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
-                }
-              )
-            ] }) })
-          ] }, service._id);
-        }),
+        ] }, row)) : filtered.map((service) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: service.title }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: service.slug }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "max-w-[420px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "line-clamp-2", children: service.shortDescription }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                size: "icon",
+                variant: "ghost",
+                onClick: () => openEdit(service),
+                "aria-label": "Edit service",
+                "data-ocid": "service_management.edit_button",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                size: "icon",
+                variant: "ghost",
+                onClick: () => setDeleteTarget(service),
+                "aria-label": "Delete service",
+                "data-ocid": "service_management.delete_button",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
+              }
+            )
+          ] }) })
+        ] }, service._id)),
         !isLoading && filtered.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           TableCell,
           {
-            colSpan: 5,
+            colSpan: 4,
             className: "text-center py-12 text-muted-foreground",
             children: "No services found."
           }
@@ -72700,7 +72817,7 @@ function ServiceManagementPage() {
                     ),
                     formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
                       "Saved as `/",
-                      formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title) || "service-slug",
+                      formData.slug.trim() ? slugify$2(formData.slug) : slugify$2(formData.title) || "service-slug",
                       "`."
                     ] })
                   ] }),
@@ -72721,20 +72838,6 @@ function ServiceManagementPage() {
                       }
                     ),
                     formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.shortDescription }) : null
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "svc-features", children: "Features (comma separated)" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Textarea,
-                      {
-                        id: "svc-features",
-                        value: featuresInput,
-                        onChange: (e3) => setFeaturesInput(e3.target.value),
-                        placeholder: "24/7 support, Advanced diagnostics, Free consultation",
-                        className: "resize-none min-h-[70px]",
-                        rows: 2
-                      }
-                    )
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
@@ -73327,7 +73430,7 @@ function SettingsPage() {
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "img",
                 {
-                  src: logoPreview.startsWith("blob") ? logoPreview : resolveAssetUrl(logoPreview),
+                  src: logoPreview.startsWith("blob") ? logoPreview : resolveAssetUrl$1(logoPreview),
                   className: "h-16 object-contain"
                 }
               ),
@@ -73594,7 +73697,7 @@ const pageTableStyles = {
     }
   }
 };
-function slugify(value) {
+function slugify$1(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
 function formatPageDate(value) {
@@ -73613,7 +73716,7 @@ function formatPageDate(value) {
 }
 function validatePageForm(form, pages, currentId) {
   const errors = {};
-  const nextSlug = form.slug.trim() ? slugify(form.slug) : slugify(form.title);
+  const nextSlug = form.slug.trim() ? slugify$1(form.slug) : slugify$1(form.title);
   const duplicateSlug = pages.find(
     (page) => page.slug === nextSlug && page._id !== currentId
   );
@@ -73753,7 +73856,7 @@ function PagesPage() {
     }
     const payload = {
       title: formData.title.trim(),
-      slug: formData.slug.trim() ? slugify(formData.slug) : slugify(formData.title),
+      slug: formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title),
       content: formData.content,
       status: formData.status,
       metaTitle: formData.metaTitle.trim(),
@@ -73999,7 +74102,7 @@ function PagesPage() {
                   ),
                   formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
                     "Leave it clean and short. We’ll save this as `/",
-                    formData.slug.trim() ? slugify(formData.slug) : slugify(formData.title) || "page-slug",
+                    formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title) || "page-slug",
                     "`."
                   ] })
                 ] }),
@@ -74076,7 +74179,7 @@ function PagesPage() {
                       setPreviewPage({
                         _id: (editTarget == null ? void 0 : editTarget._id) ?? "preview",
                         title: formData.title,
-                        slug: formData.slug.trim() ? slugify(formData.slug) : slugify(formData.title),
+                        slug: formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title),
                         content: formData.content,
                         status: formData.status,
                         seo: {
@@ -75062,9 +75165,9 @@ function AboutSectionEditor({
   ] });
 }
 function HeroPreview({ form }) {
-  const backgroundImageUrl = resolveAssetUrl(form.backgroundImage);
-  const primaryImageUrl = resolveAssetUrl(form.primaryImage);
-  const secondaryImageUrl = resolveAssetUrl(form.secondaryImage);
+  const backgroundImageUrl = resolveAssetUrl$1(form.backgroundImage);
+  const primaryImageUrl = resolveAssetUrl$1(form.primaryImage);
+  const secondaryImageUrl = resolveAssetUrl$1(form.secondaryImage);
   const featurePoints = [
     form.featurePointOne,
     form.featurePointTwo,
@@ -75177,7 +75280,7 @@ function HeroPreview({ form }) {
   ] });
 }
 function HowItWorksPreview({ form }) {
-  const sectionImageUrl = resolveAssetUrl(form.sectionImage);
+  const sectionImageUrl = resolveAssetUrl$1(form.sectionImage);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "rounded-3xl overflow-hidden border-slate-100 shadow-sm bg-white", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-sm text-[#1E293B]", children: "How We Work Preview" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-8 lg:grid-cols-[1.3fr_0.9fr] p-6 lg:p-8", children: [
@@ -75224,8 +75327,8 @@ function HowItWorksPreview({ form }) {
   ] });
 }
 function WhyChooseUsPreview({ form }) {
-  const sectionImageUrl = resolveAssetUrl(form.sectionImage);
-  const secondaryImageUrl = resolveAssetUrl(form.secondaryImage);
+  const sectionImageUrl = resolveAssetUrl$1(form.sectionImage);
+  const secondaryImageUrl = resolveAssetUrl$1(form.secondaryImage);
   const cards = [
     {
       title: form.cardOneTitle || "Expertise And Professionalism",
@@ -75287,7 +75390,7 @@ function WhyChooseUsPreview({ form }) {
   ] });
 }
 function AboutPreview({ form }) {
-  const sectionImageUrl = resolveAssetUrl(form.sectionImage);
+  const sectionImageUrl = resolveAssetUrl$1(form.sectionImage);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "rounded-3xl overflow-hidden border-slate-100 shadow-sm bg-white", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-sm text-[#1E293B]", children: "About Preview" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-8 lg:grid-cols-[0.95fr_1.05fr] p-6 lg:p-8 items-center", children: [
@@ -75642,6 +75745,405 @@ function WebsiteContentPageImpl() {
     ] }) })
   ] });
 }
+const getServiceFeaturesApi = async () => {
+  try {
+    const res = await get$3(
+      ENDPOINT.GET_SERVICE_FEATURES,
+      { needAuth: true }
+    );
+    return (res == null ? void 0 : res.data) || [];
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to fetch service features"
+    );
+  }
+};
+const addServiceFeatureApi = async (payload) => {
+  var _a2;
+  try {
+    const res = await post(
+      ENDPOINT.ADD_SERVICE_FEATURE,
+      payload,
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.feature;
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to add service feature"
+    );
+  }
+};
+const updateServiceFeatureApi = async (id, payload) => {
+  var _a2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_SERVICE_FEATURE}/${id}`,
+      payload,
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.feature;
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to update service feature"
+    );
+  }
+};
+const deleteServiceFeatureApi = async (id) => {
+  try {
+    await post(
+      `${ENDPOINT.DELETE_SERVICE_FEATURE}/${id}`,
+      {},
+      { needAuth: true }
+    );
+  } catch (error) {
+    throw createApiRequestError(
+      error,
+      "Failed to delete service feature"
+    );
+  }
+};
+function slugify(value) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
+}
+const emptyForm = {
+  title: "",
+  slug: "",
+  content: "",
+  serviceId: ""
+};
+function ServiceFeaturesPage() {
+  const queryClient2 = useQueryClient();
+  const [search, setSearch] = reactExports.useState("");
+  const [modalOpen, setModalOpen] = reactExports.useState(false);
+  const [editing, setEditing] = reactExports.useState(null);
+  const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
+  const [formData, setFormData] = reactExports.useState(emptyForm);
+  const { data: services = [] } = useQuery({
+    queryKey: ["services"],
+    queryFn: getAllServicesApi
+  });
+  const {
+    data: features = [],
+    isLoading
+  } = useQuery({
+    queryKey: ["service-features"],
+    queryFn: getServiceFeaturesApi
+  });
+  const addMutation = useMutation({
+    mutationFn: addServiceFeatureApi,
+    onSuccess: () => {
+      ue$2.success(
+        "Service feature added successfully."
+      );
+      queryClient2.invalidateQueries({
+        queryKey: ["service-features"]
+      });
+      setModalOpen(false);
+    },
+    onError: () => {
+      ue$2.error(
+        "Failed to add service feature."
+      );
+    }
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({
+      id,
+      payload
+    }) => updateServiceFeatureApi(id, payload),
+    onSuccess: () => {
+      ue$2.success(
+        "Service feature updated successfully."
+      );
+      queryClient2.invalidateQueries({
+        queryKey: ["service-features"]
+      });
+      setModalOpen(false);
+    },
+    onError: () => {
+      ue$2.error(
+        "Failed to update service feature."
+      );
+    }
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteServiceFeatureApi,
+    onSuccess: () => {
+      ue$2.success(
+        "Service feature deleted successfully."
+      );
+      queryClient2.invalidateQueries({
+        queryKey: ["service-features"]
+      });
+      setDeleteTarget(null);
+    },
+    onError: () => {
+      ue$2.error(
+        "Failed to delete service feature."
+      );
+    }
+  });
+  function openAdd() {
+    setEditing(null);
+    setFormData(emptyForm);
+    setModalOpen(true);
+  }
+  function openEdit(feature) {
+    var _a2;
+    setEditing(feature);
+    setFormData({
+      title: feature.title || "",
+      slug: feature.slug || "",
+      content: feature.content || "",
+      serviceId: ((_a2 = feature.serviceId) == null ? void 0 : _a2._id) || feature.serviceId || ""
+    });
+    setModalOpen(true);
+  }
+  async function handleSave() {
+    var _a2;
+    if (!formData.title || !formData.serviceId) {
+      ue$2.error(
+        "Title and Service are required."
+      );
+      return;
+    }
+    const payload = {
+      ...formData,
+      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify(formData.slug) : slugify(formData.title)
+    };
+    if (editing) {
+      await updateMutation.mutateAsync({
+        id: editing._id,
+        payload
+      });
+      return;
+    }
+    await addMutation.mutateAsync(payload);
+  }
+  const filtered = reactExports.useMemo(() => {
+    if (!search.trim()) return features;
+    const q2 = search.toLowerCase();
+    return features.filter(
+      (item) => {
+        var _a2, _b2;
+        return ((_a2 = item.title) == null ? void 0 : _a2.toLowerCase().includes(q2)) || ((_b2 = item.slug) == null ? void 0 : _b2.toLowerCase().includes(q2));
+      }
+    );
+  }, [features, search]);
+  const isBusy = addMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Service Features",
+        description: "Manage service features and detailed content.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: openAdd,
+            className: "gap-2",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 15 }),
+              "Add Feature"
+            ]
+          }
+        )
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: "Search feature...",
+        value: search,
+        onChange: (e3) => setSearch(e3.target.value),
+        className: "max-w-sm"
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-card border rounded-2xl overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Title" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Slug" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Service" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: "Actions" })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableBody, { children: [
+        isLoading ? [1, 2, 3].map((row) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-40" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 ml-auto rounded-lg" }) })
+        ] }, row)) : filtered.map((feature) => {
+          var _a2;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: feature.title }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: feature.slug }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: ((_a2 = feature.serviceId) == null ? void 0 : _a2.title) || "-" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  size: "icon",
+                  variant: "ghost",
+                  onClick: () => openEdit(feature),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  size: "icon",
+                  variant: "ghost",
+                  onClick: () => setDeleteTarget(
+                    feature
+                  ),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
+                }
+              )
+            ] }) })
+          ] }, feature._id);
+        }),
+        !isLoading && filtered.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          TableCell,
+          {
+            colSpan: 4,
+            className: "text-center py-10 text-muted-foreground",
+            children: "No features found."
+          }
+        ) })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: modalOpen,
+        onOpenChange: setModalOpen,
+        modal: false,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          DialogContent,
+          {
+            className: "max-w-5xl max-h-[90vh] sm:max-w-[900px] overflow-y-auto",
+            onInteractOutside: (e3) => {
+              const el = e3.target;
+              if (el.closest(".tox-tinymce-aux") || el.closest(".tox-dialog") || el.closest(".tox-menu") || el.closest(".tox-pop") || document.querySelector(
+                ".tox-dialog"
+              )) {
+                e3.preventDefault();
+              }
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editing ? "Update Feature" : "Add Feature" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      value: formData.title,
+                      onChange: (e3) => setFormData((p2) => ({
+                        ...p2,
+                        title: e3.target.value
+                      })),
+                      placeholder: "Feature title"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      value: formData.slug,
+                      onChange: (e3) => setFormData((p2) => ({
+                        ...p2,
+                        slug: e3.target.value
+                      })),
+                      placeholder: "feature-slug"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    Select,
+                    {
+                      value: formData.serviceId,
+                      onValueChange: (value) => setFormData((p2) => ({
+                        ...p2,
+                        serviceId: value
+                      })),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select service" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map(
+                          (service) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            SelectItem,
+                            {
+                              value: service._id,
+                              children: service.title
+                            },
+                            service._id
+                          )
+                        ) })
+                      ]
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Content" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    PageEditor,
+                    {
+                      value: formData.content,
+                      onChange: (content) => setFormData(
+                        (p2) => ({
+                          ...p2,
+                          content
+                        })
+                      )
+                    }
+                  ) })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    variant: "outline",
+                    onClick: () => setModalOpen(false),
+                    children: "Cancel"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    onClick: handleSave,
+                    disabled: isBusy,
+                    children: isBusy ? editing ? "Updating..." : "Adding..." : editing ? "Update Feature" : "Add Feature"
+                  }
+                )
+              ] })
+            ]
+          }
+        )
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmDialog,
+      {
+        open: !!deleteTarget,
+        title: "Delete Feature",
+        message: `Delete "${deleteTarget == null ? void 0 : deleteTarget.title}"? This action cannot be undone.`,
+        confirmLabel: deleteMutation.isPending ? "Deleting..." : "Delete",
+        onConfirm: () => deleteTarget && deleteMutation.mutate(
+          deleteTarget._id
+        ),
+        onCancel: () => setDeleteTarget(null)
+      }
+    )
+  ] });
+}
 function appendValue$1(fd, key, value) {
   if (value === void 0 || value === null) return;
   if (typeof value === "string" && value.trim() === "") return;
@@ -75655,6 +76157,7 @@ function toFormData$1(payload) {
   appendValue$1(fd, "shortDescription", (_b2 = payload.shortDescription) == null ? void 0 : _b2.trim());
   appendValue$1(fd, "content", (_c2 = payload.content) == null ? void 0 : _c2.trim());
   appendValue$1(fd, "status", payload.status);
+  appendValue$1(fd, "sortOrder", payload.sortOrder);
   if (payload.seo) {
     fd.append("seo", JSON.stringify(payload.seo));
   }
@@ -78220,6 +78723,12 @@ const serviceManagementRoute = createRoute({
   beforeLoad: () => checkPermission("/service-management"),
   component: ServiceManagementPage
 });
+const serviceFeaturesRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/service-features",
+  beforeLoad: () => checkPermission("/service-features"),
+  component: ServiceFeaturesPage
+});
 const blogsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/blogs",
@@ -78285,6 +78794,7 @@ const routeTree = rootRoute.addChildren([
     procedureRoute,
     appointmentsRoute,
     serviceManagementRoute,
+    serviceFeaturesRoute,
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,

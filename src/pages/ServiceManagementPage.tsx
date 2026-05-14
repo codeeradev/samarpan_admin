@@ -113,7 +113,6 @@ const emptyForm: ServicePayload = {
   shortDescription: "",
   image: "",
   icon: "",
-  features: [],
   content: "",
   faqs: [],
   seo: { metaTitle: "", metaDescription: "", keywords: [] },
@@ -179,7 +178,6 @@ export default function ServiceManagementPage() {
   const [deleteTarget, setDeleteTarget] = useState<ServiceItem | null>(null);
   const [formData, setFormData] = useState<ServicePayload>(emptyForm);
   const [formErrors, setFormErrors] = useState<ServiceFormErrors>({});
-  const [featuresInput, setFeaturesInput] = useState("");
   const [keywordsInput, setKeywordsInput] = useState("");
   const imageRef = useRef<HTMLInputElement>(null);
   const iconRef = useRef<HTMLInputElement>(null);
@@ -241,7 +239,6 @@ export default function ServiceManagementPage() {
     setEditTarget(null);
     setFormData(emptyForm);
     setFormErrors({});
-    setFeaturesInput("");
     setKeywordsInput("");
     setModalOpen(true);
   }
@@ -254,13 +251,11 @@ export default function ServiceManagementPage() {
       shortDescription: service.shortDescription,
       image: service.image || "",
       icon: service.icon || "",
-      features: service.features || [],
       content: service.content || "",
       faqs: service.faqs || [],
       seo: service.seo || { metaTitle: "", metaDescription: "", keywords: [] },
     });
     setFormErrors({});
-    setFeaturesInput((service.features || []).join(", "));
     setKeywordsInput((service.seo?.keywords || []).join(", "));
     setModalOpen(true);
   }
@@ -336,10 +331,6 @@ export default function ServiceManagementPage() {
       slug: formData.slug?.trim()
         ? slugify(formData.slug)
         : slugify(formData.title),
-      features: featuresInput
-        .split(",")
-        .map((f) => f.trim())
-        .filter(Boolean),
       seo: {
         ...formData.seo,
         keywords: keywordsInput
@@ -418,7 +409,6 @@ export default function ServiceManagementPage() {
               <TableHead>Title</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead>Features</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -434,9 +424,6 @@ export default function ServiceManagementPage() {
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-56" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-20 rounded-full" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-8 w-8 ml-auto rounded-lg" />
@@ -456,7 +443,6 @@ export default function ServiceManagementPage() {
                         {service.shortDescription}
                       </span>
                     </TableCell>
-                    <TableCell>{service.features?.length || 0}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button
@@ -484,7 +470,7 @@ export default function ServiceManagementPage() {
             {!isLoading && filtered.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={4}
                   className="text-center py-12 text-muted-foreground"
                 >
                   No services found.
@@ -612,19 +598,6 @@ export default function ServiceManagementPage() {
                     {formErrors.shortDescription}
                   </p>
                 ) : null}
-              </div>
-
-              {/* Features */}
-              <div className="space-y-1">
-                <Label htmlFor="svc-features">Features (comma separated)</Label>
-                <Textarea
-                  id="svc-features"
-                  value={featuresInput}
-                  onChange={(e) => setFeaturesInput(e.target.value)}
-                  placeholder="24/7 support, Advanced diagnostics, Free consultation"
-                  className="resize-none min-h-[70px]"
-                  rows={2}
-                />
               </div>
 
               {/* Image */}

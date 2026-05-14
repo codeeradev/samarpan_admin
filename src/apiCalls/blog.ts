@@ -11,6 +11,7 @@ export interface BlogPayload {
   content?: string;
   seo?: Record<string, any>;
   status?: "draft" | "published";
+  sortOrder?: number;
   image?: File | string;
 }
 
@@ -23,6 +24,7 @@ export interface BlogItem {
   content?: string;
   seo?: any;
   status?: "draft" | "published";
+  sortOrder?: Number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -43,7 +45,8 @@ function toFormData(payload: Partial<BlogPayload>): FormData {
   appendValue(fd, "shortDescription", payload.shortDescription?.trim());
   appendValue(fd, "content", payload.content?.trim());
   appendValue(fd, "status", payload.status);
-
+  appendValue(fd, "sortOrder", payload.sortOrder);
+  
   if (payload.seo) {
     fd.append("seo", JSON.stringify(payload.seo));
   }

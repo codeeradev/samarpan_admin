@@ -8,7 +8,6 @@ export interface ServicePayload {
   shortDescription: string;
   image?: File | string;
   icon?: File | string;
-  features: string[];
   content?: string;
   faqs?: { question: string; answer: string }[];
   seo?: {
@@ -37,7 +36,6 @@ function toFormData(payload: Partial<ServicePayload>): FormData {
   if (payload.icon instanceof File) fd.append("icon", payload.icon);
 
   // Arrays — must be JSON-stringified so multer/body can parse them server-side
-  if (payload.features) fd.append("features", JSON.stringify(payload.features));
   if (payload.faqs) fd.append("faqs", JSON.stringify(payload.faqs));
   if (payload.seo) fd.append("seo", JSON.stringify(payload.seo));
 

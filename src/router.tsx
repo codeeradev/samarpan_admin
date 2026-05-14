@@ -17,6 +17,7 @@ import PagesPage from "@/pages/PagesPage";
 import WebsiteContentPage from "@/pages/WebsiteContentPage";
 import { loadAuthState } from "@/lib/auth-storage";
 import { canAccessPath } from "@/lib/admin-access";
+import ServiceFeaturesPage from "@/pages/ServiceFeaturesPage";
 import {
   Outlet,
   createRootRoute,
@@ -143,6 +144,14 @@ const serviceManagementRoute = createRoute({
   component: ServiceManagementPage,
 });
 
+const serviceFeaturesRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/service-features",
+  beforeLoad: () =>
+    checkPermission("/service-features"),
+  component: ServiceFeaturesPage,
+});
+
 const blogsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/blogs",
@@ -226,6 +235,7 @@ const routeTree = rootRoute.addChildren([
     procedureRoute,
     appointmentsRoute,
     serviceManagementRoute,
+    serviceFeaturesRoute,
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,

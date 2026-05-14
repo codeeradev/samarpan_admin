@@ -22,6 +22,7 @@ export interface CareerItem {
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  image?: string;
 }
 
 export interface CareerPayload {
@@ -38,6 +39,7 @@ export interface CareerPayload {
   applyLink: string;
   status: CareerStatus;
   sortOrder: number;
+  image?: File | null;
 }
 
 function normalizeStringArray(value: unknown): string[] {
@@ -72,26 +74,52 @@ function normalizeCareerItem(career: Record<string, any>): CareerItem {
     isActive: career.isActive,
     createdAt: career.createdAt,
     updatedAt: career.updatedAt,
+    image: career.image || "",
   };
 }
 
-function toRequestPayload(payload: CareerPayload) {
-  return {
-    title: payload.title.trim(),
-    slug: payload.slug.trim(),
-    department: payload.department.trim(),
-    employmentType: payload.employmentType.trim(),
-    experience: payload.experience.trim(),
-    summary: payload.summary.trim(),
-    description: payload.description.trim(),
-    requirements: payload.requirements,
-    responsibilities: payload.responsibilities,
-    applyEmail: payload.applyEmail.trim(),
-    applyLink: payload.applyLink.trim(),
-    status: payload.status,
-    sortOrder: payload.sortOrder,
-    isActive: payload.status !== "draft",
-  };
+function createCareerFormData(payload: CareerPayload) {
+  const formData = new FormData();
+
+  formData.append("title", payload.title.trim());
+  formData.append("slug", payload.slug.trim());
+  formData.append("department", payload.department.trim());
+  formData.append(
+    "employmentType",
+    payload.employmentType.trim(),
+  );
+  formData.append("experience", payload.experience.trim());
+  formData.append("summary", payload.summary.trim());
+  formData.append("description", payload.description.trim());
+
+  payload.requirements.forEach((item) => {
+    formData.append("requirements", item);
+  });
+
+  payload.responsibilities.forEach((item) => {
+    formData.append("responsibilities", item);
+  });
+
+  formData.append("applyEmail", payload.applyEmail.trim());
+  formData.append("applyLink", payload.applyLink.trim());
+
+  formData.append("status", payload.status);
+
+  formData.append(
+    "sortOrder",
+    String(payload.sortOrder),
+  );
+
+  formData.append(
+    "isActive",
+    String(payload.status !== "draft"),
+  );
+
+  if (payload.image) {
+    formData.append("image", payload.image);
+  }
+
+  return formData;
 }
 
 export const getAllCareersApi = async (): Promise<CareerItem[]> => {
@@ -107,7 +135,7 @@ export const addCareerApi = async (
   payload: CareerPayload,
 ): Promise<CareerItem> => {
   try {
-    const res = await post(ENDPOINT.ADD_CAREER, toRequestPayload(payload), {
+    const res = await post(ENDPOINT.ADD_CAREER, createCareerFormData(payload), {
       needAuth: true,
     });
     return normalizeCareerItem(res?.data?.career ?? {});
@@ -123,7 +151,7 @@ export const updateCareerApi = async (
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_CAREER}/${id}`,
-      toRequestPayload(payload),
+      createCareerFormData(payload),
       {
         needAuth: true,
       },

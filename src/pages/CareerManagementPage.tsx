@@ -29,16 +29,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  getApiErrorMessage,
-  mapApiErrorsToFields,
-} from "@/lib/api-errors";
+import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
 import { themeColor } from "@/lib/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { toast } from "sonner";
+import { resolveAssetUrl } from "./website-content/types";
 
 type CareerFormState = {
   title: string;
@@ -54,13 +52,11 @@ type CareerFormState = {
   applyLink: string;
   status: CareerStatus;
   sortOrder: string;
+  image: File | null;
 };
 
 type CareerFormErrors = Partial<
-  Record<
-    "title" | "slug" | "sortOrder" | "applyEmail" | "applyLink",
-    string
-  >
+  Record<"title" | "slug" | "sortOrder" | "applyEmail" | "applyLink", string>
 >;
 
 const emptyCareerForm: CareerFormState = {
@@ -77,6 +73,7 @@ const emptyCareerForm: CareerFormState = {
   applyLink: "",
   status: "open",
   sortOrder: "0",
+  image: null,
 };
 
 const tableStyles = {
@@ -225,11 +222,7 @@ function CareerStatusBadge({ status }: { status: CareerStatus }) {
 
   return (
     <Badge className={className}>
-      {status === "open"
-        ? "Open"
-        : status === "closed"
-          ? "Closed"
-          : "Draft"}
+      {status === "open" ? "Open" : status === "closed" ? "Closed" : "Draft"}
     </Badge>
   );
 }
@@ -242,6 +235,7 @@ export default function CareerManagementPage() {
   const [deleteTarget, setDeleteTarget] = useState<CareerItem | null>(null);
   const [formData, setFormData] = useState<CareerFormState>(emptyCareerForm);
   const [formErrors, setFormErrors] = useState<CareerFormErrors>({});
+  const [imagePreview, setImagePreview] = useState("");
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["careers"],
@@ -279,7 +273,8 @@ export default function CareerManagementPage() {
       queryClient.invalidateQueries({ queryKey: ["careers"] });
       setDeleteTarget(null);
     },
-    onError: (error) => toast.error(getApiErrorMessage(error, "Failed to delete career.")),
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "Failed to delete career.")),
   });
 
   const filteredCareers = useMemo(() => {
@@ -312,11 +307,13 @@ export default function CareerManagementPage() {
     setEditTarget(null);
     setFormData(emptyCareerForm);
     setFormErrors({});
+    setImagePreview("");
     setModalOpen(true);
   }
 
   function openEdit(career: CareerItem) {
     setEditTarget(career);
+    setImagePreview(career.image || "");
     setFormData({
       title: career.title,
       slug: career.slug,
@@ -331,6 +328,7 @@ export default function CareerManagementPage() {
       applyLink: career.applyLink,
       status: career.status,
       sortOrder: String(career.sortOrder ?? 0),
+      image: null,
     });
     setFormErrors({});
     setModalOpen(true);
@@ -379,6 +377,7 @@ export default function CareerManagementPage() {
       applyLink: formData.applyLink.trim(),
       status: formData.status,
       sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
+      image: formData.image,
     };
 
     try {
@@ -418,6 +417,25 @@ export default function CareerManagementPage() {
 
   const columns: TableColumn<CareerItem>[] = [
     {
+      name: "Image",
+      width: "110px",
+      cell: (career) => (
+        <div className="py-2">
+          {career.image ? (
+            <img
+              src={resolveAssetUrl(career.image)}
+              alt={career.title}
+              className="h-14 w-14 rounded-xl border object-cover"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl border text-xs text-muted-foreground">
+              No Img
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
       name: "Role",
       grow: 1.4,
       cell: (career) => (
@@ -425,7 +443,9 @@ export default function CareerManagementPage() {
           <p className="truncate text-sm font-semibold text-foreground">
             {career.title}
           </p>
-          <p className="truncate text-xs text-muted-foreground">/{career.slug}</p>
+          <p className="truncate text-xs text-muted-foreground">
+            /{career.slug}
+          </p>
         </div>
       ),
     },
@@ -659,7 +679,9 @@ export default function CareerManagementPage() {
                   id="career-sort-order"
                   type="number"
                   value={formData.sortOrder}
-                  onChange={(event) => setField("sortOrder", event.target.value)}
+                  onChange={(event) =>
+                    setField("sortOrder", event.target.value)
+                  }
                   placeholder="0"
                   className={`rounded-xl ${formErrors.sortOrder ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 />
@@ -671,13 +693,43 @@ export default function CareerManagementPage() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="career-image">Career Image</Label>
+
+              <Input
+                id="career-image"
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] || null;
+
+                  setField("image", file);
+
+                  if (file) {
+                    setImagePreview(URL.createObjectURL(file));
+                  }
+                }}
+                className="rounded-xl"
+              />
+
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="mt-3 h-28 w-28 rounded-2xl border object-cover"
+                />
+              ) : null}
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-2">
                 <Label htmlFor="career-department">Department</Label>
                 <Input
                   id="career-department"
                   value={formData.department}
-                  onChange={(event) => setField("department", event.target.value)}
+                  onChange={(event) =>
+                    setField("department", event.target.value)
+                  }
                   placeholder="Nursing"
                   className="rounded-xl"
                 />
