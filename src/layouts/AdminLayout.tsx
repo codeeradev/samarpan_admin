@@ -53,7 +53,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     path: "/dashboard",
     permissionPath: "/dashboard",
   },
-    {
+  {
     label: "Services",
     icon: HeartPulse,
     permissionPath: "/service-management",
@@ -64,8 +64,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
         permissionPath: "/service-management",
       },
       {
-        label: "Service Features",
-        path: "/service-features",
+        label: "Service Category",
+        path: "/service-category",
+        permissionPath: "/service-features",
+      },
+      {
+        label: "Service Sub Category",
+        path: "/service-sub-category",
         permissionPath: "/service-features",
       },
     ],
@@ -152,8 +157,19 @@ const ALL_NAV_ITEMS: NavItem[] = [
   {
     label: "Careers",
     icon: Briefcase,
-    path: "/careers",
     permissionPath: "/careers",
+    children: [
+      {
+        label: "Career Management",
+        path: "/careers",
+        permissionPath: "/careers",
+      },
+      {
+        label: "Job Applications",
+        path: "/job-applications",
+        permissionPath: "/job-applications",
+      },
+    ],
   },
   // {
   //   label: "Enquiries",
@@ -185,7 +201,8 @@ function SidebarNav({
   const navigate = useNavigate();
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    Services: true,
+    Services: false,
+    Careers: false
   });
 
   function toggleMenu(label: string) {
@@ -215,9 +232,7 @@ function SidebarNav({
                 <ChevronDown
                   size={16}
                   className={`transition-transform ${
-                    openMenus[item.label]
-                      ? "rotate-180"
-                      : ""
+                    openMenus[item.label] ? "rotate-180" : ""
                   }`}
                 />
               </button>
@@ -225,8 +240,7 @@ function SidebarNav({
               {openMenus[item.label] && (
                 <div className="ml-6 mt-1 space-y-1">
                   {item.children.map((child) => {
-                    const isActive =
-                      currentPath === child.path;
+                    const isActive = currentPath === child.path;
 
                     return (
                       <button
@@ -257,8 +271,7 @@ function SidebarNav({
 
         // normal menu
         const isActive =
-          currentPath === item.path ||
-          currentPath.startsWith(`${item.path}/`);
+          currentPath === item.path || currentPath.startsWith(`${item.path}/`);
 
         return (
           <button

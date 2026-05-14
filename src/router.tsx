@@ -18,6 +18,8 @@ import WebsiteContentPage from "@/pages/WebsiteContentPage";
 import { loadAuthState } from "@/lib/auth-storage";
 import { canAccessPath } from "@/lib/admin-access";
 import ServiceFeaturesPage from "@/pages/ServiceFeaturesPage";
+import ServiceSubCategoriesPage from "@/pages/ServiceSubCategoriesPage";
+
 import {
   Outlet,
   createRootRoute,
@@ -28,7 +30,7 @@ import {
 import BlogsPage from "./pages/BlogPage";
 import SpecializationsPage from "./pages/Specialization";
 import ProcedurePage from "./pages/ProcedurePage";
-
+import JobApplicationsPage from "@/pages/JobApplicationsPage";
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 type StoredAuth = ReturnType<typeof loadAuthState>;
@@ -146,10 +148,16 @@ const serviceManagementRoute = createRoute({
 
 const serviceFeaturesRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: "/service-features",
-  beforeLoad: () =>
-    checkPermission("/service-features"),
+  path: "/service-category",
+  beforeLoad: () => checkPermission("/service-features"),
   component: ServiceFeaturesPage,
+});
+
+const serviceSubCategoryRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/service-sub-category",
+  beforeLoad: () => checkPermission("/service-features"),
+  component: ServiceSubCategoriesPage,
 });
 
 const blogsRoute = createRoute({
@@ -178,6 +186,16 @@ const themeRoute = createRoute({
   path: "/themes",
   beforeLoad: () => checkPermission("/themes"),
   component: ThemePage,
+});
+
+const jobApplicationsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+
+  path: "/job-applications",
+
+  beforeLoad: () => checkPermission("/job-applications"),
+
+  component: JobApplicationsPage,
 });
 
 const websiteContentRoute = createRoute({
@@ -236,9 +254,11 @@ const routeTree = rootRoute.addChildren([
     appointmentsRoute,
     serviceManagementRoute,
     serviceFeaturesRoute,
+    serviceSubCategoryRoute,
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,
+    jobApplicationsRoute,
     themeRoute,
     websiteContentRoute,
     websitePagesRoute,

@@ -70,6 +70,7 @@ type FormDataType = {
   slug: string;
   content: string;
   serviceId: string;
+  serviceSubCategoryId: string;
   image: File | string;
 };
 
@@ -78,10 +79,11 @@ const emptyForm: FormDataType = {
   slug: "",
   content: "",
   serviceId: "",
+  serviceSubCategoryId: "",
   image: "",
 };
 
-export default function ServiceFeaturesPage() {
+export default function ServiceSubCategoriesPage() {
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState("");
@@ -94,67 +96,81 @@ export default function ServiceFeaturesPage() {
 
   const [formData, setFormData] = useState(emptyForm);
 
+  // Services
   const { data: services = [] } = useQuery({
     queryKey: ["services"],
     queryFn: getAllServicesApi,
   });
 
-  const { data: features = [], isLoading } = useQuery({
+  // Categories (old service features)
+  const { data: categories = [] } = useQuery({
     queryKey: ["service-features"],
-    queryFn: getServiceFeaturesApi,
+    queryFn: () => getServiceFeaturesApi()
+  });
+
+  // Sub Categories
+  const {
+    data: subCategories = [],
+    isLoading,
+  } = useQuery({
+    queryKey: ["service-sub-categories"],
+    queryFn: () => getServiceFeaturesApi("?type=sub_cat"),
   });
 
   const addMutation = useMutation({
-    mutationFn: addServiceFeatureApi,
+    mutationFn: (payload: any) =>
+      addServiceFeatureApi(payload, "sub_cat"),
 
     onSuccess: () => {
-      toast.success("Service feature added successfully.");
+      toast.success("Service sub category added successfully.");
 
       queryClient.invalidateQueries({
-        queryKey: ["service-features"],
+        queryKey: ["service-sub-categories"],
       });
 
       setModalOpen(false);
     },
 
     onError: () => {
-      toast.error("Failed to add service feature.");
+      toast.error("Failed to add service sub category.");
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, payload }: any) => updateServiceFeatureApi(id, payload),
+    mutationFn: ({ id, payload }: any) =>
+      updateServiceFeatureApi(id, payload, "sub_cat"),
 
     onSuccess: () => {
-      toast.success("Service feature updated successfully.");
+      toast.success("Service sub category updated successfully.");
 
       queryClient.invalidateQueries({
-        queryKey: ["service-features"],
+        queryKey: ["service-sub-categories"],
       });
 
       setModalOpen(false);
     },
 
     onError: () => {
-      toast.error("Failed to update service feature.");
+      toast.error("Failed to update service sub category.");
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteServiceFeatureApi,
+    mutationFn: (id: string) =>
+      deleteServiceFeatureApi(id, "sub_cat"),
 
     onSuccess: () => {
-      toast.success("Service feature deleted successfully.");
+      toast.success("Service sub category deleted successfully.");
 
       queryClient.invalidateQueries({
-        queryKey: ["service-features"],
+        queryKey: ["service-sub-categories"],
       });
 
       setDeleteTarget(null);
     },
 
     onError: () => {
-      toast.error("Failed to delete service feature.");
+      toast.error("Failed to delete service sub category.");
     },
   });
 
@@ -166,23 +182,31 @@ export default function ServiceFeaturesPage() {
     setModalOpen(true);
   }
 
-  function openEdit(feature: any) {
-    setEditing(feature);
+  function openEdit(item: any) {
+    setEditing(item);
 
     setFormData({
-      title: feature.title || "",
-      slug: feature.slug || "",
-      content: feature.content || "",
-      image: feature.image || "",
-      serviceId: feature.serviceId?._id || feature.serviceId || "",
+      title: item.title || "",
+      slug: item.slug || "",
+      content: item.content || "",
+      image: item.image || "",
+      serviceId: item.serviceId?._id || item.serviceId || "",
+      serviceSubCategoryId:
+        item.serviceSubCategoryId?._id ||
+        item.serviceSubCategoryId ||
+        "",
     });
 
     setModalOpen(true);
   }
 
   async function handleSave() {
-    if (!formData.title || !formData.serviceId) {
-      toast.error("Title and Service are required.");
+    if (
+      !formData.title ||
+      !formData.serviceId ||
+      !formData.serviceSubCategoryId
+    ) {
+      toast.error("Title, Service and Category are required.");
 
       return;
     }
@@ -207,16 +231,16 @@ export default function ServiceFeaturesPage() {
   }
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return features;
+    if (!search.trim()) return subCategories;
 
     const q = search.toLowerCase();
 
-    return features.filter(
+    return subCategories.filter(
       (item: any) =>
         item.title?.toLowerCase().includes(q) ||
-        item.slug?.toLowerCase().includes(q),
+        item.slug?.toLowerCase().includes(q)
     );
-  }, [features, search]);
+  }, [subCategories, search]);
 
   const isBusy =
     addMutation.isPending ||
@@ -226,12 +250,12 @@ export default function ServiceFeaturesPage() {
   return (
     <div>
       <PageHeader
-        title="Service Features"
-        description="Manage service features and detailed content."
+        title="Service Sub Categories"
+        description="Manage service sub categories and detailed content."
         action={
           <Button onClick={openAdd} className="gap-2">
             <Plus size={15} />
-            Add Feature
+            Add Sub Category
           </Button>
         }
       />
@@ -239,7 +263,7 @@ export default function ServiceFeaturesPage() {
       {/* Search */}
       <div className="mb-4">
         <Input
-          placeholder="Search feature..."
+          placeholder="Search sub category..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
@@ -258,6 +282,8 @@ export default function ServiceFeaturesPage() {
               <TableHead>Slug</TableHead>
 
               <TableHead>Service</TableHead>
+
+              <TableHead>Category</TableHead>
 
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -284,39 +310,52 @@ export default function ServiceFeaturesPage() {
                     </TableCell>
 
                     <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+
+                    <TableCell>
                       <Skeleton className="h-8 w-8 ml-auto rounded-lg" />
                     </TableCell>
                   </TableRow>
                 ))
-              : filtered.map((feature: any) => (
-                  <TableRow key={feature._id}>
+              : filtered.map((item: any) => (
+                  <TableRow key={item._id}>
                     <TableCell className="font-medium">
-                      {feature.title}
+                      {item.title}
                     </TableCell>
 
                     <TableCell>
-                      {feature.image ? (
+                      {item.image ? (
                         <img
-                          src={resolveAssetUrl(feature.image)}
-                          alt={feature.title}
+                          src={resolveAssetUrl(item.image)}
+                          alt={item.title}
                           className="w-14 h-14 rounded-lg object-cover border"
                         />
                       ) : (
                         "-"
                       )}
                     </TableCell>
+
                     <TableCell>
-                      <Badge variant="secondary">{feature.slug}</Badge>
+                      <Badge variant="secondary">
+                        {item.slug}
+                      </Badge>
                     </TableCell>
 
-                    <TableCell>{feature.serviceId?.title || "-"}</TableCell>
+                    <TableCell>
+                      {item.serviceId?.title || "-"}
+                    </TableCell>
+
+                    <TableCell>
+                      {item.serviceSubCategoryId?.title || "-"}
+                    </TableCell>
 
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => openEdit(feature)}
+                          onClick={() => openEdit(item)}
                         >
                           <Pencil size={14} />
                         </Button>
@@ -324,7 +363,7 @@ export default function ServiceFeaturesPage() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => setDeleteTarget(feature)}
+                          onClick={() => setDeleteTarget(item)}
                         >
                           <Trash2 size={14} />
                         </Button>
@@ -336,10 +375,10 @@ export default function ServiceFeaturesPage() {
             {!isLoading && filtered.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={6}
                   className="text-center py-10 text-muted-foreground"
                 >
-                  No features found.
+                  No sub categories found.
                 </TableCell>
               </TableRow>
             )}
@@ -367,7 +406,9 @@ export default function ServiceFeaturesPage() {
         >
           <DialogHeader>
             <DialogTitle>
-              {editing ? "Update Feature" : "Add Feature"}
+              {editing
+                ? "Update Sub Category"
+                : "Add Sub Category"}
             </DialogTitle>
           </DialogHeader>
 
@@ -384,7 +425,7 @@ export default function ServiceFeaturesPage() {
                     title: e.target.value,
                   }))
                 }
-                placeholder="Feature title"
+                placeholder="Sub category title"
               />
             </div>
 
@@ -400,7 +441,7 @@ export default function ServiceFeaturesPage() {
                     slug: e.target.value,
                   }))
                 }
-                placeholder="feature-slug"
+                placeholder="sub-category-slug"
               />
             </div>
 
@@ -423,7 +464,10 @@ export default function ServiceFeaturesPage() {
 
                 <SelectContent>
                   {services.map((service: any) => (
-                    <SelectItem key={service._id} value={service._id}>
+                    <SelectItem
+                      key={service._id}
+                      value={service._id}
+                    >
                       {service.title}
                     </SelectItem>
                   ))}
@@ -431,14 +475,45 @@ export default function ServiceFeaturesPage() {
               </Select>
             </div>
 
+            {/* Category */}
             <div className="space-y-1">
-              <Label>Feature Image</Label>
+              <Label>Service Category</Label>
+
+              <Select
+                value={formData.serviceSubCategoryId}
+                onValueChange={(value) =>
+                  setFormData((p) => ({
+                    ...p,
+                    serviceSubCategoryId: value,
+                  }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {categories.map((category: any) => (
+                    <SelectItem
+                      key={category._id}
+                      value={category._id}
+                    >
+                      {category.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Image */}
+            <div className="space-y-1">
+              <Label>Sub Category Image</Label>
 
               {editing &&
                 typeof formData.image === "string" &&
                 formData.image && (
                   <img
-                    src={formData.image}
+                    src={resolveAssetUrl(formData.image)}
                     alt={formData.title}
                     className="w-32 h-20 object-cover rounded-lg border"
                   />
@@ -459,6 +534,7 @@ export default function ServiceFeaturesPage() {
                 }}
               />
             </div>
+
             {/* Content */}
             <div className="space-y-2">
               <Label>Content</Label>
@@ -478,7 +554,10 @@ export default function ServiceFeaturesPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setModalOpen(false)}
+            >
               Cancel
             </Button>
 
@@ -488,8 +567,8 @@ export default function ServiceFeaturesPage() {
                   ? "Updating..."
                   : "Adding..."
                 : editing
-                  ? "Update Feature"
-                  : "Add Feature"}
+                  ? "Update Sub Category"
+                  : "Add Sub Category"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -498,11 +577,14 @@ export default function ServiceFeaturesPage() {
       {/* Delete Dialog */}
       <ConfirmDialog
         open={!!deleteTarget}
-        title="Delete Feature"
+        title="Delete Sub Category"
         message={`Delete "${deleteTarget?.title}"? This action cannot be undone.`}
-        confirmLabel={deleteMutation.isPending ? "Deleting..." : "Delete"}
+        confirmLabel={
+          deleteMutation.isPending ? "Deleting..." : "Delete"
+        }
         onConfirm={() =>
-          deleteTarget && deleteMutation.mutate(deleteTarget._id)
+          deleteTarget &&
+          deleteMutation.mutate(deleteTarget._id)
         }
         onCancel={() => setDeleteTarget(null)}
       />

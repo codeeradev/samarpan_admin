@@ -1,6 +1,6 @@
 export const BASE_URL =
-  import.meta.env.VITE_API_URL || "https://samarpanapi.codeeratech.com/admin";
-  // import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
+  // import.meta.env.VITE_API_URL || "https://samarpanapi.codeeratech.com/admin";
+import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
 
 export const ENDPOINT = {
   LOGIN: "/admin-login",
@@ -71,4 +71,6 @@ export const ENDPOINT = {
   UPDATE_SERVICE_FEATURE: "/update-service-feature",
   DELETE_SERVICE_FEATURE: "/delete-service-feature",
   GET_SERVICE_FEATURES: "/get-service-feature",
+
+  GET_JOB_APPLICATIONS: "/get-job-applications",
 };
