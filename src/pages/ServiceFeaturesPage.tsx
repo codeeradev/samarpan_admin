@@ -4,11 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addServiceFeatureApi,
   deleteServiceFeatureApi,
+  getServiceFeatureRelationId,
   getServiceFeaturesApi,
+  type ServiceFeatureItem,
+  type ServiceFeaturePayload,
   updateServiceFeatureApi,
 } from "@/apiCalls/serviceFeatures";
 
-import { getAllServicesApi } from "@/apiCalls/services";
+import { getAllServicesApi, type ServiceItem } from "@/apiCalls/services";
 
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
@@ -73,6 +76,11 @@ type FormDataType = {
   image: File | string;
 };
 
+type UpdateServiceFeatureVariables = {
+  id: string;
+  payload: ServiceFeaturePayload;
+};
+
 const emptyForm: FormDataType = {
   title: "",
   slug: "",
@@ -81,6 +89,19 @@ const emptyForm: FormDataType = {
   image: "",
 };
 
+function resolveServiceTitle(
+  relation: ServiceFeatureItem["serviceId"],
+  services: ServiceItem[],
+) {
+  if (relation && typeof relation === "object" && relation.title) {
+    return relation.title;
+  }
+
+  const serviceId = getServiceFeatureRelationId(relation);
+
+  return services.find((service) => service._id === serviceId)?.title || "-";
+}
+
 export default function ServiceFeaturesPage() {
   const queryClient = useQueryClient();
 
@@ -88,9 +109,9 @@ export default function ServiceFeaturesPage() {
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState<ServiceFeatureItem | null>(null);
 
-  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ServiceFeatureItem | null>(null);
 
   const [formData, setFormData] = useState(emptyForm);
 
@@ -101,11 +122,11 @@ export default function ServiceFeaturesPage() {
 
   const { data: features = [], isLoading } = useQuery({
     queryKey: ["service-features"],
-    queryFn: getServiceFeaturesApi,
+    queryFn: () => getServiceFeaturesApi<ServiceFeatureItem>(),
   });
 
   const addMutation = useMutation({
-    mutationFn: addServiceFeatureApi,
+    mutationFn: (payload: ServiceFeaturePayload) => addServiceFeatureApi(payload),
 
     onSuccess: () => {
       toast.success("Service feature added successfully.");
@@ -123,7 +144,8 @@ export default function ServiceFeaturesPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, payload }: any) => updateServiceFeatureApi(id, payload),
+    mutationFn: ({ id, payload }: UpdateServiceFeatureVariables) =>
+      updateServiceFeatureApi(id, payload),
 
     onSuccess: () => {
       toast.success("Service feature updated successfully.");
@@ -141,7 +163,7 @@ export default function ServiceFeaturesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteServiceFeatureApi,
+    mutationFn: (id: string) => deleteServiceFeatureApi(id),
 
     onSuccess: () => {
       toast.success("Service feature deleted successfully.");
@@ -166,7 +188,7 @@ export default function ServiceFeaturesPage() {
     setModalOpen(true);
   }
 
-  function openEdit(feature: any) {
+  function openEdit(feature: ServiceFeatureItem) {
     setEditing(feature);
 
     setFormData({
@@ -174,7 +196,7 @@ export default function ServiceFeaturesPage() {
       slug: feature.slug || "",
       content: feature.content || "",
       image: feature.image || "",
-      serviceId: feature.serviceId?._id || feature.serviceId || "",
+      serviceId: getServiceFeatureRelationId(feature.serviceId),
     });
 
     setModalOpen(true);
@@ -212,9 +234,7 @@ export default function ServiceFeaturesPage() {
     const q = search.toLowerCase();
 
     return features.filter(
-      (item: any) =>
-        item.title?.toLowerCase().includes(q) ||
-        item.slug?.toLowerCase().includes(q),
+      (item) => item.title?.toLowerCase().includes(q) || item.slug?.toLowerCase().includes(q),
     );
   }, [features, search]);
 
@@ -288,7 +308,7 @@ export default function ServiceFeaturesPage() {
                     </TableCell>
                   </TableRow>
                 ))
-              : filtered.map((feature: any) => (
+              : filtered.map((feature) => (
                   <TableRow key={feature._id}>
                     <TableCell className="font-medium">
                       {feature.title}
@@ -309,7 +329,9 @@ export default function ServiceFeaturesPage() {
                       <Badge variant="secondary">{feature.slug}</Badge>
                     </TableCell>
 
-                    <TableCell>{feature.serviceId?.title || "-"}</TableCell>
+                    <TableCell>
+                      {resolveServiceTitle(feature.serviceId, services)}
+                    </TableCell>
 
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -336,7 +358,7 @@ export default function ServiceFeaturesPage() {
             {!isLoading && filtered.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   className="text-center py-10 text-muted-foreground"
                 >
                   No features found.
@@ -422,7 +444,7 @@ export default function ServiceFeaturesPage() {
                 </SelectTrigger>
 
                 <SelectContent>
-                  {services.map((service: any) => (
+                  {services.map((service) => (
                     <SelectItem key={service._id} value={service._id}>
                       {service.title}
                     </SelectItem>
@@ -438,7 +460,7 @@ export default function ServiceFeaturesPage() {
                 typeof formData.image === "string" &&
                 formData.image && (
                   <img
-                    src={formData.image}
+                    src={resolveAssetUrl(formData.image)}
                     alt={formData.title}
                     className="w-32 h-20 object-cover rounded-lg border"
                   />

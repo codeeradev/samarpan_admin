@@ -32463,13 +32463,6 @@ function loadCachedTheme() {
 function getDefaultThemeColors(_type = "panel") {
   return cloneThemeColors(DEFAULT_THEME_COLORS);
 }
-function getDefaultPanelTheme() {
-  return {
-    _id: "default-panel-theme",
-    name: "panel",
-    colors: getDefaultThemeColors("panel")
-  };
-}
 function initializeTheme() {
   const cachedTheme = loadCachedTheme();
   applyThemeColors(cachedTheme ?? getDefaultThemeColors("panel"));
@@ -32480,13 +32473,16 @@ function isHexColor(value) {
 function themeColor(variableName, alpha3) {
   return alpha3 === void 0 ? `oklch(var(--${variableName}))` : `oklch(var(--${variableName}) / ${alpha3})`;
 }
+function isPanelThemeColors(colors) {
+  return "light" in colors && "dark" in colors;
+}
 function useTheme() {
   const { admin } = useAuth();
   reactExports.useEffect(() => {
     const loadAndApplyTheme = async () => {
       try {
         const themeData = await getThemeApi("panel");
-        if (themeData == null ? void 0 : themeData.colors) {
+        if ((themeData == null ? void 0 : themeData.colors) && isPanelThemeColors(themeData.colors)) {
           applyThemeColors(themeData.colors);
           cachePanelTheme(themeData.colors);
           return;
@@ -32498,8 +32494,7 @@ function useTheme() {
         applyThemeColors(cachedTheme);
         return;
       }
-      const defaultTheme = getDefaultPanelTheme();
-      applyThemeColors(defaultTheme.colors);
+      applyThemeColors(getDefaultThemeColors("panel"));
     };
     if (admin) {
       loadAndApplyTheme();
@@ -37731,8 +37726,13 @@ const ALL_NAV_ITEMS = [
         permissionPath: "/service-management"
       },
       {
-        label: "Service Features",
-        path: "/service-features",
+        label: "Service Category",
+        path: "/service-category",
+        permissionPath: "/service-features"
+      },
+      {
+        label: "Service Sub Category",
+        path: "/service-sub-category",
         permissionPath: "/service-features"
       }
     ]
@@ -43553,7 +43553,7 @@ const tableStyles$2 = {
     }
   }
 };
-function slugify$3(value) {
+function slugify$4(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
 function formatDate$2(value) {
@@ -43583,7 +43583,7 @@ function isValidUrl(value) {
 }
 function validateCareerForm(form, careers, currentId) {
   const errors = {};
-  const nextSlug = form.slug.trim() ? slugify$3(form.slug) : slugify$3(form.title);
+  const nextSlug = form.slug.trim() ? slugify$4(form.slug) : slugify$4(form.title);
   const duplicateSlug = careers.find(
     (career) => career.slug === nextSlug && career._id !== currentId
   );
@@ -43729,7 +43729,7 @@ function CareerManagementPage() {
     const sortOrder = Number.parseInt(formData.sortOrder, 10);
     const payload = {
       title: formData.title.trim(),
-      slug: formData.slug.trim() ? slugify$3(formData.slug) : slugify$3(formData.title),
+      slug: formData.slug.trim() ? slugify$4(formData.slug) : slugify$4(formData.title),
       department: formData.department.trim(),
       employmentType: formData.employmentType.trim(),
       experience: formData.experience.trim(),
@@ -43987,7 +43987,7 @@ function CareerManagementPage() {
                 ),
                 formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
                   "This will be saved as `/",
-                  formData.slug.trim() ? slugify$3(formData.slug) : slugify$3(formData.title) || "career-role",
+                  formData.slug.trim() ? slugify$4(formData.slug) : slugify$4(formData.title) || "career-role",
                   "`."
                 ] })
               ] }),
@@ -66458,7 +66458,7 @@ function TableCell({ className, ...props }) {
 }
 const SKELETON_ROWS$1 = ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5"];
 const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
-const emptyForm$2 = {
+const emptyForm$3 = {
   name: "",
   specialization: "",
   experience: "",
@@ -66566,7 +66566,7 @@ function DoctorsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = reactExports.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = reactExports.useState(false);
   const [selectedDoctor, setSelectedDoctor] = reactExports.useState(null);
-  const [formData, setFormData] = reactExports.useState(emptyForm$2);
+  const [formData, setFormData] = reactExports.useState(emptyForm$3);
   const [formErrors, setFormErrors] = reactExports.useState({});
   const [imageFileName, setImageFileName] = reactExports.useState("");
   const fileInputRef = reactExports.useRef(null);
@@ -66622,7 +66622,7 @@ function DoctorsPage() {
     );
   }, [doctors, searchQuery]);
   function resetForm() {
-    setFormData(emptyForm$2);
+    setFormData(emptyForm$3);
     setFormErrors({});
     setImageFileName("");
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -72481,12 +72481,12 @@ function PageEditor({ value, onChange }) {
     }
   ) });
 }
-function slugify$2(value) {
+function slugify$3(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
 function validateServiceForm(form, mode, services, currentId) {
   const errors = {};
-  const nextSlug = form.slug.trim() ? slugify$2(form.slug) : slugify$2(form.title);
+  const nextSlug = form.slug.trim() ? slugify$3(form.slug) : slugify$3(form.title);
   const duplicateSlug = services.find(
     (service) => service.slug === nextSlug && service._id !== currentId
   );
@@ -72517,7 +72517,7 @@ function validateServiceForm(form, mode, services, currentId) {
   }
   return errors;
 }
-const emptyForm$1 = {
+const emptyForm$2 = {
   title: "",
   slug: "",
   shortDescription: "",
@@ -72578,7 +72578,7 @@ function ServiceManagementPage() {
   const [modalOpen, setModalOpen] = reactExports.useState(false);
   const [editTarget, setEditTarget] = reactExports.useState(null);
   const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
-  const [formData, setFormData] = reactExports.useState(emptyForm$1);
+  const [formData, setFormData] = reactExports.useState(emptyForm$2);
   const [formErrors, setFormErrors] = reactExports.useState({});
   const [keywordsInput, setKeywordsInput] = reactExports.useState("");
   const imageRef = reactExports.useRef(null);
@@ -72624,7 +72624,7 @@ function ServiceManagementPage() {
   }, [data, search]);
   function openAdd() {
     setEditTarget(null);
-    setFormData(emptyForm$1);
+    setFormData(emptyForm$2);
     setFormErrors({});
     setKeywordsInput("");
     setModalOpen(true);
@@ -72694,7 +72694,7 @@ function ServiceManagementPage() {
     }
     const payload = {
       ...formData,
-      slug: ((_a3 = formData.slug) == null ? void 0 : _a3.trim()) ? slugify$2(formData.slug) : slugify$2(formData.title),
+      slug: ((_a3 = formData.slug) == null ? void 0 : _a3.trim()) ? slugify$3(formData.slug) : slugify$3(formData.title),
       seo: {
         ...formData.seo,
         keywords: keywordsInput.split(",").map((k2) => k2.trim()).filter(Boolean)
@@ -72869,7 +72869,7 @@ function ServiceManagementPage() {
                     ),
                     formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
                       "Saved as `/",
-                      formData.slug.trim() ? slugify$2(formData.slug) : slugify$2(formData.title) || "service-slug",
+                      formData.slug.trim() ? slugify$3(formData.slug) : slugify$3(formData.title) || "service-slug",
                       "`."
                     ] })
                   ] }),
@@ -73749,7 +73749,7 @@ const pageTableStyles = {
     }
   }
 };
-function slugify$1(value) {
+function slugify$2(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
 function formatPageDate(value) {
@@ -73768,7 +73768,7 @@ function formatPageDate(value) {
 }
 function validatePageForm(form, pages, currentId) {
   const errors = {};
-  const nextSlug = form.slug.trim() ? slugify$1(form.slug) : slugify$1(form.title);
+  const nextSlug = form.slug.trim() ? slugify$2(form.slug) : slugify$2(form.title);
   const duplicateSlug = pages.find(
     (page) => page.slug === nextSlug && page._id !== currentId
   );
@@ -73908,7 +73908,7 @@ function PagesPage() {
     }
     const payload = {
       title: formData.title.trim(),
-      slug: formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title),
+      slug: formData.slug.trim() ? slugify$2(formData.slug) : slugify$2(formData.title),
       content: formData.content,
       status: formData.status,
       metaTitle: formData.metaTitle.trim(),
@@ -74154,7 +74154,7 @@ function PagesPage() {
                   ),
                   formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
                     "Leave it clean and short. We’ll save this as `/",
-                    formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title) || "page-slug",
+                    formData.slug.trim() ? slugify$2(formData.slug) : slugify$2(formData.title) || "page-slug",
                     "`."
                   ] })
                 ] }),
@@ -74231,7 +74231,7 @@ function PagesPage() {
                       setPreviewPage({
                         _id: (editTarget == null ? void 0 : editTarget._id) ?? "preview",
                         title: formData.title,
-                        slug: formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title),
+                        slug: formData.slug.trim() ? slugify$2(formData.slug) : slugify$2(formData.title),
                         content: formData.content,
                         status: formData.status,
                         seo: {
@@ -75797,135 +75797,135 @@ function WebsiteContentPageImpl() {
     ] }) })
   ] });
 }
+const SERVICE_FEATURE_TYPE = {
+  SUB_CATEGORY: "sub_cat"
+};
 function buildFormData(payload) {
   const formData = new FormData();
-  formData.append(
-    "title",
-    payload.title
-  );
-  formData.append(
-    "slug",
-    payload.slug || ""
-  );
-  formData.append(
-    "content",
-    payload.content || ""
-  );
-  formData.append(
-    "serviceId",
-    payload.serviceId
-  );
-  if (payload.image instanceof File) {
-    formData.append(
-      "image",
-      payload.image
-    );
+  formData.append("title", payload.title);
+  formData.append("slug", payload.slug || "");
+  formData.append("content", payload.content || "");
+  formData.append("serviceId", payload.serviceId);
+  if (payload.serviceSubCategoryId) {
+    formData.append("serviceSubCategoryId", payload.serviceSubCategoryId);
+    formData.append("featureServiceId", payload.serviceSubCategoryId);
   }
-  formData.append(
-    "seo",
-    JSON.stringify(payload.seo || {})
-  );
+  if (payload.image instanceof File) {
+    formData.append("image", payload.image);
+  }
+  formData.append("seo", JSON.stringify(payload.seo || {}));
   return formData;
 }
-const getServiceFeaturesApi = async () => {
+function buildFeatureUrl(endpoint, type, id) {
+  const baseUrl = id ? `${endpoint}/${id}` : endpoint;
+  return type ? `${baseUrl}?type=${type}` : baseUrl;
+}
+function getServiceFeatureRelationId(relation) {
+  if (!relation) {
+    return "";
+  }
+  return typeof relation === "string" ? relation : relation._id;
+}
+function normalizeServiceFeatureItem(item) {
+  if (!item.serviceSubCategoryId && item.featureServiceId) {
+    return {
+      ...item,
+      serviceSubCategoryId: item.featureServiceId
+    };
+  }
+  return item;
+}
+const getServiceFeaturesApi = async (query) => {
   try {
-    const res = await get$3(
-      ENDPOINT.GET_SERVICE_FEATURES,
-      { needAuth: true }
+    const queryString = typeof query === "string" ? query : "";
+    const res = await get$3(`${ENDPOINT.GET_SERVICE_FEATURES}${queryString}`, {
+      needAuth: true
+    });
+    return ((res == null ? void 0 : res.data) || []).map(
+      (item) => normalizeServiceFeatureItem(item)
     );
-    return (res == null ? void 0 : res.data) || [];
   } catch (error) {
-    throw createApiRequestError(
-      error,
-      "Failed to fetch service features"
-    );
+    throw createApiRequestError(error, "Failed to fetch service features");
   }
 };
-const addServiceFeatureApi = async (payload) => {
+const getServiceSubCategoriesApi = async () => getServiceFeaturesApi(
+  `?type=${SERVICE_FEATURE_TYPE.SUB_CATEGORY}`
+);
+const addServiceFeatureApi = async (payload, type) => {
+  var _a2, _b2;
+  try {
+    const formData = buildFormData(payload);
+    const url = buildFeatureUrl(ENDPOINT.ADD_SERVICE_FEATURE, type);
+    const res = await post(url, formData, {
+      needAuth: true,
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.feature) || ((_b2 = res == null ? void 0 : res.data) == null ? void 0 : _b2.serviceSubCategory);
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to add service feature");
+  }
+};
+const updateServiceFeatureApi = async (id, payload, type) => {
   var _a2;
   try {
     const formData = buildFormData(payload);
-    const res = await post(
-      ENDPOINT.ADD_SERVICE_FEATURE,
-      formData,
-      {
-        needAuth: true,
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
+    const url = buildFeatureUrl(ENDPOINT.UPDATE_SERVICE_FEATURE, type, id);
+    const res = await post(url, formData, {
+      needAuth: true,
+      headers: {
+        "Content-Type": "multipart/form-data"
       }
-    );
+    });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.feature;
   } catch (error) {
-    throw createApiRequestError(
-      error,
-      "Failed to add service feature"
-    );
+    throw createApiRequestError(error, "Failed to update service feature");
   }
 };
-const updateServiceFeatureApi = async (id, payload) => {
-  var _a2;
+const deleteServiceFeatureApi = async (id, type) => {
   try {
-    const formData = buildFormData(payload);
-    const res = await post(
-      `${ENDPOINT.UPDATE_SERVICE_FEATURE}/${id}`,
-      formData,
-      {
-        needAuth: true,
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      }
-    );
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.feature;
+    const url = buildFeatureUrl(ENDPOINT.DELETE_SERVICE_FEATURE, type, id);
+    await post(url, {}, { needAuth: true });
   } catch (error) {
-    throw createApiRequestError(
-      error,
-      "Failed to update service feature"
-    );
+    throw createApiRequestError(error, "Failed to delete service feature");
   }
 };
-const deleteServiceFeatureApi = async (id) => {
-  try {
-    await post(
-      `${ENDPOINT.DELETE_SERVICE_FEATURE}/${id}`,
-      {},
-      { needAuth: true }
-    );
-  } catch (error) {
-    throw createApiRequestError(
-      error,
-      "Failed to delete service feature"
-    );
-  }
-};
-function slugify(value) {
+function slugify$1(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
-const emptyForm = {
+const emptyForm$1 = {
   title: "",
   slug: "",
   content: "",
   serviceId: "",
   image: ""
 };
+function resolveServiceTitle(relation, services) {
+  var _a2;
+  if (relation && typeof relation === "object" && relation.title) {
+    return relation.title;
+  }
+  const serviceId = getServiceFeatureRelationId(relation);
+  return ((_a2 = services.find((service) => service._id === serviceId)) == null ? void 0 : _a2.title) || "-";
+}
 function ServiceFeaturesPage() {
   const queryClient2 = useQueryClient();
   const [search, setSearch] = reactExports.useState("");
   const [modalOpen, setModalOpen] = reactExports.useState(false);
   const [editing, setEditing] = reactExports.useState(null);
   const [deleteTarget, setDeleteTarget] = reactExports.useState(null);
-  const [formData, setFormData] = reactExports.useState(emptyForm);
+  const [formData, setFormData] = reactExports.useState(emptyForm$1);
   const { data: services = [] } = useQuery({
     queryKey: ["services"],
     queryFn: getAllServicesApi
   });
   const { data: features = [], isLoading } = useQuery({
     queryKey: ["service-features"],
-    queryFn: getServiceFeaturesApi
+    queryFn: () => getServiceFeaturesApi()
   });
   const addMutation = useMutation({
-    mutationFn: addServiceFeatureApi,
+    mutationFn: (payload) => addServiceFeatureApi(payload),
     onSuccess: () => {
       ue$2.success("Service feature added successfully.");
       queryClient2.invalidateQueries({
@@ -75951,7 +75951,7 @@ function ServiceFeaturesPage() {
     }
   });
   const deleteMutation = useMutation({
-    mutationFn: deleteServiceFeatureApi,
+    mutationFn: (id) => deleteServiceFeatureApi(id),
     onSuccess: () => {
       ue$2.success("Service feature deleted successfully.");
       queryClient2.invalidateQueries({
@@ -75965,18 +75965,17 @@ function ServiceFeaturesPage() {
   });
   function openAdd() {
     setEditing(null);
-    setFormData(emptyForm);
+    setFormData(emptyForm$1);
     setModalOpen(true);
   }
   function openEdit(feature) {
-    var _a2;
     setEditing(feature);
     setFormData({
       title: feature.title || "",
       slug: feature.slug || "",
       content: feature.content || "",
       image: feature.image || "",
-      serviceId: ((_a2 = feature.serviceId) == null ? void 0 : _a2._id) || feature.serviceId || ""
+      serviceId: getServiceFeatureRelationId(feature.serviceId)
     });
     setModalOpen(true);
   }
@@ -75988,7 +75987,7 @@ function ServiceFeaturesPage() {
     }
     const payload = {
       ...formData,
-      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify(formData.slug) : slugify(formData.title)
+      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify$1(formData.slug) : slugify$1(formData.title)
     };
     if (editing) {
       await updateMutation.mutateAsync({
@@ -76046,46 +76045,43 @@ function ServiceFeaturesPage() {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 ml-auto rounded-lg" }) })
-        ] }, row)) : filtered.map((feature) => {
-          var _a2;
-          return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: feature.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: feature.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "img",
+        ] }, row)) : filtered.map((feature) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: feature.title }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: feature.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "img",
+            {
+              src: resolveAssetUrl$1(feature.image),
+              alt: feature.title,
+              className: "w-14 h-14 rounded-lg object-cover border"
+            }
+          ) : "-" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: feature.slug }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: resolveServiceTitle(feature.serviceId, services) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
               {
-                src: resolveAssetUrl$1(feature.image),
-                alt: feature.title,
-                className: "w-14 h-14 rounded-lg object-cover border"
+                size: "icon",
+                variant: "ghost",
+                onClick: () => openEdit(feature),
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
               }
-            ) : "-" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: feature.slug }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: ((_a2 = feature.serviceId) == null ? void 0 : _a2.title) || "-" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  size: "icon",
-                  variant: "ghost",
-                  onClick: () => openEdit(feature),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  size: "icon",
-                  variant: "ghost",
-                  onClick: () => setDeleteTarget(feature),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
-                }
-              )
-            ] }) })
-          ] }, feature._id);
-        }),
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                size: "icon",
+                variant: "ghost",
+                onClick: () => setDeleteTarget(feature),
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
+              }
+            )
+          ] }) })
+        ] }, feature._id)),
         !isLoading && filtered.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           TableCell,
           {
-            colSpan: 4,
+            colSpan: 5,
             className: "text-center py-10 text-muted-foreground",
             children: "No features found."
           }
@@ -76155,7 +76151,7 @@ function ServiceFeaturesPage() {
               editing && typeof formData.image === "string" && formData.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "img",
                 {
-                  src: formData.image,
+                  src: resolveAssetUrl$1(formData.image),
                   alt: formData.title,
                   className: "w-32 h-20 object-cover rounded-lg border"
                 }
@@ -76204,6 +76200,378 @@ function ServiceFeaturesPage() {
       {
         open: !!deleteTarget,
         title: "Delete Feature",
+        message: `Delete "${deleteTarget == null ? void 0 : deleteTarget.title}"? This action cannot be undone.`,
+        confirmLabel: deleteMutation.isPending ? "Deleting..." : "Delete",
+        onConfirm: () => deleteTarget && deleteMutation.mutate(deleteTarget._id),
+        onCancel: () => setDeleteTarget(null)
+      }
+    )
+  ] });
+}
+function slugify(value) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
+}
+const emptyForm = {
+  title: "",
+  slug: "",
+  content: "",
+  serviceId: "",
+  serviceSubCategoryId: "",
+  image: ""
+};
+function resolveRelationTitle(relation, items) {
+  var _a2;
+  if (relation && typeof relation === "object" && relation.title) {
+    return relation.title;
+  }
+  const relationId = getServiceFeatureRelationId(relation);
+  return ((_a2 = items.find((item) => item._id === relationId)) == null ? void 0 : _a2.title) || "-";
+}
+function ServiceSubCategoriesPage() {
+  const queryClient2 = useQueryClient();
+  const [search, setSearch] = reactExports.useState("");
+  const [modalOpen, setModalOpen] = reactExports.useState(false);
+  const [editing, setEditing] = reactExports.useState(null);
+  const [deleteTarget, setDeleteTarget] = reactExports.useState(
+    null
+  );
+  const [formData, setFormData] = reactExports.useState(emptyForm);
+  const { data: services = [] } = useQuery({
+    queryKey: ["services"],
+    queryFn: getAllServicesApi
+  });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["service-features"],
+    queryFn: () => getServiceFeaturesApi()
+  });
+  const {
+    data: subCategories = [],
+    isLoading
+  } = useQuery({
+    queryKey: ["service-sub-categories"],
+    queryFn: getServiceSubCategoriesApi
+  });
+  const addMutation = useMutation({
+    mutationFn: (payload) => addServiceFeatureApi(payload, SERVICE_FEATURE_TYPE.SUB_CATEGORY),
+    onSuccess: () => {
+      ue$2.success("Service sub category added successfully.");
+      queryClient2.invalidateQueries({
+        queryKey: ["service-sub-categories"]
+      });
+      setModalOpen(false);
+    },
+    onError: () => {
+      ue$2.error("Failed to add service sub category.");
+    }
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }) => updateServiceFeatureApi(id, payload, SERVICE_FEATURE_TYPE.SUB_CATEGORY),
+    onSuccess: () => {
+      ue$2.success("Service sub category updated successfully.");
+      queryClient2.invalidateQueries({
+        queryKey: ["service-sub-categories"]
+      });
+      setModalOpen(false);
+    },
+    onError: () => {
+      ue$2.error("Failed to update service sub category.");
+    }
+  });
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteServiceFeatureApi(id, SERVICE_FEATURE_TYPE.SUB_CATEGORY),
+    onSuccess: () => {
+      ue$2.success("Service sub category deleted successfully.");
+      queryClient2.invalidateQueries({
+        queryKey: ["service-sub-categories"]
+      });
+      setDeleteTarget(null);
+    },
+    onError: () => {
+      ue$2.error("Failed to delete service sub category.");
+    }
+  });
+  function openAdd() {
+    setEditing(null);
+    setFormData(emptyForm);
+    setModalOpen(true);
+  }
+  function openEdit(item) {
+    setEditing(item);
+    setFormData({
+      title: item.title || "",
+      slug: item.slug || "",
+      content: item.content || "",
+      image: item.image || "",
+      serviceId: getServiceFeatureRelationId(item.serviceId),
+      serviceSubCategoryId: getServiceFeatureRelationId(item.serviceSubCategoryId)
+    });
+    setModalOpen(true);
+  }
+  async function handleSave() {
+    var _a2;
+    if (!formData.title || !formData.serviceId || !formData.serviceSubCategoryId) {
+      ue$2.error("Title, Service and Category are required.");
+      return;
+    }
+    const payload = {
+      ...formData,
+      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify(formData.slug) : slugify(formData.title)
+    };
+    if (editing) {
+      await updateMutation.mutateAsync({
+        id: editing._id,
+        payload
+      });
+      return;
+    }
+    await addMutation.mutateAsync(payload);
+  }
+  const filteredCategories = reactExports.useMemo(() => {
+    if (!formData.serviceId) {
+      return categories;
+    }
+    return categories.filter(
+      (category) => getServiceFeatureRelationId(category.serviceId) === formData.serviceId
+    );
+  }, [categories, formData.serviceId]);
+  const filtered = reactExports.useMemo(() => {
+    if (!search.trim()) return subCategories;
+    const q2 = search.toLowerCase();
+    return subCategories.filter(
+      (item) => {
+        var _a2, _b2;
+        return ((_a2 = item.title) == null ? void 0 : _a2.toLowerCase().includes(q2)) || ((_b2 = item.slug) == null ? void 0 : _b2.toLowerCase().includes(q2));
+      }
+    );
+  }, [subCategories, search]);
+  const isBusy = addMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Service Sub Categories",
+        description: "Manage service sub categories and detailed content.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: openAdd, className: "gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 15 }),
+          "Add Sub Category"
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: "Search sub category...",
+        value: search,
+        onChange: (e3) => setSearch(e3.target.value),
+        className: "max-w-sm"
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-card border rounded-2xl overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Title" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Image" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Slug" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Service" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Category" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: "Actions" })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableBody, { children: [
+        isLoading ? [1, 2, 3].map((row) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-40" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-14 w-14 rounded-lg" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 ml-auto rounded-lg" }) })
+        ] }, row)) : filtered.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: item.title }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: item.image ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "img",
+            {
+              src: resolveAssetUrl$1(item.image),
+              alt: item.title,
+              className: "w-14 h-14 rounded-lg object-cover border"
+            }
+          ) : "-" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: item.slug }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: resolveRelationTitle(item.serviceId, services) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: resolveRelationTitle(item.serviceSubCategoryId, categories) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                size: "icon",
+                variant: "ghost",
+                onClick: () => openEdit(item),
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                size: "icon",
+                variant: "ghost",
+                onClick: () => setDeleteTarget(item),
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
+              }
+            )
+          ] }) })
+        ] }, item._id)),
+        !isLoading && filtered.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          TableCell,
+          {
+            colSpan: 6,
+            className: "text-center py-10 text-muted-foreground",
+            children: "No sub categories found."
+          }
+        ) })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: modalOpen, onOpenChange: setModalOpen, modal: false, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      DialogContent,
+      {
+        className: "max-w-5xl max-h-[90vh] sm:max-w-[900px] overflow-y-auto",
+        onInteractOutside: (e3) => {
+          const el = e3.target;
+          if (el.closest(".tox-tinymce-aux") || el.closest(".tox-dialog") || el.closest(".tox-menu") || el.closest(".tox-pop") || document.querySelector(".tox-dialog")) {
+            e3.preventDefault();
+          }
+        },
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editing ? "Update Sub Category" : "Add Sub Category" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  value: formData.title,
+                  onChange: (e3) => setFormData((previous) => ({
+                    ...previous,
+                    title: e3.target.value
+                  })),
+                  placeholder: "Sub category title"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  value: formData.slug,
+                  onChange: (e3) => setFormData((previous) => ({
+                    ...previous,
+                    slug: e3.target.value
+                  })),
+                  placeholder: "sub-category-slug"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: formData.serviceId,
+                  onValueChange: (value) => setFormData((previous) => {
+                    const nextCategories = categories.filter(
+                      (category) => getServiceFeatureRelationId(category.serviceId) === value
+                    );
+                    const hasSelectedCategory = nextCategories.some(
+                      (category) => category._id === previous.serviceSubCategoryId
+                    );
+                    return {
+                      ...previous,
+                      serviceId: value,
+                      serviceSubCategoryId: hasSelectedCategory ? previous.serviceSubCategoryId : ""
+                    };
+                  }),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select service" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((service) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: service._id, children: service.title }, service._id)) })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service Category" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: formData.serviceSubCategoryId,
+                  disabled: !formData.serviceId,
+                  onValueChange: (value) => setFormData((previous) => ({
+                    ...previous,
+                    serviceSubCategoryId: value
+                  })),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      SelectValue,
+                      {
+                        placeholder: formData.serviceId ? "Select category" : "Select service first"
+                      }
+                    ) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: filteredCategories.map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: category._id, children: category.title }, category._id)) })
+                  ]
+                }
+              ),
+              formData.serviceId && filteredCategories.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "No service categories found for this service." })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Sub Category Image" }),
+              editing && typeof formData.image === "string" && formData.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: resolveAssetUrl$1(formData.image),
+                  alt: formData.title,
+                  className: "w-32 h-20 object-cover rounded-lg border"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  type: "file",
+                  accept: "image/*",
+                  onChange: (e3) => {
+                    var _a2;
+                    const file = (_a2 = e3.target.files) == null ? void 0 : _a2[0];
+                    if (file) {
+                      setFormData((previous) => ({
+                        ...previous,
+                        image: file
+                      }));
+                    }
+                  }
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Content" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                PageEditor,
+                {
+                  value: formData.content,
+                  onChange: (content) => setFormData((previous) => ({
+                    ...previous,
+                    content
+                  }))
+                }
+              ) })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: () => setModalOpen(false), children: "Cancel" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, disabled: isBusy, children: isBusy ? editing ? "Updating..." : "Adding..." : editing ? "Update Sub Category" : "Add Sub Category" })
+          ] })
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmDialog,
+      {
+        open: !!deleteTarget,
+        title: "Delete Sub Category",
         message: `Delete "${deleteTarget == null ? void 0 : deleteTarget.title}"? This action cannot be undone.`,
         confirmLabel: deleteMutation.isPending ? "Deleting..." : "Delete",
         onConfirm: () => deleteTarget && deleteMutation.mutate(deleteTarget._id),
@@ -78987,9 +79355,15 @@ const serviceManagementRoute = createRoute({
 });
 const serviceFeaturesRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: "/service-features",
+  path: "/service-category",
   beforeLoad: () => checkPermission("/service-features"),
   component: ServiceFeaturesPage
+});
+const serviceSubCategoryRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/service-sub-category",
+  beforeLoad: () => checkPermission("/service-features"),
+  component: ServiceSubCategoriesPage
 });
 const blogsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
@@ -79063,6 +79437,7 @@ const routeTree = rootRoute.addChildren([
     appointmentsRoute,
     serviceManagementRoute,
     serviceFeaturesRoute,
+    serviceSubCategoryRoute,
     blogsRoute,
     galleryRoute,
     reviewsAndShortsRoute,

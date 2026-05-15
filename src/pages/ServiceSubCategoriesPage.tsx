@@ -2,9 +2,15 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+  SERVICE_FEATURE_TYPE,
   addServiceFeatureApi,
   deleteServiceFeatureApi,
+  getServiceFeatureRelationId,
   getServiceFeaturesApi,
+  getServiceSubCategoriesApi,
+  type ServiceFeatureItem,
+  type ServiceFeaturePayload,
+  type ServiceSubCategoryItem,
   updateServiceFeatureApi,
 } from "@/apiCalls/serviceFeatures";
 
@@ -74,6 +80,11 @@ type FormDataType = {
   image: File | string;
 };
 
+type UpdateServiceSubCategoryVariables = {
+  id: string;
+  payload: ServiceFeaturePayload;
+};
+
 const emptyForm: FormDataType = {
   title: "",
   slug: "",
@@ -83,6 +94,19 @@ const emptyForm: FormDataType = {
   image: "",
 };
 
+function resolveRelationTitle(
+  relation: ServiceFeatureItem["serviceId"],
+  items: Array<{ _id: string; title: string }>,
+) {
+  if (relation && typeof relation === "object" && relation.title) {
+    return relation.title;
+  }
+
+  const relationId = getServiceFeatureRelationId(relation);
+
+  return items.find((item) => item._id === relationId)?.title || "-";
+}
+
 export default function ServiceSubCategoriesPage() {
   const queryClient = useQueryClient();
 
@@ -90,36 +114,35 @@ export default function ServiceSubCategoriesPage() {
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState<ServiceSubCategoryItem | null>(null);
 
-  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ServiceSubCategoryItem | null>(
+    null,
+  );
 
   const [formData, setFormData] = useState(emptyForm);
 
-  // Services
   const { data: services = [] } = useQuery({
     queryKey: ["services"],
     queryFn: getAllServicesApi,
   });
 
-  // Categories (old service features)
   const { data: categories = [] } = useQuery({
     queryKey: ["service-features"],
-    queryFn: () => getServiceFeaturesApi()
+    queryFn: () => getServiceFeaturesApi<ServiceFeatureItem>(),
   });
 
-  // Sub Categories
   const {
     data: subCategories = [],
     isLoading,
   } = useQuery({
     queryKey: ["service-sub-categories"],
-    queryFn: () => getServiceFeaturesApi("?type=sub_cat"),
+    queryFn: getServiceSubCategoriesApi,
   });
 
   const addMutation = useMutation({
-    mutationFn: (payload: any) =>
-      addServiceFeatureApi(payload, "sub_cat"),
+    mutationFn: (payload: ServiceFeaturePayload) =>
+      addServiceFeatureApi(payload, SERVICE_FEATURE_TYPE.SUB_CATEGORY),
 
     onSuccess: () => {
       toast.success("Service sub category added successfully.");
@@ -137,8 +160,8 @@ export default function ServiceSubCategoriesPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, payload }: any) =>
-      updateServiceFeatureApi(id, payload, "sub_cat"),
+    mutationFn: ({ id, payload }: UpdateServiceSubCategoryVariables) =>
+      updateServiceFeatureApi(id, payload, SERVICE_FEATURE_TYPE.SUB_CATEGORY),
 
     onSuccess: () => {
       toast.success("Service sub category updated successfully.");
@@ -157,7 +180,7 @@ export default function ServiceSubCategoriesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) =>
-      deleteServiceFeatureApi(id, "sub_cat"),
+      deleteServiceFeatureApi(id, SERVICE_FEATURE_TYPE.SUB_CATEGORY),
 
     onSuccess: () => {
       toast.success("Service sub category deleted successfully.");
@@ -182,7 +205,7 @@ export default function ServiceSubCategoriesPage() {
     setModalOpen(true);
   }
 
-  function openEdit(item: any) {
+  function openEdit(item: ServiceSubCategoryItem) {
     setEditing(item);
 
     setFormData({
@@ -190,22 +213,15 @@ export default function ServiceSubCategoriesPage() {
       slug: item.slug || "",
       content: item.content || "",
       image: item.image || "",
-      serviceId: item.serviceId?._id || item.serviceId || "",
-      serviceSubCategoryId:
-        item.serviceSubCategoryId?._id ||
-        item.serviceSubCategoryId ||
-        "",
+      serviceId: getServiceFeatureRelationId(item.serviceId),
+      serviceSubCategoryId: getServiceFeatureRelationId(item.serviceSubCategoryId),
     });
 
     setModalOpen(true);
   }
 
   async function handleSave() {
-    if (
-      !formData.title ||
-      !formData.serviceId ||
-      !formData.serviceSubCategoryId
-    ) {
+    if (!formData.title || !formData.serviceId || !formData.serviceSubCategoryId) {
       toast.error("Title, Service and Category are required.");
 
       return;
@@ -230,15 +246,23 @@ export default function ServiceSubCategoriesPage() {
     await addMutation.mutateAsync(payload);
   }
 
+  const filteredCategories = useMemo(() => {
+    if (!formData.serviceId) {
+      return categories;
+    }
+
+    return categories.filter(
+      (category) => getServiceFeatureRelationId(category.serviceId) === formData.serviceId,
+    );
+  }, [categories, formData.serviceId]);
+
   const filtered = useMemo(() => {
     if (!search.trim()) return subCategories;
 
     const q = search.toLowerCase();
 
     return subCategories.filter(
-      (item: any) =>
-        item.title?.toLowerCase().includes(q) ||
-        item.slug?.toLowerCase().includes(q)
+      (item) => item.title?.toLowerCase().includes(q) || item.slug?.toLowerCase().includes(q),
     );
   }, [subCategories, search]);
 
@@ -260,7 +284,6 @@ export default function ServiceSubCategoriesPage() {
         }
       />
 
-      {/* Search */}
       <div className="mb-4">
         <Input
           placeholder="Search sub category..."
@@ -270,21 +293,15 @@ export default function ServiceSubCategoriesPage() {
         />
       </div>
 
-      {/* Table */}
       <div className="bg-card border rounded-2xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-
               <TableHead>Image</TableHead>
-
               <TableHead>Slug</TableHead>
-
               <TableHead>Service</TableHead>
-
               <TableHead>Category</TableHead>
-
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -318,11 +335,9 @@ export default function ServiceSubCategoriesPage() {
                     </TableCell>
                   </TableRow>
                 ))
-              : filtered.map((item: any) => (
+              : filtered.map((item) => (
                   <TableRow key={item._id}>
-                    <TableCell className="font-medium">
-                      {item.title}
-                    </TableCell>
+                    <TableCell className="font-medium">{item.title}</TableCell>
 
                     <TableCell>
                       {item.image ? (
@@ -337,17 +352,15 @@ export default function ServiceSubCategoriesPage() {
                     </TableCell>
 
                     <TableCell>
-                      <Badge variant="secondary">
-                        {item.slug}
-                      </Badge>
+                      <Badge variant="secondary">{item.slug}</Badge>
                     </TableCell>
 
                     <TableCell>
-                      {item.serviceId?.title || "-"}
+                      {resolveRelationTitle(item.serviceId, services)}
                     </TableCell>
 
                     <TableCell>
-                      {item.serviceSubCategoryId?.title || "-"}
+                      {resolveRelationTitle(item.serviceSubCategoryId, categories)}
                     </TableCell>
 
                     <TableCell className="text-right">
@@ -386,7 +399,6 @@ export default function ServiceSubCategoriesPage() {
         </Table>
       </div>
 
-      {/* Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen} modal={false}>
         <DialogContent
           className="max-w-5xl max-h-[90vh] sm:max-w-[900px] overflow-y-auto"
@@ -406,22 +418,19 @@ export default function ServiceSubCategoriesPage() {
         >
           <DialogHeader>
             <DialogTitle>
-              {editing
-                ? "Update Sub Category"
-                : "Add Sub Category"}
+              {editing ? "Update Sub Category" : "Add Sub Category"}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-5">
-            {/* Title */}
             <div className="space-y-1">
               <Label>Title</Label>
 
               <Input
                 value={formData.title}
                 onChange={(e) =>
-                  setFormData((p) => ({
-                    ...p,
+                  setFormData((previous) => ({
+                    ...previous,
                     title: e.target.value,
                   }))
                 }
@@ -429,15 +438,14 @@ export default function ServiceSubCategoriesPage() {
               />
             </div>
 
-            {/* Slug */}
             <div className="space-y-1">
               <Label>Slug</Label>
 
               <Input
                 value={formData.slug}
                 onChange={(e) =>
-                  setFormData((p) => ({
-                    ...p,
+                  setFormData((previous) => ({
+                    ...previous,
                     slug: e.target.value,
                   }))
                 }
@@ -445,17 +453,30 @@ export default function ServiceSubCategoriesPage() {
               />
             </div>
 
-            {/* Service */}
             <div className="space-y-1">
               <Label>Service</Label>
 
               <Select
                 value={formData.serviceId}
                 onValueChange={(value) =>
-                  setFormData((p) => ({
-                    ...p,
-                    serviceId: value,
-                  }))
+                  setFormData((previous) => {
+                    const nextCategories = categories.filter(
+                      (category) =>
+                        getServiceFeatureRelationId(category.serviceId) === value,
+                    );
+
+                    const hasSelectedCategory = nextCategories.some(
+                      (category) => category._id === previous.serviceSubCategoryId,
+                    );
+
+                    return {
+                      ...previous,
+                      serviceId: value,
+                      serviceSubCategoryId: hasSelectedCategory
+                        ? previous.serviceSubCategoryId
+                        : "",
+                    };
+                  })
                 }
               >
                 <SelectTrigger>
@@ -463,11 +484,8 @@ export default function ServiceSubCategoriesPage() {
                 </SelectTrigger>
 
                 <SelectContent>
-                  {services.map((service: any) => (
-                    <SelectItem
-                      key={service._id}
-                      value={service._id}
-                    >
+                  {services.map((service) => (
+                    <SelectItem key={service._id} value={service._id}>
                       {service.title}
                     </SelectItem>
                   ))}
@@ -475,37 +493,45 @@ export default function ServiceSubCategoriesPage() {
               </Select>
             </div>
 
-            {/* Category */}
             <div className="space-y-1">
               <Label>Service Category</Label>
 
               <Select
                 value={formData.serviceSubCategoryId}
+                disabled={!formData.serviceId}
                 onValueChange={(value) =>
-                  setFormData((p) => ({
-                    ...p,
+                  setFormData((previous) => ({
+                    ...previous,
                     serviceSubCategoryId: value,
                   }))
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue
+                    placeholder={
+                      formData.serviceId
+                        ? "Select category"
+                        : "Select service first"
+                    }
+                  />
                 </SelectTrigger>
 
                 <SelectContent>
-                  {categories.map((category: any) => (
-                    <SelectItem
-                      key={category._id}
-                      value={category._id}
-                    >
+                  {filteredCategories.map((category) => (
+                    <SelectItem key={category._id} value={category._id}>
                       {category.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+
+              {formData.serviceId && filteredCategories.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No service categories found for this service.
+                </p>
+              )}
             </div>
 
-            {/* Image */}
             <div className="space-y-1">
               <Label>Sub Category Image</Label>
 
@@ -526,8 +552,8 @@ export default function ServiceSubCategoriesPage() {
                   const file = e.target.files?.[0];
 
                   if (file) {
-                    setFormData((p) => ({
-                      ...p,
+                    setFormData((previous) => ({
+                      ...previous,
                       image: file,
                     }));
                   }
@@ -535,7 +561,6 @@ export default function ServiceSubCategoriesPage() {
               />
             </div>
 
-            {/* Content */}
             <div className="space-y-2">
               <Label>Content</Label>
 
@@ -543,8 +568,8 @@ export default function ServiceSubCategoriesPage() {
                 <PageEditor
                   value={formData.content}
                   onChange={(content) =>
-                    setFormData((p) => ({
-                      ...p,
+                    setFormData((previous) => ({
+                      ...previous,
                       content,
                     }))
                   }
@@ -554,10 +579,7 @@ export default function ServiceSubCategoriesPage() {
           </div>
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setModalOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
 
@@ -574,17 +596,13 @@ export default function ServiceSubCategoriesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Dialog */}
       <ConfirmDialog
         open={!!deleteTarget}
         title="Delete Sub Category"
         message={`Delete "${deleteTarget?.title}"? This action cannot be undone.`}
-        confirmLabel={
-          deleteMutation.isPending ? "Deleting..." : "Delete"
-        }
+        confirmLabel={deleteMutation.isPending ? "Deleting..." : "Delete"}
         onConfirm={() =>
-          deleteTarget &&
-          deleteMutation.mutate(deleteTarget._id)
+          deleteTarget && deleteMutation.mutate(deleteTarget._id)
         }
         onCancel={() => setDeleteTarget(null)}
       />

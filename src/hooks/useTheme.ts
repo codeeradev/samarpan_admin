@@ -1,12 +1,22 @@
 import { useEffect } from "react";
 import { useAuth } from "./useAuth";
-import { getThemeApi } from "@/apiCalls/theme";
+import {
+  getThemeApi,
+  type ThemeColors,
+  type WebsiteThemeColors,
+} from "@/apiCalls/theme";
 import {
   applyThemeColors,
   cachePanelTheme,
-  getDefaultPanelTheme,
+  getDefaultThemeColors,
   loadCachedTheme,
 } from "@/lib/theme";
+
+function isPanelThemeColors(
+  colors: ThemeColors | WebsiteThemeColors,
+): colors is ThemeColors {
+  return "light" in colors && "dark" in colors;
+}
 
 /**
  * Hook to load and apply panel theme
@@ -23,9 +33,9 @@ export function useTheme() {
         // Try to fetch fresh theme from API
         const themeData = await getThemeApi("panel");
 
-        if (themeData?.colors) {
-          applyThemeColors(themeData.colors as any);
-          cachePanelTheme(themeData.colors as any);
+        if (themeData?.colors && isPanelThemeColors(themeData.colors)) {
+          applyThemeColors(themeData.colors);
+          cachePanelTheme(themeData.colors);
           return;
         }
       } catch (error) {
@@ -40,8 +50,7 @@ export function useTheme() {
       }
 
       // Last resort - use default
-      const defaultTheme = getDefaultPanelTheme();
-      applyThemeColors(defaultTheme.colors);
+      applyThemeColors(getDefaultThemeColors("panel"));
     };
 
     if (admin) {

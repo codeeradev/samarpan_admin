@@ -90,7 +90,6 @@ export default function SettingsPage() {
       if (data?.website_logo) {
         setLogoPreview(data.website_logo);
       }
-      
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -388,6 +387,7 @@ export default function SettingsPage() {
           </CardHeader>
 
           <CardContent className="space-y-4">
+            <Label>Inquiry Email</Label>
             <Input
               placeholder="Inquiry Email"
               value={safeSettings.inquiry_email ?? ""}
@@ -397,6 +397,7 @@ export default function SettingsPage() {
               disabled={loading}
             />
 
+            <Label>Inquiry Mobile</Label>
             <Input
               placeholder="Inquiry Mobile"
               value={safeSettings.inquiry_mobile_number ?? ""}
@@ -406,6 +407,7 @@ export default function SettingsPage() {
               disabled={loading}
             />
 
+            <Label>Whatsapp Inquiry Number</Label>
             <Input
               placeholder="Whatsapp Inquiry Number"
               value={safeSettings.whatsapp_number ?? ""}
@@ -415,6 +417,7 @@ export default function SettingsPage() {
               disabled={loading}
             />
 
+            <Label>Set Working Hours</Label>
             <Input
               placeholder="Working Hours"
               value={safeSettings.working_hours ?? ""}
@@ -424,6 +427,7 @@ export default function SettingsPage() {
               disabled={loading}
             />
 
+            <Label>Set Address</Label>
             <Textarea
               placeholder="Address"
               value={safeSettings.address ?? ""}
@@ -518,13 +522,16 @@ export default function SettingsPage() {
           <CardContent className="space-y-3">
             {["facebook", "instagram", "youtube", "whatsapp", "call"].map(
               (item) => (
-                <Input
-                  key={item}
-                  placeholder={item}
-                  value={safeSettings.social_links?.[item] ?? ""}
-                  onChange={(event) => updateSocial(item, event.target.value)}
-                  disabled={loading}
-                />
+                <div key={item}>
+                  <Label className="capitalize">{item}</Label>
+                  <Input
+                    key={item}
+                    placeholder={item}
+                    value={safeSettings.social_links?.[item] ?? ""}
+                    onChange={(event) => updateSocial(item, event.target.value)}
+                    disabled={loading}
+                  />
+                </div>
               ),
             )}
 
@@ -547,6 +554,7 @@ export default function SettingsPage() {
           </CardHeader>
 
           <CardContent className="space-y-4">
+            <Label>Google Place ID</Label>
             <Input
               placeholder="Google Place ID"
               value={safeSettings.google_reviews?.place_id ?? ""}
@@ -562,6 +570,7 @@ export default function SettingsPage() {
               disabled={loading}
             />
 
+            <Label>Google API Key</Label>
             <Input
               placeholder="Google API Key"
               value={safeSettings.google_reviews?.api_key ?? ""}
