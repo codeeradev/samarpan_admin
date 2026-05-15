@@ -100,7 +100,11 @@ export default function GalleryPage() {
     {
       key: "caption",
       header: "Caption",
-      render: (item) => <span className="text-sm">{item.caption || "—"}</span>,
+      render: (item) => (
+        <span className="text-sm truncate block max-w-[220px]">
+          {item.caption || "—"}
+        </span>
+      ),
     },
     {
       key: "image",

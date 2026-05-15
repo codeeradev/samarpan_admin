@@ -29,17 +29,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import { Skeleton } from "@/components/ui/skeleton";
+import { themeColor } from "@/lib/theme";
 
 import {
   Select,
@@ -50,6 +40,8 @@ import {
 } from "@/components/ui/select";
 
 import { Pencil, Plus, Trash2 } from "lucide-react";
+
+import DataTable, { type TableColumn } from "react-data-table-component";
 
 import { toast } from "sonner";
 
@@ -87,6 +79,58 @@ const emptyForm: FormDataType = {
   content: "",
   serviceId: "",
   image: "",
+};
+
+const tableStyles = {
+  table: {
+    style: {
+      backgroundColor: "transparent",
+    },
+  },
+  headRow: {
+    style: {
+      minHeight: "54px",
+      backgroundColor: themeColor("muted"),
+      borderBottomWidth: "1px",
+      borderBottomColor: themeColor("border"),
+    },
+  },
+  headCells: {
+    style: {
+      color: themeColor("muted-foreground"),
+      fontSize: "12px",
+      fontWeight: 700,
+      textTransform: "uppercase" as const,
+      letterSpacing: "0.04em",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+    },
+  },
+  rows: {
+    style: {
+      minHeight: "72px",
+      borderBottomWidth: "1px",
+      borderBottomColor: themeColor("border", 0.7),
+      backgroundColor: themeColor("card"),
+    },
+  },
+  cells: {
+    style: {
+      paddingLeft: "16px",
+      paddingRight: "16px",
+      color: themeColor("foreground"),
+      fontSize: "14px",
+    },
+  },
+  pagination: {
+    style: {
+      borderTopWidth: "1px",
+      borderTopColor: themeColor("border"),
+      minHeight: "60px",
+      color: themeColor("muted-foreground"),
+      backgroundColor: themeColor("card"),
+    },
+  },
 };
 
 function resolveServiceTitle(
@@ -243,6 +287,72 @@ export default function ServiceFeaturesPage() {
     updateMutation.isPending ||
     deleteMutation.isPending;
 
+  const columns: TableColumn<ServiceFeatureItem>[] = [
+    {
+      name: "Title",
+      grow: 1.2,
+      cell: (feature) => (
+        <div className="min-w-0 py-3">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {feature.title}
+          </p>
+        </div>
+      ),
+    },
+    {
+      name: "Image",
+      width: "110px",
+      cell: (feature) => (
+        <div className="py-2">
+          {feature.image ? (
+            <img
+              src={resolveAssetUrl(feature.image)}
+              alt={feature.title}
+              className="h-14 w-14 rounded-lg border object-cover"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-lg border text-xs text-muted-foreground">
+              No Img
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      name: "Service",
+      grow: 1,
+      cell: (feature) => (
+        <span className="text-sm text-foreground">
+          {resolveServiceTitle(feature.serviceId, services)}
+        </span>
+      ),
+    },
+    {
+      name: "Actions",
+      right: true,
+      width: "140px",
+      cell: (feature) => (
+        <div className="flex items-center justify-end gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => openEdit(feature)}
+          >
+            <Pencil size={14} />
+          </Button>
+
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => setDeleteTarget(feature)}
+          >
+            <Trash2 size={14} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
       <PageHeader
@@ -268,105 +378,21 @@ export default function ServiceFeaturesPage() {
 
       {/* Table */}
       <div className="bg-card border rounded-2xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-
-              <TableHead>Image</TableHead>
-
-              <TableHead>Slug</TableHead>
-
-              <TableHead>Service</TableHead>
-
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {isLoading
-              ? [1, 2, 3].map((row) => (
-                  <TableRow key={row}>
-                    <TableCell>
-                      <Skeleton className="h-4 w-40" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-14 w-14 rounded-lg" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-4 w-32" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-8 w-8 ml-auto rounded-lg" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : filtered.map((feature) => (
-                  <TableRow key={feature._id}>
-                    <TableCell className="font-medium">
-                      {feature.title}
-                    </TableCell>
-
-                    <TableCell>
-                      {feature.image ? (
-                        <img
-                          src={resolveAssetUrl(feature.image)}
-                          alt={feature.title}
-                          className="w-14 h-14 rounded-lg object-cover border"
-                        />
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{feature.slug}</Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      {resolveServiceTitle(feature.serviceId, services)}
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEdit(feature)}
-                        >
-                          <Pencil size={14} />
-                        </Button>
-
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setDeleteTarget(feature)}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-
-            {!isLoading && filtered.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-center py-10 text-muted-foreground"
-                >
-                  No features found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          customStyles={tableStyles}
+          progressPending={isLoading}
+          pagination
+          responsive
+          highlightOnHover
+          persistTableHead
+          noDataComponent={
+            <div className="py-10 text-center text-muted-foreground">
+              No features found.
+            </div>
+          }
+        />
       </div>
 
       {/* Modal */}

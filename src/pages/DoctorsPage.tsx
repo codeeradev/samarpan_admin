@@ -610,7 +610,7 @@ export default function DoctorsPage() {
                     data-ocid={`doctors.item.${idx + 1}`}
                   >
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 max-w-[180px]">
                         {renderDoctorAvatar(doctor)}
                         <div className="min-w-0">
                           <p className="font-semibold text-foreground text-sm truncate">

@@ -11,18 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
+import { themeColor } from "@/lib/theme";
 import {
   addServiceApi,
   deleteServiceApi,
@@ -34,6 +26,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import DataTable, { type TableColumn } from "react-data-table-component";
 import { toast } from "sonner";
 import PageEditor from "@/components/editor/pageEditor";
 import "./pages-editor.css";
@@ -116,6 +109,58 @@ const emptyForm: ServicePayload = {
   content: "",
   faqs: [],
   seo: { metaTitle: "", metaDescription: "", keywords: [] },
+};
+
+const tableStyles = {
+  table: {
+    style: {
+      backgroundColor: "transparent",
+    },
+  },
+  headRow: {
+    style: {
+      minHeight: "54px",
+      backgroundColor: themeColor("muted"),
+      borderBottomWidth: "1px",
+      borderBottomColor: themeColor("border"),
+    },
+  },
+  headCells: {
+    style: {
+      color: themeColor("muted-foreground"),
+      fontSize: "12px",
+      fontWeight: 700,
+      textTransform: "uppercase" as const,
+      letterSpacing: "0.04em",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+    },
+  },
+  rows: {
+    style: {
+      minHeight: "72px",
+      borderBottomWidth: "1px",
+      borderBottomColor: themeColor("border", 0.7),
+      backgroundColor: themeColor("card"),
+    },
+  },
+  cells: {
+    style: {
+      paddingLeft: "16px",
+      paddingRight: "16px",
+      color: themeColor("foreground"),
+      fontSize: "14px",
+    },
+  },
+  pagination: {
+    style: {
+      borderTopWidth: "1px",
+      borderTopColor: themeColor("border"),
+      minHeight: "60px",
+      color: themeColor("muted-foreground"),
+      backgroundColor: themeColor("card"),
+    },
+  },
 };
 
 // ─── FAQ row component ───────────────────────────────────────────────────────────
@@ -373,6 +418,63 @@ export default function ServiceManagementPage() {
     updateMutation.isPending ||
     deleteMutation.isPending;
 
+  const columns: TableColumn<ServiceItem>[] = [
+    {
+      name: "Title",
+      grow: 1,
+      cell: (service) => (
+        <div className="min-w-0 py-3">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {service.title}
+          </p>
+        </div>
+      ),
+    },
+    {
+      name: "Slug",
+      width: "180px",
+      cell: (service) => <Badge variant="secondary">{service.slug}</Badge>,
+    },
+    {
+      name: "Description",
+      grow: 1.8,
+      cell: (service) => (
+        <div className="min-w-0 py-3">
+          <p className="line-clamp-2 text-sm text-foreground">
+            {service.shortDescription}
+          </p>
+        </div>
+      ),
+    },
+    {
+      name: "Actions",
+      right: true,
+      width: "140px",
+      cell: (service) => (
+        <div className="flex items-center justify-end gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => openEdit(service)}
+            aria-label="Edit service"
+            data-ocid="service_management.edit_button"
+          >
+            <Pencil size={14} />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => setDeleteTarget(service)}
+            aria-label="Delete service"
+            data-ocid="service_management.delete_button"
+          >
+            <Trash2 size={14} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -403,82 +505,21 @@ export default function ServiceManagementPage() {
 
       {/* ── Table ──────────────────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading
-              ? [1, 2, 3].map((row) => (
-                  <TableRow key={row}>
-                    <TableCell>
-                      <Skeleton className="h-4 w-36" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-56" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-8 w-8 ml-auto rounded-lg" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : filtered.map((service) => (
-                  <TableRow key={service._id}>
-                    <TableCell className="font-medium">
-                      {service.title}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{service.slug}</Badge>
-                    </TableCell>
-                    <TableCell className="max-w-[420px]">
-                      <span className="line-clamp-2">
-                        {service.shortDescription}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEdit(service)}
-                          aria-label="Edit service"
-                          data-ocid="service_management.edit_button"
-                        >
-                          <Pencil size={14} />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setDeleteTarget(service)}
-                          aria-label="Delete service"
-                          data-ocid="service_management.delete_button"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            {!isLoading && filtered.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-center py-12 text-muted-foreground"
-                >
-                  No services found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          customStyles={tableStyles}
+          progressPending={isLoading}
+          pagination
+          responsive
+          highlightOnHover
+          persistTableHead
+          noDataComponent={
+            <div className="py-12 text-center text-muted-foreground">
+              No services found.
+            </div>
+          }
+        />
       </div>
 
       {/* ── Add / Edit Modal ────────────────────────────────────────────────── */}

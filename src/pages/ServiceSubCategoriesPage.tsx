@@ -32,17 +32,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import { Skeleton } from "@/components/ui/skeleton";
+import { themeColor } from "@/lib/theme";
 
 import {
   Select,
@@ -53,6 +43,8 @@ import {
 } from "@/components/ui/select";
 
 import { Pencil, Plus, Trash2 } from "lucide-react";
+
+import DataTable, { type TableColumn } from "react-data-table-component";
 
 import { toast } from "sonner";
 
@@ -92,6 +84,58 @@ const emptyForm: FormDataType = {
   serviceId: "",
   serviceSubCategoryId: "",
   image: "",
+};
+
+const tableStyles = {
+  table: {
+    style: {
+      backgroundColor: "transparent",
+    },
+  },
+  headRow: {
+    style: {
+      minHeight: "54px",
+      backgroundColor: themeColor("muted"),
+      borderBottomWidth: "1px",
+      borderBottomColor: themeColor("border"),
+    },
+  },
+  headCells: {
+    style: {
+      color: themeColor("muted-foreground"),
+      fontSize: "12px",
+      fontWeight: 700,
+      textTransform: "uppercase" as const,
+      letterSpacing: "0.04em",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+    },
+  },
+  rows: {
+    style: {
+      minHeight: "72px",
+      borderBottomWidth: "1px",
+      borderBottomColor: themeColor("border", 0.7),
+      backgroundColor: themeColor("card"),
+    },
+  },
+  cells: {
+    style: {
+      paddingLeft: "16px",
+      paddingRight: "16px",
+      color: themeColor("foreground"),
+      fontSize: "14px",
+    },
+  },
+  pagination: {
+    style: {
+      borderTopWidth: "1px",
+      borderTopColor: themeColor("border"),
+      minHeight: "60px",
+      color: themeColor("muted-foreground"),
+      backgroundColor: themeColor("card"),
+    },
+  },
 };
 
 function resolveRelationTitle(
@@ -271,6 +315,81 @@ export default function ServiceSubCategoriesPage() {
     updateMutation.isPending ||
     deleteMutation.isPending;
 
+  const columns: TableColumn<ServiceSubCategoryItem>[] = [
+    {
+      name: "Title",
+      grow: 1.2,
+      cell: (item) => (
+        <div className="min-w-0 py-3">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {item.title}
+          </p>
+        </div>
+      ),
+    },
+    {
+      name: "Image",
+      width: "110px",
+      cell: (item) => (
+        <div className="py-2">
+          {item.image ? (
+            <img
+              src={resolveAssetUrl(item.image)}
+              alt={item.title}
+              className="h-14 w-14 rounded-lg border object-cover"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-lg border text-xs text-muted-foreground">
+              No Img
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      name: "Service",
+      grow: 1,
+      cell: (item) => (
+        <span className="text-sm text-foreground">
+          {resolveRelationTitle(item.serviceId, services)}
+        </span>
+      ),
+    },
+    {
+      name: "Category",
+      grow: 1,
+      cell: (item) => (
+        <span className="text-sm text-foreground">
+          {resolveRelationTitle(item.serviceSubCategoryId, categories)}
+        </span>
+      ),
+    },
+    {
+      name: "Actions",
+      right: true,
+      width: "140px",
+      cell: (item) => (
+        <div className="flex items-center justify-end gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => openEdit(item)}
+          >
+            <Pencil size={14} />
+          </Button>
+
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => setDeleteTarget(item)}
+          >
+            <Trash2 size={14} />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
       <PageHeader
@@ -294,109 +413,21 @@ export default function ServiceSubCategoriesPage() {
       </div>
 
       <div className="bg-card border rounded-2xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Image</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {isLoading
-              ? [1, 2, 3].map((row) => (
-                  <TableRow key={row}>
-                    <TableCell>
-                      <Skeleton className="h-4 w-40" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-14 w-14 rounded-lg" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-4 w-32" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-4 w-32" />
-                    </TableCell>
-
-                    <TableCell>
-                      <Skeleton className="h-8 w-8 ml-auto rounded-lg" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : filtered.map((item) => (
-                  <TableRow key={item._id}>
-                    <TableCell className="font-medium">{item.title}</TableCell>
-
-                    <TableCell>
-                      {item.image ? (
-                        <img
-                          src={resolveAssetUrl(item.image)}
-                          alt={item.title}
-                          className="w-14 h-14 rounded-lg object-cover border"
-                        />
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant="secondary">{item.slug}</Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      {resolveRelationTitle(item.serviceId, services)}
-                    </TableCell>
-
-                    <TableCell>
-                      {resolveRelationTitle(item.serviceSubCategoryId, categories)}
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEdit(item)}
-                        >
-                          <Pencil size={14} />
-                        </Button>
-
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setDeleteTarget(item)}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-
-            {!isLoading && filtered.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center py-10 text-muted-foreground"
-                >
-                  No sub categories found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          customStyles={tableStyles}
+          progressPending={isLoading}
+          pagination
+          responsive
+          highlightOnHover
+          persistTableHead
+          noDataComponent={
+            <div className="py-10 text-center text-muted-foreground">
+              No sub categories found.
+            </div>
+          }
+        />
       </div>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen} modal={false}>
