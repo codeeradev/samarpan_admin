@@ -47,9 +47,16 @@ export default function SettingsPage() {
 
   const [settings, setSettings] = useState<SettingsItem | null>(null);
   const [loading, setLoading] = useState(true);
-  const [settingsSaving, setSettingsSaving] = useState(false);
+
+  // Separate loaders
+  const [businessSaving, setBusinessSaving] = useState(false);
+  const [socialSaving, setSocialSaving] = useState(false);
+  const [googleSaving, setGoogleSaving] = useState(false);
+  const [logoSaving, setLogoSaving] = useState(false);
+
   const [accountSaving, setAccountSaving] = useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
+
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
@@ -84,7 +91,9 @@ export default function SettingsPage() {
   async function loadSettings() {
     try {
       setLoading(true);
+
       const data = await getSettingsApi();
+
       setSettings(data);
 
       if (data?.website_logo) {
@@ -97,26 +106,83 @@ export default function SettingsPage() {
     }
   }
 
-  async function saveSettings(
-    payload?: Partial<SettingsItem>,
-    files?: { logo?: File | null },
-  ) {
+  async function saveBusinessSettings() {
     try {
-      setSettingsSaving(true);
-      const body = payload ?? settings;
-      const updated = await updateSettingsApi(body ?? {}, files);
-      setSettings(updated);
+      setBusinessSaving(true);
 
-      if (updated.website_logo) {
-        setLogoPreview(updated.website_logo);
-        setLogoFile(null);
-      }
+      const updated = await updateSettingsApi(settings ?? {});
+
+      setSettings(updated);
 
       toast.success("Business settings updated successfully.");
     } catch (err: any) {
       toast.error(err.message);
     } finally {
-      setSettingsSaving(false);
+      setBusinessSaving(false);
+    }
+  }
+
+  async function saveSocialSettings() {
+    try {
+      setSocialSaving(true);
+
+      const updated = await updateSettingsApi(settings ?? {});
+
+      setSettings(updated);
+
+      toast.success("Social links updated successfully.");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSocialSaving(false);
+    }
+  }
+
+  async function saveGoogleSettings() {
+    try {
+      setGoogleSaving(true);
+
+      const updated = await updateSettingsApi(settings ?? {});
+
+      setSettings(updated);
+
+      toast.success("Google settings updated successfully.");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setGoogleSaving(false);
+    }
+  }
+
+  async function saveLogoSettings() {
+    try {
+      if (!logoFile) {
+        toast.error("Please select a logo.");
+        return;
+      }
+
+      setLogoSaving(true);
+
+      const updated = await updateSettingsApi(
+        {},
+        {
+          logo: logoFile,
+        },
+      );
+
+      setSettings(updated);
+
+      if (updated.website_logo) {
+        setLogoPreview(updated.website_logo);
+      }
+
+      setLogoFile(null);
+
+      toast.success("Logo updated successfully.");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLogoSaving(false);
     }
   }
 
@@ -179,8 +245,16 @@ export default function SettingsPage() {
 
     try {
       setPasswordSaving(true);
-      await updateAdminAccountApi({ password: passwordForm.newPass });
-      setPasswordForm({ newPass: "", confirm: "" });
+
+      await updateAdminAccountApi({
+        password: passwordForm.newPass,
+      });
+
+      setPasswordForm({
+        newPass: "",
+        confirm: "",
+      });
+
       toast.success("Password updated successfully.");
     } catch (err: any) {
       toast.error(err.message);
@@ -210,6 +284,7 @@ export default function SettingsPage() {
   }
 
   const safeSettings = settings ?? ({} as SettingsItem);
+
   const initials = (accountForm.name || admin?.name || "Admin")
     .split(" ")
     .map((name) => name[0])
@@ -225,12 +300,15 @@ export default function SettingsPage() {
       />
 
       <div className="grid lg:grid-cols-2 gap-6">
+
+        {/* Admin Account */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User size={16} />
               Admin Account
             </CardTitle>
+
             <CardDescription>
               These details are saved on your login user record.
             </CardDescription>
@@ -243,6 +321,7 @@ export default function SettingsPage() {
 
             <div>
               <Label>Full Name</Label>
+
               <Input
                 value={accountForm.name}
                 onChange={(event) =>
@@ -256,6 +335,7 @@ export default function SettingsPage() {
 
             <div>
               <Label>Login Email</Label>
+
               <Input
                 type="email"
                 value={accountForm.email}
@@ -270,6 +350,7 @@ export default function SettingsPage() {
 
             <div>
               <Label>Phone</Label>
+
               <Input
                 value={accountForm.phone}
                 onChange={(event) =>
@@ -281,18 +362,23 @@ export default function SettingsPage() {
               />
             </div>
 
-            <Button disabled={accountSaving} onClick={handleAccountSave}>
+            <Button
+              disabled={accountSaving}
+              onClick={handleAccountSave}
+            >
               {accountSaving ? "Saving..." : "Save Account"}
             </Button>
           </CardContent>
         </Card>
 
+        {/* Password */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock size={16} />
               Password
             </CardTitle>
+
             <CardDescription>
               Update the password used for admin sign-in.
             </CardDescription>
@@ -301,6 +387,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div>
               <Label>New Password</Label>
+
               <div className="relative">
                 <Input
                   type={showPasswords.newPass ? "text" : "password"}
@@ -313,6 +400,7 @@ export default function SettingsPage() {
                   }
                   className="pr-10"
                 />
+
                 <button
                   type="button"
                   onClick={() =>
@@ -322,9 +410,6 @@ export default function SettingsPage() {
                     }))
                   }
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  aria-label={
-                    showPasswords.newPass ? "Hide password" : "Show password"
-                  }
                 >
                   {showPasswords.newPass ? (
                     <EyeOff size={16} />
@@ -337,6 +422,7 @@ export default function SettingsPage() {
 
             <div>
               <Label>Confirm Password</Label>
+
               <div className="relative">
                 <Input
                   type={showPasswords.confirm ? "text" : "password"}
@@ -349,6 +435,7 @@ export default function SettingsPage() {
                   }
                   className="pr-10"
                 />
+
                 <button
                   type="button"
                   onClick={() =>
@@ -358,9 +445,6 @@ export default function SettingsPage() {
                     }))
                   }
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  aria-label={
-                    showPasswords.confirm ? "Hide password" : "Show password"
-                  }
                 >
                   {showPasswords.confirm ? (
                     <EyeOff size={16} />
@@ -371,16 +455,21 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <Button disabled={passwordSaving} onClick={handlePasswordUpdate}>
-              <Shield size={14} />{" "}
+            <Button
+              disabled={passwordSaving}
+              onClick={handlePasswordUpdate}
+            >
+              <Shield size={14} />
               {passwordSaving ? "Updating..." : "Update Password"}
             </Button>
           </CardContent>
         </Card>
 
+        {/* Business Info */}
         <Card>
           <CardHeader>
             <CardTitle>Business Info</CardTitle>
+
             <CardDescription>
               Public-facing contact details for the website.
             </CardDescription>
@@ -388,66 +477,65 @@ export default function SettingsPage() {
 
           <CardContent className="space-y-4">
             <Label>Inquiry Email</Label>
+
             <Input
-              placeholder="Inquiry Email"
               value={safeSettings.inquiry_email ?? ""}
               onChange={(event) =>
                 updateField("inquiry_email", event.target.value)
               }
-              disabled={loading}
             />
 
             <Label>Inquiry Mobile</Label>
+
             <Input
-              placeholder="Inquiry Mobile"
               value={safeSettings.inquiry_mobile_number ?? ""}
               onChange={(event) =>
                 updateField("inquiry_mobile_number", event.target.value)
               }
-              disabled={loading}
             />
 
             <Label>Whatsapp Inquiry Number</Label>
+
             <Input
-              placeholder="Whatsapp Inquiry Number"
               value={safeSettings.whatsapp_number ?? ""}
               onChange={(event) =>
                 updateField("whatsapp_number", event.target.value)
               }
-              disabled={loading}
             />
 
             <Label>Set Working Hours</Label>
+
             <Input
-              placeholder="Working Hours"
               value={safeSettings.working_hours ?? ""}
               onChange={(event) =>
                 updateField("working_hours", event.target.value)
               }
-              disabled={loading}
             />
 
             <Label>Set Address</Label>
+
             <Textarea
-              placeholder="Address"
               value={safeSettings.address ?? ""}
-              onChange={(event) => updateField("address", event.target.value)}
-              disabled={loading}
+              onChange={(event) =>
+                updateField("address", event.target.value)
+              }
             />
 
             <Button
-              disabled={settingsSaving || loading}
-              onClick={() => saveSettings()}
+              disabled={businessSaving || loading}
+              onClick={saveBusinessSettings}
             >
-              <Save size={14} />{" "}
-              {settingsSaving ? "Saving..." : "Save Business Info"}
+              <Save size={14} />
+              {businessSaving ? "Saving..." : "Save Business Info"}
             </Button>
           </CardContent>
         </Card>
 
+        {/* Logo */}
         <Card>
           <CardHeader>
             <CardTitle>Website Logo</CardTitle>
+
             <CardDescription>
               Upload logo used across the website.
             </CardDescription>
@@ -464,8 +552,12 @@ export default function SettingsPage() {
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null;
+
                     setLogoFile(file);
-                    setLogoPreview(file ? URL.createObjectURL(file) : null);
+
+                    setLogoPreview(
+                      file ? URL.createObjectURL(file) : null,
+                    );
                   }}
                 />
 
@@ -474,7 +566,10 @@ export default function SettingsPage() {
                     <p className="text-sm font-medium">
                       Click or drag image to upload
                     </p>
-                    <p className="text-xs">PNG, JPG (recommended 200x80)</p>
+
+                    <p className="text-xs">
+                      PNG, JPG (recommended 200x80)
+                    </p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-3">
@@ -503,17 +598,20 @@ export default function SettingsPage() {
 
               <Button
                 className="mt-4"
-                onClick={() => saveSettings({}, { logo: logoFile })}
+                disabled={logoSaving}
+                onClick={saveLogoSettings}
               >
-                Save Logo
+                {logoSaving ? "Saving..." : "Save Logo"}
               </Button>
             </div>
           </CardContent>
         </Card>
 
+        {/* Social Links */}
         <Card>
           <CardHeader>
             <CardTitle>Social Links</CardTitle>
+
             <CardDescription>
               Website footer, contact, and social CTA links.
             </CardDescription>
@@ -524,30 +622,33 @@ export default function SettingsPage() {
               (item) => (
                 <div key={item}>
                   <Label className="capitalize">{item}</Label>
+
                   <Input
-                    key={item}
                     placeholder={item}
                     value={safeSettings.social_links?.[item] ?? ""}
-                    onChange={(event) => updateSocial(item, event.target.value)}
-                    disabled={loading}
+                    onChange={(event) =>
+                      updateSocial(item, event.target.value)
+                    }
                   />
                 </div>
               ),
             )}
 
             <Button
-              disabled={settingsSaving || loading}
-              onClick={() => saveSettings()}
+              disabled={socialSaving || loading}
+              onClick={saveSocialSettings}
             >
-              <Save size={14} />{" "}
-              {settingsSaving ? "Saving..." : "Save Social Links"}
+              <Save size={14} />
+              {socialSaving ? "Saving..." : "Save Social Links"}
             </Button>
           </CardContent>
         </Card>
 
+        {/* Google Reviews */}
         <Card>
           <CardHeader>
             <CardTitle>Google Reviews</CardTitle>
+
             <CardDescription>
               Configure Google Place details used to fetch public reviews.
             </CardDescription>
@@ -555,8 +656,8 @@ export default function SettingsPage() {
 
           <CardContent className="space-y-4">
             <Label>Google Place ID</Label>
+
             <Input
-              placeholder="Google Place ID"
               value={safeSettings.google_reviews?.place_id ?? ""}
               onChange={(event) =>
                 setSettings((prev) => ({
@@ -567,12 +668,11 @@ export default function SettingsPage() {
                   },
                 }))
               }
-              disabled={loading}
             />
 
             <Label>Google API Key</Label>
+
             <Input
-              placeholder="Google API Key"
               value={safeSettings.google_reviews?.api_key ?? ""}
               onChange={(event) =>
                 setSettings((prev) => ({
@@ -583,19 +683,19 @@ export default function SettingsPage() {
                   },
                 }))
               }
-              disabled={loading}
             />
 
             <Button
-              disabled={settingsSaving || loading}
-              onClick={() => saveSettings()}
+              disabled={googleSaving || loading}
+              onClick={saveGoogleSettings}
             >
-              <Save size={14} />{" "}
-              {settingsSaving ? "Saving..." : "Save Google Settings"}
+              <Save size={14} />
+              {googleSaving ? "Saving..." : "Save Google Settings"}
             </Button>
           </CardContent>
         </Card>
 
+        {/* Danger Zone */}
         <Card className="border-destructive/20 bg-destructive/10">
           <CardHeader>
             <CardTitle className="text-destructive flex gap-2">
@@ -610,10 +710,12 @@ export default function SettingsPage() {
               className="border-destructive/40 text-destructive"
               onClick={logout}
             >
-              <LogOut size={14} /> Logout
+              <LogOut size={14} />
+              Logout
             </Button>
           </CardContent>
         </Card>
+
       </div>
     </div>
   );

@@ -328,7 +328,7 @@ function AddStaffDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!w-[95vw] !max-w-[80vw] max-h-[90vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="!w-[95vw] !max-w-[80vw] max-h-[90vh] overflow-y-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-foreground">
             Add Staff Member

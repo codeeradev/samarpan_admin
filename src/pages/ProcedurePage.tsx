@@ -471,7 +471,7 @@ export default function ProceduresPage() {
           }
         }}
       >
-        <DialogContent className="max-w-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]">
+        <DialogContent className="max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>
               {mode === "edit" ? "Edit Procedure" : "Create Procedure"}

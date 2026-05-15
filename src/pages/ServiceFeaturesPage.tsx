@@ -372,7 +372,7 @@ export default function ServiceFeaturesPage() {
       {/* Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen} modal={false}>
         <DialogContent
-          className="max-w-5xl max-h-[90vh] sm:max-w-[900px] overflow-y-auto"
+          className="max-w-5xl max-h-[90vh] rounded-3xl sm:max-w-[900px] overflow-y-auto"
           onInteractOutside={(e) => {
             const el = e.target as HTMLElement;
 

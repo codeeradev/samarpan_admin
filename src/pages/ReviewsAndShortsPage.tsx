@@ -716,7 +716,7 @@ export default function ReviewsAndShortsPage() {
         open={!!shortPreviewTarget}
         onOpenChange={(open) => !open && setShortPreviewTarget(null)}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl">
+        <DialogContent className="max-h-[92vh] rounded-3xl overflow-y-auto rounded-3xl border-border sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-xl text-foreground">
               Short Preview

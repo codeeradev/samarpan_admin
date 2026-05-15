@@ -493,7 +493,7 @@ export default function ServiceManagementPage() {
         modal={false}
       >
         <DialogContent
-          className="max-w-2xl max-h-[90vh] sm:max-w-[900px] overflow-y-auto"
+          className="max-w-2xl max-h-[90vh] rounded-3xl sm:max-w-[900px] overflow-y-auto"
           onInteractOutside={(e) => {
             const el = e.target as HTMLElement;
 

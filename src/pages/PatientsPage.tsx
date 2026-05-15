@@ -145,7 +145,7 @@ function PatientFormModal({
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
       <DialogContent
-        className="rounded-2xl w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto"
+        className="rounded-3xl w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto"
         data-ocid="patients.edit_dialog"
       >
         <DialogHeader>

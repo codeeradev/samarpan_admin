@@ -413,7 +413,7 @@ export default function BlogsPage() {
           }
         }}
       >
-        <DialogContent className="max-w-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]">
+        <DialogContent className="max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>
               {mode === "edit" ? "Edit Blog" : "Create Blog"}

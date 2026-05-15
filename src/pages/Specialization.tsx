@@ -207,7 +207,7 @@ export default function SpecializationsPage() {
         </Card>
 
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="rounded-2xl">
+          <DialogContent className="rounded-3xl">
             <DialogHeader>
               <DialogTitle>
                 {editingId ? "Edit Specialization" : "Add Specialization"}

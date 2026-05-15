@@ -615,8 +615,8 @@ export default function CareerManagementPage() {
           </DialogHeader>
 
           <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2 md:col-span-2">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
                 <Label htmlFor="career-title">
                   Role Title <span className="text-destructive">*</span>
                 </Label>
@@ -639,7 +639,7 @@ export default function CareerManagementPage() {
                     setField("status", value as CareerStatus)
                   }
                 >
-                  <SelectTrigger id="career-status" className="rounded-xl">
+                  <SelectTrigger id="career-status" className="rounded-xl w-full">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -721,7 +721,7 @@ export default function CareerManagementPage() {
               ) : null}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="career-department">Department</Label>
                 <Input
