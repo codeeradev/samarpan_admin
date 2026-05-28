@@ -1,3 +1,8 @@
+import {
+  getAppointmentsApi,
+  updateAppointmentApi,
+} from "@/apiCalls/appointments";
+import { type DoctorItem, getAllDoctorsApi } from "@/apiCalls/doctors";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusBadge } from "@/components/admin/StatusBadge";
@@ -19,24 +24,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { getAppointmentsApi, updateAppointmentApi } from "@/apiCalls/appointments";
-import { getAllDoctorsApi, type DoctorItem } from "@/apiCalls/doctors";
 import type { Appointment, AppointmentStatus } from "@/types";
-import { formatDate } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarClock, CheckCircle2, Search, XCircle } from "lucide-react";
+import {
+  CalendarClock,
+  CheckCircle2,
+  Eye,
+  FileText,
+  Mail,
+  Phone,
+  RefreshCw,
+  Search,
+  Stethoscope,
+  StickyNote,
+  UserRound,
+  XCircle,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import DataTable from "react-data-table-component";
 import { toast } from "sonner";
-import DataTable from 'react-data-table-component';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,6 +76,107 @@ const STATUS_OPTIONS: { value: "all" | AppointmentStatus; label: string }[] = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
+const INDIA_TIME_ZONE = "Asia/Kolkata";
+
+function parseDate(value?: Date | string | null) {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date;
+}
+
+function formatIndiaDate(value?: Date | string | null) {
+  const date = parseDate(value);
+  if (!date) return null;
+
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: INDIA_TIME_ZONE,
+  }).format(date);
+}
+
+function formatIndiaDateInputValue(value?: Date | string | null) {
+  const date = parseDate(value);
+  if (!date) return "";
+
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: INDIA_TIME_ZONE,
+  }).formatToParts(date);
+
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+
+  return year && month && day ? `${year}-${month}-${day}` : "";
+}
+
+function formatIndiaTimeInputValue(value?: Date | string | null) {
+  const date = parseDate(value);
+  if (!date) return "";
+
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: INDIA_TIME_ZONE,
+  }).formatToParts(date);
+
+  const hour = parts.find((part) => part.type === "hour")?.value ?? "";
+  const minute = parts.find((part) => part.type === "minute")?.value ?? "";
+
+  return hour && minute ? `${hour}:${minute}` : "";
+}
+
+function toAppointmentDatePayload(date: string, time: string) {
+  if (!date) return "";
+
+  return new Date(`${date}T${time || "00:00"}:00+05:30`).toISOString();
+}
+
+function hasText(value?: string | null) {
+  return Boolean(value?.trim());
+}
+
+function trimmedValue(value?: string | null) {
+  return value?.trim() ?? "";
+}
+
+interface DetailItemProps {
+  icon: LucideIcon;
+  label: string;
+  value: ReactNode;
+  wide?: boolean;
+}
+
+function DetailItem({ icon: Icon, label, value, wide }: DetailItemProps) {
+  return (
+    <div
+      className={`rounded-xl border border-border bg-background/70 p-3 shadow-sm ${wide ? "sm:col-span-2" : ""}`}
+    >
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Icon size={15} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {label}
+          </p>
+          <div className="mt-1 break-words text-sm font-semibold text-foreground">
+            {value}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Mobile Card ──────────────────────────────────────────────────────────────
 
 interface AppointmentCardProps {
@@ -76,6 +186,7 @@ interface AppointmentCardProps {
   onReject: () => void;
   onComplete: () => void;
   onReschedule: () => void;
+  onView: () => void;
   isUpdating: boolean; // 👈 ADD THIS
 }
 
@@ -86,6 +197,7 @@ function AppointmentCard({
   onReject,
   onComplete,
   onReschedule,
+  onView,
   isUpdating,
 }: AppointmentCardProps) {
   const isInactive = appt.status === "completed" || appt.status === "cancelled";
@@ -99,7 +211,9 @@ function AppointmentCard({
           <p className="font-semibold text-foreground text-sm leading-tight truncate">
             {appt.fullName}
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">{appt.serviceName}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {appt.serviceName}
+          </p>
         </div>
         <StatusBadge status={appt.status} />
       </div>
@@ -112,9 +226,9 @@ function AppointmentCard({
           </span>
         </div>
         <div>
-          <span className="text-muted-foreground block">Date &amp; Time</span>
+          <span className="text-muted-foreground block">Date</span>
           <span className="font-medium text-foreground block">
-            {formatDate(appt.appointmentDate)}
+            {formatIndiaDate(appt.appointmentDate) ?? "TBD"}
           </span>
         </div>
       </div>
@@ -125,62 +239,76 @@ function AppointmentCard({
         </p>
       )}
 
-      {!isInactive && (
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
-          {appt.status === "pending" && (
-            <>
-              <Button
-                type="button"
-                size="sm"
-                className="h-8 px-3 text-xs bg-primary hover:bg-secondary text-white rounded-xl gap-1 flex-1 sm:flex-none"
-                onClick={onApprove}
-                disabled={isUpdating}
-                data-ocid={`appointments.approve_button.${idx + 1}`}
-              >
-                <CheckCircle2 size={12} />
-                Approve
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-8 px-3 text-xs text-destructive border-destructive/20 hover:bg-destructive/10 rounded-xl gap-1 flex-1 sm:flex-none"
-                onClick={onReject}
-                disabled={isUpdating}
-                data-ocid={`appointments.reject_button.${idx + 1}`}
-              >
-                <XCircle size={12} />
-                Reject
-              </Button>
-            </>
-          )}
-          {appt.status === "confirmed" && (
-            <>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-8 px-3 text-xs text-primary border-primary/30 hover:bg-primary/10 rounded-xl gap-1 flex-1 sm:flex-none"
-                onClick={onReschedule}
-                data-ocid={`appointments.reschedule_button.${idx + 1}`}
-              >
-                <CalendarClock size={12} />
-                Reschedule
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                className="h-8 px-3 text-xs bg-secondary hover:bg-primary text-white rounded-xl gap-1 flex-1 sm:flex-none"
-                onClick={onComplete}
-                data-ocid={`appointments.complete_button.${idx + 1}`}
-              >
-                <CheckCircle2 size={12} />
-                Complete
-              </Button>
-            </>
-          )}
-        </div>
-      )}
+      <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="h-8 px-3 text-xs text-foreground border-border hover:bg-accent rounded-xl gap-1 flex-1 sm:flex-none"
+          onClick={onView}
+          data-ocid={`appointments.view_button.${idx + 1}`}
+        >
+          <Eye size={12} />
+          View
+        </Button>
+
+        {!isInactive && (
+          <>
+            {appt.status === "pending" && (
+              <>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 px-3 text-xs bg-primary hover:bg-secondary text-white rounded-xl gap-1 flex-1 sm:flex-none"
+                  onClick={onApprove}
+                  disabled={isUpdating}
+                  data-ocid={`appointments.approve_button.${idx + 1}`}
+                >
+                  <CheckCircle2 size={12} />
+                  Approve
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 px-3 text-xs text-destructive border-destructive/20 hover:bg-destructive/10 rounded-xl gap-1 flex-1 sm:flex-none"
+                  onClick={onReject}
+                  disabled={isUpdating}
+                  data-ocid={`appointments.reject_button.${idx + 1}`}
+                >
+                  <XCircle size={12} />
+                  Reject
+                </Button>
+              </>
+            )}
+            {appt.status === "confirmed" && (
+              <>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 px-3 text-xs text-primary border-primary/30 hover:bg-primary/10 rounded-xl gap-1 flex-1 sm:flex-none"
+                  onClick={onReschedule}
+                  data-ocid={`appointments.reschedule_button.${idx + 1}`}
+                >
+                  <CalendarClock size={12} />
+                  Reschedule
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 px-3 text-xs bg-secondary hover:bg-primary text-white rounded-xl gap-1 flex-1 sm:flex-none"
+                  onClick={onComplete}
+                  data-ocid={`appointments.complete_button.${idx + 1}`}
+                >
+                  <CheckCircle2 size={12} />
+                  Complete
+                </Button>
+              </>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -219,6 +347,7 @@ export default function AppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | AppointmentStatus>(
     "all",
   );
+  const [detailTarget, setDetailTarget] = useState<Appointment | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -258,61 +387,66 @@ export default function AppointmentsPage() {
   // ── Data table columns ─────────────────────────────────────────────────────
   const columns = [
     {
-      name: 'Patient',
+      name: "Patient",
       selector: (row: Appointment) => row.fullName,
       sortable: true,
       cell: (row: Appointment) => (
         <div>
-          <p className="font-semibold text-foreground text-sm">{row.fullName}</p>
+          <p className="font-semibold text-foreground text-sm">
+            {row.fullName}
+          </p>
           <p className="text-xs text-muted-foreground">{row.email}</p>
         </div>
       ),
     },
     {
-      name: 'Doctor',
+      name: "Doctor",
       selector: (row: Appointment) => row.doctorName,
       sortable: true,
     },
     {
-      name: 'Date & Time',
+      name: "Date",
       selector: (row: Appointment) => new Date(row.appointmentDate).getTime(),
       sortable: true,
-      cell: (row: Appointment) => {
-        const date = new Date(row.appointmentDate);
-        const isValidDate = !isNaN(date.getTime());
-        return (
-          <p className="text-sm text-foreground font-medium">
-            {isValidDate ? formatDate(date) : 'TBD'}
-          </p>
-        );
-      },
-    },
-    {
-      name: 'Reason',
-      selector: (row: Appointment) => row.reason || "",
       cell: (row: Appointment) => (
-        <p className="text-sm text-muted-foreground max-w-[180px] truncate">{row.reason}</p>
+        <p className="text-sm text-foreground font-medium">
+          {formatIndiaDate(row.appointmentDate) ?? "TBD"}
+        </p>
       ),
     },
     {
-      name: 'Status',
+      name: "Status",
       selector: (row: Appointment) => row.status,
       sortable: true,
       cell: (row: Appointment) => <StatusBadge status={row.status} />,
     },
     {
-      name: 'Actions',
+      name: "Actions",
+      width: "320px",
       cell: (row: Appointment) => {
-        const isInactive = row.status === "completed" || row.status === "cancelled";
+        const isInactive =
+          row.status === "completed" || row.status === "cancelled";
         return (
           <div className="flex items-center gap-1.5">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 px-2.5 text-xs text-foreground border-border hover:bg-accent rounded-lg gap-1"
+              onClick={() => setDetailTarget(row)}
+            >
+              <Eye size={11} />
+              View
+            </Button>
             {row.status === "pending" && (
               <>
                 <Button
                   type="button"
                   size="sm"
                   className="h-7 px-2.5 text-xs bg-primary hover:bg-secondary text-white rounded-lg gap-1"
-                  onClick={() => triggerAction(row._id, "approve", row.fullName)}
+                  onClick={() =>
+                    triggerAction(row._id, "approve", row.fullName)
+                  }
                   disabled={updateMutation.isPending}
                 >
                   <CheckCircle2 size={11} />
@@ -348,7 +482,9 @@ export default function AppointmentsPage() {
                   type="button"
                   size="sm"
                   className="h-7 px-2.5 text-xs bg-secondary hover:bg-primary text-white rounded-lg gap-1"
-                  onClick={() => triggerAction(row._id, "complete", row.fullName)}
+                  onClick={() =>
+                    triggerAction(row._id, "complete", row.fullName)
+                  }
                   disabled={updateMutation.isPending}
                 >
                   <CheckCircle2 size={11} />
@@ -356,7 +492,9 @@ export default function AppointmentsPage() {
                 </Button>
               </>
             )}
-            {isInactive && <span className="text-border text-sm select-none pr-1">—</span>}
+            {isInactive && (
+              <span className="text-border text-sm select-none pr-1">—</span>
+            )}
           </div>
         );
       },
@@ -377,13 +515,10 @@ export default function AppointmentsPage() {
 
   function openReschedule(appt: Appointment) {
     setRescheduleTarget(appt);
-    const appointmentDate = new Date(appt.appointmentDate);
-    const dateStr = appointmentDate.toISOString().split('T')[0];
-    const timeStr = appointmentDate.toTimeString().split(':').slice(0, 2).join(':');
-    
+
     setRescheduleForm({
-      date: dateStr || "",
-      time: timeStr || "",
+      date: formatIndiaDateInputValue(appt.appointmentDate),
+      time: formatIndiaTimeInputValue(appt.appointmentDate),
       doctorId: appt.doctorId || "",
       reason: appt.rescheduleReason || appt.reason || "",
     });
@@ -395,7 +530,10 @@ export default function AppointmentsPage() {
       id: rescheduleTarget._id,
       payload: {
         action: "reschedule",
-        appointmentDate: rescheduleForm.date,
+        appointmentDate: toAppointmentDatePayload(
+          rescheduleForm.date,
+          rescheduleForm.time,
+        ),
         rescheduleReason: rescheduleForm.reason,
       },
     });
@@ -432,7 +570,7 @@ export default function AppointmentsPage() {
     <div data-ocid="appointments.page">
       <PageHeader
         title="Appointments"
-        description={`Approving an appointment adds the patient record. Completing an appointment reflects discharge status automatically.`}
+        description="Approving an appointment adds the patient record. Completing an appointment reflects discharge status automatically."
       />
 
       {/* Filter bar */}
@@ -517,13 +655,12 @@ export default function AppointmentsPage() {
               onApprove={() =>
                 triggerAction(appt._id, "approve", appt.fullName)
               }
-              onReject={() =>
-                triggerAction(appt._id, "reject", appt.fullName)
-              }
+              onReject={() => triggerAction(appt._id, "reject", appt.fullName)}
               onComplete={() =>
                 triggerAction(appt._id, "complete", appt.fullName)
               }
               onReschedule={() => openReschedule(appt)}
+              onView={() => setDetailTarget(appt)}
             />
           ))
         )}
@@ -536,7 +673,11 @@ export default function AppointmentsPage() {
           data={filtered}
           progressPending={isLoading}
           progressComponent={<Skeleton className="h-4 w-full" />}
-          noDataComponent={<p className="text-muted-foreground text-sm py-16 text-center">No appointments found matching your filters.</p>}
+          noDataComponent={
+            <p className="text-muted-foreground text-sm py-16 text-center">
+              No appointments found matching your filters.
+            </p>
+          }
           pagination
           responsive
           highlightOnHover
@@ -556,6 +697,154 @@ export default function AppointmentsPage() {
           onCancel={() => setPendingAction(null)}
         />
       )}
+
+      {/* Appointment details dialog */}
+      <Dialog
+        open={!!detailTarget}
+        onOpenChange={(open) => !open && setDetailTarget(null)}
+      >
+        <DialogContent
+          className="max-h-[92vh] overflow-y-auto rounded-2xl border border-border shadow-xl sm:max-w-3xl"
+          data-ocid="appointments.details.dialog"
+        >
+          <DialogHeader>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <DialogTitle className="text-xl font-semibold text-foreground">
+                  Appointment Details
+                </DialogTitle>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {detailTarget?.fullName ?? "Patient"} ·{" "}
+                  {formatIndiaDate(detailTarget?.appointmentDate) ?? "TBD"}
+                </p>
+              </div>
+              {detailTarget && <StatusBadge status={detailTarget.status} />}
+            </div>
+          </DialogHeader>
+
+          {detailTarget && (
+            <div className="space-y-4 py-1">
+              <div className="rounded-2xl border border-primary/15 bg-primary/5 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-wide text-primary">
+                      Patient
+                    </p>
+                    <h3 className="mt-1 truncate text-2xl font-bold text-foreground">
+                      {detailTarget.fullName}
+                    </h3>
+                    {hasText(detailTarget.serviceName) && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {trimmedValue(detailTarget.serviceName)}
+                      </p>
+                    )}
+                  </div>
+                  <div className="rounded-xl bg-card px-4 py-3 text-sm shadow-sm">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Appointment
+                    </p>
+                    <p className="mt-1 font-semibold text-foreground">
+                      {formatIndiaDate(detailTarget.appointmentDate) ?? "TBD"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <DetailItem
+                  icon={UserRound}
+                  label="Full name"
+                  value={trimmedValue(detailTarget.fullName)}
+                />
+                <DetailItem
+                  icon={CalendarClock}
+                  label="Appointment date"
+                  value={formatIndiaDate(detailTarget.appointmentDate) ?? "TBD"}
+                />
+                {hasText(detailTarget.phoneNumber) && (
+                  <DetailItem
+                    icon={Phone}
+                    label="Phone number"
+                    value={trimmedValue(detailTarget.phoneNumber)}
+                  />
+                )}
+                {hasText(detailTarget.email) && (
+                  <DetailItem
+                    icon={Mail}
+                    label="Email"
+                    value={trimmedValue(detailTarget.email)}
+                  />
+                )}
+                {hasText(detailTarget.doctorName) && (
+                  <DetailItem
+                    icon={Stethoscope}
+                    label="Doctor"
+                    value={trimmedValue(detailTarget.doctorName)}
+                  />
+                )}
+                {hasText(detailTarget.serviceName) && (
+                  <DetailItem
+                    icon={FileText}
+                    label="Service"
+                    value={trimmedValue(detailTarget.serviceName)}
+                  />
+                )}
+                {formatIndiaDate(detailTarget.preferredDate) && (
+                  <DetailItem
+                    icon={CalendarClock}
+                    label="Preferred date"
+                    value={formatIndiaDate(detailTarget.preferredDate)}
+                  />
+                )}
+                {hasText(detailTarget.reason) && (
+                  <DetailItem
+                    icon={StickyNote}
+                    label="Reason"
+                    value={trimmedValue(detailTarget.reason)}
+                    wide
+                  />
+                )}
+                {hasText(detailTarget.rescheduleReason) && (
+                  <DetailItem
+                    icon={RefreshCw}
+                    label="Reschedule reason"
+                    value={trimmedValue(detailTarget.rescheduleReason)}
+                    wide
+                  />
+                )}
+                {hasText(detailTarget.rejectionReason) && (
+                  <DetailItem
+                    icon={XCircle}
+                    label="Rejection reason"
+                    value={trimmedValue(detailTarget.rejectionReason)}
+                    wide
+                  />
+                )}
+                {hasText(detailTarget.notes) && (
+                  <DetailItem
+                    icon={StickyNote}
+                    label="Notes"
+                    value={trimmedValue(detailTarget.notes)}
+                    wide
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full rounded-xl border-border text-muted-foreground hover:bg-accent sm:w-auto"
+              onClick={() => setDetailTarget(null)}
+              data-ocid="appointments.details.close_button"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Reschedule modal */}
       <Dialog

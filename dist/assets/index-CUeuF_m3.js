@@ -21847,7 +21847,7 @@ const {
   getAdapter,
   mergeConfig
 } = axios;
-const BASE_URL = "https://samarpanapi.codeeratech.com/admin";
+const BASE_URL = "https://api.samarpanhospitalhisar.com/admin";
 const ENDPOINT = {
   LOGIN: "/admin-login",
   ADD_SERVICE: "/add-service",

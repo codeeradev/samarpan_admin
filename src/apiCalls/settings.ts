@@ -59,7 +59,7 @@ export const getSettingsApi = async (): Promise<SettingsItem> => {
 
 export const updateSettingsApi = async (
   payload: Partial<SettingsItem>,
-  files?: { logo?: File | null }
+  files?: { logo?: File | null },
 ): Promise<SettingsItem> => {
   try {
     const formData = new FormData();
@@ -68,13 +68,14 @@ export const updateSettingsApi = async (
     Object.keys(payload).forEach((key) => {
       const value = payload[key as keyof SettingsItem];
 
-      if (key === "social_links") {
-        formData.append(key, JSON.stringify(value));
-      } else if (value !== undefined && value !== null) {
-        formData.append(key, String(value));
+      if (value !== undefined && value !== null) {
+        if (typeof value === "object") {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, String(value));
+        }
       }
     });
-
     // file
     if (files?.logo) {
       formData.append("image", files.logo);
@@ -87,7 +88,7 @@ export const updateSettingsApi = async (
     return res?.data?.data;
   } catch (error: any) {
     throw new Error(
-      error.response?.data?.message ?? "Failed to update settings"
+      error.response?.data?.message ?? "Failed to update settings",
     );
   }
 };
