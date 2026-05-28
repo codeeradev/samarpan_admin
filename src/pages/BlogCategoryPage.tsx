@@ -140,6 +140,11 @@ export default function BlogCategoryPage() {
       errors.sortOrder = "Sort order must be a number.";
     }
 
+    if (mode === "add" && !form.image) {
+      toast.error("Image is required.");
+      return;
+    }
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       toast.error(

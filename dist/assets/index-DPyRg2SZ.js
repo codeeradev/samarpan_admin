@@ -42631,6 +42631,16 @@ function formatIndiaDate(value) {
     timeZone: INDIA_TIME_ZONE
   }).format(date2);
 }
+function formatIndiaTime(value) {
+  const date2 = parseDate(value);
+  if (!date2) return null;
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: INDIA_TIME_ZONE
+  }).format(date2);
+}
 function formatIndiaDateInputValue(value) {
   var _a2, _b2, _c2;
   const date2 = parseDate(value);
@@ -42669,6 +42679,12 @@ function hasText(value) {
 }
 function trimmedValue(value) {
   return (value == null ? void 0 : value.trim()) ?? "";
+}
+function isRescheduledAppointment(appt) {
+  return appt.status === "rescheduled" || Boolean(appt.rescheduledAt) || hasText(appt.rescheduleReason);
+}
+function getAppointmentDisplayTime(appt) {
+  return isRescheduledAppointment(appt) ? formatIndiaTime(appt.appointmentDate) : formatIndiaTime(appt.createdAt ?? appt.appointmentDate);
 }
 function DetailItem({ icon: Icon2, label, value, wide }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -42717,6 +42733,10 @@ function AppointmentCard({
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground block", children: "Date" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-foreground block", children: formatIndiaDate(appt.appointmentDate) ?? "TBD" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground block", children: "Time" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-foreground block", children: getAppointmentDisplayTime(appt) ?? "TBD" })
           ] })
         ] }),
         appt.reason && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground mb-3 line-clamp-2", children: appt.reason }),
@@ -42876,9 +42896,12 @@ function AppointmentsPage() {
     },
     {
       name: "Date",
-      selector: (row) => new Date(row.appointmentDate).getTime(),
+      selector: (row) => isRescheduledAppointment(row) ? new Date(row.appointmentDate).getTime() : new Date(row.createdAt ?? row.appointmentDate).getTime(),
       sortable: true,
-      cell: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-foreground font-medium", children: formatIndiaDate(row.appointmentDate) ?? "TBD" })
+      cell: (row) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-foreground font-medium", children: formatIndiaDate(row.appointmentDate) ?? "TBD" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: getAppointmentDisplayTime(row) ?? "TBD" })
+      ] })
     },
     {
       name: "Status",
@@ -43181,7 +43204,8 @@ function AppointmentsPage() {
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl bg-card px-4 py-3 text-sm shadow-sm", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium text-muted-foreground", children: "Appointment" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-semibold text-foreground", children: formatIndiaDate(detailTarget.appointmentDate) ?? "TBD" })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-semibold text-foreground", children: formatIndiaDate(detailTarget.appointmentDate) ?? "TBD" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-0.5 text-xs font-medium text-muted-foreground", children: getAppointmentDisplayTime(detailTarget) ?? "TBD" })
                   ] })
                 ] }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 sm:grid-cols-2", children: [
@@ -43191,14 +43215,6 @@ function AppointmentsPage() {
                       icon: UserRound,
                       label: "Full name",
                       value: trimmedValue(detailTarget.fullName)
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    DetailItem,
-                    {
-                      icon: CalendarClock,
-                      label: "Appointment date",
-                      value: formatIndiaDate(detailTarget.appointmentDate) ?? "TBD"
                     }
                   ),
                   hasText(detailTarget.phoneNumber) && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -43231,6 +43247,14 @@ function AppointmentsPage() {
                       icon: FileText,
                       label: "Service",
                       value: trimmedValue(detailTarget.serviceName)
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    DetailItem,
+                    {
+                      icon: Clock,
+                      label: isRescheduledAppointment(detailTarget) ? "Appointment time" : "Appointment time",
+                      value: getAppointmentDisplayTime(detailTarget) ?? "TBD"
                     }
                   ),
                   formatIndiaDate(detailTarget.preferredDate) && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -77327,6 +77351,10 @@ function BlogCategoryPage() {
     }
     if (Number.isNaN(sortOrder)) {
       errors.sortOrder = "Sort order must be a number.";
+    }
+    if (mode === "add" && !form.image) {
+      ue.error("Image is required.");
+      return;
     }
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);

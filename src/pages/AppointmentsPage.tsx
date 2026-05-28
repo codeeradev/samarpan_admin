@@ -30,6 +30,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CalendarClock,
   CheckCircle2,
+  Clock,
   Eye,
   FileText,
   Mail,
@@ -99,6 +100,18 @@ function formatIndiaDate(value?: Date | string | null) {
   }).format(date);
 }
 
+function formatIndiaTime(value?: Date | string | null) {
+  const date = parseDate(value);
+  if (!date) return null;
+
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: INDIA_TIME_ZONE,
+  }).format(date);
+}
+
 function formatIndiaDateInputValue(value?: Date | string | null) {
   const date = parseDate(value);
   if (!date) return "";
@@ -146,6 +159,20 @@ function hasText(value?: string | null) {
 
 function trimmedValue(value?: string | null) {
   return value?.trim() ?? "";
+}
+
+function isRescheduledAppointment(appt: Appointment) {
+  return (
+    appt.status === "rescheduled" ||
+    Boolean(appt.rescheduledAt) ||
+    hasText(appt.rescheduleReason)
+  );
+}
+
+function getAppointmentDisplayTime(appt: Appointment) {
+  return isRescheduledAppointment(appt)
+    ? formatIndiaTime(appt.appointmentDate)
+    : formatIndiaTime(appt.createdAt ?? appt.appointmentDate);
 }
 
 interface DetailItemProps {
@@ -229,6 +256,12 @@ function AppointmentCard({
           <span className="text-muted-foreground block">Date</span>
           <span className="font-medium text-foreground block">
             {formatIndiaDate(appt.appointmentDate) ?? "TBD"}
+          </span>
+        </div>
+        <div>
+          <span className="text-muted-foreground block">Time</span>
+          <span className="font-medium text-foreground block">
+            {getAppointmentDisplayTime(appt) ?? "TBD"}
           </span>
         </div>
       </div>
@@ -406,12 +439,20 @@ export default function AppointmentsPage() {
     },
     {
       name: "Date",
-      selector: (row: Appointment) => new Date(row.appointmentDate).getTime(),
+      selector: (row: Appointment) =>
+        isRescheduledAppointment(row)
+          ? new Date(row.appointmentDate).getTime()
+          : new Date(row.createdAt ?? row.appointmentDate).getTime(),
       sortable: true,
       cell: (row: Appointment) => (
-        <p className="text-sm text-foreground font-medium">
-          {formatIndiaDate(row.appointmentDate) ?? "TBD"}
-        </p>
+        <div>
+          <p className="text-sm text-foreground font-medium">
+            {formatIndiaDate(row.appointmentDate) ?? "TBD"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {getAppointmentDisplayTime(row) ?? "TBD"}
+          </p>
+        </div>
       ),
     },
     {
@@ -746,6 +787,9 @@ export default function AppointmentsPage() {
                     <p className="mt-1 font-semibold text-foreground">
                       {formatIndiaDate(detailTarget.appointmentDate) ?? "TBD"}
                     </p>
+                    <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                      {getAppointmentDisplayTime(detailTarget) ?? "TBD"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -755,11 +799,6 @@ export default function AppointmentsPage() {
                   icon={UserRound}
                   label="Full name"
                   value={trimmedValue(detailTarget.fullName)}
-                />
-                <DetailItem
-                  icon={CalendarClock}
-                  label="Appointment date"
-                  value={formatIndiaDate(detailTarget.appointmentDate) ?? "TBD"}
                 />
                 {hasText(detailTarget.phoneNumber) && (
                   <DetailItem
@@ -789,6 +828,15 @@ export default function AppointmentsPage() {
                     value={trimmedValue(detailTarget.serviceName)}
                   />
                 )}
+                <DetailItem
+                  icon={Clock}
+                  label={
+                    isRescheduledAppointment(detailTarget)
+                      ? "Appointment time"
+                      : "Appointment time"
+                  }
+                  value={getAppointmentDisplayTime(detailTarget) ?? "TBD"}
+                />
                 {formatIndiaDate(detailTarget.preferredDate) && (
                   <DetailItem
                     icon={CalendarClock}
