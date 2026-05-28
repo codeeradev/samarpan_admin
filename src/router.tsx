@@ -27,6 +27,7 @@ import {
   createRouter,
   redirect,
 } from "@tanstack/react-router";
+import BlogCategoryPage from "./pages/BlogCategoryPage";
 import BlogsPage from "./pages/BlogPage";
 import SpecializationsPage from "./pages/Specialization";
 import ProcedurePage from "./pages/ProcedurePage";
@@ -167,6 +168,13 @@ const blogsRoute = createRoute({
   component: BlogsPage,
 });
 
+const blogCategoryRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/blog-category",
+  beforeLoad: () => checkPermission("/blogs"),
+  component: BlogCategoryPage,
+});
+
 const galleryRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/gallery",
@@ -256,6 +264,7 @@ const routeTree = rootRoute.addChildren([
     serviceFeaturesRoute,
     serviceSubCategoryRoute,
     blogsRoute,
+    blogCategoryRoute,
     galleryRoute,
     reviewsAndShortsRoute,
     jobApplicationsRoute,

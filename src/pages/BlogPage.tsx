@@ -1,24 +1,33 @@
 "use client";
 
 import {
+  type BlogCategoryItem,
+  type BlogItem,
   addBlogApi,
   deleteBlogApi,
+  getAllBlogCategoriesApi,
   getAllBlogsApi,
   updateBlogApi,
-  type BlogItem,
 } from "@/apiCalls/blog";
 import { getAllServicesApi } from "@/apiCalls/services";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
 import { BASE_URL } from "@/apis/endpoint";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 
-import { DataTable, type Column } from "@/components/admin/DataTable";
+import { type Column, DataTable } from "@/components/admin/DataTable";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import DOMPurify from "dompurify";
 import {
   Select,
   SelectContent,
@@ -26,22 +35,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
 import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
+import DOMPurify from "dompurify";
 
-import { toast } from "sonner";
-import { Eye, Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import PageEditor from "@/components/editor/pageEditor";
+import { Eye, Pencil, Plus, Trash2, Upload } from "lucide-react";
+import { toast } from "sonner";
 
 const BLOG_QUERY_KEY = ["blogs"];
+const BLOG_CATEGORIES_QUERY_KEY = ["blog-categories"];
 const SERVICES_QUERY_KEY = ["services"];
 
 type BlogFormState = {
@@ -53,6 +57,7 @@ type BlogFormState = {
   keywords: string;
   status: "draft" | "published";
   serviceId: string;
+  blogCategoryId: string;
   image: File | null;
 };
 
@@ -60,6 +65,7 @@ type BlogFormErrors = Partial<
   Record<
     | "title"
     | "serviceId"
+    | "blogCategoryId"
     | "shortDescription"
     | "content"
     | "metaTitle"
@@ -78,6 +84,7 @@ const EMPTY_FORM: BlogFormState = {
   keywords: "",
   status: "published",
   serviceId: "",
+  blogCategoryId: "",
   image: null,
 };
 
@@ -93,6 +100,10 @@ function validateBlogForm(
 
   if (!form.serviceId) {
     errors.serviceId = "Please select a service.";
+  }
+
+  if (!form.blogCategoryId) {
+    errors.blogCategoryId = "Please select a blog category.";
   }
 
   if (!form.shortDescription.trim()) {
@@ -138,6 +149,11 @@ export default function BlogsPage() {
     queryFn: getAllBlogsApi,
   });
 
+  const { data: categories = [] } = useQuery({
+    queryKey: BLOG_CATEGORIES_QUERY_KEY,
+    queryFn: getAllBlogCategoriesApi,
+  });
+
   const { data: services = [] } = useQuery({
     queryKey: SERVICES_QUERY_KEY,
     queryFn: getAllServicesApi,
@@ -146,6 +162,11 @@ export default function BlogsPage() {
   const serviceById = useMemo(
     () => new Map(services.map((s) => [s._id, s.title])),
     [services],
+  );
+
+  const categoryById = useMemo(
+    () => new Map(categories.map((category) => [category._id, category.title])),
+    [categories],
   );
 
   const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
@@ -162,6 +183,17 @@ export default function BlogsPage() {
     if (!path) return "";
     if (/^https?:\/\//.test(path)) return path;
     return `${API_ASSET_ORIGIN}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+
+  function getBlogCategoryId(blog: BlogItem) {
+    const category = blog.blogCategoryId;
+    return typeof category === "string" ? category : category?._id || "";
+  }
+
+  function getBlogCategoryTitle(blog: BlogItem) {
+    const category = blog.blogCategoryId;
+    if (typeof category === "object" && category?.title) return category.title;
+    return categoryById.get(getBlogCategoryId(blog)) || "—";
   }
 
   const openAdd = () => {
@@ -188,6 +220,7 @@ export default function BlogsPage() {
       keywords: blog.seo?.keywords?.join(", ") || "",
       status: blog.status || "published",
       serviceId: blog.serviceId || "",
+      blogCategoryId: getBlogCategoryId(blog),
       image: null,
     });
     setFormErrors({});
@@ -235,6 +268,7 @@ export default function BlogsPage() {
     const payload = {
       title: form.title,
       serviceId: form.serviceId,
+      blogCategoryId: form.blogCategoryId,
       shortDescription: form.shortDescription,
       content: form.content,
       seo,
@@ -260,6 +294,7 @@ export default function BlogsPage() {
       const backendErrors = mapApiErrorsToFields<keyof BlogFormErrors>(error, {
         title: /title/i,
         serviceId: /service/i,
+        blogCategoryId: /category/i,
         shortDescription: /short description/i,
         content: /content/i,
         metaTitle: /meta title/i,
@@ -310,12 +345,21 @@ export default function BlogsPage() {
               {(() => {
                 const desc = blog.shortDescription ?? "";
                 return desc.length > 80
-                  ? desc.slice(0, 80) + "..."
+                  ? `${desc.slice(0, 80)}...`
                   : desc || "No description";
               })()}
             </p>
           </div>
         </div>
+      ),
+    },
+    {
+      key: "blogCategoryId",
+      header: "Category",
+      render: (blog) => (
+        <span className="text-muted-foreground">
+          {getBlogCategoryTitle(blog)}
+        </span>
       ),
     },
     {
@@ -381,13 +425,13 @@ export default function BlogsPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Blog Management"
+        title="Blog List"
         description="Manage blog content, SEO, and preview posts."
         action={
           <Button onClick={openAdd} className="rounded-xl gap-2 bg-primary">
-            <Plus className="h-4 w-4" />
-            Add Blog
-          </Button>
+          <Plus className="h-4 w-4" />
+          Add Blog
+        </Button>
         }
       />
 
@@ -474,6 +518,40 @@ export default function BlogsPage() {
                     {formErrors.serviceId ? (
                       <p className="text-xs text-destructive">
                         {formErrors.serviceId}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>
+                      Blog Category <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={form.blogCategoryId}
+                      onValueChange={(v) => setField("blogCategoryId", v)}
+                    >
+                      <SelectTrigger
+                        className={
+                          formErrors.blogCategoryId
+                            ? "border-destructive focus-visible:ring-destructive"
+                            : undefined
+                        }
+                      >
+                        <SelectValue placeholder="Select Blog Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories
+                          .filter((category) => category.isActive !== false)
+                          .map((category) => (
+                            <SelectItem key={category._id} value={category._id}>
+                              {category.title}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    {formErrors.blogCategoryId ? (
+                      <p className="text-xs text-destructive">
+                        {formErrors.blogCategoryId}
                       </p>
                     ) : null}
                   </div>
@@ -670,6 +748,7 @@ export default function BlogsPage() {
 
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {getBlogCategoryTitle(previewTarget)} ·{" "}
                   {serviceById.get(previewTarget.serviceId || "") ||
                     "No service"}{" "}
                   · {previewTarget.status || "published"}
@@ -685,6 +764,7 @@ export default function BlogsPage() {
               <div className="rounded-2xl border border-border bg-card p-4">
                 <p className="text-sm font-semibold text-foreground">Content</p>
                 <div
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: Blog preview renders sanitized CMS HTML.
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(previewTarget.content || ""),
                   }}
@@ -693,20 +773,22 @@ export default function BlogsPage() {
             </div>
           )}
         </DialogContent>
-        <ConfirmDialog
-          open={!!deleteTarget}
-          title="Delete this blog?"
-          message="This blog will be permanently removed."
-          confirmLabel="Delete Blog"
-          onConfirm={() => {
-            if (deleteTarget) {
-              handleDelete(deleteTarget._id);
-              setDeleteTarget(null);
-            }
-          }}
-          onCancel={() => setDeleteTarget(null)}
-        />
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete this blog?"
+        message="This blog will be permanently removed."
+        confirmLabel="Delete Blog"
+        onConfirm={() => {
+          if (deleteTarget) {
+            handleDelete(deleteTarget._id);
+            setDeleteTarget(null);
+          }
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
     </div>
   );
 }

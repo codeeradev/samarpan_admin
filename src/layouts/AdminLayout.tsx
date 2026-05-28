@@ -121,8 +121,19 @@ const ALL_NAV_ITEMS: NavItem[] = [
   {
     label: "Blogs",
     icon: FileImage,
-    path: "/blogs",
     permissionPath: "/blogs",
+    children: [
+      {
+        label: "Blog List",
+        path: "/blogs",
+        permissionPath: "/blogs",
+      },
+      {
+        label: "Blog Category",
+        path: "/blog-category",
+        permissionPath: "/blogs",
+      },
+    ],
   },
   {
     label: "Gallery",
@@ -202,7 +213,8 @@ function SidebarNav({
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     Services: false,
-    Careers: false
+    Blogs: false,
+    Careers: false,
   });
 
   function toggleMenu(label: string) {
@@ -217,6 +229,10 @@ function SidebarNav({
       {visibleItems.map((item) => {
         // submenu
         if (item.children?.length) {
+          const isMenuOpen =
+            openMenus[item.label] ||
+            item.children.some((child) => currentPath === child.path);
+
           return (
             <div key={item.label}>
               <button
@@ -232,12 +248,12 @@ function SidebarNav({
                 <ChevronDown
                   size={16}
                   className={`transition-transform ${
-                    openMenus[item.label] ? "rotate-180" : ""
+                    isMenuOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
-              {openMenus[item.label] && (
+              {isMenuOpen && (
                 <div className="ml-6 mt-1 space-y-1">
                   {item.children.map((child) => {
                     const isActive = currentPath === child.path;
