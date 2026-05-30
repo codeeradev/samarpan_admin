@@ -39,11 +39,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
 import type { PatientGender } from "@/types";
 import { formatDate } from "@/types";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -74,7 +70,9 @@ const EMPTY_FORM: PatientFormState = {
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const SKELETON_ROWS = ["sk1", "sk2", "sk3", "sk4", "sk5"];
 
-function normalizePhone(value?: PatientItem["phone"] | Appointment["phoneNumber"]) {
+function normalizePhone(
+  value?: PatientItem["phone"] | Appointment["phoneNumber"],
+) {
   if (value === null || value === undefined) {
     return "";
   }
@@ -97,6 +95,10 @@ function GenderBadge({ gender }: { gender: PatientGender }) {
       {gender}
     </Badge>
   );
+}
+
+function getPatientDoctor(patient: PatientItem) {
+  return patient.doctor?.trim() || "Not assigned";
 }
 
 function isPatientDischarged(patient: PatientItem) {
@@ -281,7 +283,9 @@ function PatientFormModal({
               className="text-sm font-medium text-foreground"
             >
               Medical History{" "}
-              <span className="text-muted-foreground font-normal">(optional)</span>
+              <span className="text-muted-foreground font-normal">
+                (optional)
+              </span>
             </Label>
             <Textarea
               id="pt-history"
@@ -395,9 +399,8 @@ export default function PatientsPage() {
   );
   const [statusFilter, setStatusFilter] = useState<PatientStatusFilter>("all");
   const [editPatient, setEditPatient] = useState<PatientItem | null>(null);
-  const [patientToDischarge, setPatientToDischarge] = useState<PatientItem | null>(
-    null,
-  );
+  const [patientToDischarge, setPatientToDischarge] =
+    useState<PatientItem | null>(null);
   const [form, setForm] = useState<PatientFormState>(EMPTY_FORM);
 
   const {
@@ -454,20 +457,20 @@ export default function PatientsPage() {
     }
 
     return patients.filter((patient) => {
-      const email = patient.email ? String(patient.email).toLowerCase().trim() : "";
+      const email = patient.email
+        ? String(patient.email).toLowerCase().trim()
+        : "";
       const phone = normalizePhone(patient.phone);
-      return (email && allowedEmails.has(email)) || (phone && allowedPhones.has(phone));
+      return (
+        (email && allowedEmails.has(email)) ||
+        (phone && allowedPhones.has(phone))
+      );
     });
   }, [admin?.id, appointmentData?.appointments, isDoctor, patients]);
 
   const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: string;
-      payload: PatientPayload;
-    }) => updatePatientApi(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: PatientPayload }) =>
+      updatePatientApi(id, payload),
     onSuccess: () => {
       toast.success("Patient updated successfully.");
       queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -540,7 +543,9 @@ export default function PatientsPage() {
 
     const errors = validateForm(form);
     if (Object.keys(errors).length > 0) {
-      toast.error(Object.values(errors)[0] ?? "Please fill in all required fields.");
+      toast.error(
+        Object.values(errors)[0] ?? "Please fill in all required fields.",
+      );
       return;
     }
 
@@ -565,7 +570,10 @@ export default function PatientsPage() {
         description="Approved appointments add patients automatically. Completed appointments are treated as discharged, and manual discharge keeps the appointment flow in sync."
       />
 
-      <div className="grid gap-3 mb-5 md:grid-cols-3" data-ocid="patients.summary">
+      <div
+        className="grid gap-3 mb-5 md:grid-cols-3"
+        data-ocid="patients.summary"
+      >
         <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Total Patients
@@ -611,7 +619,9 @@ export default function PatientsPage() {
         </div>
         <Select
           value={genderFilter}
-          onValueChange={(value) => setGenderFilter(value as PatientGender | "all")}
+          onValueChange={(value) =>
+            setGenderFilter(value as PatientGender | "all")
+          }
         >
           <SelectTrigger
             className="w-full sm:w-44 rounded-xl border-border bg-card focus:ring-primary/30 text-sm"
@@ -628,7 +638,9 @@ export default function PatientsPage() {
         </Select>
         <Select
           value={statusFilter}
-          onValueChange={(value) => setStatusFilter(value as PatientStatusFilter)}
+          onValueChange={(value) =>
+            setStatusFilter(value as PatientStatusFilter)
+          }
         >
           <SelectTrigger
             className="w-full sm:w-44 rounded-xl border-border bg-card focus:ring-primary/30 text-sm"
@@ -663,6 +675,9 @@ export default function PatientsPage() {
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   Gender
+                </TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Doctor
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide max-w-[160px]">
                   Address
@@ -711,12 +726,12 @@ export default function PatientsPage() {
               ) : filteredPatients.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={9}
                     className="text-center py-12 text-muted-foreground text-sm"
                     data-ocid="patients.empty_state"
                   >
                     {isError
-                      ? error?.message ?? "Unable to load patients."
+                      ? (error?.message ?? "Unable to load patients.")
                       : "No patients found matching your filters."}
                   </TableCell>
                 </TableRow>
@@ -745,8 +760,13 @@ export default function PatientsPage() {
                         {gender ? (
                           <GenderBadge gender={gender} />
                         ) : (
-                          <span className="text-xs text-muted-foreground">Not set</span>
+                          <span className="text-xs text-muted-foreground">
+                            Not set
+                          </span>
                         )}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {getPatientDoctor(patient)}
                       </TableCell>
                       <TableCell className="max-w-[160px]">
                         <p
@@ -827,7 +847,7 @@ export default function PatientsPage() {
               data-ocid="patients.empty_state"
             >
               {isError
-                ? error?.message ?? "Unable to load patients."
+                ? (error?.message ?? "Unable to load patients.")
                 : "No patients found matching your filters."}
             </div>
           ) : (
@@ -862,6 +882,9 @@ export default function PatientsPage() {
                             Gender not set
                           </Badge>
                         )}
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Doctor: {getPatientDoctor(patient)}
+                        </p>
                         <PatientStatusBadge patient={patient} />
                         <Badge
                           variant="outline"
@@ -922,7 +945,8 @@ export default function PatientsPage() {
 
       {!isLoading && filteredPatients.length > 0 && (
         <p className="text-xs text-muted-foreground mt-3 px-1">
-          Showing {filteredPatients.length} of {roleScopedPatients.length} patients
+          Showing {filteredPatients.length} of {roleScopedPatients.length}{" "}
+          patients
         </p>
       )}
 
@@ -946,7 +970,9 @@ export default function PatientsPage() {
             ? `Mark ${getPatientName(patientToDischarge)} as discharged? This will keep the record in the patient list but mark it as inactive.`
             : ""
         }
-        confirmLabel={dischargeMutation.isPending ? "Discharging..." : "Discharge"}
+        confirmLabel={
+          dischargeMutation.isPending ? "Discharging..." : "Discharge"
+        }
         onConfirm={handleDischarge}
         onCancel={() => {
           if (!dischargeMutation.isPending) {

@@ -69100,6 +69100,10 @@ function GenderBadge({ gender }) {
     }
   );
 }
+function getPatientDoctor(patient) {
+  var _a2;
+  return ((_a2 = patient.doctor) == null ? void 0 : _a2.trim()) || "Not assigned";
+}
 function isPatientDischarged(patient) {
   return Boolean(patient.dischargedAt);
 }
@@ -69411,9 +69415,7 @@ function PatientsPage() {
   );
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [editPatient, setEditPatient] = reactExports.useState(null);
-  const [patientToDischarge, setPatientToDischarge] = reactExports.useState(
-    null
-  );
+  const [patientToDischarge, setPatientToDischarge] = reactExports.useState(null);
   const [form, setForm] = reactExports.useState(EMPTY_FORM$3);
   const {
     data: patients = [],
@@ -69465,10 +69467,7 @@ function PatientsPage() {
     });
   }, [admin == null ? void 0 : admin.id, appointmentData == null ? void 0 : appointmentData.appointments, isDoctor, patients]);
   const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      payload
-    }) => updatePatientApi(id, payload),
+    mutationFn: ({ id, payload }) => updatePatientApi(id, payload),
     onSuccess: () => {
       ue.success("Patient updated successfully.");
       queryClient2.invalidateQueries({ queryKey: ["patients"] });
@@ -69524,7 +69523,9 @@ function PatientsPage() {
     if (!editPatient) return;
     const errors = validateForm(form);
     if (Object.keys(errors).length > 0) {
-      ue.error(Object.values(errors)[0] ?? "Please fill in all required fields.");
+      ue.error(
+        Object.values(errors)[0] ?? "Please fill in all required fields."
+      );
       return;
     }
     updateMutation.mutate({
@@ -69546,20 +69547,27 @@ function PatientsPage() {
         description: "Approved appointments add patients automatically. Completed appointments are treated as discharged, and manual discharge keeps the appointment flow in sync."
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 mb-5 md:grid-cols-3", "data-ocid": "patients.summary", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-border bg-card p-4 shadow-sm", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground", children: "Total Patients" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-foreground", children: patientMetrics.total })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-primary/20 bg-primary/10/50 p-4 shadow-sm", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-primary", children: "Active" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-primary", children: patientMetrics.active })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-secondary/20 bg-accent/60 p-4 shadow-sm", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-secondary", children: "Discharged" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-secondary", children: patientMetrics.discharged })
-      ] })
-    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "grid gap-3 mb-5 md:grid-cols-3",
+        "data-ocid": "patients.summary",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-border bg-card p-4 shadow-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground", children: "Total Patients" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-foreground", children: patientMetrics.total })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-primary/20 bg-primary/10/50 p-4 shadow-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-primary", children: "Active" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-primary", children: patientMetrics.active })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-secondary/20 bg-accent/60 p-4 shadow-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium uppercase tracking-[0.18em] text-secondary", children: "Discharged" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-2xl font-semibold text-secondary", children: patientMetrics.discharged })
+          ] })
+        ]
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
@@ -69645,6 +69653,7 @@ function PatientsPage() {
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Phone" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Age" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Gender" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Doctor" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide max-w-[160px]", children: "Address" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Status" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Registered" }),
@@ -69662,7 +69671,7 @@ function PatientsPage() {
             ] }, key)) : filteredPatients.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               TableCell,
               {
-                colSpan: 8,
+                colSpan: 9,
                 className: "text-center py-12 text-muted-foreground text-sm",
                 "data-ocid": "patients.empty_state",
                 children: isError ? (error == null ? void 0 : error.message) ?? "Unable to load patients." : "No patients found matching your filters."
@@ -69679,6 +69688,7 @@ function PatientsPage() {
                     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-muted-foreground", children: getPatientPhone(patient) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-muted-foreground", children: getPatientAgeLabel(patient) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: gender ? /* @__PURE__ */ jsxRuntimeExports.jsx(GenderBadge, { gender }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: "Not set" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-muted-foreground", children: getPatientDoctor(patient) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "max-w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                       "p",
                       {
@@ -69768,6 +69778,10 @@ function PatientsPage() {
                             children: "Gender not set"
                           }
                         ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground mt-0.5", children: [
+                          "Doctor: ",
+                          getPatientDoctor(patient)
+                        ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(PatientStatusBadge, { patient }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           Badge,
@@ -69834,7 +69848,8 @@ function PatientsPage() {
       filteredPatients.length,
       " of ",
       roleScopedPatients.length,
-      " patients"
+      " ",
+      "patients"
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PatientFormModal,

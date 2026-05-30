@@ -17,6 +17,7 @@ export interface PatientItem {
   name?: string;
   phone?: number | string;
   age?: number | null;
+  doctor?: string;
   gender?: PatientGender | null;
   address?: string;
   email?: string;
