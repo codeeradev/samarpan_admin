@@ -2,12 +2,24 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import type {
+  AnalyticsPageGroup,
+  AnalyticsVisitorStats,
+} from "@/apiCalls/analytics";
 import { getDashboardApi } from "@/apiCalls/dashboard";
 import { useAnalyticsDashboard } from "@/hooks/useAnalytics";
 import { themeColor } from "@/lib/theme";
 import { formatDate } from "@/types";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   Activity,
   Calendar,
@@ -15,6 +27,7 @@ import {
   Eye,
   FileImage,
   ImageIcon,
+  type LucideIcon,
   MessageSquare,
   Users,
   UserRound,
@@ -50,8 +63,38 @@ const SKELETON_ROW_KEYS = [
 ];
 const SKELETON_CELL_KEYS = ["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5"];
 
+type AnalyticsDisplayRow =
+  | {
+      type: "group";
+      key: string;
+      title: string;
+      pageViews: number;
+      visitors: number;
+      group: AnalyticsPageGroup;
+    }
+  | {
+      type: "page";
+      key: string;
+      title: string;
+      pageViews: number;
+      visitors: number;
+    };
+
+const decodePagePath = (page: string) => {
+  try {
+    return decodeURI(page);
+  } catch {
+    return page;
+  }
+};
+
+const formatTitleWord = (word: string) => {
+  if (!word) return word;
+  return word.charAt(0).toLocaleUpperCase() + word.slice(1);
+};
+
 const formatPageTitle = (page: string) => {
-  const cleanPage = page.split("?")[0]?.split("#")[0] || "/";
+  const cleanPage = decodePagePath(page).split("?")[0]?.split("#")[0] || "/";
 
   if (cleanPage === "/") {
     return "Home";
@@ -64,15 +107,99 @@ const formatPageTitle = (page: string) => {
       part
         .split("-")
         .filter(Boolean)
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .map(formatTitleWord)
         .join(" "),
     )
     .join(" / ");
 };
 
+const emptyVisitorStats: AnalyticsVisitorStats = {
+  total: 0,
+  unique: 0,
+  repeated: 0,
+};
+
+function VisitorStatsCard({
+  icon: Icon,
+  label,
+  stats = emptyVisitorStats,
+}: {
+  icon: LucideIcon;
+  label: string;
+  stats?: AnalyticsVisitorStats;
+}) {
+  return (
+    <Card className="shadow-card border border-border rounded-2xl overflow-hidden hover:shadow-elevated transition-colors duration-200">
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Icon size={18} className="text-primary" />
+          </div>
+          <div className="text-right">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground leading-snug">
+              {label}
+            </p>
+            <p className="text-xl sm:text-2xl font-bold text-foreground mt-0.5 sm:mt-1 font-display tabular-nums">
+              {stats.total.toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-2 text-xs sm:text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-muted-foreground">Total Visitors</span>
+            <span className="font-semibold text-foreground tabular-nums">
+              {stats.total.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-muted-foreground">Unique Visitors</span>
+            <span className="font-semibold text-foreground tabular-nums">
+              {stats.unique.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-muted-foreground">Repeated Visitors</span>
+            <span className="font-semibold text-foreground tabular-nums">
+              {stats.repeated.toLocaleString()}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+const buildAnalyticsRows = (
+  groups: AnalyticsPageGroup[] = [],
+  pages: { page: string; pageViews: number; visitors: number }[] = [],
+): AnalyticsDisplayRow[] =>
+  [
+    ...groups.map((group) => ({
+      type: "group" as const,
+      key: `group-${group.key}`,
+      title: group.title,
+      pageViews: group.pageViews,
+      visitors: group.visitors,
+      group,
+    })),
+    ...pages.map((page) => ({
+      type: "page" as const,
+      key: `page-${page.page}`,
+      title: formatPageTitle(page.page),
+      pageViews: page.pageViews,
+      visitors: page.visitors,
+    })),
+  ].sort((a, b) => {
+    if (b.pageViews !== a.pageViews) return b.pageViews - a.pageViews;
+    return a.title.localeCompare(b.title);
+  });
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const [selectedPageGroup, setSelectedPageGroup] =
+    useState<AnalyticsPageGroup | null>(null);
   const gridColor = themeColor("border", 0.7);
   const mutedTextColor = themeColor("muted-foreground");
   const tooltipBorder = `1px solid ${themeColor("border")}`;
@@ -94,6 +221,10 @@ export default function DashboardPage() {
   const apptLoading = statsLoading;
   const totals = data?.totals;
   const charts = data?.charts;
+  const analyticsRows = buildAnalyticsRows(
+    analytics?.pageGroups,
+    analytics?.topPages,
+  );
 
   return (
     <div data-ocid="dashboard.page">
@@ -136,37 +267,25 @@ export default function DashboardPage() {
             ))
           ) : (
             <>
-              <StatCard
+              <VisitorStatsCard
                 icon={Users}
                 label="Total Visitors"
-                value={(analytics?.totals.totalVisitors ?? 0).toLocaleString()}
-                subtitle="unique visitors"
-                color="gold"
+                stats={analytics?.totals.totalVisitors}
               />
-              <StatCard
-                icon={UserRound}
-                label="Today's Visitors"
-                value={(analytics?.totals.todaysVisitors ?? 0).toLocaleString()}
-                subtitle="unique today"
-                color="green"
-              />
-              <StatCard
+              <VisitorStatsCard
                 icon={Calendar}
-                label="Last 7 Days"
-                value={(
-                  analytics?.totals.last7DaysVisitors ?? 0
-                ).toLocaleString()}
-                subtitle="unique visitors"
-                color="gold-deep"
+                label="Today's Visitors"
+                stats={analytics?.totals.todaysVisitors}
               />
-              <StatCard
+              <VisitorStatsCard
                 icon={Activity}
+                label="Last 7 Days"
+                stats={analytics?.totals.last7DaysVisitors}
+              />
+              <VisitorStatsCard
+                icon={UserRound}
                 label="Last 30 Days"
-                value={(
-                  analytics?.totals.last30DaysVisitors ?? 0
-                ).toLocaleString()}
-                subtitle="unique visitors"
-                color="purple"
+                stats={analytics?.totals.last30DaysVisitors}
               />
               <StatCard
                 icon={Eye}
@@ -260,7 +379,10 @@ export default function DashboardPage() {
                   <tbody>
                     {analyticsLoading ? (
                       SKELETON_ROW_KEYS.map((rk) => (
-                        <tr key={`analytics-${rk}`} className="border-b border-border/60">
+                        <tr
+                          key={`analytics-${rk}`}
+                          className="border-b border-border/60"
+                        >
                           {["page", "visitors", "views"].map((ck) => (
                             <td key={ck} className="px-5 py-3">
                               <Skeleton className="h-4 w-3/4 rounded" />
@@ -268,20 +390,30 @@ export default function DashboardPage() {
                           ))}
                         </tr>
                       ))
-                    ) : (analytics?.topPages ?? []).length > 0 ? (
-                      (analytics?.topPages ?? []).map((page) => (
+                    ) : analyticsRows.length > 0 ? (
+                      analyticsRows.map((row) => (
                         <tr
-                          key={page.page}
+                          key={row.key}
                           className="border-b border-border/60 hover:bg-muted transition-colors"
                         >
                           <td className="px-5 py-3 font-medium text-foreground max-w-[280px] truncate">
-                            {formatPageTitle(page.page)}
+                            {row.type === "group" ? (
+                              <button
+                                type="button"
+                                className="font-medium text-primary hover:text-secondary transition-colors"
+                                onClick={() => setSelectedPageGroup(row.group)}
+                              >
+                                {row.title}
+                              </button>
+                            ) : (
+                              row.title
+                            )}
                           </td>
                           <td className="px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums">
-                            {page.visitors.toLocaleString()}
+                            {row.visitors.toLocaleString()}
                           </td>
                           <td className="px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums">
-                            {page.pageViews.toLocaleString()}
+                            {row.pageViews.toLocaleString()}
                           </td>
                         </tr>
                       ))
@@ -302,6 +434,57 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
+
+      <Dialog
+        open={Boolean(selectedPageGroup)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedPageGroup(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-3xl max-h-[86vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>{selectedPageGroup?.title} Pages</DialogTitle>
+            <DialogDescription>
+              Detailed page views for this website section.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[60vh] overflow-y-auto rounded-xl border border-border">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-muted">
+                <tr className="border-b border-border">
+                  {["Page", "Visitors", "Page Views"].map((col) => (
+                    <th
+                      key={col}
+                      className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-4 whitespace-nowrap"
+                    >
+                      {col}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(selectedPageGroup?.pages ?? []).map((page) => (
+                  <tr
+                    key={page.page}
+                    className="border-b border-border/60 last:border-b-0"
+                  >
+                    <td className="px-4 py-3 font-medium text-foreground">
+                      {formatPageTitle(page.page)}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap tabular-nums">
+                      {page.visitors.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap tabular-nums">
+                      {page.pageViews.toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* ── Stat Cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4 sm:mb-6">

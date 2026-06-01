@@ -1,11 +1,17 @@
 import { get } from "@/apis/apiClient";
 import { ENDPOINT } from "@/apis/endpoint";
 
+export type AnalyticsVisitorStats = {
+  total: number;
+  unique: number;
+  repeated: number;
+};
+
 export type AnalyticsTotals = {
-  totalVisitors: number;
-  todaysVisitors: number;
-  last7DaysVisitors: number;
-  last30DaysVisitors: number;
+  totalVisitors: AnalyticsVisitorStats;
+  todaysVisitors: AnalyticsVisitorStats;
+  last7DaysVisitors: AnalyticsVisitorStats;
+  last30DaysVisitors: AnalyticsVisitorStats;
   totalPageViews: number;
 };
 
@@ -13,6 +19,14 @@ export type AnalyticsTopPage = {
   page: string;
   pageViews: number;
   visitors: number;
+};
+
+export type AnalyticsPageGroup = {
+  key: string;
+  title: string;
+  pageViews: number;
+  visitors: number;
+  pages: AnalyticsTopPage[];
 };
 
 export type AnalyticsDailyVisitors = {
@@ -23,6 +37,7 @@ export type AnalyticsDailyVisitors = {
 export type AnalyticsDashboard = {
   totals: AnalyticsTotals;
   topPages: AnalyticsTopPage[];
+  pageGroups: AnalyticsPageGroup[];
   dailyVisitors: AnalyticsDailyVisitors[];
 };
 
