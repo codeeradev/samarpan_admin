@@ -57,6 +57,7 @@ export const ENDPOINT = {
   GET_APPOINTMENTS: "/get-appointments",
   UPDATE_APPOINTMENT: "/update-appointment",
   GET_DASHBOARD: "/get-dashboard",
+  GET_ANALYTICS: "/get-analytics",
 
   ADD_SPECIALIZATION: "/add-specialization",
   GET_ALL_SPECIALIZATIONS: "/get-all-specializations",

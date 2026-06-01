@@ -4,12 +4,15 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getDashboardApi } from "@/apiCalls/dashboard";
+import { useAnalyticsDashboard } from "@/hooks/useAnalytics";
 import { themeColor } from "@/lib/theme";
 import { formatDate } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Activity,
   Calendar,
   Clock,
+  Eye,
   FileImage,
   ImageIcon,
   MessageSquare,
@@ -31,6 +34,13 @@ import {
 // ─── Skeleton keys ──────────────────────────────────────────────────────────
 
 const SKELETON_STAT_KEYS = ["sk-stat-1", "sk-stat-2", "sk-stat-3", "sk-stat-4"];
+const SKELETON_ANALYTICS_STAT_KEYS = [
+  "sk-analytics-1",
+  "sk-analytics-2",
+  "sk-analytics-3",
+  "sk-analytics-4",
+  "sk-analytics-5",
+];
 const SKELETON_ROW_KEYS = [
   "sk-row-1",
   "sk-row-2",
@@ -40,6 +50,26 @@ const SKELETON_ROW_KEYS = [
 ];
 const SKELETON_CELL_KEYS = ["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5"];
 
+const formatPageTitle = (page: string) => {
+  const cleanPage = page.split("?")[0]?.split("#")[0] || "/";
+
+  if (cleanPage === "/") {
+    return "Home";
+  }
+
+  return cleanPage
+    .split("/")
+    .filter(Boolean)
+    .map((part) =>
+      part
+        .split("-")
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "),
+    )
+    .join(" / ");
+};
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -48,6 +78,12 @@ export default function DashboardPage() {
   const tooltipBorder = `1px solid ${themeColor("border")}`;
   const lineColor = themeColor("chart-1");
   const barColor = themeColor("chart-2");
+
+  const {
+    data: analytics,
+    isLoading: analyticsLoading,
+    error: analyticsError,
+  } = useAnalyticsDashboard();
 
   const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["dashboard-stats"],
@@ -65,6 +101,207 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Welcome to Samarpan Hospital Admin"
       />
+
+      {/* ── Website Analytics ─────────────────────────────────────────────── */}
+      <div className="mb-4 sm:mb-6" data-ocid="dashboard.analytics">
+        <div className="mb-3">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground font-display">
+            Website Analytics
+          </h2>
+        </div>
+
+        {analyticsError ? (
+          <Card className="shadow-card border border-destructive/30 rounded-2xl mb-4">
+            <CardContent className="p-4 text-sm text-destructive">
+              {analyticsError instanceof Error
+                ? analyticsError.message
+                : "Failed to load analytics"}
+            </CardContent>
+          </Card>
+        ) : null}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-4">
+          {analyticsLoading ? (
+            SKELETON_ANALYTICS_STAT_KEYS.map((k) => (
+              <Card
+                key={k}
+                className="rounded-2xl shadow-card border border-border"
+              >
+                <CardContent className="p-5 space-y-3">
+                  <Skeleton className="h-11 w-11 rounded-xl" />
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-7 w-20 rounded" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <>
+              <StatCard
+                icon={Users}
+                label="Total Visitors"
+                value={(analytics?.totals.totalVisitors ?? 0).toLocaleString()}
+                subtitle="unique visitors"
+                color="gold"
+              />
+              <StatCard
+                icon={UserRound}
+                label="Today's Visitors"
+                value={(analytics?.totals.todaysVisitors ?? 0).toLocaleString()}
+                subtitle="unique today"
+                color="green"
+              />
+              <StatCard
+                icon={Calendar}
+                label="Last 7 Days"
+                value={(
+                  analytics?.totals.last7DaysVisitors ?? 0
+                ).toLocaleString()}
+                subtitle="unique visitors"
+                color="gold-deep"
+              />
+              <StatCard
+                icon={Activity}
+                label="Last 30 Days"
+                value={(
+                  analytics?.totals.last30DaysVisitors ?? 0
+                ).toLocaleString()}
+                subtitle="unique visitors"
+                color="purple"
+              />
+              <StatCard
+                icon={Eye}
+                label="Total Page Views"
+                value={(analytics?.totals.totalPageViews ?? 0).toLocaleString()}
+                subtitle="all tracked views"
+                color="orange"
+              />
+            </>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <Card className="shadow-card border border-border rounded-2xl">
+            <CardHeader className="pb-2 px-4 sm:px-6">
+              <CardTitle className="text-sm sm:text-base font-semibold text-foreground font-display">
+                Daily Visitors
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-2 sm:px-6">
+              {analyticsLoading ? (
+                <Skeleton className="h-[250px] w-full rounded-xl" />
+              ) : (
+                <div style={{ height: 250 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={(analytics?.dailyVisitors ?? []).map((row) => ({
+                        day: row.day.slice(5),
+                        visitors: row.visitors,
+                      }))}
+                      margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                      <XAxis
+                        dataKey="day"
+                        tick={{ fontSize: 11, fill: mutedTextColor }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: mutedTextColor }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: "12px",
+                          border: tooltipBorder,
+                          boxShadow: "0 4px 6px rgba(0,0,0,0.07)",
+                          fontSize: 12,
+                        }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="visitors"
+                        stroke={lineColor}
+                        strokeWidth={2.5}
+                        dot={{ fill: lineColor, r: 4, strokeWidth: 0 }}
+                        activeDot={{ r: 6, strokeWidth: 0 }}
+                        name="Visitors"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card border border-border rounded-2xl">
+            <CardHeader className="pb-2 px-4 sm:px-6">
+              <CardTitle className="text-sm sm:text-base font-semibold text-foreground font-display">
+                Top Pages
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-muted">
+                      {["Page", "Visitors", "Page Views"].map((col) => (
+                        <th
+                          key={col}
+                          className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap"
+                        >
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analyticsLoading ? (
+                      SKELETON_ROW_KEYS.map((rk) => (
+                        <tr key={`analytics-${rk}`} className="border-b border-border/60">
+                          {["page", "visitors", "views"].map((ck) => (
+                            <td key={ck} className="px-5 py-3">
+                              <Skeleton className="h-4 w-3/4 rounded" />
+                            </td>
+                          ))}
+                        </tr>
+                      ))
+                    ) : (analytics?.topPages ?? []).length > 0 ? (
+                      (analytics?.topPages ?? []).map((page) => (
+                        <tr
+                          key={page.page}
+                          className="border-b border-border/60 hover:bg-muted transition-colors"
+                        >
+                          <td className="px-5 py-3 font-medium text-foreground max-w-[280px] truncate">
+                            {formatPageTitle(page.page)}
+                          </td>
+                          <td className="px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums">
+                            {page.visitors.toLocaleString()}
+                          </td>
+                          <td className="px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums">
+                            {page.pageViews.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={3}
+                          className="px-5 py-6 text-sm text-muted-foreground text-center"
+                        >
+                          No analytics data yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* ── Stat Cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4 sm:mb-6">

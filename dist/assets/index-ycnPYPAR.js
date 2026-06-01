@@ -21901,6 +21901,7 @@ const ENDPOINT = {
   GET_APPOINTMENTS: "/get-appointments",
   UPDATE_APPOINTMENT: "/update-appointment",
   GET_DASHBOARD: "/get-dashboard",
+  GET_ANALYTICS: "/get-analytics",
   ADD_SPECIALIZATION: "/add-specialization",
   GET_ALL_SPECIALIZATIONS: "/get-all-specializations",
   UPDATE_SPECIALIZATION: "/update-specialization",
@@ -30805,6 +30806,22 @@ const createLucideIcon = (iconName, iconNode) => {
   Component2.displayName = toPascalCase(iconName);
   return Component2;
 };
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$T = [
+  [
+    "path",
+    {
+      d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
+      key: "169zse"
+    }
+  ]
+];
+const Activity = createLucideIcon("activity", __iconNode$T);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -44627,6 +44644,16 @@ const getDashboardApi = async () => {
   const response = await get$3(ENDPOINT.GET_DASHBOARD, { needAuth: true });
   return response.data;
 };
+const getAnalyticsApi = async () => {
+  const response = await get$3(ENDPOINT.GET_ANALYTICS, {
+    needAuth: true
+  });
+  return response.data.analytics;
+};
+const useAnalyticsDashboard = () => useQuery({
+  queryKey: ["analytics-dashboard"],
+  queryFn: getAnalyticsApi
+});
 var isArray$e = Array.isArray;
 var isArray_1 = isArray$e;
 var freeGlobal$1 = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
@@ -66280,6 +66307,13 @@ var BarChart = generateCategoricalChart({
   formatAxisMap
 });
 const SKELETON_STAT_KEYS = ["sk-stat-1", "sk-stat-2", "sk-stat-3", "sk-stat-4"];
+const SKELETON_ANALYTICS_STAT_KEYS = [
+  "sk-analytics-1",
+  "sk-analytics-2",
+  "sk-analytics-3",
+  "sk-analytics-4",
+  "sk-analytics-5"
+];
 const SKELETON_ROW_KEYS = [
   "sk-row-1",
   "sk-row-2",
@@ -66288,6 +66322,16 @@ const SKELETON_ROW_KEYS = [
   "sk-row-5"
 ];
 const SKELETON_CELL_KEYS = ["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5"];
+const formatPageTitle = (page) => {
+  var _a2;
+  const cleanPage = ((_a2 = page.split("?")[0]) == null ? void 0 : _a2.split("#")[0]) || "/";
+  if (cleanPage === "/") {
+    return "Home";
+  }
+  return cleanPage.split("/").filter(Boolean).map(
+    (part) => part.split("-").filter(Boolean).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+  ).join(" / ");
+};
 function DashboardPage() {
   var _a2;
   const gridColor = themeColor("border", 0.7);
@@ -66295,6 +66339,11 @@ function DashboardPage() {
   const tooltipBorder = `1px solid ${themeColor("border")}`;
   const lineColor = themeColor("chart-1");
   const barColor = themeColor("chart-2");
+  const {
+    data: analytics,
+    isLoading: analyticsLoading,
+    error: analyticsError
+  } = useAnalyticsDashboard();
   const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: getDashboardApi
@@ -66311,6 +66360,164 @@ function DashboardPage() {
         description: "Welcome to Samarpan Hospital Admin"
       }
     ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 sm:mb-6", "data-ocid": "dashboard.analytics", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-base sm:text-lg font-semibold text-foreground font-display", children: "Website Analytics" }) }),
+      analyticsError ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-card border border-destructive/30 rounded-2xl mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4 text-sm text-destructive", children: analyticsError instanceof Error ? analyticsError.message : "Failed to load analytics" }) }) : null,
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-4", children: analyticsLoading ? SKELETON_ANALYTICS_STAT_KEYS.map((k2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Card,
+        {
+          className: "rounded-2xl shadow-card border border-border",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-5 space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-xl" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24 rounded" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-20 rounded" })
+          ] })
+        },
+        k2
+      )) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          StatCard,
+          {
+            icon: Users,
+            label: "Total Visitors",
+            value: ((analytics == null ? void 0 : analytics.totals.totalVisitors) ?? 0).toLocaleString(),
+            subtitle: "unique visitors",
+            color: "gold"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          StatCard,
+          {
+            icon: UserRound,
+            label: "Today's Visitors",
+            value: ((analytics == null ? void 0 : analytics.totals.todaysVisitors) ?? 0).toLocaleString(),
+            subtitle: "unique today",
+            color: "green"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          StatCard,
+          {
+            icon: Calendar,
+            label: "Last 7 Days",
+            value: ((analytics == null ? void 0 : analytics.totals.last7DaysVisitors) ?? 0).toLocaleString(),
+            subtitle: "unique visitors",
+            color: "gold-deep"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          StatCard,
+          {
+            icon: Activity,
+            label: "Last 30 Days",
+            value: ((analytics == null ? void 0 : analytics.totals.last30DaysVisitors) ?? 0).toLocaleString(),
+            subtitle: "unique visitors",
+            color: "purple"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          StatCard,
+          {
+            icon: Eye,
+            label: "Total Page Views",
+            value: ((analytics == null ? void 0 : analytics.totals.totalPageViews) ?? 0).toLocaleString(),
+            subtitle: "all tracked views",
+            color: "orange"
+          }
+        )
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 xl:grid-cols-2 gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-card border border-border rounded-2xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2 px-4 sm:px-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-sm sm:text-base font-semibold text-foreground font-display", children: "Daily Visitors" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "px-2 sm:px-6", children: analyticsLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-[250px] w-full rounded-xl" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { height: 250 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            LineChart,
+            {
+              data: ((analytics == null ? void 0 : analytics.dailyVisitors) ?? []).map((row) => ({
+                day: row.day.slice(5),
+                visitors: row.visitors
+              })),
+              margin: { top: 8, right: 8, left: -24, bottom: 0 },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3", stroke: gridColor }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  XAxis,
+                  {
+                    dataKey: "day",
+                    tick: { fontSize: 11, fill: mutedTextColor },
+                    axisLine: false,
+                    tickLine: false
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  YAxis,
+                  {
+                    tick: { fontSize: 11, fill: mutedTextColor },
+                    axisLine: false,
+                    tickLine: false,
+                    allowDecimals: false
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Tooltip,
+                  {
+                    contentStyle: {
+                      borderRadius: "12px",
+                      border: tooltipBorder,
+                      boxShadow: "0 4px 6px rgba(0,0,0,0.07)",
+                      fontSize: 12
+                    }
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Line,
+                  {
+                    type: "monotone",
+                    dataKey: "visitors",
+                    stroke: lineColor,
+                    strokeWidth: 2.5,
+                    dot: { fill: lineColor, r: 4, strokeWidth: 0 },
+                    activeDot: { r: 6, strokeWidth: 0 },
+                    name: "Visitors"
+                  }
+                )
+              ]
+            }
+          ) }) }) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-card border border-border rounded-2xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2 px-4 sm:px-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-sm sm:text-base font-semibold text-foreground font-display", children: "Top Pages" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border bg-muted", children: ["Page", "Visitors", "Page Views"].map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "th",
+              {
+                className: "text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap",
+                children: col
+              },
+              col
+            )) }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: analyticsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: ["page", "visitors", "views"].map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, `analytics-${rk}`)) : ((analytics == null ? void 0 : analytics.topPages) ?? []).length > 0 ? ((analytics == null ? void 0 : analytics.topPages) ?? []).map((page) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "tr",
+              {
+                className: "border-b border-border/60 hover:bg-muted transition-colors",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground max-w-[280px] truncate", children: formatPageTitle(page.page) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: page.visitors.toLocaleString() }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: page.pageViews.toLocaleString() })
+                ]
+              },
+              page.page
+            )) : /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "td",
+              {
+                colSpan: 3,
+                className: "px-5 py-6 text-sm text-muted-foreground text-center",
+                children: "No analytics data yet."
+              }
+            ) }) })
+          ] }) }) })
+        ] })
+      ] })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4 sm:mb-6", children: statsLoading ? SKELETON_STAT_KEYS.map((k2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       Card,
       {

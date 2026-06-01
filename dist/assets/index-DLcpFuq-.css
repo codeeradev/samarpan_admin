@@ -1792,6 +1792,9 @@ video {
 .max-w-\[220px\] {
   max-width: 220px;
 }
+.max-w-\[280px\] {
+  max-width: 280px;
+}
 .max-w-\[320px\] {
   max-width: 320px;
 }
@@ -2226,6 +2229,9 @@ video {
 }
 .border-destructive\/20 {
   border-color: oklch(var(--destructive) / 0.2);
+}
+.border-destructive\/30 {
+  border-color: oklch(var(--destructive) / 0.3);
 }
 .border-destructive\/40 {
   border-color: oklch(var(--destructive) / 0.4);
@@ -5060,6 +5066,10 @@ video {
 
   .xl\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .xl\:grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .xl\:flex-nowrap {
