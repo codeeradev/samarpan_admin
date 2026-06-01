@@ -93,11 +93,46 @@ const formatTitleWord = (word: string) => {
   return word.charAt(0).toLocaleUpperCase() + word.slice(1);
 };
 
-const formatPageTitle = (page: string) => {
-  const cleanPage = decodePagePath(page).split("?")[0]?.split("#")[0] || "/";
+const getSearchParam = (page: string, key: string) => {
+  const query = page.split("?")[1]?.split("#")[0] || "";
+  return new URLSearchParams(query).get(key);
+};
+
+const formatSlugTitle = (value: string) =>
+  decodePagePath(value)
+    .split("-")
+    .filter(Boolean)
+    .map((word) => {
+      const normalizedWord = word.toLowerCase();
+      if (normalizedWord === "ent") return "ENT";
+      return formatTitleWord(word);
+    })
+    .join(" ");
+
+const formatPageTitle = (page: string, groupKey?: string) => {
+  const decodedPage = decodePagePath(page);
+  const cleanPage = decodedPage.split("?")[0]?.split("#")[0] || "/";
 
   if (cleanPage === "/") {
+    if (decodedPage.includes("#blog")) {
+      return "Blog Categories Section";
+    }
+
     return "Home";
+  }
+
+  if (groupKey === "blog-listing-pages") {
+    const categorySlug = getSearchParam(decodedPage, "type");
+    return categorySlug ? `${formatSlugTitle(categorySlug)} Blogs` : "All Blogs";
+  }
+
+  if (groupKey === "blog-detail-pages") {
+    const blogSlug = cleanPage.replace(/^\/blogs\/?/, "");
+    return blogSlug ? formatSlugTitle(blogSlug) : "Blog Detail";
+  }
+
+  if (groupKey === "blog-categories") {
+    return "Blog Categories Section";
   }
 
   return cleanPage
@@ -194,6 +229,9 @@ const buildAnalyticsRows = (
     if (b.pageViews !== a.pageViews) return b.pageViews - a.pageViews;
     return a.title.localeCompare(b.title);
   });
+
+const formatGroupDialogTitle = (title = "") =>
+  title.toLowerCase().endsWith("pages") ? title : `${title} Pages`;
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -443,7 +481,9 @@ export default function DashboardPage() {
       >
         <DialogContent className="sm:max-w-3xl max-h-[86vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle>{selectedPageGroup?.title} Pages</DialogTitle>
+            <DialogTitle>
+              {formatGroupDialogTitle(selectedPageGroup?.title)}
+            </DialogTitle>
             <DialogDescription>
               Detailed page views for this website section.
             </DialogDescription>
@@ -470,7 +510,7 @@ export default function DashboardPage() {
                     className="border-b border-border/60 last:border-b-0"
                   >
                     <td className="px-4 py-3 font-medium text-foreground">
-                      {formatPageTitle(page.page)}
+                      {formatPageTitle(page.page, selectedPageGroup?.key)}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap tabular-nums">
                       {page.visitors.toLocaleString()}

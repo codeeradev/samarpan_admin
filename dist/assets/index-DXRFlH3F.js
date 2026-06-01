@@ -66322,18 +66322,110 @@ const SKELETON_ROW_KEYS = [
   "sk-row-5"
 ];
 const SKELETON_CELL_KEYS = ["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5"];
-const formatPageTitle = (page) => {
+const decodePagePath = (page) => {
+  try {
+    return decodeURI(page);
+  } catch {
+    return page;
+  }
+};
+const formatTitleWord = (word) => {
+  if (!word) return word;
+  return word.charAt(0).toLocaleUpperCase() + word.slice(1);
+};
+const getSearchParam = (page, key) => {
   var _a2;
-  const cleanPage = ((_a2 = page.split("?")[0]) == null ? void 0 : _a2.split("#")[0]) || "/";
+  const query = ((_a2 = page.split("?")[1]) == null ? void 0 : _a2.split("#")[0]) || "";
+  return new URLSearchParams(query).get(key);
+};
+const formatSlugTitle = (value) => decodePagePath(value).split("-").filter(Boolean).map((word) => {
+  const normalizedWord = word.toLowerCase();
+  if (normalizedWord === "ent") return "ENT";
+  return formatTitleWord(word);
+}).join(" ");
+const formatPageTitle = (page, groupKey) => {
+  var _a2;
+  const decodedPage = decodePagePath(page);
+  const cleanPage = ((_a2 = decodedPage.split("?")[0]) == null ? void 0 : _a2.split("#")[0]) || "/";
   if (cleanPage === "/") {
+    if (decodedPage.includes("#blog")) {
+      return "Blog Categories Section";
+    }
     return "Home";
   }
+  if (groupKey === "blog-listing-pages") {
+    const categorySlug = getSearchParam(decodedPage, "type");
+    return categorySlug ? `${formatSlugTitle(categorySlug)} Blogs` : "All Blogs";
+  }
+  if (groupKey === "blog-detail-pages") {
+    const blogSlug = cleanPage.replace(/^\/blogs\/?/, "");
+    return blogSlug ? formatSlugTitle(blogSlug) : "Blog Detail";
+  }
+  if (groupKey === "blog-categories") {
+    return "Blog Categories Section";
+  }
   return cleanPage.split("/").filter(Boolean).map(
-    (part) => part.split("-").filter(Boolean).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+    (part) => part.split("-").filter(Boolean).map(formatTitleWord).join(" ")
   ).join(" / ");
 };
+const emptyVisitorStats = {
+  total: 0,
+  unique: 0,
+  repeated: 0
+};
+function VisitorStatsCard({
+  icon: Icon2,
+  label,
+  stats = emptyVisitorStats
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-card border border-border rounded-2xl overflow-hidden hover:shadow-elevated transition-colors duration-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 sm:p-5", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { size: 18, className: "text-primary" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs sm:text-sm font-medium text-muted-foreground leading-snug", children: label }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl sm:text-2xl font-bold text-foreground mt-0.5 sm:mt-1 font-display tabular-nums", children: stats.total.toLocaleString() })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 space-y-2 text-xs sm:text-sm", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Total Visitors" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-foreground tabular-nums", children: stats.total.toLocaleString() })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Unique Visitors" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-foreground tabular-nums", children: stats.unique.toLocaleString() })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Repeated Visitors" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-foreground tabular-nums", children: stats.repeated.toLocaleString() })
+      ] })
+    ] })
+  ] }) });
+}
+const buildAnalyticsRows = (groups = [], pages = []) => [
+  ...groups.map((group) => ({
+    type: "group",
+    key: `group-${group.key}`,
+    title: group.title,
+    pageViews: group.pageViews,
+    visitors: group.visitors,
+    group
+  })),
+  ...pages.map((page) => ({
+    type: "page",
+    key: `page-${page.page}`,
+    title: formatPageTitle(page.page),
+    pageViews: page.pageViews,
+    visitors: page.visitors
+  }))
+].sort((a2, b2) => {
+  if (b2.pageViews !== a2.pageViews) return b2.pageViews - a2.pageViews;
+  return a2.title.localeCompare(b2.title);
+});
+const formatGroupDialogTitle = (title = "") => title.toLowerCase().endsWith("pages") ? title : `${title} Pages`;
 function DashboardPage() {
   var _a2;
+  const [selectedPageGroup, setSelectedPageGroup] = reactExports.useState(null);
   const gridColor = themeColor("border", 0.7);
   const mutedTextColor = themeColor("muted-foreground");
   const tooltipBorder = `1px solid ${themeColor("border")}`;
@@ -66352,6 +66444,10 @@ function DashboardPage() {
   const apptLoading = statsLoading;
   const totals = data == null ? void 0 : data.totals;
   const charts = data == null ? void 0 : data.charts;
+  const analyticsRows = buildAnalyticsRows(
+    analytics == null ? void 0 : analytics.pageGroups,
+    analytics == null ? void 0 : analytics.topPages
+  );
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "dashboard.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -66376,43 +66472,35 @@ function DashboardPage() {
         k2
       )) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          StatCard,
+          VisitorStatsCard,
           {
             icon: Users,
             label: "Total Visitors",
-            value: ((analytics == null ? void 0 : analytics.totals.totalVisitors) ?? 0).toLocaleString(),
-            subtitle: "unique visitors",
-            color: "gold"
+            stats: analytics == null ? void 0 : analytics.totals.totalVisitors
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          StatCard,
-          {
-            icon: UserRound,
-            label: "Today's Visitors",
-            value: ((analytics == null ? void 0 : analytics.totals.todaysVisitors) ?? 0).toLocaleString(),
-            subtitle: "unique today",
-            color: "green"
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          StatCard,
+          VisitorStatsCard,
           {
             icon: Calendar,
-            label: "Last 7 Days",
-            value: ((analytics == null ? void 0 : analytics.totals.last7DaysVisitors) ?? 0).toLocaleString(),
-            subtitle: "unique visitors",
-            color: "gold-deep"
+            label: "Today's Visitors",
+            stats: analytics == null ? void 0 : analytics.totals.todaysVisitors
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          StatCard,
+          VisitorStatsCard,
           {
             icon: Activity,
+            label: "Last 7 Days",
+            stats: analytics == null ? void 0 : analytics.totals.last7DaysVisitors
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          VisitorStatsCard,
+          {
+            icon: UserRound,
             label: "Last 30 Days",
-            value: ((analytics == null ? void 0 : analytics.totals.last30DaysVisitors) ?? 0).toLocaleString(),
-            subtitle: "unique visitors",
-            color: "purple"
+            stats: analytics == null ? void 0 : analytics.totals.last30DaysVisitors
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -66495,17 +66583,32 @@ function DashboardPage() {
               },
               col
             )) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: analyticsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: ["page", "visitors", "views"].map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, `analytics-${rk}`)) : ((analytics == null ? void 0 : analytics.topPages) ?? []).length > 0 ? ((analytics == null ? void 0 : analytics.topPages) ?? []).map((page) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: analyticsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "tr",
+              {
+                className: "border-b border-border/60",
+                children: ["page", "visitors", "views"].map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck))
+              },
+              `analytics-${rk}`
+            )) : analyticsRows.length > 0 ? analyticsRows.map((row) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "tr",
               {
                 className: "border-b border-border/60 hover:bg-muted transition-colors",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground max-w-[280px] truncate", children: formatPageTitle(page.page) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: page.visitors.toLocaleString() }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: page.pageViews.toLocaleString() })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground max-w-[280px] truncate", children: row.type === "group" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      type: "button",
+                      className: "font-medium text-primary hover:text-secondary transition-colors",
+                      onClick: () => setSelectedPageGroup(row.group),
+                      children: row.title
+                    }
+                  ) : row.title }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: row.visitors.toLocaleString() }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: row.pageViews.toLocaleString() })
                 ]
               },
-              page.page
+              row.key
             )) : /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               "td",
               {
@@ -66518,6 +66621,43 @@ function DashboardPage() {
         ] })
       ] })
     ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: Boolean(selectedPageGroup),
+        onOpenChange: (open) => {
+          if (!open) setSelectedPageGroup(null);
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "sm:max-w-3xl max-h-[86vh] overflow-hidden", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: formatGroupDialogTitle(selectedPageGroup == null ? void 0 : selectedPageGroup.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: "Detailed page views for this website section." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[60vh] overflow-y-auto rounded-xl border border-border", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "sticky top-0 bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border", children: ["Page", "Visitors", "Page Views"].map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "th",
+              {
+                className: "text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-4 whitespace-nowrap",
+                children: col
+              },
+              col
+            )) }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: ((selectedPageGroup == null ? void 0 : selectedPageGroup.pages) ?? []).map((page) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "tr",
+              {
+                className: "border-b border-border/60 last:border-b-0",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-3 font-medium text-foreground", children: formatPageTitle(page.page, selectedPageGroup == null ? void 0 : selectedPageGroup.key) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: page.visitors.toLocaleString() }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-3 text-muted-foreground whitespace-nowrap tabular-nums", children: page.pageViews.toLocaleString() })
+                ]
+              },
+              page.page
+            )) })
+          ] }) })
+        ] })
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4 sm:mb-6", children: statsLoading ? SKELETON_STAT_KEYS.map((k2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       Card,
       {
