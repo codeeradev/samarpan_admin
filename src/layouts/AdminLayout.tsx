@@ -22,6 +22,7 @@ import {
   FileText,
   HeartPulse,
   ImageIcon,
+  Instagram,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -52,6 +53,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: LayoutDashboard,
     path: "/dashboard",
     permissionPath: "/dashboard",
+  },
+  {
+    label: "Meta Analytics",
+    icon: Instagram,
+    path: "/meta-analytics",
+    permissionPath: "/meta-analytics",
   },
   {
     label: "Services",

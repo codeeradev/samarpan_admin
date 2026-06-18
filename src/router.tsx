@@ -1,4 +1,6 @@
 import AdminLayout from "@/layouts/AdminLayout";
+import { canAccessPath } from "@/lib/admin-access";
+import { loadAuthState } from "@/lib/auth-storage";
 import AppointmentsPage from "@/pages/AppointmentsPage";
 import CareerManagementPage from "@/pages/CareerManagementPage";
 import DashboardPage from "@/pages/DashboardPage";
@@ -7,19 +9,20 @@ import DoctorsPage from "@/pages/DoctorsPage";
 import GalleryPage from "@/pages/GalleryPage";
 import HonorsPage from "@/pages/HonorsPage";
 import LoginPage from "@/pages/LoginPage";
+import MetaAnalyticsPage from "@/pages/MetaAnalyticsPage";
+import MetaCallbackPage from "@/pages/MetaCallbackPage";
+import PagesPage from "@/pages/PagesPage";
 import PatientsPage from "@/pages/PatientsPage";
 import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
-import ThemePage from "@/pages/ThemePage";
 import RoleManagementPage from "@/pages/RoleManagementPage";
-import ServiceManagementPage from "@/pages/ServiceManagementPage";
-import SettingsPage from "@/pages/SettingsPage";
-import PagesPage from "@/pages/PagesPage";
-import WebsiteContentPage from "@/pages/WebsiteContentPage";
-import { loadAuthState } from "@/lib/auth-storage";
-import { canAccessPath } from "@/lib/admin-access";
 import ServiceFeaturesPage from "@/pages/ServiceFeaturesPage";
+import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import ServiceSubCategoriesPage from "@/pages/ServiceSubCategoriesPage";
+import SettingsPage from "@/pages/SettingsPage";
+import ThemePage from "@/pages/ThemePage";
+import WebsiteContentPage from "@/pages/WebsiteContentPage";
 
+import JobApplicationsPage from "@/pages/JobApplicationsPage";
 import {
   Outlet,
   createRootRoute,
@@ -29,9 +32,8 @@ import {
 } from "@tanstack/react-router";
 import BlogCategoryPage from "./pages/BlogCategoryPage";
 import BlogsPage from "./pages/BlogPage";
-import SpecializationsPage from "./pages/Specialization";
 import ProcedurePage from "./pages/ProcedurePage";
-import JobApplicationsPage from "@/pages/JobApplicationsPage";
+import SpecializationsPage from "./pages/Specialization";
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 type StoredAuth = ReturnType<typeof loadAuthState>;
@@ -96,6 +98,20 @@ const dashboardRoute = createRoute({
   path: "/dashboard",
   beforeLoad: () => checkPermission("/dashboard"),
   component: DashboardPage,
+});
+
+const metaAnalyticsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/meta-analytics",
+  beforeLoad: () => checkPermission("/meta-analytics"),
+  component: MetaAnalyticsPage,
+});
+
+const metaCallbackRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/meta/callback",
+  beforeLoad: () => checkPermission("/meta-analytics"),
+  component: MetaCallbackPage,
 });
 
 const doctorsRoute = createRoute({
@@ -254,6 +270,8 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   adminLayoutRoute.addChildren([
     dashboardRoute,
+    metaAnalyticsRoute,
+    metaCallbackRoute,
     doctorsRoute,
     specializationsRoute,
     honorsRoute,

@@ -146,6 +146,7 @@ const PATH_PERMISSION_RULES: Record<
   }
 > = {
   "/dashboard": {},
+  "/meta-analytics": { superAdminOnly: true },
   "/doctors": { permissions: ["view_doctors", "manage_doctors"] },
   "/specializations": { superAdminOnly: true },
   "/honors": { superAdminOnly: true },
