@@ -12,6 +12,9 @@ export type MetaDateRange = {
 
 export type MetaAccount = {
   id: string;
+  userId?: string;
+  userName?: string;
+  userPicture?: string;
   pageId: string;
   pageName: string;
   pagePicture: string;
@@ -57,18 +60,38 @@ export type MetaOverview = {
   websiteClicks: number;
   totalPosts: number;
   totalReels: number;
+  totalLikes?: number;
+  totalComments?: number;
+  totalMessages?: number;
+  unreadMessages?: number;
+};
+
+export type MetaPlatformOverview = MetaOverview & {
+  totalConversations?: number;
 };
 
 export type MetaOverviewResponse = {
   syncError?: string | null;
   overview: MetaOverview;
+  platforms?: {
+    facebookPage: MetaPlatformOverview;
+    facebookProfile: MetaPlatformOverview;
+    facebook: MetaPlatformOverview;
+    instagram: MetaPlatformOverview;
+  };
   daily: MetaDailyAnalytics[];
+  dailyByPlatform?: {
+    facebookPage: MetaDailyAnalytics[];
+    facebookProfile: MetaDailyAnalytics[];
+    facebook: MetaDailyAnalytics[];
+    instagram: MetaDailyAnalytics[];
+  };
 };
 
 export type MetaPost = {
   id: string;
   thumbnail: string;
-  platform: "Facebook" | "Instagram";
+  platform: "Facebook Page" | "Facebook Profile" | "Instagram";
   caption: string;
   postedDate: string;
   likes: number;

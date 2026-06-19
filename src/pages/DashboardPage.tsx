@@ -1,7 +1,12 @@
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import {
+  getMetaOverviewApi,
+  getMetaStatusApi,
+} from "@/apiCalls/metaAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -16,17 +21,23 @@ import type {
 } from "@/apiCalls/analytics";
 import { getDashboardApi } from "@/apiCalls/dashboard";
 import { useAnalyticsDashboard } from "@/hooks/useAnalytics";
+import { useAuth } from "@/hooks/useAuth";
+import { canAccessPath } from "@/lib/admin-access";
 import { themeColor } from "@/lib/theme";
 import { formatDate } from "@/types";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Activity,
+  BarChart3,
   Calendar,
   Clock,
   Eye,
+  Facebook,
   FileImage,
   ImageIcon,
+  Instagram,
   type LucideIcon,
   MessageSquare,
   Users,
@@ -233,9 +244,119 @@ const buildAnalyticsRows = (
 const formatGroupDialogTitle = (title = "") =>
   title.toLowerCase().endsWith("pages") ? title : `${title} Pages`;
 
+const formatMetaNumber = (value?: number) => Number(value || 0).toLocaleString();
+
+function MetaPlatformSummaryCard({
+  platform,
+  title,
+  username,
+  overview,
+  loading,
+}: {
+  platform: "facebookPage" | "facebookProfile" | "instagram";
+  title: string;
+  username?: string;
+  overview?: {
+    followers: number;
+    totalPosts: number;
+    totalReels?: number;
+    totalLikes?: number;
+    totalComments?: number;
+    totalMessages?: number;
+    unreadMessages?: number;
+    reach: number;
+    engagement: number;
+  };
+  loading: boolean;
+}) {
+  const Icon =
+    platform === "instagram"
+      ? Instagram
+      : platform === "facebookProfile"
+        ? Users
+        : Facebook;
+  const accentClass =
+    platform === "instagram"
+      ? "text-pink-600"
+      : platform === "facebookProfile"
+        ? "text-indigo-600"
+        : "text-blue-600";
+  const bgClass =
+    platform === "instagram"
+      ? "bg-pink-600/10"
+      : platform === "facebookProfile"
+        ? "bg-indigo-600/10"
+        : "bg-blue-600/10";
+
+  return (
+    <Card className="shadow-card border border-border rounded-2xl overflow-hidden">
+      <CardHeader className="pb-2 px-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <div
+            className={`w-10 h-10 rounded-xl ${bgClass} flex items-center justify-center`}
+          >
+            <Icon size={18} className={accentClass} />
+          </div>
+          <div className="min-w-0">
+            <CardTitle className="text-sm sm:text-base font-semibold text-foreground font-display">
+              {title}
+            </CardTitle>
+            {username ? (
+              <p className="text-xs text-muted-foreground truncate">
+                {platform === "instagram" ? `@${username}` : username}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 sm:px-6 pb-5">
+        {loading ? (
+          <div className="grid grid-cols-2 gap-3">
+            {["sk-1", "sk-2", "sk-3", "sk-4"].map((key) => (
+              <Skeleton key={key} className="h-14 rounded-xl" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            {[
+              { label: "Followers", value: overview?.followers },
+              { label: "Posts", value: overview?.totalPosts },
+              { label: "Likes", value: overview?.totalLikes },
+              { label: "Comments", value: overview?.totalComments },
+              { label: "Reach (30d)", value: overview?.reach },
+              { label: "Engagement (30d)", value: overview?.engagement },
+              ...(platform === "instagram"
+                ? [{ label: "Reels", value: overview?.totalReels }]
+                : []),
+              ...(platform === "facebookPage"
+                ? [
+                    { label: "Messages", value: overview?.totalMessages },
+                    { label: "Unread", value: overview?.unreadMessages },
+                  ]
+                : []),
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-xl border border-border bg-muted/40 px-3 py-2.5"
+              >
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="text-base font-semibold text-foreground tabular-nums mt-0.5">
+                  {formatMetaNumber(item.value)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const { admin } = useAuth();
+  const canViewMetaAnalytics = canAccessPath(admin, "/meta-analytics");
   const [selectedPageGroup, setSelectedPageGroup] =
     useState<AnalyticsPageGroup | null>(null);
   const gridColor = themeColor("border", 0.7);
@@ -255,6 +376,25 @@ export default function DashboardPage() {
     queryFn: getDashboardApi,
   });
 
+  const metaStatusQuery = useQuery({
+    queryKey: ["meta-status"],
+    queryFn: getMetaStatusApi,
+    enabled: canViewMetaAnalytics,
+  });
+
+  const metaConnected = metaStatusQuery.data?.connected === true;
+
+  const metaOverviewQuery = useQuery({
+    queryKey: ["meta-overview", "dashboard"],
+    queryFn: () =>
+      getMetaOverviewApi({
+        range: "30d",
+        startDate: "",
+        endDate: "",
+      }),
+    enabled: canViewMetaAnalytics && metaConnected,
+  });
+
   const recent = data?.recentAppointments ?? [];
   const apptLoading = statsLoading;
   const totals = data?.totals;
@@ -269,7 +409,94 @@ export default function DashboardPage() {
       <PageHeader
         title="Dashboard"
         description="Welcome to Samarpan Hospital Admin"
+        action={
+          canViewMetaAnalytics ? (
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-xl"
+              data-ocid="dashboard.meta_analytics_button"
+            >
+              <Link to="/meta-analytics">
+                <BarChart3 size={16} />
+                Meta Analytics
+              </Link>
+            </Button>
+          ) : null
+        }
       />
+
+      {canViewMetaAnalytics ? (
+        <div className="mb-4 sm:mb-6" data-ocid="dashboard.meta_analytics">
+          <div className="mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 className="text-base sm:text-lg font-semibold text-foreground font-display">
+                Meta Analytics
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                Facebook Profile, Page, and Instagram performance snapshot
+              </p>
+            </div>
+            {metaConnected ? (
+              <Button asChild variant="ghost" size="sm" className="rounded-xl">
+                <Link to="/meta-analytics">View full report →</Link>
+              </Button>
+            ) : null}
+          </div>
+
+          {!metaStatusQuery.isLoading && !metaConnected ? (
+            <Card className="shadow-card border border-border rounded-2xl">
+              <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Connect Facebook & Instagram
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                    View followers, posts, likes, and engagement from your Meta
+                    accounts.
+                  </p>
+                </div>
+                <Button asChild className="rounded-xl">
+                  <Link to="/meta-analytics">Connect Meta Accounts</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+              <MetaPlatformSummaryCard
+                platform="facebookProfile"
+                title="Facebook Profile"
+                username={metaStatusQuery.data?.account?.userName}
+                overview={metaOverviewQuery.data?.platforms?.facebookProfile}
+                loading={
+                  metaStatusQuery.isLoading || metaOverviewQuery.isLoading
+                }
+              />
+              <MetaPlatformSummaryCard
+                platform="facebookPage"
+                title="Facebook Page"
+                username={metaStatusQuery.data?.account?.pageName}
+                overview={
+                  metaOverviewQuery.data?.platforms?.facebookPage ||
+                  metaOverviewQuery.data?.platforms?.facebook
+                }
+                loading={
+                  metaStatusQuery.isLoading || metaOverviewQuery.isLoading
+                }
+              />
+              <MetaPlatformSummaryCard
+                platform="instagram"
+                title="Instagram"
+                username={metaStatusQuery.data?.account?.instagramUsername}
+                overview={metaOverviewQuery.data?.platforms?.instagram}
+                loading={
+                  metaStatusQuery.isLoading || metaOverviewQuery.isLoading
+                }
+              />
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {/* ── Website Analytics ─────────────────────────────────────────────── */}
       <div className="mb-4 sm:mb-6" data-ocid="dashboard.analytics">

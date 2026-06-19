@@ -1,6 +1,8 @@
 import {
   type MetaDailyAnalytics,
   type MetaDateRange,
+  type MetaOverview,
+  type MetaOverviewResponse,
   type MetaPageOption,
   type MetaPost,
   disconnectMetaApi,
@@ -44,11 +46,13 @@ import {
   CalendarDays,
   ExternalLink,
   Eye,
+  Facebook,
   FileText,
   Globe,
   Heart,
   ImageIcon,
   Instagram,
+  LayoutDashboard,
   LinkIcon,
   MessageCircle,
   MousePointerClick,
@@ -56,7 +60,8 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -96,8 +101,51 @@ const STAT_SKELETON_KEYS = [
   "profile-visits",
   "website-clicks",
   "total-posts",
-  "total-reels",
+  "total-likes",
 ];
+
+type PlatformFilter = "all" | "facebookPage" | "facebookProfile" | "instagram";
+
+const PLATFORM_TABS: Array<{
+  value: PlatformFilter;
+  label: string;
+  icon: typeof Facebook;
+}> = [
+  { value: "all", label: "Combined", icon: BarChart3 },
+  { value: "facebookPage", label: "Facebook Page", icon: Facebook },
+  { value: "facebookProfile", label: "Facebook Profile", icon: Users },
+  { value: "instagram", label: "Instagram", icon: Instagram },
+];
+
+const getOverviewForPlatform = (
+  filter: PlatformFilter,
+  overview?: MetaOverview,
+  platforms?: MetaOverviewResponse["platforms"],
+): MetaOverview | undefined => {
+  if (!overview) return undefined;
+  if (filter === "facebookPage") return platforms?.facebookPage;
+  if (filter === "facebookProfile") return platforms?.facebookProfile;
+  if (filter === "instagram") return platforms?.instagram;
+  return overview;
+};
+
+const getDailyForPlatform = (
+  filter: PlatformFilter,
+  daily: MetaDailyAnalytics[],
+  dailyByPlatform?: MetaOverviewResponse["dailyByPlatform"],
+): MetaDailyAnalytics[] => {
+  if (filter === "facebookPage") return dailyByPlatform?.facebookPage ?? [];
+  if (filter === "facebookProfile") return dailyByPlatform?.facebookProfile ?? [];
+  if (filter === "instagram") return dailyByPlatform?.instagram ?? [];
+  return daily;
+};
+
+const getPostPlatformLabel = (filter: PlatformFilter) => {
+  if (filter === "facebookPage") return "Facebook Page";
+  if (filter === "facebookProfile") return "Facebook Profile";
+  if (filter === "instagram") return "Instagram";
+  return null;
+};
 
 const formatNumber = (value?: number) => Number(value || 0).toLocaleString();
 
@@ -204,10 +252,15 @@ function PageSelectCard({
     <Card className="shadow-card border border-border rounded-2xl">
       <CardHeader>
         <CardTitle className="text-base font-semibold font-display">
-          Select Facebook Page
+          Select Business Page
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Your Facebook Profile (logged-in account) is linked automatically.
+          Choose the business Page you want to track, such as Meta Automation
+          Test.
+        </p>
         {loading ? (
           <Skeleton className="h-10 w-full rounded-lg" />
         ) : (
@@ -242,8 +295,9 @@ function PageSelectCard({
         )}
 
         {selectedPage && !selectedPage.hasInstagramBusinessAccount ? (
-          <p className="text-sm text-destructive">
-            This Page does not have a linked Instagram Business Account.
+          <p className="text-sm text-muted-foreground">
+            This Page has no linked Instagram Business Account. Facebook Page
+            analytics will still be available.
           </p>
         ) : null}
       </CardContent>
@@ -281,11 +335,15 @@ function ConnectedAccountCard({
                 <h2 className="text-base sm:text-lg font-semibold text-foreground font-display truncate">
                   {account.pageName || "Facebook Page"}
                 </h2>
+                <Badge variant="outline">Business Page</Badge>
                 <Badge variant="outline" className="capitalize">
                   {account.status}
                 </Badge>
               </div>
               <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">
+                  <Users size={14} /> {account.userName || "Facebook Profile"}
+                </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Instagram size={14} /> @
                   {account.instagramUsername || "not linked"}
@@ -314,10 +372,17 @@ function ConnectedAccountCard({
 function PostsTable({
   posts,
   loading,
+  platformFilter,
 }: {
   posts: MetaPost[];
   loading: boolean;
+  platformFilter: PlatformFilter;
 }) {
+  const filteredPosts =
+    platformFilter === "all"
+      ? posts
+      : posts.filter((post) => post.platform === getPostPlatformLabel(platformFilter));
+
   return (
     <Card className="shadow-card border border-border rounded-2xl">
       <CardHeader className="pb-2">
@@ -360,8 +425,8 @@ function PostsTable({
                   ))}
                 </TableRow>
               ))
-            ) : posts.length ? (
-              posts.map((post) => (
+            ) : filteredPosts.length ? (
+              filteredPosts.map((post) => (
                 <TableRow key={`${post.platform}-${post.id}`}>
                   <TableCell className="px-4 py-3">
                     {post.thumbnail ? (
@@ -425,10 +490,17 @@ function PostsTable({
 function TopPostsSection({
   posts,
   loading,
+  platformFilter,
 }: {
   posts: MetaPost[];
   loading: boolean;
+  platformFilter: PlatformFilter;
 }) {
+  const filteredPosts =
+    platformFilter === "all"
+      ? posts
+      : posts.filter((post) => post.platform === getPostPlatformLabel(platformFilter));
+
   return (
     <Card className="shadow-card border border-border rounded-2xl">
       <CardHeader className="pb-2">
@@ -441,8 +513,8 @@ function TopPostsSection({
           POST_SKELETON_ROWS.map((row) => (
             <Skeleton key={row} className="h-16 w-full rounded-xl" />
           ))
-        ) : posts.length ? (
-          posts.slice(0, 10).map((post, index) => (
+        ) : filteredPosts.length ? (
+          filteredPosts.slice(0, 10).map((post, index) => (
             <div
               key={`${post.platform}-top-${post.id}`}
               className="flex items-center gap-3 rounded-xl border border-border p-3"
@@ -488,6 +560,7 @@ export default function MetaAnalyticsPage() {
   });
   const [selectedPageId, setSelectedPageId] = useState("");
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("all");
 
   const statusQuery = useQuery({
     queryKey: ["meta-status"],
@@ -558,14 +631,22 @@ export default function MetaAnalyticsPage() {
   });
 
   const daily = overviewQuery.data?.daily ?? [];
+  const dailyByPlatform = overviewQuery.data?.dailyByPlatform;
   const overview = overviewQuery.data?.overview;
+  const platforms = overviewQuery.data?.platforms;
+  const activeOverview = getOverviewForPlatform(
+    platformFilter,
+    overview,
+    platforms,
+  );
+  const activeDaily = getDailyForPlatform(
+    platformFilter,
+    daily,
+    dailyByPlatform,
+  );
   const account = statusQuery.data?.account;
 
   const pages = pagesQuery.data ?? [];
-  const selectedPage = useMemo(
-    () => pages.find((page) => page.pageId === selectedPageId),
-    [pages, selectedPageId],
-  );
 
   const handleRangeChange = (value: MetaDateRange["range"]) => {
     setRange((current) => ({
@@ -575,9 +656,7 @@ export default function MetaAnalyticsPage() {
     }));
   };
 
-  const canSelectPage =
-    Boolean(selectedPageId) &&
-    selectedPage?.hasInstagramBusinessAccount !== false;
+  const canSelectPage = Boolean(selectedPageId);
 
   return (
     <div data-ocid="meta_analytics.page" className="space-y-4 sm:space-y-6">
@@ -585,18 +664,31 @@ export default function MetaAnalyticsPage() {
         title="Meta Analytics"
         description="Facebook Page and Instagram Business Account performance"
         action={
-          connected ? (
+          <div className="flex flex-wrap items-center gap-2">
             <Button
-              variant="outline"
-              onClick={() => connectMutation.mutate()}
-              disabled={connectMutation.isPending}
+              asChild
+              variant="ghost"
               className="rounded-xl"
               type="button"
             >
-              <Repeat2 size={16} />
-              Reconnect
+              <Link to="/dashboard">
+                <LayoutDashboard size={16} />
+                Dashboard
+              </Link>
             </Button>
-          ) : null
+            {connected ? (
+              <Button
+                variant="outline"
+                onClick={() => connectMutation.mutate()}
+                disabled={connectMutation.isPending}
+                className="rounded-xl"
+                type="button"
+              >
+                <Repeat2 size={16} />
+                Reconnect
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
@@ -618,8 +710,9 @@ export default function MetaAnalyticsPage() {
                     Connect Facebook & Instagram
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Login with Meta, choose a Facebook Page, and link its
-                    Instagram Business Account.
+                    Login with Meta as your Facebook Profile (e.g. John Diss),
+                    then select your business Page (e.g. Meta Automation Test)
+                    and link Instagram if available.
                   </p>
                 </div>
                 <Button
@@ -668,7 +761,7 @@ export default function MetaAnalyticsPage() {
           ) : null}
 
           <Card className="shadow-card border border-border rounded-2xl">
-            <CardContent className="p-4">
+            <CardContent className="p-4 space-y-4">
               <div className="flex flex-col lg:flex-row lg:items-center gap-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <Select value={range.range} onValueChange={handleRangeChange}>
@@ -712,6 +805,25 @@ export default function MetaAnalyticsPage() {
                   ) : null}
                 </div>
               </div>
+
+              <div className="flex flex-wrap gap-2">
+                {PLATFORM_TABS.map((tab) => {
+                  const TabIcon = tab.icon;
+                  const isActive = platformFilter === tab.value;
+                  return (
+                    <Button
+                      key={tab.value}
+                      type="button"
+                      variant={isActive ? "default" : "outline"}
+                      className="rounded-xl"
+                      onClick={() => setPlatformFilter(tab.value)}
+                    >
+                      <TabIcon size={16} />
+                      {tab.label}
+                    </Button>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
 
@@ -734,51 +846,81 @@ export default function MetaAnalyticsPage() {
                 <StatCard
                   icon={Users}
                   label="Followers"
-                  value={formatNumber(overview?.followers)}
+                  value={formatNumber(activeOverview?.followers)}
                   color="gold"
                 />
                 <StatCard
                   icon={TrendingUp}
                   label="Reach"
-                  value={formatNumber(overview?.reach)}
+                  value={formatNumber(activeOverview?.reach)}
                   color="green"
                 />
                 <StatCard
                   icon={Eye}
                   label="Impressions"
-                  value={formatNumber(overview?.impressions)}
+                  value={formatNumber(activeOverview?.impressions)}
                   color="orange"
                 />
                 <StatCard
                   icon={Heart}
                   label="Engagement"
-                  value={formatNumber(overview?.engagement)}
+                  value={formatNumber(activeOverview?.engagement)}
                   color="purple"
                 />
                 <StatCard
                   icon={MousePointerClick}
                   label="Profile Visits"
-                  value={formatNumber(overview?.profileVisits)}
+                  value={formatNumber(activeOverview?.profileVisits)}
                   color="gold-deep"
                 />
                 <StatCard
                   icon={LinkIcon}
                   label="Website Clicks"
-                  value={formatNumber(overview?.websiteClicks)}
+                  value={formatNumber(activeOverview?.websiteClicks)}
                   color="green"
                 />
                 <StatCard
                   icon={FileText}
                   label="Total Posts"
-                  value={formatNumber(overview?.totalPosts)}
+                  value={formatNumber(activeOverview?.totalPosts)}
                   color="orange"
                 />
                 <StatCard
-                  icon={BarChart3}
-                  label="Total Reels"
-                  value={formatNumber(overview?.totalReels)}
+                  icon={Heart}
+                  label="Total Likes"
+                  value={formatNumber(activeOverview?.totalLikes)}
                   color="purple"
                 />
+                {platformFilter !== "facebookProfile" ? (
+                  <StatCard
+                    icon={BarChart3}
+                    label="Total Reels"
+                    value={formatNumber(activeOverview?.totalReels)}
+                    color="gold"
+                  />
+                ) : null}
+                <StatCard
+                  icon={MessageCircle}
+                  label="Total Comments"
+                  value={formatNumber(activeOverview?.totalComments)}
+                  color="gold-deep"
+                />
+                {platformFilter === "all" || platformFilter === "facebookPage" ? (
+                  <>
+                    <StatCard
+                      icon={MessageCircle}
+                      label="Page Messages"
+                      value={formatNumber(activeOverview?.totalMessages)}
+                      color="purple"
+                    />
+                    <StatCard
+                      icon={MessageCircle}
+                      label="Unread Messages"
+                      value={formatNumber(activeOverview?.unreadMessages)}
+                      color="orange"
+                    />
+                  </>
+                ) : null}
               </>
             )}
           </div>
@@ -786,25 +928,25 @@ export default function MetaAnalyticsPage() {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             <ChartCard
               title="Followers Growth"
-              data={daily}
+              data={activeDaily}
               dataKey="followers"
               loading={overviewQuery.isLoading}
             />
             <ChartCard
               title="Reach Trend"
-              data={daily}
+              data={activeDaily}
               dataKey="reach"
               loading={overviewQuery.isLoading}
             />
             <ChartCard
               title="Engagement Trend"
-              data={daily}
+              data={activeDaily}
               dataKey="engagement"
               loading={overviewQuery.isLoading}
             />
             <ChartCard
               title="Impressions Trend"
-              data={daily}
+              data={activeDaily}
               dataKey="impressions"
               loading={overviewQuery.isLoading}
             />
@@ -813,11 +955,13 @@ export default function MetaAnalyticsPage() {
           <TopPostsSection
             posts={topPostsQuery.data ?? []}
             loading={topPostsQuery.isLoading}
+            platformFilter={platformFilter}
           />
 
           <PostsTable
             posts={postsQuery.data ?? []}
             loading={postsQuery.isLoading}
+            platformFilter={platformFilter}
           />
         </>
       ) : null}
