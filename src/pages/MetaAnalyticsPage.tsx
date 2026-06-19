@@ -888,11 +888,26 @@ export default function MetaAnalyticsPage() {
   const pages = pagesQuery.data ?? [];
 
   const handleRangeChange = (value: MetaDateRange["range"]) => {
-    setRange((current) => ({
-      range: value,
-      startDate: current.startDate || getDaysAgo(29),
-      endDate: current.endDate || getToday(),
-    }));
+    setRange((current) => {
+      const endDate = getToday();
+      let startDate = getDaysAgo(29);
+
+      if (value === "today") {
+        startDate = endDate;
+      } else if (value === "7d") {
+        startDate = getDaysAgo(6);
+      } else if (value === "90d") {
+        startDate = getDaysAgo(89);
+      } else if (value === "custom") {
+        startDate = current.startDate || getDaysAgo(29);
+      }
+
+      return {
+        range: value,
+        startDate,
+        endDate: value === "custom" ? current.endDate || endDate : endDate,
+      };
+    });
   };
 
   const canSelectPage = Boolean(selectedPageId);
