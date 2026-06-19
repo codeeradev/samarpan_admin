@@ -253,7 +253,7 @@ function MetaPlatformSummaryCard({
   overview,
   loading,
 }: {
-  platform: "facebookPage" | "facebookProfile" | "instagram";
+  platform: "facebook" | "instagram";
   title: string;
   username?: string;
   overview?: {
@@ -269,24 +269,11 @@ function MetaPlatformSummaryCard({
   };
   loading: boolean;
 }) {
-  const Icon =
-    platform === "instagram"
-      ? Instagram
-      : platform === "facebookProfile"
-        ? Users
-        : Facebook;
+  const Icon = platform === "facebook" ? Facebook : Instagram;
   const accentClass =
-    platform === "instagram"
-      ? "text-pink-600"
-      : platform === "facebookProfile"
-        ? "text-indigo-600"
-        : "text-blue-600";
+    platform === "facebook" ? "text-blue-600" : "text-pink-600";
   const bgClass =
-    platform === "instagram"
-      ? "bg-pink-600/10"
-      : platform === "facebookProfile"
-        ? "bg-indigo-600/10"
-        : "bg-blue-600/10";
+    platform === "facebook" ? "bg-blue-600/10" : "bg-pink-600/10";
 
   return (
     <Card className="shadow-card border border-border rounded-2xl overflow-hidden">
@@ -328,7 +315,7 @@ function MetaPlatformSummaryCard({
               ...(platform === "instagram"
                 ? [{ label: "Reels", value: overview?.totalReels }]
                 : []),
-              ...(platform === "facebookPage"
+              ...(platform === "facebook"
                 ? [
                     { label: "Messages", value: overview?.totalMessages },
                     { label: "Unread", value: overview?.unreadMessages },
@@ -434,7 +421,7 @@ export default function DashboardPage() {
                 Meta Analytics
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                Facebook Profile, Page, and Instagram performance snapshot
+                Facebook Page and Instagram performance snapshot
               </p>
             </div>
             {metaConnected ? (
@@ -462,24 +449,12 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               <MetaPlatformSummaryCard
-                platform="facebookProfile"
-                title="Facebook Profile"
-                username={metaStatusQuery.data?.account?.userName}
-                overview={metaOverviewQuery.data?.platforms?.facebookProfile}
-                loading={
-                  metaStatusQuery.isLoading || metaOverviewQuery.isLoading
-                }
-              />
-              <MetaPlatformSummaryCard
-                platform="facebookPage"
+                platform="facebook"
                 title="Facebook Page"
                 username={metaStatusQuery.data?.account?.pageName}
-                overview={
-                  metaOverviewQuery.data?.platforms?.facebookPage ||
-                  metaOverviewQuery.data?.platforms?.facebook
-                }
+                overview={metaOverviewQuery.data?.platforms?.facebook}
                 loading={
                   metaStatusQuery.isLoading || metaOverviewQuery.isLoading
                 }

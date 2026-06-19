@@ -5,10 +5,12 @@ import {
   type MetaOverviewResponse,
   type MetaPageOption,
   type MetaPost,
+  type PostDetails,
   disconnectMetaApi,
   getMetaConnectApi,
   getMetaOverviewApi,
   getMetaPagesApi,
+  getMetaPostDetailsApi,
   getMetaPostsApi,
   getMetaStatusApi,
   getMetaTopPostsApi,
@@ -53,15 +55,15 @@ import {
   ImageIcon,
   Instagram,
   LayoutDashboard,
-  LinkIcon,
   MessageCircle,
-  MousePointerClick,
   Repeat2,
   TrendingUp,
   Users,
+  ThumbsUp,
+  X,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   CartesianGrid,
   Line,
@@ -71,6 +73,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 const RANGE_OPTIONS: Array<{ value: MetaDateRange["range"]; label: string }> = [
@@ -95,16 +106,15 @@ const POST_SKELETON_CELLS = [
 ];
 const STAT_SKELETON_KEYS = [
   "followers",
+  "total-followers",
   "reach",
   "impressions",
   "engagement",
-  "profile-visits",
-  "website-clicks",
   "total-posts",
   "total-likes",
 ];
 
-type PlatformFilter = "all" | "facebookPage" | "facebookProfile" | "instagram";
+type PlatformFilter = "all" | "facebook" | "instagram";
 
 const PLATFORM_TABS: Array<{
   value: PlatformFilter;
@@ -112,8 +122,7 @@ const PLATFORM_TABS: Array<{
   icon: typeof Facebook;
 }> = [
   { value: "all", label: "Combined", icon: BarChart3 },
-  { value: "facebookPage", label: "Facebook Page", icon: Facebook },
-  { value: "facebookProfile", label: "Facebook Profile", icon: Users },
+  { value: "facebook", label: "Facebook Page", icon: Facebook },
   { value: "instagram", label: "Instagram", icon: Instagram },
 ];
 
@@ -123,8 +132,7 @@ const getOverviewForPlatform = (
   platforms?: MetaOverviewResponse["platforms"],
 ): MetaOverview | undefined => {
   if (!overview) return undefined;
-  if (filter === "facebookPage") return platforms?.facebookPage;
-  if (filter === "facebookProfile") return platforms?.facebookProfile;
+  if (filter === "facebook") return platforms?.facebook;
   if (filter === "instagram") return platforms?.instagram;
   return overview;
 };
@@ -134,15 +142,13 @@ const getDailyForPlatform = (
   daily: MetaDailyAnalytics[],
   dailyByPlatform?: MetaOverviewResponse["dailyByPlatform"],
 ): MetaDailyAnalytics[] => {
-  if (filter === "facebookPage") return dailyByPlatform?.facebookPage ?? [];
-  if (filter === "facebookProfile") return dailyByPlatform?.facebookProfile ?? [];
+  if (filter === "facebook") return dailyByPlatform?.facebook ?? [];
   if (filter === "instagram") return dailyByPlatform?.instagram ?? [];
   return daily;
 };
 
 const getPostPlatformLabel = (filter: PlatformFilter) => {
-  if (filter === "facebookPage") return "Facebook Page";
-  if (filter === "facebookProfile") return "Facebook Profile";
+  if (filter === "facebook") return "Facebook";
   if (filter === "instagram") return "Instagram";
   return null;
 };
@@ -252,14 +258,13 @@ function PageSelectCard({
     <Card className="shadow-card border border-border rounded-2xl">
       <CardHeader>
         <CardTitle className="text-base font-semibold font-display">
-          Select Business Page
+          Select Facebook Page
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Your Facebook Profile (logged-in account) is linked automatically.
-          Choose the business Page you want to track, such as Meta Automation
-          Test.
+          Choose the Facebook Page you want to track. Instagram will be linked
+          automatically if it is connected to that Page.
         </p>
         {loading ? (
           <Skeleton className="h-10 w-full rounded-lg" />
@@ -342,9 +347,6 @@ function ConnectedAccountCard({
               </div>
               <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
-                  <Users size={14} /> {account.userName || "Facebook Profile"}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
                   <Instagram size={14} /> @
                   {account.instagramUsername || "not linked"}
                 </span>
@@ -369,6 +371,224 @@ function ConnectedAccountCard({
   );
 }
 
+function PostDetailsDialog({
+  post,
+  open,
+  onOpenChange,
+}: {
+  post: MetaPost | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [details, setDetails] = useState<PostDetails | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && post) {
+      setLoading(true);
+      setDetails(null);
+      getMetaPostDetailsApi(post.id, post.platform)
+        .then(setDetails)
+        .catch((error) => {
+          toast.error(getApiErrorMessage(error, "Failed to load post details"));
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [open, post]);
+
+  if (!post) return null;
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh] flex flex-col">
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="text-lg font-display">
+            Post Details — {post.platform}
+          </DialogTitle>
+          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100">
+            <X size={16} />
+          </DialogClose>
+        </DialogHeader>
+
+        <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+          {post.thumbnail ? (
+            <img
+              src={post.thumbnail}
+              alt=""
+              className="h-40 w-40 sm:h-48 sm:w-48 rounded-xl object-cover border border-border shrink-0"
+            />
+          ) : (
+            <div className="h-40 w-40 sm:h-48 sm:w-48 rounded-xl bg-muted flex items-center justify-center shrink-0">
+              <ImageIcon size={32} className="text-muted-foreground" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0 space-y-3">
+            {post.caption ? (
+              <p className="text-sm text-foreground leading-relaxed">
+                {post.caption}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground italic">No caption</p>
+            )}
+            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays size={14} />
+                {formatDate(post.postedDate)}
+              </span>
+              {post.permalink ? (
+                <a
+                  href={post.permalink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-primary hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLink size={14} />
+                  View on {post.platform}
+                </a>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-4 py-2">
+                <ThumbsUp size={18} className="text-blue-500" />
+                <span className="text-lg font-semibold tabular-nums text-foreground">
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        details?.likeCount ?? post.likes,
+                      )}
+                </span>
+                <span className="text-sm text-muted-foreground">Likes</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-4 py-2">
+                <MessageCircle size={18} className="text-emerald-500" />
+                <span className="text-lg font-semibold tabular-nums text-foreground">
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        details?.commentCount ?? post.comments,
+                      )}
+                </span>
+                <span className="text-sm text-muted-foreground">Comments</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1 min-h-0 mt-2">
+          {loading ? (
+            <div className="space-y-3 p-2">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton
+                  key={`detail-sk-${i}`}
+                  className="h-14 w-full rounded-lg"
+                />
+              ))}
+            </div>
+          ) : details ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <ThumbsUp size={16} className="text-blue-500" />
+                  <h3 className="text-sm font-semibold text-foreground">
+                    People Who Liked
+                    {details.likes.length > 0
+                      ? ` (${details.likes.length})`
+                      : ""}
+                  </h3>
+                </div>
+                {details.likes.length > 0 ? (
+                  <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+                    {details.likes.map((like) => (
+                      <div
+                        key={like.id}
+                        className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-muted/30"
+                      >
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="text-xs">
+                            {getInitials(like.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-foreground">
+                          {like.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : post.platform === "Instagram" ? (
+                  <p className="text-sm text-muted-foreground pl-1">
+                    Meta does not provide individual liker names for Instagram
+                    posts. The total like count is shown above.
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground pl-1">
+                    No individual likes data available for this post.
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageCircle size={16} className="text-emerald-500" />
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Comments
+                    {details.comments.length > 0
+                      ? ` (${details.comments.length})`
+                      : ""}
+                  </h3>
+                </div>
+                {details.comments.length > 0 ? (
+                  <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+                    {details.comments.map((comment) => (
+                      <div
+                        key={comment.id}
+                        className="p-3 rounded-lg border border-border"
+                      >
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className="text-[10px]">
+                              {getInitials(comment.fromName)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-semibold text-foreground">
+                            {comment.fromName}
+                          </span>
+                          <span className="text-xs text-muted-foreground ml-auto shrink-0">
+                            {formatDate(comment.createdTime)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground pl-9">
+                          {comment.message || "(empty comment)"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground pl-1">
+                    No comments on this post.
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground p-2">
+              Failed to load details.
+            </p>
+          )}
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function PostsTable({
   posts,
   loading,
@@ -378,6 +598,9 @@ function PostsTable({
   loading: boolean;
   platformFilter: PlatformFilter;
 }) {
+  const [selectedPost, setSelectedPost] = useState<MetaPost | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
   const filteredPosts =
     platformFilter === "all"
       ? posts
@@ -427,7 +650,14 @@ function PostsTable({
               ))
             ) : filteredPosts.length ? (
               filteredPosts.map((post) => (
-                <TableRow key={`${post.platform}-${post.id}`}>
+                <TableRow
+                  key={`${post.platform}-${post.id}`}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setSelectedPost(post);
+                    setDetailsOpen(true);
+                  }}
+                >
                   <TableCell className="px-4 py-3">
                     {post.thumbnail ? (
                       <img
@@ -483,6 +713,15 @@ function PostsTable({
           </TableBody>
         </Table>
       </CardContent>
+
+      <PostDetailsDialog
+        post={selectedPost}
+        open={detailsOpen}
+        onOpenChange={(open) => {
+          setDetailsOpen(open);
+          if (!open) setSelectedPost(null);
+        }}
+      />
     </Card>
   );
 }
@@ -710,9 +949,8 @@ export default function MetaAnalyticsPage() {
                     Connect Facebook & Instagram
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Login with Meta as your Facebook Profile (e.g. John Diss),
-                    then select your business Page (e.g. Meta Automation Test)
-                    and link Instagram if available.
+                    Login with Meta, choose your Facebook Page, and link its
+                    Instagram Business Account if available.
                   </p>
                 </div>
                 <Button
@@ -761,8 +999,8 @@ export default function MetaAnalyticsPage() {
           ) : null}
 
           <Card className="shadow-card border border-border rounded-2xl">
-            <CardContent className="p-4 space-y-4">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <Select value={range.range} onValueChange={handleRangeChange}>
                     <SelectTrigger className="w-[170px]">
@@ -804,25 +1042,25 @@ export default function MetaAnalyticsPage() {
                     </>
                   ) : null}
                 </div>
-              </div>
 
-              <div className="flex flex-wrap gap-2">
-                {PLATFORM_TABS.map((tab) => {
-                  const TabIcon = tab.icon;
-                  const isActive = platformFilter === tab.value;
-                  return (
-                    <Button
-                      key={tab.value}
-                      type="button"
-                      variant={isActive ? "default" : "outline"}
-                      className="rounded-xl"
-                      onClick={() => setPlatformFilter(tab.value)}
-                    >
-                      <TabIcon size={16} />
-                      {tab.label}
-                    </Button>
-                  );
-                })}
+                <div className="flex flex-wrap gap-2">
+                  {PLATFORM_TABS.map((tab) => {
+                    const TabIcon = tab.icon;
+                    const isActive = platformFilter === tab.value;
+                    return (
+                      <Button
+                        key={tab.value}
+                        type="button"
+                        variant={isActive ? "default" : "outline"}
+                        className="rounded-xl"
+                        onClick={() => setPlatformFilter(tab.value)}
+                      >
+                        <TabIcon size={16} />
+                        {tab.label}
+                      </Button>
+                    );
+                  })}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -850,6 +1088,12 @@ export default function MetaAnalyticsPage() {
                   color="gold"
                 />
                 <StatCard
+                  icon={Users}
+                  label="Total Followers"
+                  value={formatNumber(activeOverview?.totalFollowers)}
+                  color="green"
+                />
+                <StatCard
                   icon={TrendingUp}
                   label="Reach"
                   value={formatNumber(activeOverview?.reach)}
@@ -868,18 +1112,6 @@ export default function MetaAnalyticsPage() {
                   color="purple"
                 />
                 <StatCard
-                  icon={MousePointerClick}
-                  label="Profile Visits"
-                  value={formatNumber(activeOverview?.profileVisits)}
-                  color="gold-deep"
-                />
-                <StatCard
-                  icon={LinkIcon}
-                  label="Website Clicks"
-                  value={formatNumber(activeOverview?.websiteClicks)}
-                  color="green"
-                />
-                <StatCard
                   icon={FileText}
                   label="Total Posts"
                   value={formatNumber(activeOverview?.totalPosts)}
@@ -891,7 +1123,7 @@ export default function MetaAnalyticsPage() {
                   value={formatNumber(activeOverview?.totalLikes)}
                   color="purple"
                 />
-                {platformFilter !== "facebookProfile" ? (
+                {platformFilter !== "facebook" ? (
                   <StatCard
                     icon={BarChart3}
                     label="Total Reels"
@@ -905,7 +1137,7 @@ export default function MetaAnalyticsPage() {
                   value={formatNumber(activeOverview?.totalComments)}
                   color="gold-deep"
                 />
-                {platformFilter === "all" || platformFilter === "facebookPage" ? (
+                {platformFilter === "all" || platformFilter === "facebook" ? (
                   <>
                     <StatCard
                       icon={MessageCircle}
@@ -929,7 +1161,7 @@ export default function MetaAnalyticsPage() {
             <ChartCard
               title="Followers Growth"
               data={activeDaily}
-              dataKey="followers"
+              dataKey="followerAdds"
               loading={overviewQuery.isLoading}
             />
             <ChartCard

@@ -12,9 +12,6 @@ export type MetaDateRange = {
 
 export type MetaAccount = {
   id: string;
-  userId?: string;
-  userName?: string;
-  userPicture?: string;
   pageId: string;
   pageName: string;
   pagePicture: string;
@@ -44,6 +41,7 @@ export type MetaPageOption = {
 export type MetaDailyAnalytics = {
   date: string;
   followers: number;
+  followerAdds?: number;
   reach: number;
   impressions: number;
   engagement: number;
@@ -53,6 +51,7 @@ export type MetaDailyAnalytics = {
 
 export type MetaOverview = {
   followers: number;
+  totalFollowers: number;
   reach: number;
   impressions: number;
   engagement: number;
@@ -74,15 +73,11 @@ export type MetaOverviewResponse = {
   syncError?: string | null;
   overview: MetaOverview;
   platforms?: {
-    facebookPage: MetaPlatformOverview;
-    facebookProfile: MetaPlatformOverview;
     facebook: MetaPlatformOverview;
     instagram: MetaPlatformOverview;
   };
   daily: MetaDailyAnalytics[];
   dailyByPlatform?: {
-    facebookPage: MetaDailyAnalytics[];
-    facebookProfile: MetaDailyAnalytics[];
     facebook: MetaDailyAnalytics[];
     instagram: MetaDailyAnalytics[];
   };
@@ -91,7 +86,8 @@ export type MetaOverviewResponse = {
 export type MetaPost = {
   id: string;
   thumbnail: string;
-  platform: "Facebook Page" | "Facebook Profile" | "Instagram";
+  permalink?: string;
+  platform: "Facebook" | "Instagram";
   caption: string;
   postedDate: string;
   likes: number;
@@ -100,6 +96,28 @@ export type MetaPost = {
   impressions: number;
   engagement: number;
   engagementRate: number;
+};
+
+export type PostLike = {
+  id: string;
+  name: string;
+};
+
+export type PostComment = {
+  id: string;
+  message: string;
+  fromName: string;
+  fromId: string;
+  createdTime: string;
+};
+
+export type PostDetails = {
+  postId: string;
+  platform: MetaPost["platform"];
+  likeCount: number;
+  commentCount: number;
+  likes: PostLike[];
+  comments: PostComment[];
 };
 
 const buildRangeParams = (range: MetaDateRange) => {
@@ -170,6 +188,19 @@ export const getMetaOverviewApi = async (
 export const getMetaPostsApi = async (): Promise<MetaPost[]> => {
   const response = await get(metaEndpoint("/posts"), { needAuth: true });
   return (response.data as { posts: MetaPost[] }).posts;
+};
+
+export const getMetaPostDetailsApi = async (
+  postId: string,
+  platform: MetaPost["platform"],
+): Promise<PostDetails> => {
+  const response = await get(
+    metaEndpoint(
+      `/posts/${encodeURIComponent(postId)}/${encodeURIComponent(platform)}`,
+    ),
+    { needAuth: true },
+  );
+  return response.data as PostDetails;
 };
 
 export const getMetaTopPostsApi = async (): Promise<MetaPost[]> => {
