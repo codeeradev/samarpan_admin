@@ -1,10 +1,8 @@
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/admin/StatusBadge";
-import {
-  getMetaOverviewApi,
-  getMetaStatusApi,
-} from "@/apiCalls/metaAnalytics";
+import { getMetaOverviewApi, getMetaStatusApi } from "@/apiCalls/metaAnalytics";
+import { getSeoReportApi } from "@/apiCalls/seoReport";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -134,7 +132,9 @@ const formatPageTitle = (page: string, groupKey?: string) => {
 
   if (groupKey === "blog-listing-pages") {
     const categorySlug = getSearchParam(decodedPage, "type");
-    return categorySlug ? `${formatSlugTitle(categorySlug)} Blogs` : "All Blogs";
+    return categorySlug
+      ? `${formatSlugTitle(categorySlug)} Blogs`
+      : "All Blogs";
   }
 
   if (groupKey === "blog-detail-pages") {
@@ -150,11 +150,7 @@ const formatPageTitle = (page: string, groupKey?: string) => {
     .split("/")
     .filter(Boolean)
     .map((part) =>
-      part
-        .split("-")
-        .filter(Boolean)
-        .map(formatTitleWord)
-        .join(" "),
+      part.split("-").filter(Boolean).map(formatTitleWord).join(" "),
     )
     .join(" / ");
 };
@@ -244,7 +240,8 @@ const buildAnalyticsRows = (
 const formatGroupDialogTitle = (title = "") =>
   title.toLowerCase().endsWith("pages") ? title : `${title} Pages`;
 
-const formatMetaNumber = (value?: number) => Number(value || 0).toLocaleString();
+const formatMetaNumber = (value?: number) =>
+  Number(value || 0).toLocaleString();
 
 function MetaPlatformSummaryCard({
   platform,
@@ -272,8 +269,7 @@ function MetaPlatformSummaryCard({
   const Icon = platform === "facebook" ? Facebook : Instagram;
   const accentClass =
     platform === "facebook" ? "text-blue-600" : "text-pink-600";
-  const bgClass =
-    platform === "facebook" ? "bg-blue-600/10" : "bg-pink-600/10";
+  const bgClass = platform === "facebook" ? "bg-blue-600/10" : "bg-pink-600/10";
 
   return (
     <Card className="shadow-card border border-border rounded-2xl overflow-hidden">
@@ -346,6 +342,7 @@ export default function DashboardPage() {
   const canViewMetaAnalytics = canAccessPath(admin, "/meta-analytics");
   const [selectedPageGroup, setSelectedPageGroup] =
     useState<AnalyticsPageGroup | null>(null);
+
   const gridColor = themeColor("border", 0.7);
   const mutedTextColor = themeColor("muted-foreground");
   const tooltipBorder = `1px solid ${themeColor("border")}`;
@@ -728,6 +725,26 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
 
+      <Card className="shadow-card border border-border rounded-2xl mb-4 sm:mb-6">
+        <CardHeader>
+          <CardTitle className="text-sm sm:text-base font-semibold font-display">
+            SEO Audit Report
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              View latest cached RankMath SEO report.
+            </p>
+          </div>
+
+          <Button asChild>
+            <Link to="/seo-report">View SEO Report</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* ── Stat Cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4 sm:mb-6">
         {statsLoading ? (
@@ -769,7 +786,9 @@ export default function DashboardPage() {
             <StatCard
               icon={MessageSquare}
               label="Pending Appointments"
-              value={(data?.appointmentsByStatus?.pending ?? 0).toLocaleString()}
+              value={(
+                data?.appointmentsByStatus?.pending ?? 0
+              ).toLocaleString()}
               subtitle="needs action"
               color="orange"
             />

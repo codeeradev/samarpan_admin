@@ -34,6 +34,7 @@ import BlogCategoryPage from "./pages/BlogCategoryPage";
 import BlogsPage from "./pages/BlogPage";
 import ProcedurePage from "./pages/ProcedurePage";
 import SpecializationsPage from "./pages/Specialization";
+import SeoReportPage from "./pages/SeoReportPage";
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 type StoredAuth = ReturnType<typeof loadAuthState>;
@@ -105,6 +106,13 @@ const metaAnalyticsRoute = createRoute({
   path: "/meta-analytics",
   beforeLoad: () => checkPermission("/meta-analytics"),
   component: MetaAnalyticsPage,
+});
+
+const seoReportRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/seo-report",
+  beforeLoad: () => checkPermission("/seo-report"),
+  component: SeoReportPage,
 });
 
 const metaCallbackRoute = createRoute({
@@ -271,6 +279,7 @@ const routeTree = rootRoute.addChildren([
   adminLayoutRoute.addChildren([
     dashboardRoute,
     metaAnalyticsRoute,
+    seoReportRoute,
     metaCallbackRoute,
     doctorsRoute,
     specializationsRoute,
