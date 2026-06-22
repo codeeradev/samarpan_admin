@@ -14,136 +14,115 @@ export default function SeoReportPage() {
   const seoHtml = data?.report?.reportHtml || "";
 
   return (
-    <div data-ocid="seo-report.page" className="p-6 max-w-[1600px] mx-auto">
+    <div data-ocid="seo-report.page">
       <PageHeader
         title="SEO Audit Report"
         description="Latest RankMath SEO Analysis"
       />
 
       {isLoading ? (
-        <div className="space-y-4" data-ocid="seo-report.skeleton">
+        <div className="space-y-6 mb-6" data-ocid="seo-report.skeleton">
           <Skeleton className="h-[200px] w-full rounded-2xl" />
           <Skeleton className="h-[400px] w-full rounded-2xl" />
           <Skeleton className="h-[400px] w-full rounded-2xl" />
           <Skeleton className="h-[400px] w-full rounded-2xl" />
         </div>
       ) : error ? (
-        <Card className="shadow-card border border-destructive/30 rounded-2xl">
-          <CardContent className="p-4 sm:p-5 text-sm text-destructive">
+        <Card className="shadow-card border border-destructive/30 rounded-2xl mb-6">
+          <CardContent className="p-5 sm:p-6 text-sm text-destructive">
             {error instanceof Error
               ? error.message
               : "Failed to load SEO report"}
           </CardContent>
         </Card>
       ) : !seoHtml ? (
-        <Card className="shadow-card border border-border rounded-2xl">
-          <CardContent className="p-4 sm:p-5 flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-sm text-muted-foreground">
-              No SEO report data available yet.
+        <Card className="shadow-card border border-border rounded-2xl mb-6">
+          <CardContent className="p-5 sm:p-6 flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center mb-4">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-muted-foreground"
+              >
+                <path d="M9 12l2 2 4-4" />
+                <circle cx="12" cy="12" r="9" />
+              </svg>
+            </div>
+            <h3 className="font-semibold text-foreground mb-2">
+              No SEO Report Available
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-md">
+              SEO report data is not available yet. The report will appear here
+              once the analysis is complete.
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div data-ocid="seo-report.content" className="mb-4 sm:mb-6">
+        <div data-ocid="seo-report.content" className="mb-6">
           <style>
             {`
-              /* =============================================================
-                 SEO Report – 100 % theme‑aware styles.
-                 ZERO hardcoded colours — every colour resolves through
-                 oklch(var(--<token>)) so it respects the panel theme API.
-                 ============================================================= */
+              /* ============================================================
+                 SEO Report — dashboard-matched, theme-aware styling
+                 ============================================================ */
 
-              /* ── Score graph container (Dashboard card pattern) ─────── */
+              .seo-report {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                font-family: inherit;
+              }
+
+              .seo-report * {
+                box-sizing: border-box;
+              }
+
+              .seo-report ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+              }
+
+              /* ── Score overview: dashboard stat-card grid ───────────── */
               .seo-report .rank-math-result-graphs {
+                width: 100%;
                 background: oklch(var(--card));
                 border: 1px solid oklch(var(--border));
-                border-radius: 16px;
-                padding: 24px;
-                margin-bottom: 24px;
-                box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+                border-radius: 1rem;
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
               }
 
               .seo-report .two-col {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 24px;
-                align-items: center;
+                display: grid;
+                grid-template-columns: 220px 1fr;
+                gap: 1.5rem;
+                align-items: stretch;
               }
 
               .seo-report .graphs-main {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 8px;
-                min-width: 180px;
-              }
-
-              .seo-report .score-average {
-                font-size: 2rem;
-                font-weight: 700;
-                color: oklch(var(--foreground));
-              }
-
-              .seo-report .result-score label {
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: oklch(var(--muted-foreground));
-                display: block;
-                text-align: center;
-              }
-
-              .seo-report .graphs-side {
-                flex: 1;
-                min-width: 220px;
-              }
-
-              /* ── Chart bar tiles ─────────────────────────────────────── */
-              .seo-report .chart {
-                display: flex;
-                gap: 12px;
-                list-style: none;
-                padding: 0;
-                margin: 0;
-              }
-
-              .seo-report .chart li {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-                background: oklch(var(--muted) / 0.5);
-                border-radius: 12px;
-                padding: 16px 12px;
-                border: 1px solid oklch(var(--border));
-              }
-
-              .seo-report .chart li span {
+                justify-content: center;
+                gap: 0.75rem;
                 width: 100%;
-                display: block;
-                border-radius: 8px;
-                height: 8px !important;
+                background: oklch(var(--muted) / 0.4);
+                border: 1px solid oklch(var(--border));
+                border-radius: 0.75rem;
+                padding: 1.5rem 1rem;
               }
 
-              /* chart‑2 = greenish‑brown (pass), chart‑3 = warm amber (warn),
-                 destructive = red (fail) — all come from theme API          */
-              .seo-report .chart-bar-good span  { background: oklch(var(--chart-2)); }
-              .seo-report .chart-bar-average span { background: oklch(var(--chart-3)); }
-              .seo-report .chart-bar-bad span    { background: oklch(var(--destructive)); }
-
-              .seo-report .chart li .result-score strong {
-                font-size: 1.125rem;
-                font-weight: 700;
-                color: oklch(var(--foreground));
-                display: block;
-                text-align: center;
-              }
-
-              /* ── Circular score badge ────────────────────────────────── */
               #rank-math-circle-progress {
-                width: 120px;
-                height: 120px;
+                width: 140px;
+                height: 140px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
@@ -162,7 +141,7 @@ export default function SeoReportPage() {
               #rank-math-circle-progress::before {
                 content: '';
                 position: absolute;
-                inset: 8px;
+                inset: 0.5rem;
                 border-radius: 50%;
                 background: oklch(var(--card));
               }
@@ -170,63 +149,196 @@ export default function SeoReportPage() {
               #rank-math-circle-progress strong {
                 position: relative;
                 z-index: 1;
+                font-family: var(--font-display, inherit);
               }
 
-              /* ── Category section header ─────────────────────────────── */
+              .seo-report .graphs-main .result-score {
+                text-align: center;
+                margin-top: 0.5rem;
+              }
+
+              .seo-report .graphs-main .result-score .score-average {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: oklch(var(--foreground));
+                font-family: var(--font-display, inherit);
+              }
+
+              .seo-report .result-score label {
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: oklch(var(--muted-foreground));
+                display: block;
+                margin-top: 0.25rem;
+                font-weight: 600;
+              }
+
+              .seo-report .graphs-side {
+                width: 100%;
+                min-width: 0;
+                display: flex;
+              }
+
+              .seo-report .chart {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 1rem;
+                width: 100%;
+              }
+
+              .seo-report .chart li {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.75rem;
+                background: oklch(var(--muted) / 0.4);
+                border-radius: 0.75rem;
+                padding: 1.25rem 1rem;
+                border: 1px solid oklch(var(--border));
+                min-height: 0;
+                text-align: center;
+                min-width: 0;
+                transition: background 0.15s ease;
+              }
+
+              .seo-report .chart li:hover {
+                background: oklch(var(--muted) / 0.6);
+              }
+
+              .seo-report .chart li span {
+                width: 100%;
+                display: block;
+                border-radius: 9999px;
+                height: 0.5rem !important;
+                order: 3;
+                background: oklch(var(--border));
+                overflow: hidden;
+              }
+
+              .seo-report .chart-bar-good span    { background: oklch(var(--chart-2)); }
+              .seo-report .chart-bar-average span  { background: oklch(var(--chart-3)); }
+              .seo-report .chart-bar-bad span      { background: oklch(var(--destructive)); }
+
+              .seo-report .chart li .result-score {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.25rem;
+                order: 1;
+              }
+
+              .seo-report .chart li .result-score strong {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: oklch(var(--foreground));
+                display: block;
+                line-height: 1.1;
+                font-family: var(--font-display, inherit);
+              }
+
+              .seo-report .chart li label {
+                font-size: 0.7rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: oklch(var(--muted-foreground));
+                order: 2;
+              }
+
+              /* ── Category cards (Basic SEO / Advanced SEO / etc.) ───── */
               .seo-report .rank-math-result-table {
-                margin-bottom: 28px;
+                width: 100%;
+                background: oklch(var(--card));
+                border: 1px solid oklch(var(--border));
+                border-radius: 1rem;
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+                overflow: hidden;
+                margin-bottom: 1.5rem;
+              }
+
+              .seo-report .rank-math-result-table > *:not(.table-row):not(.category-title) {
+                padding-left: 3.75rem;
+                padding-right: 1.75rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+              }
+
+              .seo-report .rank-math-result-table > h2,
+              .seo-report .rank-math-result-table > h3,
+              .seo-report .rank-math-result-table > h4 {
+                padding-top: 1.25rem;
+                padding-bottom: 0.75rem;
+                font-size: 1rem;
+                font-weight: 600;
+                color: oklch(var(--foreground));
+                font-family: var(--font-display, inherit);
               }
 
               .seo-report .category-title {
-                font-size: 1.05rem;
-                font-weight: 600;
+                font-size: 1rem;
+                font-weight: 700;
                 color: oklch(var(--foreground));
-                padding: 16px 20px;
-                background: oklch(var(--card));
-                border: 1px solid oklch(var(--border));
-                border-radius: 12px 12px 0 0;
-                border-bottom: 0;
-                font-family: 'Space Grotesk', sans-serif;
+                padding: 1.25rem 1.75rem;
+                background: oklch(var(--muted) / 0.5);
+                border-bottom: 1px solid oklch(var(--border));
                 letter-spacing: 0.01em;
-              }
-
-              /* ── Test row (dashboard sub‑card) ───────────────────────── */
-              .seo-report .table-row {
-                background: oklch(var(--card));
-                border: 1px solid oklch(var(--border));
-                padding: 20px;
-                transition: box-shadow 0.2s ease;
-              }
-
-              .seo-report .table-row:last-child {
-                border-radius: 0 0 12px 12px;
-              }
-
-              .seo-report .table-row:hover {
-                box-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.08);
-                position: relative;
-                z-index: 1;
-              }
-
-              /* ── Left colour bar — all from theme API ───────────────── */
-              .seo-report .table-row:has(.status-ok),
-              .seo-report .table-row:has(.icon-ok) {
-                border-left: 5px solid oklch(var(--chart-2));
-              }
-              .seo-report .table-row:has(.status-warning),
-              .seo-report .table-row:has(.icon-attention-alt) {
-                border-left: 5px solid oklch(var(--chart-3));
-              }
-              .seo-report .table-row:has(.status-fail),
-              .seo-report .table-row:has(.icon-cancel) {
-                border-left: 5px solid oklch(var(--destructive));
-              }
-              .seo-report .table-row:has(.status-info) {
-                border-left: 5px solid oklch(var(--chart-1));
+                font-family: var(--font-display, inherit);
+                margin-left:30px;
               }
 
               .seo-report .row-title {
-                margin-bottom: 10px;
+                padding-left: 60px;
+                margin-top: 10px;
+              }
+
+              .seo-report .status-icon {
+                margin-left: 20px;
+              }
+
+              .seo-report .table-row {
+                background: oklch(var(--card));
+                padding: 1.5rem 1.75rem;
+                border-bottom: 1px solid oklch(var(--border));
+                border-left: 0.25rem solid transparent;
+                transition: all 0.15s ease;
+              }
+
+              .seo-report .table-row:last-child {
+                border-bottom: 0;
+              }
+
+              .seo-report .table-row:hover {
+                background: oklch(var(--muted) / 0.3);
+              }
+
+              .seo-report .table-row:has(.status-ok),
+              .seo-report .table-row:has(.icon-ok) {
+                border-left-color: oklch(var(--chart-2));
+                background: oklch(var(--chart-2) / 0.03);
+              }
+              .seo-report .table-row:has(.status-warning),
+              .seo-report .table-row:has(.icon-attention-alt) {
+                border-left-color: oklch(var(--chart-3));
+                background: oklch(var(--chart-3) / 0.03);
+              }
+              .seo-report .table-row:has(.status-fail),
+              .seo-report .table-row:has(.icon-cancel) {
+                border-left-color: oklch(var(--destructive));
+                background: oklch(var(--destructive) / 0.03);
+              }
+              .seo-report .table-row:has(.status-info) {
+                border-left-color: oklch(var(--chart-1));
+                background: oklch(var(--chart-1) / 0.03);
+              }
+
+              .seo-report .row-title {
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                flex-wrap: wrap;
               }
 
               .seo-report .row-title h3 {
@@ -234,33 +346,62 @@ export default function SeoReportPage() {
                 font-weight: 600;
                 color: oklch(var(--foreground));
                 display: inline;
+                margin: 0;
+                font-family: var(--font-display, inherit);
               }
 
               .seo-report .row-description {
                 display: flex;
-                gap: 12px;
+                gap: 1rem;
                 align-items: flex-start;
               }
 
               .seo-report .row-content {
                 flex: 1;
                 color: oklch(var(--muted-foreground));
-                line-height: 1.7;
+                line-height: 1.6;
                 font-size: 0.875rem;
+                min-width: 0;
               }
 
-              /* ── Status icon badges — all from theme API ────────────── */
+              .seo-report .row-content p {
+                margin: 0 0 0.75rem;
+              }
+              .seo-report .row-content p:last-child {
+                margin-bottom: 0;
+              }
+
+              .seo-report .row-content .clear {
+                margin-top: 0.75rem;
+              }
+
+              .seo-report .row-content br {
+                display: none;
+              }
+
+              .seo-report .row-content code {
+                white-space: normal;
+                word-break: break-all;
+              }
+
+              .seo-report .row-content strong {
+                color: oklch(var(--foreground));
+                font-weight: 600;
+              }
+
+              /* ── Status icon badges ──────────────────────────────────── */
               .seo-report .status-icon {
-                width: 24px;
-                height: 24px;
+                width: 1.5rem;
+                height: 1.5rem;
+                min-width: 1.5rem;
                 border-radius: 9999px;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                flex-shrink: 0;
                 font-size: 0;
-                margin-top: 2px;
+                margin-top: 0.125rem;
                 color: oklch(var(--card));
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
               }
               .seo-report .status-icon.icon-ok,
               .seo-report .status-icon.status-ok {
@@ -279,52 +420,57 @@ export default function SeoReportPage() {
               }
 
               .seo-report .status-icon.icon-ok::after {
-                content: '✓'; font-size: 12px; font-weight: bold;
+                content: '✓'; font-size: 0.75rem; font-weight: bold;
               }
               .seo-report .status-icon.icon-cancel::after {
-                content: '✕'; font-size: 12px; font-weight: bold;
+                content: '✕'; font-size: 0.75rem; font-weight: bold;
               }
               .seo-report .status-icon.icon-attention-alt::after {
-                content: '!'; font-size: 14px; font-weight: bold;
+                content: '!'; font-size: 0.875rem; font-weight: bold;
               }
 
-              /* ── "How to fix" wrapper ────────────────────────────────── */
-              .seo-report .how-to-fix-wrapper {
-                margin-top: 12px;
-                padding: 16px;
-                background: oklch(var(--muted) / 0.5);
-                border-radius: 10px;
-                border-left: 4px solid oklch(var(--chart-3));
-              }
-
-              .seo-report .analysis-test-how-to-fix {
-                font-size: 0.8125rem;
-                line-height: 1.7;
-                color: oklch(var(--muted-foreground));
-              }
-              .seo-report .analysis-test-how-to-fix p {
-                margin-bottom: 8px;
-              }
-              .seo-report .analysis-test-how-to-fix p:last-child {
-                margin-bottom: 0;
-              }
-
+              /* ── "How to fix" callouts ───────────────────────────────── */
               .seo-report .result-action {
                 display: inline-flex;
                 align-items: center;
-                gap: 4px;
-                margin-bottom: 8px;
+                gap: 0.5rem;
+                margin: 0 0.5rem 0.5rem 0;
                 font-size: 0.8125rem;
                 font-weight: 600;
                 color: oklch(var(--primary));
                 text-decoration: none;
-                padding: 4px 12px;
-                border-radius: 6px;
+                padding: 0.5rem 0.875rem;
+                border-radius: 0.5rem;
                 background: oklch(var(--primary) / 0.1);
-                transition: background 0.15s ease;
+                transition: all 0.15s ease;
+                cursor: pointer;
+                border: 1px solid oklch(var(--primary) / 0.2);
               }
               .seo-report .result-action:hover {
                 background: oklch(var(--primary) / 0.15);
+                transform: translateY(-1px);
+              }
+
+              .seo-report .how-to-fix-wrapper {
+                margin-top: 1rem;
+                padding: 1.25rem;
+                background: oklch(var(--muted) / 0.4);
+                border-radius: 0.75rem;
+                border-left: 0.25rem solid oklch(var(--chart-3));
+                border: 1px solid oklch(var(--border));
+              }
+
+              .seo-report .analysis-test-how-to-fix {
+                font-size: 0.875rem;
+                line-height: 1.6;
+                color: oklch(var(--muted-foreground));
+              }
+
+              .seo-report .analysis-test-how-to-fix p {
+                margin: 0 0 0.75rem;
+              }
+              .seo-report .analysis-test-how-to-fix p:last-child {
+                margin-bottom: 0;
               }
 
               /* ── Tooltip ─────────────────────────────────────────────── */
@@ -332,40 +478,44 @@ export default function SeoReportPage() {
                 position: relative;
                 display: inline-flex;
                 align-items: center;
-                margin-left: 6px;
                 vertical-align: middle;
               }
               .seo-report .rank-math-tooltip em {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: 18px;
-                height: 18px;
+                width: 1.125rem;
+                height: 1.125rem;
                 border-radius: 9999px;
                 background: oklch(var(--muted-foreground) / 0.2);
                 color: oklch(var(--muted-foreground));
                 font-style: normal;
-                font-size: 11px;
+                font-size: 0.625rem;
                 font-weight: 700;
                 cursor: help;
+                transition: all 0.15s ease;
+              }
+              .seo-report .rank-math-tooltip:hover em {
+                background: oklch(var(--primary) / 0.2);
+                color: oklch(var(--primary));
               }
               .seo-report .rank-math-tooltip span {
                 display: none;
                 position: absolute;
-                bottom: calc(100% + 8px);
+                bottom: calc(100% + 0.5rem);
                 left: 50%;
                 transform: translateX(-50%);
                 background: oklch(var(--popover));
                 color: oklch(var(--popover-foreground));
                 border: 1px solid oklch(var(--border));
-                border-radius: 8px;
-                padding: 8px 12px;
-                font-size: 0.75rem;
+                border-radius: 0.5rem;
+                padding: 0.75rem 1rem;
+                font-size: 0.8125rem;
                 line-height: 1.5;
                 white-space: normal;
-                width: 240px;
+                width: 16rem;
                 z-index: 50;
-                box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+                box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
               }
               .seo-report .rank-math-tooltip:hover span {
                 display: block;
@@ -374,115 +524,165 @@ export default function SeoReportPage() {
               /* ── Inline code ─────────────────────────────────────────── */
               .seo-report code {
                 background: oklch(var(--muted));
-                padding: 2px 8px;
-                border-radius: 6px;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.375rem;
                 font-size: 0.8125rem;
                 color: oklch(var(--foreground));
-              }
-              .seo-report .seo-report-main-titles {
-                display: inline-block;
-                margin-top: 4px;
+                word-break: break-all;
+                border: 1px solid oklch(var(--border));
+                font-family: var(--font-mono, ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, consolas, 'DejaVu Sans Mono', monospace);
               }
 
-              /* ── Lists ───────────────────────────────────────────────── */
-              .seo-report ul,
+              .seo-report .seo-report-main-titles {
+                display: inline-block;
+                margin-top: 0.5rem;
+              }
+
+              /* ── Lists inside row content ─────────────────────────────── */
+              .seo-report .row-content ul,
               .seo-report .info-list {
-                padding-left: 20px;
-                margin-top: 8px;
+                padding-left: 1.5rem;
+                margin-top: 0.75rem;
                 list-style: disc;
               }
-              .seo-report ul li,
-              .seo-report .info-list li { margin-bottom: 4px; }
+              .seo-report .row-content ul li,
+              .seo-report .info-list li {
+                margin-bottom: 0.375rem;
+              }
 
               /* ── Images ──────────────────────────────────────────────── */
               .seo-report img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 12px;
+                border-radius: 0.75rem;
+                margin-top: 0.75rem;
+                border: 1px solid oklch(var(--border));
               }
 
-              /* ── SERP preview — zero hardcoded colours ──────────────── */
+              /* ── SERP preview ─────────────────────────────────────────── */
               .seo-report .serp-preview {
                 background: oklch(var(--muted) / 0.4);
                 border: 1px solid oklch(var(--border));
-                border-radius: 10px;
-                padding: 12px 16px;
-                margin-top: 8px;
-                max-width: 600px;
+                border-radius: 0.75rem;
+                padding: 1.25rem;
+                margin-top: 1rem;
+                max-width: 36rem;
               }
               .seo-report .serp-title {
                 font-size: 1.125rem;
                 color: oklch(var(--primary));
                 font-weight: 600;
-                line-height: 1.3;
-                margin-bottom: 2px;
+                line-height: 1.4;
+                margin-bottom: 0.375rem;
+                font-family: var(--font-display, inherit);
               }
               .seo-report .serp-url {
-                font-size: 0.8125rem;
+                font-size: 0.875rem;
                 color: oklch(var(--chart-2));
-                margin-bottom: 2px;
+                margin-bottom: 0.375rem;
+                font-family: var(--font-mono, ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, consolas, 'DejaVu Sans Mono', monospace);
               }
               .seo-report .serp-description {
-                font-size: 0.875rem;
+                font-size: 0.9375rem;
                 color: oklch(var(--muted-foreground));
-                line-height: 1.4;
+                line-height: 1.5;
               }
 
-              /* ── CTA / promo banner ──────────────────────────────────── */
+              /* ── CTA ──────────────────────────────────────────────────── */
               .seo-report .analysis-cta {
-                margin-top: 16px;
-                margin-bottom: 16px;
+                margin-top: 1rem;
               }
               .seo-report .analysis-cta a {
                 display: inline-flex;
                 align-items: center;
-                gap: 6px;
-                padding: 10px 20px;
-                background: oklch(var(--primary) / 0.1);
-                color: oklch(var(--primary));
-                border-radius: 10px;
-                font-size: 0.875rem;
+                gap: 0.5rem;
+                padding: 0.75rem 1.25rem;
+                background: oklch(var(--primary));
+                color: oklch(var(--primary-foreground));
+                border-radius: 0.5rem;
+                font-size: 0.9375rem;
                 font-weight: 600;
                 text-decoration: none;
-                transition: background 0.15s ease;
+                transition: all 0.15s ease;
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
               }
               .seo-report .analysis-cta a:hover {
-                background: oklch(var(--primary) / 0.15);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
               }
 
-              /* ── Clear ───────────────────────────────────────────────── */
-              .seo-report .clear { clear: both; }
+              .seo-report .clear {
+                clear: both;
+              }
 
               /* ── Responsive ──────────────────────────────────────────── */
-              @media (max-width: 639px) {
+              @media (max-width: 768px) {
+                .seo-report .rank-math-result-graphs {
+                  padding: 1.25rem;
+                }
                 .seo-report .two-col {
-                  flex-direction: column;
-                  align-items: center;
+                  grid-template-columns: 1fr;
+                  gap: 1.25rem;
                 }
                 .seo-report .chart {
-                  flex-direction: column;
+                  grid-template-columns: repeat(3, minmax(0, 1fr));
+                  gap: 0.75rem;
+                }
+                .seo-report .chart li {
+                  padding: 1rem 0.75rem;
+                  gap: 0.5rem;
+                }
+                .seo-report .chart li .result-score strong {
+                  font-size: 1.375rem;
+                }
+                .seo-report .chart li label {
+                  font-size: 0.625rem;
                 }
                 .seo-report .category-title {
-                  font-size: 0.95rem;
-                  padding: 14px 16px;
+                  padding: 1rem 1.25rem;
+                  font-size: 0.9375rem;
                 }
                 .seo-report .table-row {
-                  padding: 14px;
+                  padding: 1.25rem;
                 }
-                .seo-report .rank-math-result-graphs {
-                  padding: 16px;
+                .seo-report .row-content br {
+                  display: none;
                 }
                 .seo-report .rank-math-tooltip span {
-                  width: 180px;
+                  width: 12rem;
                 }
               }
 
-              @media (min-width: 640px) and (max-width: 1023px) {
+              @media (max-width: 480px) {
                 .seo-report .chart {
-                  gap: 10px;
+                  grid-template-columns: 1fr;
                 }
                 .seo-report .chart li {
-                  padding: 12px 8px;
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                  text-align: left;
+                  padding: 1rem 1.25rem;
+                }
+                .seo-report .chart li .result-score {
+                  flex-direction: row;
+                  align-items: center;
+                  gap: 0.75rem;
+                  order: 1;
+                }
+                .seo-report .chart li label {
+                  order: 2;
+                }
+                .seo-report .chart li span {
+                  order: 0;
+                  width: 28%;
+                  height: 0.625rem !important;
+                }
+                .seo-report .table-row {
+                  padding: 1rem;
+                }
+                .seo-report .category-title {
+                  padding: 0.875rem 1rem;
                 }
               }
             `}
