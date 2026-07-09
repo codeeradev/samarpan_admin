@@ -7,6 +7,8 @@ export interface ShortPayload {
   thumbnail?: string;
   sortOrder?: number;
   isActive?: boolean;
+  type?: "patient" | "doctor";
+  doctorTestimonial?: boolean;
 }
 
 export interface ShortItem {
@@ -16,13 +18,15 @@ export interface ShortItem {
   thumbnail?: string;
   sortOrder?: number;
   isActive?: boolean;
+  doctorTestimonial?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export const getAllShortsApi = async (): Promise<ShortItem[]> => {
+export const getAllShortsApi = async (type?: "patient" | "doctor"): Promise<ShortItem[]> => {
   try {
-    const res = await get(ENDPOINT.GET_ALL_SHORTS, { needAuth: true });
+    const queryParams = type ? `?type=${type}` : "";
+    const res = await get(`${ENDPOINT.GET_ALL_SHORTS}${queryParams}`, { needAuth: true });
     return res?.data?.shorts ?? [];
   } catch (error: any) {
     throw new Error(error.response?.data?.message ?? "Failed to fetch shorts");

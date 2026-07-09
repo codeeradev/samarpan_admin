@@ -1,4 +1,4 @@
-import { get } from "@/apis/apiClient";
+import { get, post } from "@/apis/apiClient";
 import { ENDPOINT } from "@/apis/endpoint";
 import type { Appointment } from "@/apiCalls/appointments";
 
@@ -35,3 +35,7 @@ export const getDashboardApi = async (): Promise<DashboardResponse> => {
   return response.data;
 };
 
+export const syncGoogleReviewsApi = async () => {
+  const response = await post(ENDPOINT.SYNC_GOOGLE_REVIEWS);
+  return response.data;
+};

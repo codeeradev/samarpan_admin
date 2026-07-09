@@ -31,6 +31,7 @@ import {
   Play,
   Plus,
   Search,
+  Stethoscope,
   Trash2,
   Video,
 } from "lucide-react";
@@ -240,7 +241,7 @@ function ShortPreviewCard({
 export default function ReviewsAndShortsPage() {
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("shorts");
+  const [activeTab, setActiveTab] = useState<"shorts" | "doctor-shorts">("shorts");
   const [shortSearch, setShortSearch] = useState("");
 
   const [shortDialogOpen, setShortDialogOpen] = useState(false);
@@ -253,16 +254,36 @@ export default function ReviewsAndShortsPage() {
     useState<ShortItem | null>(null);
   const [shortForm, setShortForm] = useState<ShortFormData>(emptyShortForm);
   const [shortErrors, setShortErrors] = useState<ShortFormErrors>({});
+  const activeShortType = activeTab === "doctor-shorts" ? "doctor" : "patient";
+
+  // Separate queries for patient and doctor shorts
+  const {
+    data: patientShorts = [],
+    isLoading: isPatientShortsLoading,
+    isError: isPatientShortsError,
+    error: patientShortsError,
+  } = useQuery<ShortItem[], Error>({
+    queryKey: [...SHORT_QUERY_KEY, "patient"],
+    queryFn: () => getAllShortsApi("patient"),
+    enabled: activeTab === "shorts",
+  });
 
   const {
-    data: shorts = [],
-    isLoading: isShortsLoading,
-    isError: isShortsError,
-    error: shortsError,
+    data: doctorShorts = [],
+    isLoading: isDoctorShortsLoading,
+    isError: isDoctorShortsError,
+    error: doctorShortsError,
   } = useQuery<ShortItem[], Error>({
-    queryKey: SHORT_QUERY_KEY,
-    queryFn: getAllShortsApi,
+    queryKey: [...SHORT_QUERY_KEY, "doctor"],
+    queryFn: () => getAllShortsApi("doctor"),
+    enabled: activeTab === "doctor-shorts",
   });
+
+  // Use appropriate data based on active tab
+  const shorts = activeTab === "doctor-shorts" ? doctorShorts : patientShorts;
+  const isShortsLoading = activeTab === "doctor-shorts" ? isDoctorShortsLoading : isPatientShortsLoading;
+  const isShortsError = activeTab === "doctor-shorts" ? isDoctorShortsError : isPatientShortsError;
+  const shortsError = activeTab === "doctor-shorts" ? doctorShortsError : patientShortsError;
 
   const addShortMutation = useMutation({ mutationFn: addShortApi });
   const updateShortMutation = useMutation({
@@ -309,7 +330,6 @@ export default function ReviewsAndShortsPage() {
   }
 
   function openAddShort() {
-    setActiveTab("shorts");
     setShortDialogMode("add");
     setSelectedShort(null);
     setShortForm(emptyShortForm);
@@ -318,7 +338,6 @@ export default function ReviewsAndShortsPage() {
   }
 
   function openEditShort(short: ShortItem) {
-    setActiveTab("shorts");
     setShortDialogMode("edit");
     setSelectedShort(short);
     setShortForm({
@@ -339,7 +358,10 @@ export default function ReviewsAndShortsPage() {
       return;
     }
 
-    const payload = buildShortPayload(shortForm);
+    const payload: ShortPayload = {
+      ...buildShortPayload(shortForm),
+      type: activeShortType,
+    };
 
     try {
       if (shortDialogMode === "edit" && selectedShort) {
@@ -500,6 +522,10 @@ export default function ReviewsAndShortsPage() {
 
       <Tabs
         value={activeTab}
+        onValueChange={(value) => {
+          setActiveTab(value as "shorts" | "doctor-shorts");
+          setShortSearch("");
+        }}
         className="space-y-6"
       >
         <div className="overflow-x-auto">
@@ -512,17 +538,27 @@ export default function ReviewsAndShortsPage() {
               <Video size={14} className="mr-2" />
               Video Shorts
             </TabsTrigger>
+            <TabsTrigger
+              value="doctor-shorts"
+              className="rounded-xl px-4 py-2 text-sm font-medium data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm"
+              data-ocid="reviews_shorts.doctor_shorts_tab"
+            >
+              <Stethoscope size={14} className="mr-2" />
+              Doctor Consultant Shorts
+            </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="shorts" className="mt-0">
+        <TabsContent value={activeTab} className="mt-0">
           <div className="grid gap-6">
             <Card className="border-border shadow-sm">
               <CardHeader className="gap-4 border-b border-border pb-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                   <div>
                     <CardTitle className="text-lg text-foreground">
-                      Shorts Library
+                      {activeTab === "doctor-shorts"
+                        ? "Doctor Consultant Shorts Library"
+                        : "Shorts Library"}
                     </CardTitle>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Search, edit, preview, and publish shorts.
@@ -557,7 +593,7 @@ export default function ReviewsAndShortsPage() {
                       No shorts found
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Paste your first short URL to start building the video
+                      Paste your first short URL to start building this video
                       showcase.
                     </p>
                   </div>

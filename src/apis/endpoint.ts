@@ -59,6 +59,7 @@ export const ENDPOINT = {
   GET_DASHBOARD: "/get-dashboard",
   GET_ANALYTICS: "/get-analytics",
   GET_SEO_REPORT:"/get-seo-report",
+  SYNC_GOOGLE_REVIEWS:"/sync-google-reviews",
 
   ADD_SPECIALIZATION: "/add-specialization",
   GET_ALL_SPECIALIZATIONS: "/get-all-specializations",

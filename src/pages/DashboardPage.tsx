@@ -17,13 +17,13 @@ import type {
   AnalyticsPageGroup,
   AnalyticsVisitorStats,
 } from "@/apiCalls/analytics";
-import { getDashboardApi } from "@/apiCalls/dashboard";
+import { getDashboardApi, syncGoogleReviewsApi } from "@/apiCalls/dashboard";
 import { useAnalyticsDashboard } from "@/hooks/useAnalytics";
 import { useAuth } from "@/hooks/useAuth";
 import { canAccessPath } from "@/lib/admin-access";
 import { themeColor } from "@/lib/theme";
 import { formatDate } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -40,7 +40,10 @@ import {
   MessageSquare,
   Users,
   UserRound,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   Bar,
   BarChart,
@@ -348,6 +351,18 @@ export default function DashboardPage() {
   const tooltipBorder = `1px solid ${themeColor("border")}`;
   const lineColor = themeColor("chart-1");
   const barColor = themeColor("chart-2");
+
+  const syncGoogleReviewsMutation = useMutation({
+    mutationFn: syncGoogleReviewsApi,
+    onSuccess: () => {
+      toast.success(
+        "Google reviews have been synchronized successfully. Please refresh the website to view the latest reviews.",
+      );
+    },
+    onError: () => {
+      toast.error("Failed to synchronize Google reviews. Please try again.");
+    },
+  });
 
   const {
     data: analytics,
@@ -739,9 +754,29 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <Button asChild>
-            <Link to="/seo-report">View SEO Report</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => syncGoogleReviewsMutation.mutate()}
+              disabled={syncGoogleReviewsMutation.isPending}
+            >
+              {syncGoogleReviewsMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Sync Google Reviews
+                </>
+              )}
+            </Button>
+
+            <Button asChild>
+              <Link to="/seo-report">View SEO Report</Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
