@@ -84872,6 +84872,62 @@ function SeoReportPage() {
     queryFn: getSeoReportApi
   });
   const seoHtml = ((_a2 = data == null ? void 0 : data.report) == null ? void 0 : _a2.reportHtml) || "";
+  const contentRef = reactExports.useRef(null);
+  reactExports.useEffect(() => {
+    var _a3;
+    const container = contentRef.current;
+    if (!seoHtml || !container) return;
+    const chartItems = container.querySelectorAll(".chart li");
+    chartItems.forEach((li) => {
+      var _a4;
+      const strongText = ((_a4 = li.querySelector("strong")) == null ? void 0 : _a4.textContent) || "";
+      const m2 = strongText.match(/(\d+)\s*\/\s*(\d+)/);
+      const bar = li.querySelector("span");
+      if (m2 && bar) {
+        const count2 = parseInt(m2[1], 10);
+        const total = parseInt(m2[2], 10);
+        const percent = total > 0 ? Math.min(100, count2 / total * 100) : 0;
+        bar.style.setProperty("--fill-percent", `${percent}%`);
+      }
+    });
+    const headingNodes = container.querySelectorAll(".row-title, h2, h3, h4");
+    headingNodes.forEach((el) => {
+      var _a4;
+      const text2 = ((_a4 = el.textContent) == null ? void 0 : _a4.trim().toLowerCase()) || "";
+      if (text2.startsWith("mobile snapshot")) {
+        const row = el.closest(".table-row") || el.parentElement;
+        row == null ? void 0 : row.remove();
+      }
+    });
+    const promoByHref = container.querySelectorAll(
+      'a[href*="wp-rocket"], a[href*="rankmath.com"]'
+    );
+    promoByHref.forEach((a2) => {
+      (a2.closest("div, p, a") || a2).remove();
+    });
+    container.querySelectorAll("a, button, div, p").forEach((el) => {
+      const text2 = el.textContent || "";
+      if (/install\s+wp\s*rocket/i.test(text2) || /install\s+rank\s*math\s+seo\s+plugin/i.test(text2) || /get\s+more\s+advanced\s+reports\s+inside\s+wordpress/i.test(text2)) {
+        const wrapper = el.closest("div, p") || el;
+        if (wrapper !== container) wrapper.remove();
+      }
+    });
+    const ring = container.querySelector(
+      "#rank-math-circle-progress"
+    );
+    if (ring) {
+      const scoreText = ((_a3 = ring.querySelector("strong")) == null ? void 0 : _a3.textContent) || "";
+      const match2 = scoreText.match(/\d+(\.\d+)?/);
+      if (match2) {
+        const percent = Math.max(0, Math.min(100, parseFloat(match2[0])));
+        ring.style.setProperty("--score-angle", `${percent / 100 * 360}deg`);
+        ring.classList.remove("score-good", "score-average", "score-poor");
+        if (percent >= 80) ring.classList.add("score-good");
+        else if (percent >= 50) ring.classList.add("score-average");
+        else ring.classList.add("score-poor");
+      }
+    }
+  }, [seoHtml]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "seo-report.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -84909,8 +84965,13 @@ function SeoReportPage() {
     ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "seo-report.content", className: "mb-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("style", { children: `
               /* ============================================================
-                 SEO Report — dashboard-matched, theme-aware styling
+                 SEO Report — RankMath-style structure, theme-aware colors
                  ============================================================ */
+
+              @keyframes seo-report-fade-in {
+                from { opacity: 0; transform: translateY(6px); }
+                to   { opacity: 1; transform: translateY(0); }
+              }
 
               .seo-report {
                 width: 100%;
@@ -84918,6 +84979,11 @@ function SeoReportPage() {
                 flex-direction: column;
                 gap: 1.5rem;
                 font-family: inherit;
+                animation: seo-report-fade-in 0.3s ease both;
+              }
+
+              @media (prefers-reduced-motion: reduce) {
+                .seo-report { animation: none; }
               }
 
               .seo-report * {
@@ -84930,20 +84996,19 @@ function SeoReportPage() {
                 padding: 0;
               }
 
-              /* ── Score overview: dashboard stat-card grid ───────────── */
+              /* ── Score overview: circular score + pass/warn/fail tiles ── */
               .seo-report .rank-math-result-graphs {
                 width: 100%;
                 background: oklch(var(--card));
                 border: 1px solid oklch(var(--border));
-                border-radius: 1rem;
-                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+                border-radius: 0.75rem;
+                box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
                 padding: 1.5rem;
-                margin-bottom: 1.5rem;
               }
 
               .seo-report .two-col {
                 display: grid;
-                grid-template-columns: 220px 1fr;
+                grid-template-columns: 240px 1fr;
                 gap: 1.5rem;
                 align-items: stretch;
               }
@@ -84955,34 +85020,50 @@ function SeoReportPage() {
                 justify-content: center;
                 gap: 0.75rem;
                 width: 100%;
-                background: oklch(var(--muted) / 0.4);
+                background: oklch(var(--muted) / 0.3);
                 border: 1px solid oklch(var(--border));
-                border-radius: 0.75rem;
+                border-radius: 0.625rem;
                 padding: 1.5rem 1rem;
               }
 
               #rank-math-circle-progress {
-                width: 140px;
-                height: 140px;
+                --score-angle: 226.8deg;
+                width: 150px;
+                height: 150px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 2.25rem;
+                font-size: 2.375rem;
                 font-weight: 700;
                 color: oklch(var(--foreground));
                 background: conic-gradient(
-                  oklch(var(--chart-2)) 0deg 226.8deg,
-                  oklch(var(--border)) 226.8deg 360deg
+                  oklch(var(--chart-2)) 0deg var(--score-angle),
+                  oklch(var(--border)) var(--score-angle) 360deg
                 );
                 position: relative;
                 flex-shrink: 0;
+                transition: background 0.6s ease;
+              }
+
+              #rank-math-circle-progress.score-average {
+                background: conic-gradient(
+                  oklch(var(--chart-3)) 0deg var(--score-angle),
+                  oklch(var(--border)) var(--score-angle) 360deg
+                );
+              }
+
+              #rank-math-circle-progress.score-poor {
+                background: conic-gradient(
+                  oklch(var(--destructive)) 0deg var(--score-angle),
+                  oklch(var(--border)) var(--score-angle) 360deg
+                );
               }
 
               #rank-math-circle-progress::before {
                 content: '';
                 position: absolute;
-                inset: 0.5rem;
+                inset: 0.55rem;
                 border-radius: 50%;
                 background: oklch(var(--card));
               }
@@ -84995,20 +85076,20 @@ function SeoReportPage() {
 
               .seo-report .graphs-main .result-score {
                 text-align: center;
-                margin-top: 0.5rem;
+                margin-top: 0.25rem;
               }
 
               .seo-report .graphs-main .result-score .score-average {
-                font-size: 1.1rem;
+                font-size: 1.05rem;
                 font-weight: 600;
                 color: oklch(var(--foreground));
                 font-family: var(--font-display, inherit);
               }
 
               .seo-report .result-score label {
-                font-size: 0.7rem;
+                font-size: 0.6875rem;
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.06em;
                 color: oklch(var(--muted-foreground));
                 display: block;
                 margin-top: 0.25rem;
@@ -85033,34 +85114,52 @@ function SeoReportPage() {
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 0.75rem;
-                background: oklch(var(--muted) / 0.4);
-                border-radius: 0.75rem;
-                padding: 1.25rem 1rem;
+                gap: 0.625rem;
+                background: oklch(var(--card));
+                border-radius: 0.625rem;
+                padding: 1.5rem 1rem;
                 border: 1px solid oklch(var(--border));
                 min-height: 0;
                 text-align: center;
                 min-width: 0;
-                transition: background 0.15s ease;
+                transition: box-shadow 0.15s ease;
               }
 
               .seo-report .chart li:hover {
-                background: oklch(var(--muted) / 0.6);
+                box-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.1);
               }
 
-              .seo-report .chart li span {
-                width: 100%;
-                display: block;
-                border-radius: 9999px;
-                height: 0.5rem !important;
-                order: 3;
-                background: oklch(var(--border));
-                overflow: hidden;
-              }
+.seo-report .chart li span {
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  display: block;
+  border-radius: 9999px;
+  height: 0.375rem !important;
+  order: 3;
+  background: oklch(var(--border)); /* empty/track color — hamesha full width */
+  overflow: hidden;
+}
 
-              .seo-report .chart-bar-good span    { background: oklch(var(--chart-2)); }
-              .seo-report .chart-bar-average span  { background: oklch(var(--chart-3)); }
-              .seo-report .chart-bar-bad span      { background: oklch(var(--destructive)); }
+.seo-report .chart li span::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--fill-percent, 0%);
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Explicit green / yellow / red — theme's chart-2/chart-3/destructive tokens
+   are gold/brown in this design system, not literal colors, so hardcode here. */
+.seo-report .chart li:nth-child(1) span::before { background: #22c55e !important; } /* Passed = green */
+.seo-report .chart li:nth-child(2) span::before { background: #eab308 !important; } /* Warnings = yellow */
+.seo-report .chart li:nth-child(3) span::before { background: #ef4444 !important; } /* Failed = red */
 
               .seo-report .chart li .result-score {
                 display: flex;
@@ -85073,17 +85172,21 @@ function SeoReportPage() {
               .seo-report .chart li .result-score strong {
                 font-size: 1.75rem;
                 font-weight: 700;
-                color: oklch(var(--foreground));
                 display: block;
                 line-height: 1.1;
                 font-family: var(--font-display, inherit);
+                color: oklch(var(--foreground));
               }
 
+              .seo-report .chart-bar-good .result-score strong    { color: oklch(var(--chart-2)); }
+              .seo-report .chart-bar-average .result-score strong { color: oklch(var(--chart-3)); }
+              .seo-report .chart-bar-bad .result-score strong     { color: oklch(var(--destructive)); }
+
               .seo-report .chart li label {
-                font-size: 0.7rem;
+                font-size: 0.6875rem;
                 font-weight: 600;
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.06em;
                 color: oklch(var(--muted-foreground));
                 order: 2;
               }
@@ -85093,17 +85196,19 @@ function SeoReportPage() {
                 width: 100%;
                 background: oklch(var(--card));
                 border: 1px solid oklch(var(--border));
-                border-radius: 1rem;
-                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+                border-radius: 0.75rem;
+                box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
                 overflow: hidden;
-                margin-bottom: 1.5rem;
               }
 
               .seo-report .rank-math-result-table > *:not(.table-row):not(.category-title) {
-                padding-left: 3.75rem;
+                padding-left: 1.75rem;
                 padding-right: 1.75rem;
                 margin-top: 1rem;
                 margin-bottom: 1rem;
+                color: oklch(var(--muted-foreground));
+                font-size: 0.875rem;
+                line-height: 1.6;
               }
 
               .seo-report .rank-math-result-table > h2,
@@ -85117,33 +85222,34 @@ function SeoReportPage() {
                 font-family: var(--font-display, inherit);
               }
 
+              /* Solid, full-width section header bar — matches the RankMath report layout */
               .seo-report .category-title {
-                font-size: 1rem;
+                font-size: 0.9375rem;
                 font-weight: 700;
-                color: oklch(var(--foreground));
-                padding: 1.25rem 1.75rem;
-                background: oklch(var(--muted) / 0.5);
-                border-bottom: 1px solid oklch(var(--border));
-                letter-spacing: 0.01em;
+                color: oklch(var(--primary-foreground));
+                background: oklch(var(--primary));
+                padding: 0.875rem 1.75rem;
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
                 font-family: var(--font-display, inherit);
-                margin-left:30px;
+                margin-left: 0;
               }
 
-              .seo-report .row-title {
-                padding-left: 60px;
-                margin-top: 10px;
-              }
-
-              .seo-report .status-icon {
-                margin-left: 20px;
-              }
-
+              /* Two-column row: label on the left, result content on the right */
               .seo-report .table-row {
+                display: grid;
+                grid-template-columns: 190px 1fr;
+                gap: 1.5rem;
+                align-items: start;
                 background: oklch(var(--card));
-                padding: 1.5rem 1.75rem;
+                padding: 1.125rem 1.75rem;
                 border-bottom: 1px solid oklch(var(--border));
-                border-left: 0.25rem solid transparent;
-                transition: all 0.15s ease;
+                border-left: 3px solid transparent;
+                transition: background 0.15s ease;
+              }
+
+              .seo-report .table-row:nth-child(even) {
+                background: oklch(var(--muted) / 0.25);
               }
 
               .seo-report .table-row:last-child {
@@ -85151,50 +85257,52 @@ function SeoReportPage() {
               }
 
               .seo-report .table-row:hover {
-                background: oklch(var(--muted) / 0.3);
+                background: oklch(var(--muted) / 0.45);
               }
 
               .seo-report .table-row:has(.status-ok),
               .seo-report .table-row:has(.icon-ok) {
                 border-left-color: oklch(var(--chart-2));
-                background: oklch(var(--chart-2) / 0.03);
               }
               .seo-report .table-row:has(.status-warning),
               .seo-report .table-row:has(.icon-attention-alt) {
                 border-left-color: oklch(var(--chart-3));
-                background: oklch(var(--chart-3) / 0.03);
               }
               .seo-report .table-row:has(.status-fail),
               .seo-report .table-row:has(.icon-cancel) {
                 border-left-color: oklch(var(--destructive));
-                background: oklch(var(--destructive) / 0.03);
               }
               .seo-report .table-row:has(.status-info) {
                 border-left-color: oklch(var(--chart-1));
-                background: oklch(var(--chart-1) / 0.03);
               }
 
               .seo-report .row-title {
-                margin-bottom: 0.75rem;
+                grid-column: 1;
+                padding-left: 0;
+                margin-top: 0;
+                margin-bottom: 0;
                 display: flex;
-                align-items: center;
-                gap: 0.75rem;
+                align-items: flex-start;
+                gap: 0.5rem;
                 flex-wrap: wrap;
               }
 
               .seo-report .row-title h3 {
-                font-size: 1rem;
+                font-size: 0.9375rem;
                 font-weight: 600;
                 color: oklch(var(--foreground));
                 display: inline;
                 margin: 0;
+                line-height: 1.4;
                 font-family: var(--font-display, inherit);
               }
 
               .seo-report .row-description {
+                grid-column: 2;
                 display: flex;
-                gap: 1rem;
+                gap: 0.875rem;
                 align-items: flex-start;
+                min-width: 0;
               }
 
               .seo-report .row-content {
@@ -85232,9 +85340,10 @@ function SeoReportPage() {
 
               /* ── Status icon badges ──────────────────────────────────── */
               .seo-report .status-icon {
-                width: 1.5rem;
-                height: 1.5rem;
-                min-width: 1.5rem;
+                width: 1.375rem;
+                height: 1.375rem;
+                min-width: 1.375rem;
+                margin-left: 0;
                 border-radius: 9999px;
                 display: inline-flex;
                 align-items: center;
@@ -85242,8 +85351,8 @@ function SeoReportPage() {
                 font-size: 0;
                 margin-top: 0.125rem;
                 color: oklch(var(--card));
-                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
               }
+
               .seo-report .status-icon.icon-ok,
               .seo-report .status-icon.status-ok {
                 background: oklch(var(--chart-2));
@@ -85261,13 +85370,13 @@ function SeoReportPage() {
               }
 
               .seo-report .status-icon.icon-ok::after {
-                content: '✓'; font-size: 0.75rem; font-weight: bold;
+                content: '✓'; font-size: 0.6875rem; font-weight: bold;
               }
               .seo-report .status-icon.icon-cancel::after {
-                content: '✕'; font-size: 0.75rem; font-weight: bold;
+                content: '✕'; font-size: 0.6875rem; font-weight: bold;
               }
               .seo-report .status-icon.icon-attention-alt::after {
-                content: '!'; font-size: 0.875rem; font-weight: bold;
+                content: '!'; font-size: 0.8125rem; font-weight: bold;
               }
 
               /* ── "How to fix" callouts ───────────────────────────────── */
@@ -85280,29 +85389,27 @@ function SeoReportPage() {
                 font-weight: 600;
                 color: oklch(var(--primary));
                 text-decoration: none;
-                padding: 0.5rem 0.875rem;
-                border-radius: 0.5rem;
-                background: oklch(var(--primary) / 0.1);
+                padding: 0.375rem 0.75rem;
+                border-radius: 0.375rem;
+                background: oklch(var(--primary) / 0.08);
                 transition: all 0.15s ease;
                 cursor: pointer;
                 border: 1px solid oklch(var(--primary) / 0.2);
               }
               .seo-report .result-action:hover {
                 background: oklch(var(--primary) / 0.15);
-                transform: translateY(-1px);
               }
 
               .seo-report .how-to-fix-wrapper {
-                margin-top: 1rem;
-                padding: 1.25rem;
-                background: oklch(var(--muted) / 0.4);
-                border-radius: 0.75rem;
-                border-left: 0.25rem solid oklch(var(--chart-3));
-                border: 1px solid oklch(var(--border));
+                margin-top: 0.875rem;
+                padding: 1rem 1.125rem;
+                background: oklch(var(--chart-3) / 0.06);
+                border-radius: 0.5rem;
+                border-left: 3px solid oklch(var(--chart-3));
               }
 
               .seo-report .analysis-test-how-to-fix {
-                font-size: 0.875rem;
+                font-size: 0.8438rem;
                 line-height: 1.6;
                 color: oklch(var(--muted-foreground));
               }
@@ -85325,13 +85432,13 @@ function SeoReportPage() {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: 1.125rem;
-                height: 1.125rem;
+                width: 1.0625rem;
+                height: 1.0625rem;
                 border-radius: 9999px;
                 background: oklch(var(--muted-foreground) / 0.2);
                 color: oklch(var(--muted-foreground));
                 font-style: normal;
-                font-size: 0.625rem;
+                font-size: 0.6rem;
                 font-weight: 700;
                 cursor: help;
                 transition: all 0.15s ease;
@@ -85356,7 +85463,7 @@ function SeoReportPage() {
                 white-space: normal;
                 width: 16rem;
                 z-index: 50;
-                box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+                box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
               }
               .seo-report .rank-math-tooltip:hover span {
                 display: block;
@@ -85365,13 +85472,25 @@ function SeoReportPage() {
               /* ── Inline code ─────────────────────────────────────────── */
               .seo-report code {
                 background: oklch(var(--muted));
-                padding: 0.25rem 0.5rem;
-                border-radius: 0.375rem;
-                font-size: 0.8125rem;
+                padding: 0.2rem 0.45rem;
+                border-radius: 0.3rem;
+                font-size: 0.8em;
                 color: oklch(var(--foreground));
                 word-break: break-all;
                 border: 1px solid oklch(var(--border));
                 font-family: var(--font-mono, ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, consolas, 'DejaVu Sans Mono', monospace);
+              }
+
+              .seo-report pre code,
+              .seo-report pre {
+                display: block;
+                white-space: pre-wrap;
+                word-break: break-word;
+                background: oklch(var(--foreground));
+                color: oklch(var(--card));
+                border: none;
+                border-radius: 0.5rem;
+                padding: 0.875rem 1rem;
               }
 
               .seo-report .seo-report-main-titles {
@@ -85395,22 +85514,22 @@ function SeoReportPage() {
               .seo-report img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 0.75rem;
+                border-radius: 0.5rem;
                 margin-top: 0.75rem;
                 border: 1px solid oklch(var(--border));
               }
 
-              /* ── SERP preview ─────────────────────────────────────────── */
+              /* ── Search preview cards (desktop + mobile) ─────────────── */
               .seo-report .serp-preview {
-                background: oklch(var(--muted) / 0.4);
+                background: oklch(var(--card));
                 border: 1px solid oklch(var(--border));
-                border-radius: 0.75rem;
-                padding: 1.25rem;
-                margin-top: 1rem;
-                max-width: 36rem;
+                border-radius: 0.5rem;
+                padding: 1.125rem 1.25rem;
+                margin-top: 0.5rem;
+                max-width: 32rem;
               }
               .seo-report .serp-title {
-                font-size: 1.125rem;
+                font-size: 1.0625rem;
                 color: oklch(var(--primary));
                 font-weight: 600;
                 line-height: 1.4;
@@ -85418,13 +85537,13 @@ function SeoReportPage() {
                 font-family: var(--font-display, inherit);
               }
               .seo-report .serp-url {
-                font-size: 0.875rem;
+                font-size: 0.8125rem;
                 color: oklch(var(--chart-2));
                 margin-bottom: 0.375rem;
                 font-family: var(--font-mono, ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, consolas, 'DejaVu Sans Mono', monospace);
               }
               .seo-report .serp-description {
-                font-size: 0.9375rem;
+                font-size: 0.875rem;
                 color: oklch(var(--muted-foreground));
                 line-height: 1.5;
               }
@@ -85437,26 +85556,24 @@ function SeoReportPage() {
                 display: inline-flex;
                 align-items: center;
                 gap: 0.5rem;
-                padding: 0.75rem 1.25rem;
+                padding: 0.625rem 1.125rem;
                 background: oklch(var(--primary));
                 color: oklch(var(--primary-foreground));
-                border-radius: 0.5rem;
-                font-size: 0.9375rem;
+                border-radius: 0.375rem;
+                font-size: 0.875rem;
                 font-weight: 600;
                 text-decoration: none;
                 transition: all 0.15s ease;
-                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
               }
               .seo-report .analysis-cta a:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+                opacity: 0.9;
               }
 
               .seo-report .clear {
                 clear: both;
               }
 
-              /* ── Responsive ──────────────────────────────────────────── */
+              /* ── Responsive: stack the two-column rows on small screens ── */
               @media (max-width: 768px) {
                 .seo-report .rank-math-result-graphs {
                   padding: 1.25rem;
@@ -85480,11 +85597,17 @@ function SeoReportPage() {
                   font-size: 0.625rem;
                 }
                 .seo-report .category-title {
-                  padding: 1rem 1.25rem;
-                  font-size: 0.9375rem;
+                  padding: 0.875rem 1.25rem;
+                  font-size: 0.875rem;
                 }
                 .seo-report .table-row {
-                  padding: 1.25rem;
+                  grid-template-columns: 1fr;
+                  gap: 0.5rem;
+                  padding: 1.125rem 1.25rem;
+                }
+                .seo-report .row-title,
+                .seo-report .row-description {
+                  grid-column: 1;
                 }
                 .seo-report .row-content br {
                   display: none;
@@ -85523,11 +85646,11 @@ function SeoReportPage() {
                   padding: 1rem;
                 }
                 .seo-report .category-title {
-                  padding: 0.875rem 1rem;
+                  padding: 0.75rem 1rem;
                 }
               }
             ` }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "seo-report", children: parse(seoHtml) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "seo-report", ref: contentRef, children: parse(seoHtml) })
     ] })
   ] });
 }

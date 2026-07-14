@@ -650,6 +650,30 @@ video {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.\!container {
+  width: 100% !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  padding-right: 2rem !important;
+  padding-left: 2rem !important;
+}
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+@media (min-width: 1400px) {
+
+  .\!container {
+    max-width: 1400px !important;
+  }
+
+  .container {
+    max-width: 1400px;
+  }
+}
 .prose {
   color: var(--tw-prose-body);
   max-width: 65ch;

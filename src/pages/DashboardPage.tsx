@@ -2,7 +2,6 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { getMetaOverviewApi, getMetaStatusApi } from "@/apiCalls/metaAnalytics";
-import { getSeoReportApi } from "@/apiCalls/seoReport";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
