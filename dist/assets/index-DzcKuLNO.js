@@ -78344,15 +78344,13 @@ function HeroSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.description,
-            onChange: (event) => updateField("description", event.target.value),
-            placeholder: "Intro copy shown below the hero heading",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("description", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
@@ -78574,28 +78572,24 @@ function HowItWorksSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Subheading" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.subheading,
-            onChange: (event) => updateField("subheading", event.target.value),
-            placeholder: "We're dedicated to helping you achieve and maintain healthy skin with treatment plans built around your comfort.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("subheading", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Section Description" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Textarea,
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageEditor,
         {
           value: form.description,
-          onChange: (event) => updateField("description", event.target.value),
-          placeholder: "Optional additional description for the section.",
-          className: "rounded-2xl min-h-[110px] resize-none"
+          onChange: (content) => updateField("description", content)
         }
-      )
+      ) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
@@ -78612,15 +78606,13 @@ function HowItWorksSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Step One Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.stepOneDescription,
-            onChange: (event) => updateField("stepOneDescription", event.target.value),
-            placeholder: "We understand your skin concerns and goals to build a plan around your needs.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("stepOneDescription", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-3", children: [
@@ -78638,15 +78630,13 @@ function HowItWorksSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Step Two Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.stepTwoDescription,
-            onChange: (event) => updateField("stepTwoDescription", event.target.value),
-            placeholder: "Our specialists design a treatment approach that matches your condition and comfort.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("stepTwoDescription", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-3", children: [
@@ -78664,15 +78654,13 @@ function HowItWorksSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Step Three Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.stepThreeDescription,
-            onChange: (event) => updateField("stepThreeDescription", event.target.value),
-            placeholder: "Regular follow-ups help us monitor progress and keep your results on track.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("stepThreeDescription", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -78734,15 +78722,13 @@ function WhyChooseUsSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.description,
-            onChange: (event) => updateField("description", event.target.value),
-            placeholder: "Being deeply focused on patient care and wellbeing, we ensure every treatment is designed for long-term skin health and natural results.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("description", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
@@ -78782,15 +78768,13 @@ function WhyChooseUsSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Card One Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.cardOneDescription,
-            onChange: (event) => updateField("cardOneDescription", event.target.value),
-            placeholder: "Our team consists of highly trained and certified dermatology specialists.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("cardOneDescription", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
@@ -78808,15 +78792,13 @@ function WhyChooseUsSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Card Two Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.cardTwoDescription,
-            onChange: (event) => updateField("cardTwoDescription", event.target.value),
-            placeholder: "We utilize modern laser systems to provide safe and effective treatments.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("cardTwoDescription", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
@@ -78834,15 +78816,13 @@ function WhyChooseUsSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Card Three Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.cardThreeDescription,
-            onChange: (event) => updateField("cardThreeDescription", event.target.value),
-            placeholder: "Every treatment plan is personalized according to your skin goals.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("cardThreeDescription", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
@@ -78860,15 +78840,13 @@ function WhyChooseUsSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Card Four Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.cardFourDescription,
-            onChange: (event) => updateField("cardFourDescription", event.target.value),
-            placeholder: "We follow strict protocols and high-quality medical safety standards.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("cardFourDescription", content)
           }
-        )
+        ) })
       ] })
     ] })
   ] });
@@ -78920,27 +78898,23 @@ function AboutSectionEditor({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Subheading" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.subheading,
-            onChange: (event) => updateField("subheading", event.target.value),
-            placeholder: "Samarpan Hospital is a premium healthcare center in Hisar, Haryana, specializing in Gynecology, Obstetrics, and Plastic & Cosmetic Surgery.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("subheading", content)
           }
-        )
+        ) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Description" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Textarea,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
           {
             value: form.description,
-            onChange: (event) => updateField("description", event.target.value),
-            placeholder: "Our team of experienced specialists delivers safe, effective treatments in a comfortable and caring environment.",
-            className: "rounded-2xl min-h-[110px] resize-none"
+            onChange: (content) => updateField("description", content)
           }
-        )
+        ) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
@@ -84933,7 +84907,7 @@ function SeoReportPage() {
       PageHeader,
       {
         title: "SEO Audit Report",
-        description: "Latest RankMath SEO Analysis"
+        description: "Latest SEO Analysis"
       }
     ),
     isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6 mb-6", "data-ocid": "seo-report.skeleton", children: [

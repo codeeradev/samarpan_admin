@@ -13,6 +13,10 @@ import {
   resolveAssetUrl,
 } from "./types";
 
+import PageEditor from "@/components/editor/pageEditor";
+
+import "../pages-editor.css";
+
 type FormUpdater<Form> = <K extends keyof Form>(key: K, value: Form[K]) => void;
 
 type ImageUploadFieldProps = {
@@ -138,12 +142,12 @@ export function HeroSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Description</Label>
-          <Textarea
-            value={form.description}
-            onChange={(event) => updateField("description", event.target.value)}
-            placeholder="Intro copy shown below the hero heading"
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.description}
+              onChange={(content) => updateField("description", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -349,24 +353,24 @@ export function HowItWorksSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Subheading</Label>
-          <Textarea
-            value={form.subheading}
-            onChange={(event) => updateField("subheading", event.target.value)}
-            placeholder="We're dedicated to helping you achieve and maintain healthy skin with treatment plans built around your comfort."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.subheading}
+              onChange={(content) => updateField("subheading", content)}
+            />
+          </div>
         </div>
       </div>
 
       <div className="grid gap-4">
         <div className="space-y-2">
           <Label>Section Description</Label>
-          <Textarea
-            value={form.description}
-            onChange={(event) => updateField("description", event.target.value)}
-            placeholder="Optional additional description for the section."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.description}
+              onChange={(content) => updateField("description", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -384,14 +388,12 @@ export function HowItWorksSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Step One Description</Label>
-          <Textarea
-            value={form.stepOneDescription}
-            onChange={(event) =>
-              updateField("stepOneDescription", event.target.value)
-            }
-            placeholder="We understand your skin concerns and goals to build a plan around your needs."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.stepOneDescription}
+              onChange={(content) => updateField("stepOneDescription", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -409,14 +411,12 @@ export function HowItWorksSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Step Two Description</Label>
-          <Textarea
-            value={form.stepTwoDescription}
-            onChange={(event) =>
-              updateField("stepTwoDescription", event.target.value)
-            }
-            placeholder="Our specialists design a treatment approach that matches your condition and comfort."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.stepTwoDescription}
+              onChange={(content) => updateField("stepTwoDescription", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -434,14 +434,14 @@ export function HowItWorksSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Step Three Description</Label>
-          <Textarea
-            value={form.stepThreeDescription}
-            onChange={(event) =>
-              updateField("stepThreeDescription", event.target.value)
-            }
-            placeholder="Regular follow-ups help us monitor progress and keep your results on track."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.stepThreeDescription}
+              onChange={(content) =>
+                updateField("stepThreeDescription", content)
+              }
+            />
+          </div>
         </div>
       </div>
 
@@ -503,12 +503,12 @@ export function WhyChooseUsSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Description</Label>
-          <Textarea
-            value={form.description}
-            onChange={(event) => updateField("description", event.target.value)}
-            placeholder="Being deeply focused on patient care and wellbeing, we ensure every treatment is designed for long-term skin health and natural results."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.description}
+              onChange={(content) => updateField("description", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -543,14 +543,12 @@ export function WhyChooseUsSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Card One Description</Label>
-          <Textarea
-            value={form.cardOneDescription}
-            onChange={(event) =>
-              updateField("cardOneDescription", event.target.value)
-            }
-            placeholder="Our team consists of highly trained and certified dermatology specialists."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.cardOneDescription}
+              onChange={(content) => updateField("cardOneDescription", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -568,14 +566,12 @@ export function WhyChooseUsSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Card Two Description</Label>
-          <Textarea
-            value={form.cardTwoDescription}
-            onChange={(event) =>
-              updateField("cardTwoDescription", event.target.value)
-            }
-            placeholder="We utilize modern laser systems to provide safe and effective treatments."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.cardTwoDescription}
+              onChange={(content) => updateField("cardTwoDescription", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -593,14 +589,14 @@ export function WhyChooseUsSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Card Three Description</Label>
-          <Textarea
-            value={form.cardThreeDescription}
-            onChange={(event) =>
-              updateField("cardThreeDescription", event.target.value)
-            }
-            placeholder="Every treatment plan is personalized according to your skin goals."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.cardThreeDescription}
+              onChange={(content) =>
+                updateField("cardThreeDescription", content)
+              }
+            />
+          </div>
         </div>
       </div>
 
@@ -618,14 +614,14 @@ export function WhyChooseUsSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Card Four Description</Label>
-          <Textarea
-            value={form.cardFourDescription}
-            onChange={(event) =>
-              updateField("cardFourDescription", event.target.value)
-            }
-            placeholder="We follow strict protocols and high-quality medical safety standards."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.cardFourDescription}
+              onChange={(content) =>
+                updateField("cardFourDescription", content)
+              }
+            />
+          </div>
         </div>
       </div>
     </>
@@ -677,21 +673,21 @@ export function AboutSectionEditor({
         </div>
         <div className="space-y-2">
           <Label>Subheading</Label>
-          <Textarea
-            value={form.subheading}
-            onChange={(event) => updateField("subheading", event.target.value)}
-            placeholder="Samarpan Hospital is a premium healthcare center in Hisar, Haryana, specializing in Gynecology, Obstetrics, and Plastic & Cosmetic Surgery."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.subheading}
+              onChange={(content) => updateField("subheading", content)}
+            />
+          </div>
         </div>
         <div className="space-y-2">
           <Label>Description</Label>
-          <Textarea
-            value={form.description}
-            onChange={(event) => updateField("description", event.target.value)}
-            placeholder="Our team of experienced specialists delivers safe, effective treatments in a comfortable and caring environment."
-            className="rounded-2xl min-h-[110px] resize-none"
-          />
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.description}
+              onChange={(content) => updateField("description", content)}
+            />
+          </div>
         </div>
       </div>
 
@@ -1073,28 +1069,28 @@ export function WhyChooseUsPreview({ form }: { form: WhyChooseUsFormState }) {
             </div>
           </div>
           <div className="relative rounded-[28px] border border-slate-100 bg-[#F7EFE6]">
-  {sectionImageUrl ? (
-    <img
-      src={sectionImageUrl}
-      alt="Why choose us"
-      className="h-full min-h-[360px] w-full object-cover rounded-[28px]"
-    />
-  ) : (
-    <div className="flex h-full min-h-[360px] items-center justify-center text-[#B9775B]">
-      <ImageIcon size={40} />
-    </div>
-  )}
+            {sectionImageUrl ? (
+              <img
+                src={sectionImageUrl}
+                alt="Why choose us"
+                className="h-full min-h-[360px] w-full object-cover rounded-[28px]"
+              />
+            ) : (
+              <div className="flex h-full min-h-[360px] items-center justify-center text-[#B9775B]">
+                <ImageIcon size={40} />
+              </div>
+            )}
 
-  {secondaryImageUrl && (
-    <div className="absolute left-6 bottom-6 w-[42%] max-w-[160px] rounded-[20px] border border-white shadow-2xl overflow-hidden z-20">
-      <img
-        src={secondaryImageUrl}
-        alt="Secondary"
-        className="w-full h-[160px] object-cover"
-      />
-    </div>
-  )}
-</div>
+            {secondaryImageUrl && (
+              <div className="absolute left-6 bottom-6 w-[42%] max-w-[160px] rounded-[20px] border border-white shadow-2xl overflow-hidden z-20">
+                <img
+                  src={secondaryImageUrl}
+                  alt="Secondary"
+                  className="w-full h-[160px] object-cover"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

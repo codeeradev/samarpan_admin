@@ -89,7 +89,7 @@ export default function SeoReportPage() {
     <div data-ocid="seo-report.page">
       <PageHeader
         title="SEO Audit Report"
-        description="Latest RankMath SEO Analysis"
+        description="Latest SEO Analysis"
       />
 
       {isLoading ? (
