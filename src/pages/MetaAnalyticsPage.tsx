@@ -384,6 +384,24 @@ function PostDetailsDialog({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const status = params.get("meta");
+
+    if (status === "connected") {
+      toast.success("Facebook connected successfully");
+
+      window.history.replaceState({}, "", "/meta-analytics");
+    }
+
+    if (status === "failed") {
+      toast.error("Failed to connect Facebook");
+
+      window.history.replaceState({}, "", "/meta-analytics");
+    }
+  }, []);
+
+  useEffect(() => {
     if (open && post) {
       setLoading(true);
       setDetails(null);
@@ -462,9 +480,7 @@ function PostDetailsDialog({
                 <span className="text-lg font-semibold tabular-nums text-foreground">
                   {loading
                     ? "—"
-                    : formatNumber(
-                        details?.likeCount ?? post.likes,
-                      )}
+                    : formatNumber(details?.likeCount ?? post.likes)}
                 </span>
                 <span className="text-sm text-muted-foreground">Likes</span>
               </div>
@@ -473,9 +489,7 @@ function PostDetailsDialog({
                 <span className="text-lg font-semibold tabular-nums text-foreground">
                   {loading
                     ? "—"
-                    : formatNumber(
-                        details?.commentCount ?? post.comments,
-                      )}
+                    : formatNumber(details?.commentCount ?? post.comments)}
                 </span>
                 <span className="text-sm text-muted-foreground">Comments</span>
               </div>
@@ -604,7 +618,9 @@ function PostsTable({
   const filteredPosts =
     platformFilter === "all"
       ? posts
-      : posts.filter((post) => post.platform === getPostPlatformLabel(platformFilter));
+      : posts.filter(
+          (post) => post.platform === getPostPlatformLabel(platformFilter),
+        );
 
   return (
     <Card className="shadow-card border border-border rounded-2xl">
@@ -738,7 +754,9 @@ function TopPostsSection({
   const filteredPosts =
     platformFilter === "all"
       ? posts
-      : posts.filter((post) => post.platform === getPostPlatformLabel(platformFilter));
+      : posts.filter(
+          (post) => post.platform === getPostPlatformLabel(platformFilter),
+        );
 
   return (
     <Card className="shadow-card border border-border rounded-2xl">

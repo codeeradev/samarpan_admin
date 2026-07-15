@@ -11,6 +11,7 @@ import HonorsPage from "@/pages/HonorsPage";
 import LoginPage from "@/pages/LoginPage";
 import MetaAnalyticsPage from "@/pages/MetaAnalyticsPage";
 import MetaCallbackPage from "@/pages/MetaCallbackPage";
+import LeadsPage from "@/pages/LeadsPage";
 import PagesPage from "@/pages/PagesPage";
 import PatientsPage from "@/pages/PatientsPage";
 import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
@@ -120,6 +121,13 @@ const metaCallbackRoute = createRoute({
   path: "/meta/callback",
   beforeLoad: () => checkPermission("/meta-analytics"),
   component: MetaCallbackPage,
+});
+
+const leadsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/leads",
+  beforeLoad: () => checkPermission("/leads"),
+  component: LeadsPage,
 });
 
 const doctorsRoute = createRoute({
@@ -281,6 +289,7 @@ const routeTree = rootRoute.addChildren([
     metaAnalyticsRoute,
     seoReportRoute,
     metaCallbackRoute,
+    leadsRoute,
     doctorsRoute,
     specializationsRoute,
     honorsRoute,

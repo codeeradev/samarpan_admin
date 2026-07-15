@@ -41,6 +41,7 @@ import {
   UserRound,
   Loader2,
   RefreshCw,
+  Contact,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -424,6 +425,39 @@ export default function DashboardPage() {
         }
       />
 
+      <PageHeader
+        title="Dashboard"
+        description="Welcome to Samarpan Hospital Admin"
+        action={
+          canViewMetaAnalytics ? (
+            <div className="flex items-center gap-2">
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-xl"
+                data-ocid="dashboard.leads_button"
+              >
+                <Link to="/leads">
+                  <Contact size={16} />
+                  Leads
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-xl"
+                data-ocid="dashboard.meta_analytics_button"
+              >
+                <Link to="/meta-analytics">
+                  <BarChart3 size={16} />
+                  Meta Analytics
+                </Link>
+              </Button>
+            </div>
+          ) : null
+        }
+      />
+      
       {canViewMetaAnalytics ? (
         <div className="mb-4 sm:mb-6" data-ocid="dashboard.meta_analytics">
           <div className="mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">

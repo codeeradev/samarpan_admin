@@ -21972,6 +21972,9 @@ const get$3 = (url, config2) => {
 const post = (url, data, config2) => {
   return apiClient.post(url, data, config2);
 };
+const patch = (url, data, config2) => {
+  return apiClient.patch(url, data, config2);
+};
 const loginApi = async (email, password) => {
   var _a2;
   try {
@@ -22319,7 +22322,7 @@ function canAccessPath(admin, path) {
 const AuthContext = reactExports.createContext(null);
 function AuthProvider({ children }) {
   const [state, setState] = reactExports.useState(loadAuthState);
-  const updateAdmin = reactExports.useCallback((patch) => {
+  const updateAdmin = reactExports.useCallback((patch2) => {
     setState((prev2) => {
       if (!prev2.admin) {
         return prev2;
@@ -22328,8 +22331,8 @@ function AuthProvider({ children }) {
         ...prev2,
         admin: {
           ...prev2.admin,
-          ...patch,
-          permissions: patch.permissions !== void 0 ? normalizePermissions(patch.permissions) : prev2.admin.permissions
+          ...patch2,
+          permissions: patch2.permissions !== void 0 ? normalizePermissions(patch2.permissions) : prev2.admin.permissions
         }
       };
       saveAuthState(nextState);
@@ -30839,7 +30842,7 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$11 = [
+const __iconNode$12 = [
   [
     "path",
     {
@@ -30848,7 +30851,24 @@ const __iconNode$11 = [
     }
   ]
 ];
-const Activity = createLucideIcon("activity", __iconNode$11);
+const Activity = createLucideIcon("activity", __iconNode$12);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$11 = [
+  [
+    "path",
+    {
+      d: "m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526",
+      key: "1yiouv"
+    }
+  ],
+  ["circle", { cx: "12", cy: "8", r: "6", key: "1vp47v" }]
+];
+const Award = createLucideIcon("award", __iconNode$11);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30859,13 +30879,13 @@ const __iconNode$10 = [
   [
     "path",
     {
-      d: "m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526",
-      key: "1yiouv"
+      d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+      key: "3c2336"
     }
   ],
-  ["circle", { cx: "12", cy: "8", r: "6", key: "1vp47v" }]
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const Award = createLucideIcon("award", __iconNode$10);
+const BadgeCheck = createLucideIcon("badge-check", __iconNode$10);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30873,16 +30893,10 @@ const Award = createLucideIcon("award", __iconNode$10);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$$ = [
-  [
-    "path",
-    {
-      d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
-      key: "3c2336"
-    }
-  ],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ["path", { d: "M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16", key: "jecpp" }],
+  ["rect", { width: "20", height: "14", x: "2", y: "6", rx: "2", key: "i6l2r4" }]
 ];
-const BadgeCheck = createLucideIcon("badge-check", __iconNode$$);
+const Briefcase = createLucideIcon("briefcase", __iconNode$$);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30890,17 +30904,6 @@ const BadgeCheck = createLucideIcon("badge-check", __iconNode$$);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$_ = [
-  ["path", { d: "M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16", key: "jecpp" }],
-  ["rect", { width: "20", height: "14", x: "2", y: "6", rx: "2", key: "i6l2r4" }]
-];
-const Briefcase = createLucideIcon("briefcase", __iconNode$_);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$Z = [
   ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["path", { d: "M8 2v4", key: "1cmpym" }],
@@ -30908,14 +30911,14 @@ const __iconNode$Z = [
   ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
   ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
 ];
-const CalendarClock = createLucideIcon("calendar-clock", __iconNode$Z);
+const CalendarClock = createLucideIcon("calendar-clock", __iconNode$_);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$Y = [
+const __iconNode$Z = [
   ["path", { d: "M8 2v4", key: "1cmpym" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
@@ -30927,7 +30930,20 @@ const __iconNode$Y = [
   ["path", { d: "M12 18h.01", key: "mhygvu" }],
   ["path", { d: "M16 18h.01", key: "kzsmim" }]
 ];
-const CalendarDays = createLucideIcon("calendar-days", __iconNode$Y);
+const CalendarDays = createLucideIcon("calendar-days", __iconNode$Z);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$Y = [
+  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M16 2v4", key: "4m81vk" }],
+  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
+  ["path", { d: "M3 10h18", key: "8toen8" }]
+];
+const Calendar = createLucideIcon("calendar", __iconNode$Y);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -30935,65 +30951,63 @@ const CalendarDays = createLucideIcon("calendar-days", __iconNode$Y);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$X = [
-  ["path", { d: "M8 2v4", key: "1cmpym" }],
-  ["path", { d: "M16 2v4", key: "4m81vk" }],
-  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
-  ["path", { d: "M3 10h18", key: "8toen8" }]
-];
-const Calendar = createLucideIcon("calendar", __iconNode$X);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$W = [
   ["path", { d: "M3 3v16a2 2 0 0 0 2 2h16", key: "c24i48" }],
   ["path", { d: "M18 17V9", key: "2bz60n" }],
   ["path", { d: "M13 17V5", key: "1frdt8" }],
   ["path", { d: "M8 17v-3", key: "17ska0" }]
 ];
-const ChartColumn = createLucideIcon("chart-column", __iconNode$W);
+const ChartColumn = createLucideIcon("chart-column", __iconNode$X);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$V = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", __iconNode$V);
+const __iconNode$W = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
+const Check = createLucideIcon("check", __iconNode$W);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$U = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$U);
+const __iconNode$V = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$V);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$T = [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]];
-const ChevronLeft = createLucideIcon("chevron-left", __iconNode$T);
+const __iconNode$U = [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]];
+const ChevronLeft = createLucideIcon("chevron-left", __iconNode$U);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$S = [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]];
-const ChevronRight = createLucideIcon("chevron-right", __iconNode$S);
+const __iconNode$T = [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]];
+const ChevronRight = createLucideIcon("chevron-right", __iconNode$T);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$R = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$R);
+const __iconNode$S = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$S);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$R = [
+  ["path", { d: "m11 17-5-5 5-5", key: "13zhaf" }],
+  ["path", { d: "m18 17-5-5 5-5", key: "h8a8et" }]
+];
+const ChevronsLeft = createLucideIcon("chevrons-left", __iconNode$R);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31001,10 +31015,10 @@ const ChevronUp = createLucideIcon("chevron-up", __iconNode$R);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$Q = [
-  ["path", { d: "m11 17-5-5 5-5", key: "13zhaf" }],
-  ["path", { d: "m18 17-5-5 5-5", key: "h8a8et" }]
+  ["path", { d: "m6 17 5-5-5-5", key: "xnjwq" }],
+  ["path", { d: "m13 17 5-5-5-5", key: "17xmmf" }]
 ];
-const ChevronsLeft = createLucideIcon("chevrons-left", __iconNode$Q);
+const ChevronsRight = createLucideIcon("chevrons-right", __iconNode$Q);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31012,10 +31026,10 @@ const ChevronsLeft = createLucideIcon("chevrons-left", __iconNode$Q);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$P = [
-  ["path", { d: "m6 17 5-5-5-5", key: "xnjwq" }],
-  ["path", { d: "m13 17 5-5-5-5", key: "17xmmf" }]
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const ChevronsRight = createLucideIcon("chevrons-right", __iconNode$P);
+const CircleCheck = createLucideIcon("circle-check", __iconNode$P);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31024,9 +31038,10 @@ const ChevronsRight = createLucideIcon("chevrons-right", __iconNode$P);
  */
 const __iconNode$O = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
+  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
 ];
-const CircleCheck = createLucideIcon("circle-check", __iconNode$O);
+const CircleX = createLucideIcon("circle-x", __iconNode$O);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31035,10 +31050,9 @@ const CircleCheck = createLucideIcon("circle-check", __iconNode$O);
  */
 const __iconNode$N = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
-  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
+  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
 ];
-const CircleX = createLucideIcon("circle-x", __iconNode$N);
+const Clock = createLucideIcon("clock", __iconNode$N);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31046,10 +31060,13 @@ const CircleX = createLucideIcon("circle-x", __iconNode$N);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$M = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
+  ["path", { d: "M16 2v2", key: "scm5qe" }],
+  ["path", { d: "M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2", key: "1waht3" }],
+  ["path", { d: "M8 2v2", key: "pbkmx" }],
+  ["circle", { cx: "12", cy: "11", r: "3", key: "itu57m" }],
+  ["rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", key: "12vinp" }]
 ];
-const Clock = createLucideIcon("clock", __iconNode$M);
+const Contact = createLucideIcon("contact", __iconNode$M);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -42789,7 +42806,7 @@ var $e = reactExports.forwardRef(function(e3, t2) {
   }));
 });
 const SKELETON_ROWS$2 = ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5"];
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS$1 = [
   { value: "all", label: "All Statuses" },
   { value: "pending", label: "Pending" },
   { value: "confirmed", label: "Confirmed" },
@@ -43273,7 +43290,7 @@ function AppointmentsPage() {
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Filter by status" })
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { className: "rounded-xl", children: STATUS_OPTIONS.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { className: "rounded-xl", children: STATUS_OPTIONS$1.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx(
               SelectItem,
               {
                 value: opt.value,
@@ -44873,6 +44890,44 @@ const getMetaPostDetailsApi = async (postId, platform2) => {
 const getMetaTopPostsApi = async () => {
   const response = await get$3(metaEndpoint("/top-posts"), { needAuth: true });
   return response.data.posts;
+};
+const buildLeadsQuery = (query) => {
+  const params = new URLSearchParams();
+  if (query.page) params.set("page", String(query.page));
+  params.set("limit", String(query.limit));
+  if (query.search) params.set("search", query.search);
+  if (query.formId) params.set("formId", query.formId);
+  if (query.status) params.set("status", query.status);
+  if (query.startDate) params.set("startDate", query.startDate);
+  if (query.endDate) params.set("endDate", query.endDate);
+  return params.toString();
+};
+const getLeadFormsApi = async () => {
+  const response = await get$3(metaEndpoint("/leads/forms"), { needAuth: true });
+  return response.data;
+};
+const syncMetaLeadsApi = async () => {
+  const response = await post(
+    metaEndpoint("/leads/sync"),
+    {},
+    { needAuth: true }
+  );
+  return response.data;
+};
+const getMetaLeadsApi = async (query) => {
+  const response = await get$3(
+    metaEndpoint(`/leads?${buildLeadsQuery(query)}`),
+    { needAuth: true }
+  );
+  return response.data;
+};
+const updateMetaLeadApi = async (leadId, payload) => {
+  const response = await patch(
+    metaEndpoint(`/leads/${encodeURIComponent(leadId)}`),
+    payload,
+    { needAuth: true }
+  );
+  return response.data;
 };
 const getDashboardApi = async () => {
   const response = await get$3(ENDPOINT.GET_DASHBOARD, { needAuth: true });
@@ -66552,7 +66607,7 @@ const SKELETON_ANALYTICS_STAT_KEYS = [
   "sk-analytics-4",
   "sk-analytics-5"
 ];
-const SKELETON_ROW_KEYS = [
+const SKELETON_ROW_KEYS$1 = [
   "sk-row-1",
   "sk-row-2",
   "sk-row-3",
@@ -66785,6 +66840,41 @@ function DashboardPage() {
         ) : null
       }
     ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Dashboard",
+        description: "Welcome to Samarpan Hospital Admin",
+        action: canViewMetaAnalytics ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              asChild: true,
+              variant: "outline",
+              className: "rounded-xl",
+              "data-ocid": "dashboard.leads_button",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Link, { to: "/leads", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Contact, { size: 16 }),
+                "Leads"
+              ] })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              asChild: true,
+              variant: "outline",
+              className: "rounded-xl",
+              "data-ocid": "dashboard.meta_analytics_button",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Link, { to: "/meta-analytics", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ChartColumn, { size: 16 }),
+                "Meta Analytics"
+              ] })
+            }
+          )
+        ] }) : null
+      }
+    ),
     canViewMetaAnalytics ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 sm:mb-6", "data-ocid": "dashboard.meta_analytics", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -66949,7 +67039,7 @@ function DashboardPage() {
               },
               col
             )) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: analyticsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: analyticsLoading ? SKELETON_ROW_KEYS$1.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx(
               "tr",
               {
                 className: "border-b border-border/60",
@@ -67266,7 +67356,7 @@ function DashboardPage() {
                   col
                 )
               ) }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: apptLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: SKELETON_CELL_KEYS.map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, rk)) : recent.map((appt, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: apptLoading ? SKELETON_ROW_KEYS$1.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: SKELETON_CELL_KEYS.map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, rk)) : recent.map((appt, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "tr",
                 {
                   className: "border-b border-border/60 hover:bg-muted transition-colors",
@@ -67282,7 +67372,7 @@ function DashboardPage() {
                 appt._id
               )) })
             ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "md:hidden divide-y divide-border/60", children: apptLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "md:hidden divide-y divide-border/60", children: apptLoading ? SKELETON_ROW_KEYS$1.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 space-y-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-1/2 rounded" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-2/3 rounded" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-1/3 rounded" })
@@ -70745,6 +70835,18 @@ function PostDetailsDialog({
   const [details, setDetails] = reactExports.useState(null);
   const [loading, setLoading] = reactExports.useState(false);
   reactExports.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("meta");
+    if (status === "connected") {
+      ue.success("Facebook connected successfully");
+      window.history.replaceState({}, "", "/meta-analytics");
+    }
+    if (status === "failed") {
+      ue.error("Failed to connect Facebook");
+      window.history.replaceState({}, "", "/meta-analytics");
+    }
+  }, []);
+  reactExports.useEffect(() => {
     if (open && post2) {
       setLoading(true);
       setDetails(null);
@@ -70798,16 +70900,12 @@ function PostDetailsDialog({
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-4 py-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ThumbsUp, { size: 18, className: "text-blue-500" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-semibold tabular-nums text-foreground", children: loading ? "—" : formatNumber(
-              (details == null ? void 0 : details.likeCount) ?? post2.likes
-            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-semibold tabular-nums text-foreground", children: loading ? "—" : formatNumber((details == null ? void 0 : details.likeCount) ?? post2.likes) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: "Likes" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-4 py-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(MessageCircle, { size: 18, className: "text-emerald-500" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-semibold tabular-nums text-foreground", children: loading ? "—" : formatNumber(
-              (details == null ? void 0 : details.commentCount) ?? post2.comments
-            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-semibold tabular-nums text-foreground", children: loading ? "—" : formatNumber((details == null ? void 0 : details.commentCount) ?? post2.comments) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: "Comments" })
           ] })
         ] })
@@ -70874,7 +70972,9 @@ function PostsTable({
 }) {
   const [selectedPost, setSelectedPost] = reactExports.useState(null);
   const [detailsOpen, setDetailsOpen] = reactExports.useState(false);
-  const filteredPosts = platformFilter === "all" ? posts : posts.filter((post2) => post2.platform === getPostPlatformLabel(platformFilter));
+  const filteredPosts = platformFilter === "all" ? posts : posts.filter(
+    (post2) => post2.platform === getPostPlatformLabel(platformFilter)
+  );
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-card border border-border rounded-2xl", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base font-semibold font-display", children: "Posts" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
@@ -70960,7 +71060,9 @@ function TopPostsSection({
   loading,
   platformFilter
 }) {
-  const filteredPosts = platformFilter === "all" ? posts : posts.filter((post2) => post2.platform === getPostPlatformLabel(platformFilter));
+  const filteredPosts = platformFilter === "all" ? posts : posts.filter(
+    (post2) => post2.platform === getPostPlatformLabel(platformFilter)
+  );
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-card border border-border rounded-2xl", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base font-semibold font-display", children: "Top Performing Posts" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: loading ? POST_SKELETON_ROWS.map((row) => /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-16 w-full rounded-xl" }, row)) : filteredPosts.length ? filteredPosts.slice(0, 10).map((post2, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -71455,6 +71557,304 @@ function MetaCallbackPage() {
       /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-2/3 rounded" })
     ] })
   ] }) }) }) });
+}
+const STATUS_OPTIONS = [
+  { value: "new", label: "New" },
+  { value: "contacted", label: "Contacted" },
+  { value: "qualified", label: "Qualified" },
+  { value: "converted", label: "Converted" },
+  { value: "closed", label: "Closed" }
+];
+const STATUS_BADGE_CLASS = {
+  new: "bg-primary/10 text-primary border-primary/20",
+  contacted: "bg-chart-2/10 text-chart-2 border-chart-2/20",
+  qualified: "bg-chart-1/10 text-chart-1 border-chart-1/20",
+  converted: "bg-green-600/10 text-green-600 border-green-600/20",
+  closed: "bg-muted text-muted-foreground border-border"
+};
+function LeadStatusBadge({ status }) {
+  const option = STATUS_OPTIONS.find((s2) => s2.value === status);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Badge,
+    {
+      variant: "outline",
+      className: `rounded-full font-medium ${STATUS_BADGE_CLASS[status]}`,
+      children: (option == null ? void 0 : option.label) ?? status
+    }
+  );
+}
+const formatDateTime = (value) => new Date(value).toLocaleString(void 0, {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit"
+});
+const SKELETON_ROW_KEYS = ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5", "sk-6"];
+function LeadsPage() {
+  const queryClient2 = useQueryClient();
+  const [search, setSearch] = reactExports.useState("");
+  const [debouncedSearch, setDebouncedSearch] = reactExports.useState("");
+  const [formId, setFormId] = reactExports.useState("all");
+  const [status, setStatus] = reactExports.useState("all");
+  const [page, setPage] = reactExports.useState(1);
+  const [selectedLead, setSelectedLead] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+  const { data: formsData } = useQuery({
+    queryKey: ["meta-lead-forms"],
+    queryFn: getLeadFormsApi
+  });
+  const {
+    data: leadsData,
+    isLoading: leadsLoading,
+    isFetching: leadsFetching
+  } = useQuery({
+    queryKey: ["meta-leads", { page, formId, status, debouncedSearch }],
+    queryFn: () => getMetaLeadsApi({
+      page,
+      limit: 20,
+      search: debouncedSearch || void 0,
+      formId: formId === "all" ? void 0 : formId,
+      status: status === "all" ? void 0 : status
+    })
+  });
+  const syncMutation = useMutation({
+    mutationFn: syncMetaLeadsApi,
+    onSuccess: (result) => {
+      ue.success(`Synced ${result.syncedCount} new lead(s) from Facebook.`);
+      queryClient2.invalidateQueries({ queryKey: ["meta-leads"] });
+      queryClient2.invalidateQueries({ queryKey: ["meta-lead-forms"] });
+    },
+    onError: () => ue.error("Failed to sync leads. Please try again.")
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ leadId, payload }) => updateMetaLeadApi(leadId, payload),
+    onSuccess: (result) => {
+      ue.success("Lead updated");
+      setSelectedLead(result.lead);
+      queryClient2.invalidateQueries({ queryKey: ["meta-leads"] });
+    },
+    onError: () => ue.error("Failed to update lead.")
+  });
+  const leads = (leadsData == null ? void 0 : leadsData.leads) ?? [];
+  const pagination = leadsData == null ? void 0 : leadsData.pagination;
+  const statusCounts = (leadsData == null ? void 0 : leadsData.statusCounts) ?? {};
+  const forms = (formsData == null ? void 0 : formsData.forms) ?? [];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "leads.page", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Leads",
+        description: "Facebook Lead Ads synced from your connected Page",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            onClick: () => syncMutation.mutate(),
+            disabled: syncMutation.isPending,
+            className: "rounded-xl",
+            children: syncMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }),
+              "Syncing..."
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "mr-2 h-4 w-4" }),
+              "Sync Leads"
+            ] })
+          }
+        )
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4 mb-4 sm:mb-6", children: leadsLoading ? SKELETON_ROW_KEYS.slice(0, 5).map((k2) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "rounded-2xl shadow-card border border-border", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-5 space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-xl" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20 rounded" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-14 rounded" })
+    ] }) }, k2)) : STATUS_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      StatCard,
+      {
+        icon: UserRound,
+        label: option.label,
+        value: (statusCounts[option.value] ?? 0).toLocaleString(),
+        subtitle: "leads",
+        color: "gold"
+      },
+      option.value
+    )) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-card border border-border rounded-2xl mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 flex flex-col lg:flex-row gap-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            placeholder: "Search by name, email or phone...",
+            value: search,
+            onChange: (e3) => setSearch(e3.target.value),
+            className: "pl-9 rounded-xl"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          value: formId,
+          onValueChange: (value) => {
+            setFormId(value);
+            setPage(1);
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full lg:w-56 rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "All forms" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "all", children: "All forms" }),
+              forms.map((form) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: form.formId, children: form.formName }, form.formId))
+            ] })
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          value: status,
+          onValueChange: (value) => {
+            setStatus(value);
+            setPage(1);
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full lg:w-44 rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "All statuses" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "all", children: "All statuses" }),
+              STATUS_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: option.value, children: option.label }, option.value))
+            ] })
+          ]
+        }
+      )
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-card border border-border rounded-2xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-0", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border bg-muted", children: ["Lead", "Contact", "Form", "Received", "Status"].map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "th",
+          {
+            className: "text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap",
+            children: col
+          },
+          col
+        )) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: leadsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: ["a", "b", "c", "d", "e"].map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, rk)) : leads.length > 0 ? leads.map((lead) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "tr",
+          {
+            className: "border-b border-border/60 hover:bg-muted transition-colors cursor-pointer",
+            onClick: () => setSelectedLead(lead),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground whitespace-nowrap", children: lead.fullName || "—" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5", children: [
+                lead.email ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5 text-xs", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { size: 12 }),
+                  " ",
+                  lead.email
+                ] }) : null,
+                lead.phoneNumber ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5 text-xs", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { size: 12 }),
+                  " ",
+                  lead.phoneNumber
+                ] }) : null
+              ] }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground max-w-[200px] truncate", children: lead.formName }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap text-xs", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { size: 12 }),
+                " ",
+                formatDateTime(lead.createdTime)
+              ] }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LeadStatusBadge, { status: lead.status }) })
+            ]
+          },
+          lead._id
+        )) : /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 5, className: "px-5 py-8 text-sm text-muted-foreground text-center", children: "No leads found. Try syncing or adjusting filters." }) }) })
+      ] }) }),
+      pagination && pagination.totalPages > 1 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between px-5 py-3 border-t border-border", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
+          "Page ",
+          pagination.page,
+          " of ",
+          pagination.totalPages,
+          " · ",
+          pagination.total,
+          " leads",
+          leadsFetching ? " · updating..." : ""
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              size: "sm",
+              className: "rounded-lg",
+              disabled: pagination.page <= 1,
+              onClick: () => setPage((p2) => Math.max(1, p2 - 1)),
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronLeft, { size: 14 })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              size: "sm",
+              className: "rounded-lg",
+              disabled: pagination.page >= pagination.totalPages,
+              onClick: () => setPage((p2) => p2 + 1),
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { size: 14 })
+            }
+          )
+        ] })
+      ] }) : null
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: Boolean(selectedLead),
+        onOpenChange: (open) => {
+          if (!open) setSelectedLead(null);
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "sm:max-w-lg max-h-[86vh] overflow-y-auto", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: (selectedLead == null ? void 0 : selectedLead.fullName) || "Lead details" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogDescription, { children: [
+              "Submitted via ",
+              selectedLead == null ? void 0 : selectedLead.formName,
+              " on",
+              " ",
+              selectedLead ? formatDateTime(selectedLead.createdTime) : ""
+            ] })
+          ] }),
+          selectedLead ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl border border-border divide-y divide-border/60", children: Object.entries(selectedLead.fieldData).map(([key, value]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3 px-4 py-2.5 text-sm", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground capitalize", children: key.replace(/_/g, " ") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-foreground text-right", children: value || "—" })
+            ] }, key)) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium text-muted-foreground mb-1.5", children: "Status" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: selectedLead.status,
+                  onValueChange: (value) => updateMutation.mutate({
+                    leadId: selectedLead._id,
+                    payload: { status: value }
+                  }),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: STATUS_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: option.value, children: option.label }, option.value)) })
+                  ]
+                }
+              )
+            ] })
+          ] }) : null
+        ] })
+      }
+    )
+  ] });
 }
 function normalizePageItem(page) {
   const seo = page.seo || {};
@@ -85693,6 +86093,12 @@ const metaCallbackRoute = createRoute({
   beforeLoad: () => checkPermission("/meta-analytics"),
   component: MetaCallbackPage
 });
+const leadsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/leads",
+  beforeLoad: () => checkPermission("/leads"),
+  component: LeadsPage
+});
 const doctorsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/doctors",
@@ -85820,6 +86226,7 @@ const routeTree = rootRoute.addChildren([
     metaAnalyticsRoute,
     seoReportRoute,
     metaCallbackRoute,
+    leadsRoute,
     doctorsRoute,
     specializationsRoute,
     honorsRoute,

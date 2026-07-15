@@ -51,4 +51,8 @@ export const put = (url: string, data?: any, config?: AxiosRequestConfig) => {
   return apiClient.put(url, data, config);
 };
 
+export const patch = (url: string, data?: any, config?: AxiosRequestConfig) => {
+  return apiClient.patch(url, data, config);
+};
+
 export default apiClient;
