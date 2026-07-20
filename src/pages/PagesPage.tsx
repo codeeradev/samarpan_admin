@@ -60,6 +60,7 @@ const emptyPageForm: PagePayload = {
   status: "published",
   metaTitle: "",
   metaDescription: "",
+  keywords: [],
   canonicalUrl: "",
   schemaMarkup: "",
 };
@@ -273,6 +274,7 @@ export default function PagesPage() {
         page.content,
         page.seo.metaTitle,
         page.seo.metaDescription,
+        page.seo.keywords.join(", "),
         page.status,
       ]
         .filter(Boolean)
@@ -296,6 +298,7 @@ export default function PagesPage() {
       status: page.status,
       metaTitle: page.seo.metaTitle,
       metaDescription: page.seo.metaDescription,
+      keywords: page.seo.keywords,
       canonicalUrl: page.seo.canonicalUrl,
       schemaMarkup: page.seo.schemaMarkup,
     });
@@ -350,6 +353,7 @@ export default function PagesPage() {
       status: formData.status,
       metaTitle: formData.metaTitle.trim(),
       metaDescription: formData.metaDescription.trim(),
+      keywords: formData.keywords,
       canonicalUrl: formData.canonicalUrl.trim(),
       schemaMarkup: formData.schemaMarkup,
     };
@@ -482,6 +486,11 @@ export default function PagesPage() {
                   metaTitle: "Samarpan Hospital",
                   metaDescription:
                     "Samarpan Hospital provides expert healthcare services in Hisar.",
+                  keywords: [
+                    "Samarpan Hospital Hisar",
+                    "hospital in Hisar",
+                    "healthcare services",
+                  ],
                   canonicalUrl: "https://samarpanhospitalhisar.com/",
                   schemaMarkup: JSON.stringify(
                     {
@@ -734,6 +743,27 @@ export default function PagesPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="page-keywords">
+                    Keywords (comma separated)
+                  </Label>
+                  <Input
+                    id="page-keywords"
+                    value={formData.keywords.join(", ")}
+                    onChange={(event) =>
+                      setField(
+                        "keywords",
+                        event.target.value
+                          .split(",")
+                          .map((keyword) => keyword.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                    placeholder="hospital in hisar, maternity care, cosmetic surgery"
+                    className="rounded-xl bg-card"
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="page-canonical-url">Canonical URL</Label>
                   <Input
                     id="page-canonical-url"
@@ -809,6 +839,7 @@ export default function PagesPage() {
                   seo: {
                     metaTitle: formData.metaTitle,
                     metaDescription: formData.metaDescription,
+                    keywords: formData.keywords,
                     canonicalUrl: formData.canonicalUrl,
                     schemaMarkup: formData.schemaMarkup,
                   },
@@ -884,6 +915,16 @@ export default function PagesPage() {
                     </p>
                     <p className="mt-1 text-sm text-foreground">
                       {previewPage.seo.metaDescription || "No meta description"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Keywords
+                    </p>
+                    <p className="mt-1 text-sm text-foreground">
+                      {previewPage.seo.keywords.length > 0
+                        ? previewPage.seo.keywords.join(", ")
+                        : "No keywords"}
                     </p>
                   </div>
                   <div>

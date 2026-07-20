@@ -12,6 +12,11 @@ export interface DoctorPayload {
   experience: string;
   qualification: string;
   expertise?: string[];
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
   permissions?: Record<string, boolean>;
   status?: boolean;
   isActive?: boolean;
@@ -32,6 +37,11 @@ export interface DoctorItem {
   experience?: string;
   qualification?: string;
   expertise?: string[];
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -68,6 +78,10 @@ function toFormData(payload: Partial<DoctorPayload>): FormData {
 
   if (payload.expertise) {
     fd.append("expertise", JSON.stringify(payload.expertise));
+  }
+
+  if (payload.seo) {
+    fd.append("seo", JSON.stringify(payload.seo));
   }
 
   if (payload.permissions) {

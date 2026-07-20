@@ -18,6 +18,11 @@ export interface CareerItem {
   applyEmail: string;
   applyLink: string;
   status: CareerStatus;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
   sortOrder: number;
   isActive?: boolean;
   createdAt?: string;
@@ -38,6 +43,11 @@ export interface CareerPayload {
   applyEmail: string;
   applyLink: string;
   status: CareerStatus;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
   sortOrder: number;
   image?: File | null;
 }
@@ -67,6 +77,7 @@ function normalizeCareerItem(career: Record<string, any>): CareerItem {
     applyEmail: career.applyEmail || "",
     applyLink: career.applyLink || "",
     status: career.status || "open",
+    seo: career.seo || { metaTitle: "", metaDescription: "", keywords: [] },
     sortOrder:
       typeof career.sortOrder === "number"
         ? career.sortOrder
@@ -104,6 +115,7 @@ function createCareerFormData(payload: CareerPayload) {
   formData.append("applyLink", payload.applyLink.trim());
 
   formData.append("status", payload.status);
+  formData.append("seo", JSON.stringify(payload.seo || {}));
 
   formData.append(
     "sortOrder",

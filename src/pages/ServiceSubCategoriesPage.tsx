@@ -32,6 +32,8 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { themeColor } from "@/lib/theme";
 
 import {
@@ -70,6 +72,9 @@ type FormDataType = {
   serviceId: string;
   serviceSubCategoryId: string;
   image: File | string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
 };
 
 type UpdateServiceSubCategoryVariables = {
@@ -84,6 +89,9 @@ const emptyForm: FormDataType = {
   serviceId: "",
   serviceSubCategoryId: "",
   image: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: "",
 };
 
 const tableStyles = {
@@ -259,6 +267,9 @@ export default function ServiceSubCategoriesPage() {
       image: item.image || "",
       serviceId: getServiceFeatureRelationId(item.serviceId),
       serviceSubCategoryId: getServiceFeatureRelationId(item.serviceSubCategoryId),
+      metaTitle: item.seo?.metaTitle || "",
+      metaDescription: item.seo?.metaDescription || "",
+      keywords: item.seo?.keywords?.join(", ") || "",
     });
 
     setModalOpen(true);
@@ -271,11 +282,23 @@ export default function ServiceSubCategoriesPage() {
       return;
     }
 
-    const payload = {
-      ...formData,
+    const payload: ServiceFeaturePayload = {
+      title: formData.title,
       slug: formData.slug?.trim()
         ? slugify(formData.slug)
         : slugify(formData.title),
+      content: formData.content,
+      image: formData.image,
+      serviceId: formData.serviceId,
+      serviceSubCategoryId: formData.serviceSubCategoryId,
+      seo: {
+        metaTitle: formData.metaTitle.trim(),
+        metaDescription: formData.metaDescription.trim(),
+        keywords: formData.keywords
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean),
+      },
     };
 
     if (editing) {
@@ -453,7 +476,20 @@ export default function ServiceSubCategoriesPage() {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-5">
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="w-full mb-2">
+              <TabsTrigger value="basic" className="flex-1">
+                Basic Info
+              </TabsTrigger>
+              <TabsTrigger value="content" className="flex-1">
+                Content
+              </TabsTrigger>
+              <TabsTrigger value="seo" className="flex-1">
+                SEO
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basic" className="space-y-5 mt-0">
             <div className="space-y-1">
               <Label>Title</Label>
 
@@ -591,7 +627,9 @@ export default function ServiceSubCategoriesPage() {
                 }}
               />
             </div>
+            </TabsContent>
 
+            <TabsContent value="content" className="mt-0">
             <div className="space-y-2">
               <Label>Content</Label>
 
@@ -607,7 +645,60 @@ export default function ServiceSubCategoriesPage() {
                 />
               </div>
             </div>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="seo" className="mt-0 space-y-4">
+                <div className="space-y-1">
+                  <Label>Meta Title</Label>
+                  <Input
+                    value={formData.metaTitle}
+                    onChange={(e) =>
+                      setFormData((previous) => ({
+                        ...previous,
+                        metaTitle: e.target.value,
+                      }))
+                    }
+                    placeholder="Sub-category meta title"
+                    maxLength={60}
+                  />
+                  <p className="text-xs text-muted-foreground text-right">
+                    {formData.metaTitle.length}/60
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Meta Description</Label>
+                  <Textarea
+                    value={formData.metaDescription}
+                    onChange={(e) =>
+                      setFormData((previous) => ({
+                        ...previous,
+                        metaDescription: e.target.value,
+                      }))
+                    }
+                    placeholder="Short search description for this sub-category"
+                    maxLength={160}
+                    className="min-h-[80px] resize-none"
+                    rows={3}
+                  />
+                  <p className="text-xs text-muted-foreground text-right">
+                    {formData.metaDescription.length}/160
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Keywords (comma separated)</Label>
+                  <Input
+                    value={formData.keywords}
+                    onChange={(e) =>
+                      setFormData((previous) => ({
+                        ...previous,
+                        keywords: e.target.value,
+                      }))
+                    }
+                    placeholder="service keyword, treatment keyword"
+                  />
+                </div>
+            </TabsContent>
+          </Tabs>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>

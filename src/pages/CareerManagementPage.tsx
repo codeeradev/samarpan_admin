@@ -8,6 +8,7 @@ import {
   updateCareerApi,
 } from "@/apiCalls/careers";
 import { PageHeader } from "@/components/admin/PageHeader";
+import PageEditor from "@/components/editor/pageEditor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
 import { themeColor } from "@/lib/theme";
@@ -37,6 +39,7 @@ import { useMemo, useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { toast } from "sonner";
 import { resolveAssetUrl } from "./website-content/types";
+import "./pages-editor.css";
 
 type CareerFormState = {
   title: string;
@@ -50,6 +53,9 @@ type CareerFormState = {
   responsibilitiesText: string;
   applyEmail: string;
   applyLink: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
   status: CareerStatus;
   sortOrder: string;
   image: File | null;
@@ -71,6 +77,9 @@ const emptyCareerForm: CareerFormState = {
   responsibilitiesText: "",
   applyEmail: "",
   applyLink: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: "",
   status: "open",
   sortOrder: "0",
   image: null,
@@ -326,6 +335,9 @@ export default function CareerManagementPage() {
       responsibilitiesText: career.responsibilities.join("\n"),
       applyEmail: career.applyEmail,
       applyLink: career.applyLink,
+      metaTitle: career.seo?.metaTitle || "",
+      metaDescription: career.seo?.metaDescription || "",
+      keywords: career.seo?.keywords?.join(", ") || "",
       status: career.status,
       sortOrder: String(career.sortOrder ?? 0),
       image: null,
@@ -375,6 +387,14 @@ export default function CareerManagementPage() {
       responsibilities: splitLines(formData.responsibilitiesText),
       applyEmail: formData.applyEmail.trim(),
       applyLink: formData.applyLink.trim(),
+      seo: {
+        metaTitle: formData.metaTitle.trim(),
+        metaDescription: formData.metaDescription.trim(),
+        keywords: formData.keywords
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean),
+      },
       status: formData.status,
       sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
       image: formData.image,
@@ -602,8 +622,23 @@ export default function CareerManagementPage() {
             setFormErrors({});
           }
         }}
+        modal={false}
       >
-        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-4xl">
+        <DialogContent
+          className="max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-4xl"
+          onInteractOutside={(e) => {
+            const el = e.target as HTMLElement;
+            if (
+              el.closest(".tox-tinymce-aux") ||
+              el.closest(".tox-dialog") ||
+              el.closest(".tox-menu") ||
+              el.closest(".tox-pop") ||
+              document.querySelector(".tox-dialog")
+            ) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl text-foreground">
               {editTarget ? "Edit Career" : "Add Career"}
@@ -614,7 +649,17 @@ export default function CareerManagementPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="w-full mb-2">
+              <TabsTrigger value="basic" className="flex-1">
+                Basic Info
+              </TabsTrigger>
+              <TabsTrigger value="seo" className="flex-1">
+                SEO
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basic" className="space-y-6 mt-0">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="career-title">
@@ -773,15 +818,12 @@ export default function CareerManagementPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="career-description">Description</Label>
-                <Textarea
-                  id="career-description"
-                  value={formData.description}
-                  onChange={(event) =>
-                    setField("description", event.target.value)
-                  }
-                  placeholder="Describe the role, team, and what the candidate will work on."
-                  className="rounded-2xl min-h-[140px]"
-                />
+                <div id="career-description" className="website-page-editor">
+                  <PageEditor
+                    value={formData.description}
+                    onChange={(content) => setField("description", content)}
+                  />
+                </div>
               </div>
             </div>
 
@@ -850,7 +892,58 @@ export default function CareerManagementPage() {
                 ) : null}
               </div>
             </div>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="seo" className="mt-0 space-y-4">
+              <div className="space-y-1">
+                <Label htmlFor="career-meta-title">Meta Title</Label>
+                <Input
+                  id="career-meta-title"
+                  value={formData.metaTitle}
+                  onChange={(event) =>
+                    setField("metaTitle", event.target.value)
+                  }
+                  placeholder="Career role meta title"
+                  maxLength={60}
+                />
+                <p className="text-xs text-muted-foreground text-right">
+                  {formData.metaTitle.length}/60
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="career-meta-description">
+                  Meta Description
+                </Label>
+                <Textarea
+                  id="career-meta-description"
+                  value={formData.metaDescription}
+                  onChange={(event) =>
+                    setField("metaDescription", event.target.value)
+                  }
+                  placeholder="Short search description for this career role."
+                  maxLength={160}
+                  className="resize-none min-h-[80px]"
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground text-right">
+                  {formData.metaDescription.length}/160
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="career-keywords">
+                  Keywords (comma separated)
+                </Label>
+                <Input
+                  id="career-keywords"
+                  value={formData.keywords}
+                  onChange={(event) => setField("keywords", event.target.value)}
+                  placeholder="nursing jobs hisar, hospital career"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <DialogFooter className="mt-4 gap-2">
             <Button

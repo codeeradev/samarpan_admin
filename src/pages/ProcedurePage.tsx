@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -479,6 +480,23 @@ export default function ProceduresPage() {
           </DialogHeader>
 
           <div className="space-y-8">
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="w-full mb-2">
+                <TabsTrigger value="basic" className="flex-1">
+                  Basic Info
+                </TabsTrigger>
+                <TabsTrigger value="content" className="flex-1">
+                  Content
+                </TabsTrigger>
+                <TabsTrigger value="seo" className="flex-1">
+                  SEO
+                </TabsTrigger>
+                <TabsTrigger value="image" className="flex-1">
+                  Image
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="basic" className="mt-0">
             <Card>
               <CardContent className="p-6 space-y-4">
                 <h3 className="font-semibold">Basic Info</h3>
@@ -540,7 +558,9 @@ export default function ProceduresPage() {
                 </div>
               </CardContent>
             </Card>
+              </TabsContent>
 
+              <TabsContent value="content" className="mt-0">
             <Card>
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">
@@ -588,7 +608,9 @@ export default function ProceduresPage() {
                 ) : null}
               </CardContent>
             </Card>
+              </TabsContent>
 
+              <TabsContent value="seo" className="mt-0">
             <Card>
               <CardContent className="p-6 space-y-4">
                 <h3 className="font-semibold">SEO</h3>
@@ -612,7 +634,9 @@ export default function ProceduresPage() {
                 />
               </CardContent>
             </Card>
+              </TabsContent>
 
+              <TabsContent value="image" className="mt-0">
             <Card>
               <CardContent className="p-6 space-y-4">
                 <h3 className="font-semibold">Featured Image</h3>
@@ -643,6 +667,8 @@ export default function ProceduresPage() {
                 ) : null}
               </CardContent>
             </Card>
+              </TabsContent>
+            </Tabs>
 
             <Button onClick={handleSave} className="w-full bg-primary">
               {mode === "edit" ? "Update Procedure" : "Create Procedure"}

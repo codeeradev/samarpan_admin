@@ -7,6 +7,7 @@ import {
   updateDoctorApi,
 } from "@/apiCalls/doctors";
 import { BASE_URL } from "@/apis/endpoint";
+import PageEditor from "@/components/editor/pageEditor";
 import { useSpecializations } from "@/hooks/useSpecializations";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatusBadge } from "@/components/admin/StatusBadge";
@@ -39,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -59,6 +61,8 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+
+import "./pages-editor.css";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -96,6 +100,9 @@ type DoctorFormData = {
   qualification: string;
   description: string;
   expertise: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
 };
 
 type FormErrors = Partial<Record<keyof DoctorFormData, string>>;
@@ -114,6 +121,9 @@ const emptyForm: DoctorFormData = {
   qualification: "",
   description: "",
   expertise: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: "",
 };
 
 function getInitials(name: string): string {
@@ -210,6 +220,11 @@ function buildPayload(
     experience: form.experience.trim(),
     qualification: form.qualification.trim(),
     expertise: splitCommaList(form.expertise),
+    seo: {
+      metaTitle: form.metaTitle.trim(),
+      metaDescription: form.metaDescription.trim(),
+      keywords: splitCommaList(form.keywords),
+    },
     image: form.image,
     ...availabilityToFlags(form.availability),
   };
@@ -345,6 +360,9 @@ export default function DoctorsPage() {
       qualification: doctor.qualification ?? "",
       description: doctor.description ?? "",
       expertise: (doctor.expertise ?? []).join(", "),
+      metaTitle: doctor.seo?.metaTitle ?? "",
+      metaDescription: doctor.seo?.metaDescription ?? "",
+      keywords: (doctor.seo?.keywords ?? []).join(", "),
     });
     setFormErrors({});
     setImageFileName(getImageLabel(doctor.image ?? ""));
@@ -711,10 +729,22 @@ export default function DoctorsPage() {
       </div>
 
       {/* Add Doctor Modal */}
-      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen} modal={false}>
         <DialogContent
           className="rounded-3xl w-[95vw] max-w-2xl max-h-[90vh] !max-w-[40vw] overflow-y-auto"
           data-ocid="doctors.dialog"
+          onInteractOutside={(e) => {
+            const el = e.target as HTMLElement;
+            if (
+              el.closest(".tox-tinymce-aux") ||
+              el.closest(".tox-dialog") ||
+              el.closest(".tox-menu") ||
+              el.closest(".tox-pop") ||
+              document.querySelector(".tox-dialog")
+            ) {
+              e.preventDefault();
+            }
+          }}
         >
           <DialogHeader>
             <DialogTitle className="text-foreground text-lg font-semibold">
@@ -757,10 +787,22 @@ export default function DoctorsPage() {
       </Dialog>
 
       {/* Edit Doctor Modal */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen} modal={false}>
         <DialogContent
           className="rounded-3xl w-[95vw] max-w-2xl !max-w-[40vw] max-h-[90vh] overflow-y-auto"
           data-ocid="doctors.dialog"
+          onInteractOutside={(e) => {
+            const el = e.target as HTMLElement;
+            if (
+              el.closest(".tox-tinymce-aux") ||
+              el.closest(".tox-dialog") ||
+              el.closest(".tox-menu") ||
+              el.closest(".tox-pop") ||
+              document.querySelector(".tox-dialog")
+            ) {
+              e.preventDefault();
+            }
+          }}
         >
           <DialogHeader>
             <DialogTitle className="text-foreground text-lg font-semibold">
@@ -879,7 +921,20 @@ function DoctorForm({
   onFileClick,
 }: DoctorFormProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+    <Tabs defaultValue="basic" className="w-full py-2">
+      <TabsList className="w-full mb-2">
+        <TabsTrigger value="basic" className="flex-1">
+          Basic Info
+        </TabsTrigger>
+        <TabsTrigger value="description" className="flex-1">
+          Description
+        </TabsTrigger>
+        <TabsTrigger value="seo" className="flex-1">
+          SEO
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="basic" className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-0">
       {/* Full Name */}
       <div className="col-span-1 sm:col-span-2 space-y-1.5">
         <Label className="text-sm font-medium text-foreground">
@@ -1075,23 +1130,31 @@ function DoctorForm({
           </SelectContent>
         </Select>
       </div>
+      </TabsContent>
 
+      <TabsContent value="description" className="mt-0 space-y-4">
       {/* Description */}
       <div className="col-span-1 sm:col-span-2 space-y-1.5">
         <Label className="text-sm font-medium text-foreground">
           Description <span className="text-destructive">*</span>
         </Label>
-        <Textarea
-          value={formData.description}
-          onChange={(e) => onFieldChange("description", e.target.value)}
-          placeholder="Short professional bio shown on the website"
-          className={`rounded-xl min-h-[90px] resize-none ${formErrors.description ? "border-destructive" : "border-border"}`}
-          data-ocid="doctors.description_textarea"
-        />
+        <div
+          className={
+            formErrors.description
+              ? "rounded-2xl border border-destructive"
+              : ""
+          }
+          data-ocid="doctors.description_editor"
+        >
+          <PageEditor
+            value={formData.description}
+            onChange={(content) => onFieldChange("description", content)}
+          />
+        </div>
         {formErrors.description && (
           <p
             className="text-xs text-destructive mt-1"
-            data-ocid="doctors.description_textarea.field_error"
+            data-ocid="doctors.description_editor.field_error"
           >
             {formErrors.description}
           </p>
@@ -1154,6 +1217,49 @@ function DoctorForm({
           </p>
         )}
       </div>
-    </div>
+      </TabsContent>
+
+      <TabsContent value="seo" className="mt-0 space-y-4">
+        <div className="space-y-1">
+          <Label>Meta Title</Label>
+          <Input
+            value={formData.metaTitle}
+            onChange={(e) => onFieldChange("metaTitle", e.target.value)}
+            placeholder="Doctor profile meta title"
+            maxLength={60}
+            data-ocid="doctors.meta_title_input"
+          />
+          <p className="text-xs text-muted-foreground text-right">
+            {formData.metaTitle.length}/60
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          <Label>Meta Description</Label>
+          <Textarea
+            value={formData.metaDescription}
+            onChange={(e) => onFieldChange("metaDescription", e.target.value)}
+            placeholder="Short search description for this doctor"
+            maxLength={160}
+            className="resize-none min-h-[80px]"
+            rows={3}
+            data-ocid="doctors.meta_description_textarea"
+          />
+          <p className="text-xs text-muted-foreground text-right">
+            {formData.metaDescription.length}/160
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          <Label>Keywords (comma separated)</Label>
+          <Input
+            value={formData.keywords}
+            onChange={(e) => onFieldChange("keywords", e.target.value)}
+            placeholder="gynecologist hisar, doctor name, specialist"
+            data-ocid="doctors.keywords_input"
+          />
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 }
