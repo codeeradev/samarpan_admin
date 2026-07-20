@@ -1630,6 +1630,9 @@ video {
 .min-h-0 {
   min-height: 0px;
 }
+.min-h-10 {
+  min-height: 2.5rem;
+}
 .min-h-16 {
   min-height: 4rem;
 }
@@ -2456,6 +2459,9 @@ video {
 }
 .bg-destructive\/100 {
   background-color: oklch(var(--destructive) / 1);
+}
+.bg-destructive\/5 {
+  background-color: oklch(var(--destructive) / 0.05);
 }
 .bg-foreground {
   background-color: oklch(var(--foreground));
@@ -5068,6 +5074,10 @@ video {
 
   .md\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .md\:grid-cols-\[1fr_220px\] {
+    grid-template-columns: 1fr 220px;
   }
 
   .md\:flex-row {

@@ -7,6 +7,8 @@ export type PageStatus = "draft" | "published";
 export interface PageSeo {
   metaTitle: string;
   metaDescription: string;
+  canonicalUrl: string;
+  schemaMarkup: string;
 }
 
 export interface PageItem {
@@ -28,6 +30,8 @@ export interface PagePayload {
   status: PageStatus;
   metaTitle: string;
   metaDescription: string;
+  canonicalUrl: string;
+  schemaMarkup: string;
 }
 
 function normalizePageItem(page: Record<string, any>): PageItem {
@@ -42,6 +46,8 @@ function normalizePageItem(page: Record<string, any>): PageItem {
     seo: {
       metaTitle: seo.metaTitle || page.metaTitle || "",
       metaDescription: seo.metaDescription || page.metaDescription || "",
+      canonicalUrl: seo.canonicalUrl || page.canonicalUrl || "",
+      schemaMarkup: seo.schemaMarkup || page.schemaMarkup || "",
     },
     isActive: page.isActive,
     createdAt: page.createdAt,
@@ -58,9 +64,13 @@ function toRequestPayload(payload: PagePayload) {
     isActive: payload.status === "published",
     metaTitle: payload.metaTitle.trim(),
     metaDescription: payload.metaDescription.trim(),
+    canonicalUrl: payload.canonicalUrl.trim(),
+    schemaMarkup: payload.schemaMarkup,
     seo: {
       metaTitle: payload.metaTitle.trim(),
       metaDescription: payload.metaDescription.trim(),
+      canonicalUrl: payload.canonicalUrl.trim(),
+      schemaMarkup: payload.schemaMarkup,
     },
   };
 }

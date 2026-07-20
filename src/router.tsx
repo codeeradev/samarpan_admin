@@ -8,10 +8,10 @@ import DoctorsPage from "@/pages/DoctorsPage";
 // import EnquiriesPage from "@/pages/EnquiriesPage";
 import GalleryPage from "@/pages/GalleryPage";
 import HonorsPage from "@/pages/HonorsPage";
+import LeadsPage from "@/pages/LeadsPage";
 import LoginPage from "@/pages/LoginPage";
 import MetaAnalyticsPage from "@/pages/MetaAnalyticsPage";
 import MetaCallbackPage from "@/pages/MetaCallbackPage";
-import LeadsPage from "@/pages/LeadsPage";
 import PagesPage from "@/pages/PagesPage";
 import PatientsPage from "@/pages/PatientsPage";
 import ReviewsAndShortsPage from "@/pages/ReviewsAndShortsPage";
@@ -20,6 +20,7 @@ import ServiceFeaturesPage from "@/pages/ServiceFeaturesPage";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import ServiceSubCategoriesPage from "@/pages/ServiceSubCategoriesPage";
 import SettingsPage from "@/pages/SettingsPage";
+import SlotManagementPage from "@/pages/SlotManagementPage";
 import ThemePage from "@/pages/ThemePage";
 import WebsiteContentPage from "@/pages/WebsiteContentPage";
 
@@ -34,8 +35,8 @@ import {
 import BlogCategoryPage from "./pages/BlogCategoryPage";
 import BlogsPage from "./pages/BlogPage";
 import ProcedurePage from "./pages/ProcedurePage";
-import SpecializationsPage from "./pages/Specialization";
 import SeoReportPage from "./pages/SeoReportPage";
+import SpecializationsPage from "./pages/Specialization";
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 type StoredAuth = ReturnType<typeof loadAuthState>;
@@ -172,6 +173,13 @@ const appointmentsRoute = createRoute({
   component: AppointmentsPage,
 });
 
+const slotManagementRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/slot-management",
+  beforeLoad: () => checkPermission("/slot-management"),
+  component: SlotManagementPage,
+});
+
 const serviceManagementRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/service-management",
@@ -296,6 +304,7 @@ const routeTree = rootRoute.addChildren([
     patientsRoute,
     procedureRoute,
     appointmentsRoute,
+    slotManagementRoute,
     serviceManagementRoute,
     serviceFeaturesRoute,
     serviceSubCategoryRoute,

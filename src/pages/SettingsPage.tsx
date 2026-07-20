@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getRoleFromRoleId } from "@/lib/admin-access";
 import {
   AlertTriangle,
+  CreditCard,
   Eye,
   EyeOff,
   Lock,
@@ -29,10 +30,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
+  type SettingsItem,
   getSettingsApi,
   updateAdminAccountApi,
   updateSettingsApi,
-  type SettingsItem,
 } from "@/apiCalls/settings";
 import { resolveAssetUrl } from "./website-content/types";
 
@@ -52,6 +53,7 @@ export default function SettingsPage() {
   const [businessSaving, setBusinessSaving] = useState(false);
   const [socialSaving, setSocialSaving] = useState(false);
   const [googleSaving, setGoogleSaving] = useState(false);
+  const [razorpaySaving, setRazorpaySaving] = useState(false);
   const [logoSaving, setLogoSaving] = useState(false);
 
   const [accountSaving, setAccountSaving] = useState(false);
@@ -151,6 +153,22 @@ export default function SettingsPage() {
       toast.error(err.message);
     } finally {
       setGoogleSaving(false);
+    }
+  }
+
+  async function saveRazorpaySettings() {
+    try {
+      setRazorpaySaving(true);
+
+      const updated = await updateSettingsApi(settings ?? {});
+
+      setSettings(updated);
+
+      toast.success("Razorpay settings updated successfully.");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setRazorpaySaving(false);
     }
   }
 
@@ -300,7 +318,6 @@ export default function SettingsPage() {
       />
 
       <div className="grid lg:grid-cols-2 gap-6">
-
         {/* Admin Account */}
         <Card>
           <CardHeader>
@@ -362,10 +379,7 @@ export default function SettingsPage() {
               />
             </div>
 
-            <Button
-              disabled={accountSaving}
-              onClick={handleAccountSave}
-            >
+            <Button disabled={accountSaving} onClick={handleAccountSave}>
               {accountSaving ? "Saving..." : "Save Account"}
             </Button>
           </CardContent>
@@ -455,10 +469,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <Button
-              disabled={passwordSaving}
-              onClick={handlePasswordUpdate}
-            >
+            <Button disabled={passwordSaving} onClick={handlePasswordUpdate}>
               <Shield size={14} />
               {passwordSaving ? "Updating..." : "Update Password"}
             </Button>
@@ -516,9 +527,7 @@ export default function SettingsPage() {
 
             <Textarea
               value={safeSettings.address ?? ""}
-              onChange={(event) =>
-                updateField("address", event.target.value)
-              }
+              onChange={(event) => updateField("address", event.target.value)}
             />
 
             <Button
@@ -555,9 +564,7 @@ export default function SettingsPage() {
 
                     setLogoFile(file);
 
-                    setLogoPreview(
-                      file ? URL.createObjectURL(file) : null,
-                    );
+                    setLogoPreview(file ? URL.createObjectURL(file) : null);
                   }}
                 />
 
@@ -567,13 +574,12 @@ export default function SettingsPage() {
                       Click or drag image to upload
                     </p>
 
-                    <p className="text-xs">
-                      PNG, JPG (recommended 200x80)
-                    </p>
+                    <p className="text-xs">PNG, JPG (recommended 200x80)</p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-3">
                     <img
+                      alt="Website logo preview"
                       src={
                         logoPreview.startsWith("blob")
                           ? logoPreview
@@ -607,6 +613,60 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        {/* Razorpay Payment */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard size={16} />
+              Razorpay Payment
+            </CardTitle>
+
+            <CardDescription>
+              Add these keys to collect online appointment payments.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Razorpay Key ID</Label>
+
+              <Input
+                value={safeSettings.razorpay_key_id ?? ""}
+                placeholder="rzp_live_xxxxxxxxx"
+                onChange={(event) =>
+                  updateField("razorpay_key_id", event.target.value)
+                }
+              />
+            </div>
+
+            <div>
+              <Label>Razorpay Key Secret</Label>
+
+              <Input
+                type="password"
+                value={safeSettings.razorpay_key_secret ?? ""}
+                placeholder="Enter Razorpay key secret"
+                onChange={(event) =>
+                  updateField("razorpay_key_secret", event.target.value)
+                }
+              />
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              If both keys are saved, patients can pay online while booking an
+              appointment.
+            </p>
+
+            <Button
+              disabled={razorpaySaving || loading}
+              onClick={saveRazorpaySettings}
+            >
+              <Save size={14} />
+              {razorpaySaving ? "Saving..." : "Save Razorpay Details"}
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Social Links */}
         <Card>
           <CardHeader>
@@ -626,9 +686,7 @@ export default function SettingsPage() {
                   <Input
                     placeholder={item}
                     value={safeSettings.social_links?.[item] ?? ""}
-                    onChange={(event) =>
-                      updateSocial(item, event.target.value)
-                    }
+                    onChange={(event) => updateSocial(item, event.target.value)}
                   />
                 </div>
               ),
@@ -715,7 +773,6 @@ export default function SettingsPage() {
             </Button>
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

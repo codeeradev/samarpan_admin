@@ -109,8 +109,19 @@ const ALL_NAV_ITEMS: NavItem[] = [
   {
     label: "Appointments",
     icon: Calendar,
-    path: "/appointments",
     permissionPath: "/appointments",
+    children: [
+      {
+        label: "Appointments",
+        path: "/appointments",
+        permissionPath: "/appointments",
+      },
+      {
+        label: "Slot Management",
+        path: "/slot-management",
+        permissionPath: "/slot-management",
+      },
+    ],
   },
   {
     label: "Cosmetic Procedures",

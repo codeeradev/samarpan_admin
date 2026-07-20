@@ -154,6 +154,7 @@ const PATH_PERMISSION_RULES: Record<
   "/appointments": {
     permissions: ["view_appointments", "manage_appointments"],
   },
+  "/slot-management": { superAdminOnly: true },
   "/service-management": {
     permissions: ["view_services", "manage_services"],
   },

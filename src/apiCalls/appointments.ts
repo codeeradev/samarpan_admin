@@ -24,6 +24,8 @@ export interface Appointment {
   serviceId?: string | null;
   appointmentDate: Date | string;
   preferredDate?: Date | string;
+  slotType?: "daily" | "weekly" | null;
+  slotLabel?: string;
   reason?: string;
   notes?: string;
   rescheduleReason?: string;
@@ -34,6 +36,15 @@ export interface Appointment {
   rejectionReason?: string;
   completedAt?: Date | string | null;
   updatedBy?: string | null;
+  payment?: {
+    provider?: string;
+    status?: "not_required" | "pending" | "paid" | "failed" | "";
+    amount?: number;
+    currency?: string;
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    verifiedAt?: Date | string | null;
+  };
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
@@ -76,11 +87,9 @@ export const updateAppointmentApi = async (
     notes?: string;
   },
 ) => {
-  const response = await post(
-    `${ENDPOINT.UPDATE_APPOINTMENT}/${id}`,
-    payload,
-    {needAuth: true}
-  );
+  const response = await post(`${ENDPOINT.UPDATE_APPOINTMENT}/${id}`, payload, {
+    needAuth: true,
+  });
 
   return response.data;
 };

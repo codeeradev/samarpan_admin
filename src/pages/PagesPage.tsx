@@ -29,10 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  getApiErrorMessage,
-  mapApiErrorsToFields,
-} from "@/lib/api-errors";
+import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
 import { themeColor } from "@/lib/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
@@ -45,7 +42,15 @@ import PageEditor from "@/components/editor/pageEditor";
 import "./pages-editor.css";
 
 type PageFormErrors = Partial<
-  Record<"title" | "slug" | "metaTitle" | "metaDescription", string>
+  Record<
+    | "title"
+    | "slug"
+    | "metaTitle"
+    | "metaDescription"
+    | "canonicalUrl"
+    | "schemaMarkup",
+    string
+  >
 >;
 
 const emptyPageForm: PagePayload = {
@@ -55,6 +60,8 @@ const emptyPageForm: PagePayload = {
   status: "published",
   metaTitle: "",
   metaDescription: "",
+  canonicalUrl: "",
+  schemaMarkup: "",
 };
 
 const pageTableStyles = {
@@ -156,13 +163,33 @@ function validatePageForm(
     errors.slug = "Another page already uses this slug.";
   }
 
-  if (form.metaTitle.trim().length > 60) {
+  if (!form.metaTitle.trim()) {
+    errors.metaTitle = "Meta title is required.";
+  } else if (form.metaTitle.trim().length > 60) {
     errors.metaTitle = "Meta title should stay within 60 characters.";
   }
 
-  if (form.metaDescription.trim().length > 160) {
+  if (!form.metaDescription.trim()) {
+    errors.metaDescription = "Meta description is required.";
+  } else if (form.metaDescription.trim().length > 160) {
     errors.metaDescription =
       "Meta description should stay within 160 characters.";
+  }
+
+  if (!form.canonicalUrl.trim()) {
+    errors.canonicalUrl = "Canonical URL is required.";
+  } else if (!/^https?:\/\/[^\s]+$/i.test(form.canonicalUrl.trim())) {
+    errors.canonicalUrl = "Canonical URL must start with http:// or https://.";
+  }
+
+  if (!form.schemaMarkup.trim()) {
+    errors.schemaMarkup = "Schema markup is required.";
+  } else {
+    try {
+      JSON.parse(form.schemaMarkup);
+    } catch {
+      errors.schemaMarkup = "Schema markup must be valid JSON-LD.";
+    }
   }
 
   return errors;
@@ -174,9 +201,7 @@ function StatusBadge({ status }: { status: PageStatus }) {
   return (
     <Badge
       className={
-        isPublished
-          ? "bg-primary/10 text-primary"
-          : "bg-accent text-secondary"
+        isPublished ? "bg-primary/10 text-primary" : "bg-accent text-secondary"
       }
     >
       {isPublished ? "Published" : "Draft"}
@@ -231,7 +256,8 @@ export default function PagesPage() {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
       setDeleteTarget(null);
     },
-    onError: (error) => toast.error(getApiErrorMessage(error, "Failed to delete page.")),
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "Failed to delete page.")),
   });
 
   const filteredPages = useMemo(() => {
@@ -270,6 +296,8 @@ export default function PagesPage() {
       status: page.status,
       metaTitle: page.seo.metaTitle,
       metaDescription: page.seo.metaDescription,
+      canonicalUrl: page.seo.canonicalUrl,
+      schemaMarkup: page.seo.schemaMarkup,
     });
     setFormErrors({});
     setModalOpen(true);
@@ -288,7 +316,10 @@ export default function PagesPage() {
     deleteMutation.mutate(deleteTarget._id);
   }
 
-  function setField<K extends keyof PagePayload>(key: K, value: PagePayload[K]) {
+  function setField<K extends keyof PagePayload>(
+    key: K,
+    value: PagePayload[K],
+  ) {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
@@ -319,6 +350,8 @@ export default function PagesPage() {
       status: formData.status,
       metaTitle: formData.metaTitle.trim(),
       metaDescription: formData.metaDescription.trim(),
+      canonicalUrl: formData.canonicalUrl.trim(),
+      schemaMarkup: formData.schemaMarkup,
     };
 
     try {
@@ -334,6 +367,7 @@ export default function PagesPage() {
         slug: /slug/i,
         metaTitle: /meta title/i,
         metaDescription: /meta description/i,
+        canonicalUrl: /canonical/i,
       });
 
       if (Object.keys(backendErrors).length > 0) {
@@ -430,14 +464,53 @@ export default function PagesPage() {
         title="Website Pages"
         description="Create SEO-ready website pages with title, content, publish status, and meta details."
         action={
-          <Button
-            type="button"
-            onClick={openAdd}
-            className="w-full gap-2 rounded-xl shadow-sm sm:w-auto bg-primary"
-          >
-            <Plus size={16} />
-            Add page
-          </Button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                const homepage = data.find((page) => page.slug === "home");
+                if (homepage) {
+                  openEdit(homepage);
+                  return;
+                }
+                setEditTarget(null);
+                setFormData({
+                  ...emptyPageForm,
+                  title: "Homepage",
+                  slug: "home",
+                  metaTitle: "Samarpan Hospital",
+                  metaDescription:
+                    "Samarpan Hospital provides expert healthcare services in Hisar.",
+                  canonicalUrl: "https://samarpanhospitalhisar.com/",
+                  schemaMarkup: JSON.stringify(
+                    {
+                      "@context": "https://schema.org",
+                      "@type": "WebPage",
+                      name: "Samarpan Hospital",
+                      url: "https://samarpanhospitalhisar.com/",
+                    },
+                    null,
+                    2,
+                  ),
+                });
+                setFormErrors({});
+                setModalOpen(true);
+              }}
+              className="w-full gap-2 rounded-xl shadow-sm sm:w-auto"
+            >
+              <Pencil size={16} />
+              Homepage Schema
+            </Button>
+            <Button
+              type="button"
+              onClick={openAdd}
+              className="w-full gap-2 rounded-xl shadow-sm sm:w-auto bg-primary"
+            >
+              <Plus size={16} />
+              Add page
+            </Button>
+          </div>
         }
       />
 
@@ -597,8 +670,8 @@ export default function PagesPage() {
                   SEO Details
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Add meta title and meta description for search and social
-                  previews.
+                  Add meta title, meta description, canonical URL, and schema
+                  markup for search and social previews.
                 </p>
               </div>
 
@@ -659,6 +732,52 @@ export default function PagesPage() {
                     </span>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="page-canonical-url">Canonical URL</Label>
+                  <Input
+                    id="page-canonical-url"
+                    value={formData.canonicalUrl}
+                    onChange={(event) =>
+                      setField("canonicalUrl", event.target.value)
+                    }
+                    placeholder="https://samarpanhospitalhisar.com/about"
+                    className={`rounded-xl bg-card ${formErrors.canonicalUrl ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  />
+                  {formErrors.canonicalUrl ? (
+                    <p className="text-xs text-destructive">
+                      {formErrors.canonicalUrl}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Enter the preferred absolute URL for this page.
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="page-schema-markup">Schema Markup</Label>
+                  <Textarea
+                    id="page-schema-markup"
+                    rows={8}
+                    value={formData.schemaMarkup}
+                    onChange={(event) =>
+                      setField("schemaMarkup", event.target.value)
+                    }
+                    placeholder='{"@context":"https://schema.org","@type":"WebPage"}'
+                    className={`rounded-2xl bg-card font-mono text-xs ${formErrors.schemaMarkup ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  />
+                  {formErrors.schemaMarkup ? (
+                    <p className="text-xs text-destructive">
+                      {formErrors.schemaMarkup}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Paste JSON-LD only. It will be rendered as structured data
+                      on the website.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -690,6 +809,8 @@ export default function PagesPage() {
                   seo: {
                     metaTitle: formData.metaTitle,
                     metaDescription: formData.metaDescription,
+                    canonicalUrl: formData.canonicalUrl,
+                    schemaMarkup: formData.schemaMarkup,
                   },
                 });
                 setPreviewOpen(true);
@@ -765,11 +886,28 @@ export default function PagesPage() {
                       {previewPage.seo.metaDescription || "No meta description"}
                     </p>
                   </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Canonical URL
+                    </p>
+                    <p className="mt-1 text-sm text-foreground">
+                      {previewPage.seo.canonicalUrl || "Uses current page URL"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Schema Markup
+                    </p>
+                    <p className="mt-1 line-clamp-3 text-sm text-foreground">
+                      {previewPage.seo.schemaMarkup || "No schema markup"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               <div className="rounded-3xl border border-border bg-card p-6 prose prose-slate max-w-full">
                 <div
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: Admin preview intentionally renders saved page HTML.
                   dangerouslySetInnerHTML={{
                     __html:
                       previewPage.content || "<p>No content added yet.</p>",

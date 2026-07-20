@@ -57,6 +57,8 @@ export interface Appointment {
   serviceId?: string | null;
   appointmentDate: Date | string;
   preferredDate?: Date | string;
+  slotType?: "daily" | "weekly" | null;
+  slotLabel?: string;
   reason?: string;
   notes?: string;
   rescheduleReason?: string;
@@ -67,6 +69,15 @@ export interface Appointment {
   rejectionReason?: string;
   completedAt?: Date | string | null;
   updatedBy?: string | null;
+  payment?: {
+    provider?: string;
+    status?: "not_required" | "pending" | "paid" | "failed" | "";
+    amount?: number;
+    currency?: string;
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    verifiedAt?: Date | string | null;
+  };
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
@@ -200,7 +211,7 @@ export function getStatusColor(
 export function formatDate(date: string | Date | null | undefined): string {
   if (!date) return "TBD";
   const parsedDate = new Date(date);
-  if (isNaN(parsedDate.getTime())) return "TBD";
+  if (Number.isNaN(parsedDate.getTime())) return "TBD";
   return new Intl.DateTimeFormat("en-IN", {
     day: "2-digit",
     month: "short",

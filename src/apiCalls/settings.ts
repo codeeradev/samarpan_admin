@@ -19,6 +19,8 @@ export interface SettingsItem {
   working_hours?: string;
   password?: string;
   website_logo?: string;
+  razorpay_key_id?: string;
+  razorpay_key_secret?: string;
   google_reviews?: {
     place_id?: string;
     api_key?: string;
@@ -65,7 +67,7 @@ export const updateSettingsApi = async (
     const formData = new FormData();
 
     // normal fields
-    Object.keys(payload).forEach((key) => {
+    for (const key of Object.keys(payload)) {
       const value = payload[key as keyof SettingsItem];
 
       if (value !== undefined && value !== null) {
@@ -75,7 +77,7 @@ export const updateSettingsApi = async (
           formData.append(key, String(value));
         }
       }
-    });
+    }
     // file
     if (files?.logo) {
       formData.append("image", files.logo);

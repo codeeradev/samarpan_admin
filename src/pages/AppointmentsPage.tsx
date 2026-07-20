@@ -31,8 +31,10 @@ import {
   CalendarClock,
   CheckCircle2,
   Clock,
+  CreditCard,
   Eye,
   FileText,
+  IndianRupee,
   Mail,
   Phone,
   RefreshCw,
@@ -175,6 +177,104 @@ function getAppointmentDisplayTime(appt: Appointment) {
     : formatIndiaTime(appt.createdAt ?? appt.appointmentDate);
 }
 
+function formatSlotTimePart(value: string) {
+  const match = value.trim().match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+  if (!match) return value.trim();
+
+  const hours = Number(match[1]);
+  const minutes = match[2];
+  const hour12 = hours % 12 || 12;
+  const period = hours >= 12 ? "PM" : "AM";
+
+  return `${hour12}:${minutes} ${period}`;
+}
+
+function formatSlotTime(slotLabel?: string | null) {
+  const label = trimmedValue(slotLabel);
+  if (!label) return "";
+
+  const [start, end] = label.split(/\s*-\s*/);
+  if (!start || !end) return `${label} slot`;
+
+  return `${formatSlotTimePart(start)} - ${formatSlotTimePart(end)} slot`;
+}
+
+function formatSlotType(slotType?: Appointment["slotType"]) {
+  if (slotType === "daily") return "Day Wise Slot";
+  if (slotType === "weekly") return "Week Slot";
+  return "";
+}
+
+function formatPaymentMethod(payment?: Appointment["payment"]) {
+  if (!payment?.provider || payment.status === "not_required") {
+    return "No online payment";
+  }
+
+  return payment.provider.toLowerCase() === "razorpay"
+    ? "Razorpay"
+    : payment.provider;
+}
+
+function formatPaymentStatus(payment?: Appointment["payment"]) {
+  switch (payment?.status) {
+    case "paid":
+      return "Paid";
+    case "pending":
+      return "Payment pending";
+    case "failed":
+      return "Payment failed";
+    case "not_required":
+    case "":
+    case undefined:
+      return "No online payment";
+    default:
+      return payment?.status ?? "No online payment";
+  }
+}
+
+function formatPaymentAmount(payment?: Appointment["payment"]) {
+  const amount = Number(payment?.amount ?? 0);
+
+  if (!amount || payment?.status === "not_required") {
+    return "No online payment";
+  }
+
+  const provider = payment?.provider?.toLowerCase();
+  const amountInRupees = provider === "razorpay" ? amount / 100 : amount;
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: payment?.currency || "INR",
+    maximumFractionDigits: amountInRupees % 1 === 0 ? 0 : 2,
+  }).format(amountInRupees);
+}
+
+function hasPaymentDetails(payment?: Appointment["payment"]) {
+  return Boolean(
+    payment?.provider ||
+      (payment?.status && payment.status !== "not_required") ||
+      payment?.amount ||
+      payment?.razorpayPaymentId,
+  );
+}
+
+function getPaymentSummary(payment?: Appointment["payment"]) {
+  const status = formatPaymentStatus(payment);
+  const method = formatPaymentMethod(payment);
+
+  if (!payment?.provider || payment.status === "not_required") {
+    return {
+      amount: "No online payment",
+      detail: "",
+    };
+  }
+
+  return {
+    amount: formatPaymentAmount(payment),
+    detail: method ? `${status} by ${method}` : status,
+  };
+}
+
 interface DetailItemProps {
   icon: LucideIcon;
   label: string;
@@ -228,6 +328,8 @@ function AppointmentCard({
   isUpdating,
 }: AppointmentCardProps) {
   const isInactive = appt.status === "completed" || appt.status === "cancelled";
+  const paymentSummary = getPaymentSummary(appt.payment);
+
   return (
     <div
       className={`bg-card border border-border rounded-2xl p-4 shadow-sm ${isInactive ? "opacity-60" : ""}`}
@@ -262,6 +364,12 @@ function AppointmentCard({
           <span className="text-muted-foreground block">Time</span>
           <span className="font-medium text-foreground block">
             {getAppointmentDisplayTime(appt) ?? "TBD"}
+          </span>
+        </div>
+        <div>
+          <span className="text-muted-foreground block">Payment</span>
+          <span className="font-medium text-foreground block">
+            {paymentSummary.amount}
           </span>
         </div>
       </div>
@@ -391,7 +499,8 @@ export default function AppointmentsPage() {
         a.fullName.toLowerCase().includes(q) ||
         a.doctorName.toLowerCase().includes(q) ||
         a.serviceName.toLowerCase().includes(q) ||
-        a.email.toLowerCase().includes(q);
+        a.email.toLowerCase().includes(q) ||
+        (a.payment?.razorpayPaymentId || "").toLowerCase().includes(q);
       return matchesStatus && matchesSearch;
     });
   }, [appointments, search, statusFilter]);
@@ -460,6 +569,27 @@ export default function AppointmentsPage() {
       selector: (row: Appointment) => row.status,
       sortable: true,
       cell: (row: Appointment) => <StatusBadge status={row.status} />,
+    },
+    {
+      name: "Payment",
+      selector: (row: Appointment) => row.payment?.amount ?? 0,
+      sortable: true,
+      cell: (row: Appointment) => {
+        const paymentSummary = getPaymentSummary(row.payment);
+
+        return (
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              {paymentSummary.amount}
+            </p>
+            {paymentSummary.detail && (
+              <p className="text-xs text-muted-foreground">
+                {paymentSummary.detail}
+              </p>
+            )}
+          </div>
+        );
+      },
     },
     {
       name: "Actions",
@@ -830,19 +960,52 @@ export default function AppointmentsPage() {
                 )}
                 <DetailItem
                   icon={Clock}
-                  label={
-                    isRescheduledAppointment(detailTarget)
-                      ? "Appointment time"
-                      : "Appointment time"
-                  }
+                  label="Appointment time"
                   value={getAppointmentDisplayTime(detailTarget) ?? "TBD"}
                 />
+                {hasText(detailTarget.slotLabel) && (
+                  <DetailItem
+                    icon={Clock}
+                    label="Slot time"
+                    value={formatSlotTime(detailTarget.slotLabel)}
+                  />
+                )}
+                {formatSlotType(detailTarget.slotType) && (
+                  <DetailItem
+                    icon={CalendarClock}
+                    label="Slot type"
+                    value={formatSlotType(detailTarget.slotType)}
+                  />
+                )}
                 {formatIndiaDate(detailTarget.preferredDate) && (
                   <DetailItem
                     icon={CalendarClock}
                     label="Preferred date"
                     value={formatIndiaDate(detailTarget.preferredDate)}
                   />
+                )}
+                {hasPaymentDetails(detailTarget.payment) && (
+                  <>
+                    <DetailItem
+                      icon={IndianRupee}
+                      label="Amount"
+                      value={formatPaymentAmount(detailTarget.payment)}
+                    />
+                    <DetailItem
+                      icon={CreditCard}
+                      label="Paid by"
+                      value={formatPaymentMethod(detailTarget.payment)}
+                    />
+                    {hasText(detailTarget.payment?.razorpayPaymentId) && (
+                      <DetailItem
+                        icon={FileText}
+                        label="Transaction ID"
+                        value={trimmedValue(
+                          detailTarget.payment?.razorpayPaymentId,
+                        )}
+                      />
+                    )}
+                  </>
                 )}
                 {hasText(detailTarget.reason) && (
                   <DetailItem
