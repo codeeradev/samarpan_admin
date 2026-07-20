@@ -20,15 +20,18 @@ export interface AppointmentSlot {
     startTime: string;
     endTime: string;
     maximumPatients: number;
+    isActive?: boolean;
   }>;
   weeklyDays?: Array<{
     date: string;
     dateKey?: string | null;
     weekday: number;
+    isActive?: boolean;
     timeSlots: Array<{
       startTime: string;
       endTime: string;
       maximumPatients: number;
+      isActive?: boolean;
     }>;
   }>;
   appointmentPrice: number;
@@ -58,14 +61,17 @@ export interface AppointmentSlotPayload {
     startTime: string;
     endTime: string;
     maximumPatients: number;
+    isActive?: boolean;
   }>;
   weeklyDays?: Array<{
     date: string;
     weekday: number;
+    isActive?: boolean;
     timeSlots: Array<{
       startTime: string;
       endTime: string;
       maximumPatients: number;
+      isActive?: boolean;
     }>;
   }>;
   appointmentPrice: number;

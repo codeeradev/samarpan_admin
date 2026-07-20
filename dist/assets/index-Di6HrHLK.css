@@ -1828,6 +1828,12 @@ video {
   min-width: -moz-max-content;
   min-width: max-content;
 }
+.\!max-w-2xl {
+  max-width: 42rem !important;
+}
+.\!max-w-3xl {
+  max-width: 48rem !important;
+}
 .\!max-w-\[40vw\] {
   max-width: 40vw !important;
 }
@@ -1845,9 +1851,6 @@ video {
 }
 .max-w-5xl {
   max-width: 64rem;
-}
-.max-w-7xl {
-  max-width: 80rem;
 }
 .max-w-\[100px\] {
   max-width: 100px;
@@ -5085,10 +5088,6 @@ video {
 
   .md\:grid-cols-\[minmax\(0\2c 1fr\)_auto\] {
     grid-template-columns: minmax(0,1fr) auto;
-  }
-
-  .md\:grid-cols-\[minmax\(0\2c 1fr\)_minmax\(0\2c 1fr\)_minmax\(0\2c 1fr\)_2\.5rem\] {
-    grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 2.5rem;
   }
 
   .md\:flex-row {

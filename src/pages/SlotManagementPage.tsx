@@ -39,7 +39,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { Eye, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -48,11 +48,13 @@ type TimeSlotLine = {
   startTime: string;
   endTime: string;
   maximumPatients: number;
+  isActive: boolean;
 };
 
 type WeeklyDayLine = {
   id: string;
   date: string;
+  isActive: boolean;
   slots: TimeSlotLine[];
 };
 
@@ -74,6 +76,7 @@ const createTimeSlotLine = (
   startTime: "09:00",
   endTime: "10:00",
   maximumPatients: 10,
+  isActive: true,
   ...overrides,
 });
 
@@ -84,6 +87,7 @@ const createWeeklyDayLine = (
 ): WeeklyDayLine => ({
   id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
   date: "",
+  isActive: true,
   slots: [createTimeSlotLine()],
   ...overrides,
 });
@@ -104,8 +108,10 @@ export default function SlotManagementPage() {
   const [search, setSearch] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editingSlot, setEditingSlot] = useState<AppointmentSlot | null>(null);
+  const [viewingSlot, setViewingSlot] = useState<AppointmentSlot | null>(null);
   const [form, setForm] = useState<AppointmentSlotForm>(() => resetForm());
 
   const { data: doctors = [] } = useQuery<DoctorItem[]>({
@@ -154,6 +160,16 @@ export default function SlotManagementPage() {
       toast.success("Slot updated successfully.");
       queryClient.invalidateQueries({ queryKey: ["appointment-slots"] });
       closeDialog();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const toggleStatusMutation = useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      updateAppointmentSlotApi(id, { isActive } as AppointmentSlotPayload),
+    onSuccess: () => {
+      toast.success("Status updated successfully.");
+      queryClient.invalidateQueries({ queryKey: ["appointment-slots"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -222,6 +238,11 @@ export default function SlotManagementPage() {
           : [createWeeklyDayLine()],
     });
     setDialogOpen(true);
+  }
+
+  function openView(slot: AppointmentSlot) {
+    setViewingSlot(slot);
+    setViewOpen(true);
   }
 
   function closeDialog() {
@@ -300,6 +321,13 @@ export default function SlotManagementPage() {
     }
   }
 
+  function toggleStatus(slot: AppointmentSlot) {
+    toggleStatusMutation.mutate({
+      id: slot._id,
+      isActive: !slot.isActive,
+    });
+  }
+
   const isSaving = addMutation.isPending || updateMutation.isPending;
 
   return (
@@ -343,8 +371,6 @@ export default function SlotManagementPage() {
               <TableRow>
                 <TableHead>Doctor</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Date / Applies On</TableHead>
-                <TableHead>Time</TableHead>
                 <TableHead>Capacity</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Status</TableHead>
@@ -361,7 +387,7 @@ export default function SlotManagementPage() {
                   "slot-sk-5",
                 ].map((key) => (
                   <TableRow key={key}>
-                    <TableCell colSpan={8}>
+                    <TableCell colSpan={6}>
                       <Skeleton className="h-8 w-full" />
                     </TableCell>
                   </TableRow>
@@ -373,29 +399,21 @@ export default function SlotManagementPage() {
                       {slot.doctorName}
                     </TableCell>
                     <TableCell>{formatSlotType(slot.slotType)}</TableCell>
-                    <TableCell className="max-w-[180px]">
-                      <div className="truncate" title={formatSlotDate(slot)}>
-                        {formatSlotDate(slot)}
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="max-w-[250px]">
-                      <div className="truncate" title={formatSlotTimes(slot)}>
-                        {formatSlotTimes(slot)}
-                      </div>
-                    </TableCell>
                     <TableCell>
                       {slot.bookedCount ?? 0}/{sumSlotCapacity(slot)}
                     </TableCell>
                     <TableCell>₹{slot.appointmentPrice ?? 0}</TableCell>
                     <TableCell>
-                      <StatusBadge
-                        status={
-                          slot.isActive && !slot.isExpired
-                            ? "available"
-                            : "on-leave"
-                        }
-                      />
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={slot.isActive}
+                          onCheckedChange={() => toggleStatus(slot)}
+                          disabled={toggleStatusMutation.isPending}
+                        />
+                        <span className="text-sm">
+                          {slot.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </div>
                       {slot.disabledReason && (
                         <div className="mt-1 text-xs text-muted-foreground">
                           {slot.disabledReason}
@@ -407,7 +425,16 @@ export default function SlotManagementPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => openView(slot)}
+                          title="View Details"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => openEdit(slot)}
+                          title="Edit"
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -418,6 +445,7 @@ export default function SlotManagementPage() {
                             setEditingSlot(slot);
                             setDeleteOpen(true);
                           }}
+                          title="Delete"
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -428,7 +456,7 @@ export default function SlotManagementPage() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={6}
                     className="h-24 text-center text-muted-foreground"
                   >
                     No slots found.
@@ -459,6 +487,15 @@ export default function SlotManagementPage() {
         onCancel={() => setDeleteOpen(false)}
         onConfirm={() => {
           if (editingSlot) deleteMutation.mutate(editingSlot._id);
+        }}
+      />
+
+      <ViewSlotDialog
+        open={viewOpen}
+        slot={viewingSlot}
+        onOpenChange={(open) => {
+          setViewOpen(open);
+          if (!open) setViewingSlot(null);
         }}
       />
     </div>
@@ -762,13 +799,22 @@ function SlotDialog({
                             updateWeeklyDayDate(day.id, event.target.value)
                           }
                         />
-                        {/* {day.date && (
-                          <p className="text-xs text-muted-foreground">
-                            Applies on {weekdayNames[getWeekday(day.date)]}
-                          </p>
-                        )} */}
                       </div>
-                      <div className="flex justify-end gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
+                          <Label className="text-sm">Day Active</Label>
+                          <Switch
+                            checked={day.isActive}
+                            onCheckedChange={(checked) =>
+                              onChange({
+                                ...form,
+                                weeklyDays: form.weeklyDays.map((d) =>
+                                  d.id === day.id ? { ...d, isActive: checked } : d,
+                                ),
+                              })
+                            }
+                          />
+                        </div>
                         <Button
                           type="button"
                           variant="outline"
@@ -844,35 +890,15 @@ function TimeSlotFields({
   removeLabel: string;
 }) {
   return (
-    <div className="grid gap-3 rounded-lg border border-border bg-background/70 p-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_2.5rem] md:items-end">
-      <div className="space-y-2">
-        <Label>Start Time</Label>
-        <Input
-          type="time"
-          value={slot.startTime}
-          onChange={(event) => onChange("startTime", event.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>End Time</Label>
-        <Input
-          type="time"
-          value={slot.endTime}
-          onChange={(event) => onChange("endTime", event.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Patient Capacity</Label>
-        <Input
-          type="number"
-          min={1}
-          value={slot.maximumPatients}
-          onChange={(event) =>
-            onChange("maximumPatients", Number(event.target.value))
-          }
-        />
-      </div>
-      <div className="flex justify-end">
+    <div className="rounded-lg border border-border bg-background/70 p-3">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label className="text-sm">Time Slot Active</Label>
+          <Switch
+            checked={slot.isActive}
+            onCheckedChange={(checked) => onChange("isActive", checked)}
+          />
+        </div>
         <Button
           type="button"
           variant="ghost"
@@ -884,7 +910,213 @@ function TimeSlotFields({
           <X className="h-4 w-4" />
         </Button>
       </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <div className="space-y-2">
+          <Label>Start Time</Label>
+          <Input
+            type="time"
+            value={slot.startTime}
+            onChange={(event) => onChange("startTime", event.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>End Time</Label>
+          <Input
+            type="time"
+            value={slot.endTime}
+            onChange={(event) => onChange("endTime", event.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Patient Capacity</Label>
+          <Input
+            type="number"
+            min={1}
+            value={slot.maximumPatients}
+            onChange={(event) =>
+              onChange("maximumPatients", Number(event.target.value))
+            }
+          />
+        </div>
+      </div>
     </div>
+  );
+}
+
+function ViewSlotDialog({
+  open,
+  slot,
+  onOpenChange,
+}: {
+  open: boolean;
+  slot: AppointmentSlot | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  if (!slot) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[92vh] w-[calc(100vw-1rem)] !max-w-2xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Slot Details</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Basic Information */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Basic Information
+            </h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label className="text-muted-foreground">Doctor</Label>
+                <p className="mt-1 font-medium">{slot.doctorName}</p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Slot Type</Label>
+                <p className="mt-1 font-medium">{formatSlotType(slot.slotType)}</p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Appointment Price</Label>
+                <p className="mt-1 font-medium">₹{slot.appointmentPrice ?? 0}</p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Total Capacity</Label>
+                <p className="mt-1 font-medium">
+                  {slot.bookedCount ?? 0}/{sumSlotCapacity(slot)} patients
+                </p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Booking Closes Before</Label>
+                <p className="mt-1 font-medium">
+                  {slot.bookingCloseMinutesBeforeEnd ?? 10} minutes
+                </p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Status</Label>
+                <div className="mt-1">
+                  <StatusBadge
+                    status={
+                      slot.isActive && !slot.isExpired ? "available" : "on-leave"
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+            {slot.disabledReason && (
+              <div>
+                <Label className="text-muted-foreground">Disabled Reason</Label>
+                <p className="mt-1 text-sm text-destructive">{slot.disabledReason}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Date Information */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Date Information
+            </h3>
+            <div>
+              <Label className="text-muted-foreground">
+                {slot.slotType === "weekly" ? "Applies On" : "Date"}
+              </Label>
+              <p className="mt-1 font-medium">{formatSlotDate(slot)}</p>
+            </div>
+          </div>
+
+          {/* Time Slots */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Time Slots
+            </h3>
+            {slot.weeklyDays?.length ? (
+              <div className="space-y-4">
+                {slot.weeklyDays.map((day, index) => (
+                  <div
+                    key={index}
+                    className="rounded-lg border border-border bg-muted/20 p-4"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <Label className="text-sm font-semibold">
+                        {getDateKey(day.date, day.dateKey)} ({weekdayNames[day.weekday]})
+                      </Label>
+                      {day.isActive !== undefined && (
+                        <StatusBadge
+                          status={day.isActive ? "available" : "on-leave"}
+                        />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      {day.timeSlots.map((timeSlot, slotIndex) => (
+                        <div
+                          key={slotIndex}
+                          className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-sm"
+                        >
+                          <span className="font-medium">
+                            {formatTime12Hour(timeSlot.startTime)} -{" "}
+                            {formatTime12Hour(timeSlot.endTime)}
+                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-muted-foreground">
+                              Max: {timeSlot.maximumPatients} patients
+                            </span>
+                            {timeSlot.isActive !== undefined && (
+                              <StatusBadge
+                                status={timeSlot.isActive ? "available" : "on-leave"}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {(slot.timeSlots?.length
+                  ? slot.timeSlots
+                  : [
+                      {
+                        startTime: slot.startTime,
+                        endTime: slot.endTime,
+                        maximumPatients: slot.maximumPatients,
+                        isActive: true,
+                      },
+                    ]
+                ).map((timeSlot, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"
+                  >
+                    <span className="font-medium">
+                      {formatTime12Hour(timeSlot.startTime)} -{" "}
+                      {formatTime12Hour(timeSlot.endTime)}
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-muted-foreground">
+                        Max: {timeSlot.maximumPatients} patients
+                      </span>
+                      {timeSlot.isActive !== undefined && (
+                        <StatusBadge
+                          status={timeSlot.isActive ? "available" : "on-leave"}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -958,6 +1190,7 @@ function buildSlotPayload(
       startTime: slot.startTime,
       endTime: slot.endTime,
       maximumPatients: Number(slot.maximumPatients),
+      isActive: slot.isActive,
     }))
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
   const firstSlot = timeSlots[0];
@@ -991,6 +1224,7 @@ function buildWeeklySlotPayload(
     .map((day) => ({
       date: day.date,
       weekday: getWeekday(day.date),
+      isActive: day.isActive,
       timeSlots: normalizeTimeSlots(day.slots),
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -1027,6 +1261,7 @@ function normalizeTimeSlots(slots: TimeSlotLine[]) {
       startTime: slot.startTime,
       endTime: slot.endTime,
       maximumPatients: Number(slot.maximumPatients),
+      isActive: slot.isActive,
     }))
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 }
@@ -1039,6 +1274,7 @@ function getFormTimeSlots(slot: AppointmentSlot): TimeSlotLine[] {
           startTime: slot.startTime,
           endTime: slot.endTime,
           maximumPatients: slot.maximumPatients,
+          isActive: true,
         },
       ];
 
@@ -1047,6 +1283,7 @@ function getFormTimeSlots(slot: AppointmentSlot): TimeSlotLine[] {
       startTime: timeSlot.startTime,
       endTime: timeSlot.endTime,
       maximumPatients: timeSlot.maximumPatients,
+      isActive: timeSlot.isActive ?? true,
     }),
   );
 }
@@ -1056,11 +1293,13 @@ function getFormWeeklyDays(slot: AppointmentSlot): WeeklyDayLine[] {
     return slot.weeklyDays.map((day) =>
       createWeeklyDayLine({
         date: getDateKey(day.date, day.dateKey),
+        isActive: day.isActive ?? true,
         slots: day.timeSlots.map((timeSlot) =>
           createTimeSlotLine({
             startTime: timeSlot.startTime,
             endTime: timeSlot.endTime,
             maximumPatients: timeSlot.maximumPatients,
+            isActive: timeSlot.isActive ?? true,
           }),
         ),
       }),
@@ -1073,6 +1312,7 @@ function getFormWeeklyDays(slot: AppointmentSlot): WeeklyDayLine[] {
         slot.dateKey ||
         (slot.date ? slot.date.slice(0, 10) : "") ||
         dateForWeekday(slot.weekday ?? undefined),
+      isActive: true,
       slots: getFormTimeSlots(slot),
     }),
   ];

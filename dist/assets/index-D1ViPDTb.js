@@ -21871,10 +21871,7 @@ const {
   getAdapter,
   mergeConfig
 } = axios;
-const BASE_URL = (
-  // import.meta.env.VITE_API_URL || "https://api.samarpanhospitalhisar.com/admin";
-  "http://localhost:9010/admin"
-);
+const BASE_URL = "https://api.samarpanhospitalhisar.com/admin";
 const ENDPOINT = {
   LOGIN: "/admin-login",
   ADD_SERVICE: "/add-service",
@@ -78847,11 +78844,13 @@ const createTimeSlotLine = (overrides = {}) => ({
   startTime: "09:00",
   endTime: "10:00",
   maximumPatients: 10,
+  isActive: true,
   ...overrides
 });
 const createWeeklyDayLine = (overrides = {}) => ({
   id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
   date: "",
+  isActive: true,
   slots: [createTimeSlotLine()],
   ...overrides
 });
@@ -78870,8 +78869,10 @@ function SlotManagementPage() {
   const [search, setSearch] = reactExports.useState("");
   const [selectedDate, setSelectedDate] = reactExports.useState("");
   const [dialogOpen, setDialogOpen] = reactExports.useState(false);
+  const [viewOpen, setViewOpen] = reactExports.useState(false);
   const [deleteOpen, setDeleteOpen] = reactExports.useState(false);
   const [editingSlot, setEditingSlot] = reactExports.useState(null);
+  const [viewingSlot, setViewingSlot] = reactExports.useState(null);
   const [form, setForm] = reactExports.useState(() => resetForm());
   const { data: doctors = [] } = useQuery({
     queryKey: ["doctors"],
@@ -78910,6 +78911,14 @@ function SlotManagementPage() {
       ue.success("Slot updated successfully.");
       queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
       closeDialog();
+    },
+    onError: (error2) => ue.error(error2.message)
+  });
+  const toggleStatusMutation = useMutation({
+    mutationFn: ({ id, isActive }) => updateAppointmentSlotApi(id, { isActive }),
+    onSuccess: () => {
+      ue.success("Status updated successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
     },
     onError: (error2) => ue.error(error2.message)
   });
@@ -78966,6 +78975,10 @@ function SlotManagementPage() {
     });
     setDialogOpen(true);
   }
+  function openView(slot) {
+    setViewingSlot(slot);
+    setViewOpen(true);
+  }
   function closeDialog() {
     setDialogOpen(false);
     setEditingSlot(null);
@@ -79020,6 +79033,12 @@ function SlotManagementPage() {
       addMutation.mutate(payloads);
     }
   }
+  function toggleStatus(slot) {
+    toggleStatusMutation.mutate({
+      id: slot._id,
+      isActive: !slot.isActive
+    });
+  }
   const isSaving = addMutation.isPending || updateMutation.isPending;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -79059,8 +79078,6 @@ function SlotManagementPage() {
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Doctor" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Type" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Date / Applies On" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Time" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Capacity" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Price" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Status" }),
@@ -79072,11 +79089,9 @@ function SlotManagementPage() {
         "slot-sk-3",
         "slot-sk-4",
         "slot-sk-5"
-      ].map((key) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 8, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }) }, key)) : filteredSlots.length ? filteredSlots.map((slot) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+      ].map((key) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }) }, key)) : filteredSlots.length ? filteredSlots.map((slot) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: slot.doctorName }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatSlotType(slot.slotType) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatSlotDate(slot) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatSlotTimes(slot) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
           slot.bookedCount ?? 0,
           "/",
@@ -79087,12 +79102,17 @@ function SlotManagementPage() {
           slot.appointmentPrice ?? 0
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            StatusBadge$1,
-            {
-              status: slot.isActive && !slot.isExpired ? "available" : "on-leave"
-            }
-          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Switch,
+              {
+                checked: slot.isActive,
+                onCheckedChange: () => toggleStatus(slot),
+                disabled: toggleStatusMutation.isPending
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: slot.isActive ? "Active" : "Inactive" })
+          ] }),
           slot.disabledReason && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 text-xs text-muted-foreground", children: slot.disabledReason })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-2", children: [
@@ -79101,7 +79121,18 @@ function SlotManagementPage() {
             {
               variant: "ghost",
               size: "icon",
+              onClick: () => openView(slot),
+              title: "View Details",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "h-4 w-4" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "ghost",
+              size: "icon",
               onClick: () => openEdit(slot),
+              title: "Edit",
               children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "h-4 w-4" })
             }
           ),
@@ -79114,6 +79145,7 @@ function SlotManagementPage() {
                 setEditingSlot(slot);
                 setDeleteOpen(true);
               },
+              title: "Delete",
               children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "h-4 w-4 text-destructive" })
             }
           )
@@ -79121,7 +79153,7 @@ function SlotManagementPage() {
       ] }, slot._id)) : /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         TableCell,
         {
-          colSpan: 8,
+          colSpan: 6,
           className: "h-24 text-center text-muted-foreground",
           children: "No slots found."
         }
@@ -79150,6 +79182,17 @@ function SlotManagementPage() {
         onCancel: () => setDeleteOpen(false),
         onConfirm: () => {
           if (editingSlot) deleteMutation.mutate(editingSlot._id);
+        }
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ViewSlotDialog,
+      {
+        open: viewOpen,
+        slot: viewingSlot,
+        onOpenChange: (open) => {
+          setViewOpen(open);
+          if (!open) setViewingSlot(null);
         }
       }
     )
@@ -79247,7 +79290,7 @@ function SlotDialog({
       (day) => day.id === dayId ? { ...day, slots: day.slots.filter((slot) => slot.id !== slotId) } : day
     )
   });
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] w-[calc(100vw-1rem)] max-w-7xl overflow-y-auto p-0", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] w-[calc(100vw-1rem)] !max-w-3xl overflow-y-auto p-0", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-border px-6 py-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: isEditing ? "Edit Slot" : "Add Slot" }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-5 px-6 py-5 sm:grid-cols-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 sm:col-span-2", children: [
@@ -79403,13 +79446,24 @@ function SlotDialog({
                       value: day.date,
                       onChange: (event) => updateWeeklyDayDate(day.id, event.target.value)
                     }
-                  ),
-                  day.date && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
-                    "Applies on ",
-                    weekdayNames[getWeekday(day.date)]
-                  ] })
+                  )
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 rounded-md border border-border px-3 py-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm", children: "Day Active" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Switch,
+                      {
+                        checked: day.isActive,
+                        onCheckedChange: (checked) => onChange({
+                          ...form,
+                          weeklyDays: form.weeklyDays.map(
+                            (d2) => d2.id === day.id ? { ...d2, isActive: checked } : d2
+                          )
+                        })
+                      }
+                    )
+                  ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs(
                     Button,
                     {
@@ -79467,54 +79521,226 @@ function TimeSlotFields({
   onRemove,
   removeLabel
 }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 rounded-lg border border-border bg-background/70 p-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_2.5rem] md:items-end", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Start Time" }),
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-lg border border-border bg-background/70 p-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 flex items-center justify-between", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm", children: "Time Slot Active" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Switch,
+          {
+            checked: slot.isActive,
+            onCheckedChange: (checked) => onChange("isActive", checked)
+          }
+        )
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
+        Button,
         {
-          type: "time",
-          value: slot.startTime,
-          onChange: (event) => onChange("startTime", event.target.value)
+          type: "button",
+          variant: "ghost",
+          size: "icon",
+          disabled: !canRemove,
+          onClick: onRemove,
+          "aria-label": removeLabel,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(X$2, { className: "h-4 w-4" })
         }
       )
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "End Time" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          type: "time",
-          value: slot.endTime,
-          onChange: (event) => onChange("endTime", event.target.value)
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Patient Capacity" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          type: "number",
-          min: 1,
-          value: slot.maximumPatients,
-          onChange: (event) => onChange("maximumPatients", Number(event.target.value))
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Button,
-      {
-        type: "button",
-        variant: "ghost",
-        size: "icon",
-        disabled: !canRemove,
-        onClick: onRemove,
-        "aria-label": removeLabel,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(X$2, { className: "h-4 w-4" })
-      }
-    ) })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 md:grid-cols-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Start Time" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "time",
+            value: slot.startTime,
+            onChange: (event) => onChange("startTime", event.target.value)
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "End Time" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "time",
+            value: slot.endTime,
+            onChange: (event) => onChange("endTime", event.target.value)
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Patient Capacity" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "number",
+            min: 1,
+            value: slot.maximumPatients,
+            onChange: (event) => onChange("maximumPatients", Number(event.target.value))
+          }
+        )
+      ] })
+    ] })
   ] });
+}
+function ViewSlotDialog({
+  open,
+  slot,
+  onOpenChange
+}) {
+  var _a2, _b2;
+  if (!slot) return null;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] w-[calc(100vw-1rem)] !max-w-2xl overflow-y-auto", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Slot Details" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-sm text-muted-foreground uppercase tracking-wide", children: "Basic Information" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Doctor" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-medium", children: slot.doctorName })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Slot Type" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-medium", children: formatSlotType(slot.slotType) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Appointment Price" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1 font-medium", children: [
+              "₹",
+              slot.appointmentPrice ?? 0
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Total Capacity" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1 font-medium", children: [
+              slot.bookedCount ?? 0,
+              "/",
+              sumSlotCapacity(slot),
+              " patients"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Booking Closes Before" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1 font-medium", children: [
+              slot.bookingCloseMinutesBeforeEnd ?? 10,
+              " minutes"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Status" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              StatusBadge$1,
+              {
+                status: slot.isActive && !slot.isExpired ? "available" : "on-leave"
+              }
+            ) })
+          ] })
+        ] }),
+        slot.disabledReason && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Disabled Reason" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-destructive", children: slot.disabledReason })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-sm text-muted-foreground uppercase tracking-wide", children: "Date Information" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: slot.slotType === "weekly" ? "Applies On" : "Date" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-medium", children: formatSlotDate(slot) })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-sm text-muted-foreground uppercase tracking-wide", children: "Time Slots" }),
+        ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: slot.weeklyDays.map((day, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "rounded-lg border border-border bg-muted/20 p-4",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 flex items-center justify-between", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-semibold", children: [
+                  getDateKey(day.date, day.dateKey),
+                  " (",
+                  weekdayNames[day.weekday],
+                  ")"
+                ] }),
+                day.isActive !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  StatusBadge$1,
+                  {
+                    status: day.isActive ? "available" : "on-leave"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: day.timeSlots.map((timeSlot, slotIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  className: "flex items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-sm",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
+                      formatTime12Hour(timeSlot.startTime),
+                      " -",
+                      " ",
+                      formatTime12Hour(timeSlot.endTime)
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                        "Max: ",
+                        timeSlot.maximumPatients,
+                        " patients"
+                      ] }),
+                      timeSlot.isActive !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        StatusBadge$1,
+                        {
+                          status: timeSlot.isActive ? "available" : "on-leave"
+                        }
+                      )
+                    ] })
+                  ]
+                },
+                slotIndex
+              )) })
+            ]
+          },
+          index2
+        )) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: (((_b2 = slot.timeSlots) == null ? void 0 : _b2.length) ? slot.timeSlots : [
+          {
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            maximumPatients: slot.maximumPatients,
+            isActive: true
+          }
+        ]).map((timeSlot, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
+                formatTime12Hour(timeSlot.startTime),
+                " -",
+                " ",
+                formatTime12Hour(timeSlot.endTime)
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                  "Max: ",
+                  timeSlot.maximumPatients,
+                  " patients"
+                ] }),
+                timeSlot.isActive !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  StatusBadge$1,
+                  {
+                    status: timeSlot.isActive ? "available" : "on-leave"
+                  }
+                )
+              ] })
+            ]
+          },
+          index2
+        )) })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: () => onOpenChange(false), children: "Close" }) })
+  ] }) });
 }
 function formatSlotDate(slot) {
   var _a2, _b2;
@@ -79560,7 +79786,8 @@ function buildSlotPayload(form, slots, weeklyDate) {
   const timeSlots = [...slots].map((slot) => ({
     startTime: slot.startTime,
     endTime: slot.endTime,
-    maximumPatients: Number(slot.maximumPatients)
+    maximumPatients: Number(slot.maximumPatients),
+    isActive: slot.isActive
   })).sort((a2, b2) => a2.startTime.localeCompare(b2.startTime));
   const firstSlot = timeSlots[0];
   const lastSlot = timeSlots[timeSlots.length - 1];
@@ -79584,6 +79811,7 @@ function buildWeeklySlotPayload(form) {
   const weeklyDays = form.weeklyDays.map((day) => ({
     date: day.date,
     weekday: getWeekday(day.date),
+    isActive: day.isActive,
     timeSlots: normalizeTimeSlots(day.slots)
   })).sort((a2, b2) => a2.date.localeCompare(b2.date));
   const flattenedSlots = weeklyDays.flatMap((day) => day.timeSlots);
@@ -79614,7 +79842,8 @@ function normalizeTimeSlots(slots) {
   return [...slots].map((slot) => ({
     startTime: slot.startTime,
     endTime: slot.endTime,
-    maximumPatients: Number(slot.maximumPatients)
+    maximumPatients: Number(slot.maximumPatients),
+    isActive: slot.isActive
   })).sort((a2, b2) => a2.startTime.localeCompare(b2.startTime));
 }
 function getFormTimeSlots(slot) {
@@ -79623,14 +79852,16 @@ function getFormTimeSlots(slot) {
     {
       startTime: slot.startTime,
       endTime: slot.endTime,
-      maximumPatients: slot.maximumPatients
+      maximumPatients: slot.maximumPatients,
+      isActive: true
     }
   ];
   return source.map(
     (timeSlot) => createTimeSlotLine({
       startTime: timeSlot.startTime,
       endTime: timeSlot.endTime,
-      maximumPatients: timeSlot.maximumPatients
+      maximumPatients: timeSlot.maximumPatients,
+      isActive: timeSlot.isActive ?? true
     })
   );
 }
@@ -79640,11 +79871,13 @@ function getFormWeeklyDays(slot) {
     return slot.weeklyDays.map(
       (day) => createWeeklyDayLine({
         date: getDateKey(day.date, day.dateKey),
+        isActive: day.isActive ?? true,
         slots: day.timeSlots.map(
           (timeSlot) => createTimeSlotLine({
             startTime: timeSlot.startTime,
             endTime: timeSlot.endTime,
-            maximumPatients: timeSlot.maximumPatients
+            maximumPatients: timeSlot.maximumPatients,
+            isActive: timeSlot.isActive ?? true
           })
         )
       })
@@ -79653,6 +79886,7 @@ function getFormWeeklyDays(slot) {
   return [
     createWeeklyDayLine({
       date: slot.dateKey || (slot.date ? slot.date.slice(0, 10) : "") || dateForWeekday(slot.weekday ?? void 0),
+      isActive: true,
       slots: getFormTimeSlots(slot)
     })
   ];
@@ -79680,32 +79914,6 @@ function sumTimeSlotCapacity(slots) {
     (total, slot) => total + Number(slot.maximumPatients || 0),
     0
   );
-}
-function formatSlotTimes(slot) {
-  var _a2, _b2;
-  if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
-    return slot.weeklyDays.map((day) => {
-      const dateKey = getDateKey(day.date, day.dateKey);
-      const times = day.timeSlots.map(
-        (timeSlot) => `${formatTime12Hour(timeSlot.startTime)} - ${formatTime12Hour(
-          timeSlot.endTime
-        )}`
-      ).join(", ");
-      return `${dateKey}: ${times}`;
-    }).join(" | ");
-  }
-  const timeSlots = ((_b2 = slot.timeSlots) == null ? void 0 : _b2.length) ? slot.timeSlots : [
-    {
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-      maximumPatients: slot.maximumPatients
-    }
-  ];
-  return timeSlots.map(
-    (timeSlot) => `${formatTime12Hour(timeSlot.startTime)} - ${formatTime12Hour(
-      timeSlot.endTime
-    )}`
-  ).join(", ");
 }
 function formatTime12Hour(time2) {
   const [rawHours, rawMinutes] = time2.split(":").map(Number);
