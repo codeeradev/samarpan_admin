@@ -38406,6 +38406,9 @@ function toFormData$4(payload) {
   if (payload.expertise) {
     fd.append("expertise", JSON.stringify(payload.expertise));
   }
+  if (payload.seo) {
+    fd.append("seo", JSON.stringify(payload.seo));
+  }
   if (payload.permissions) {
     fd.append("permissions", JSON.stringify(payload.permissions));
   }
@@ -43872,6 +43875,7 @@ function normalizeCareerItem(career) {
     applyEmail: career.applyEmail || "",
     applyLink: career.applyLink || "",
     status: career.status || "open",
+    seo: career.seo || { metaTitle: "", metaDescription: "", keywords: [] },
     sortOrder: typeof career.sortOrder === "number" ? career.sortOrder : Number(career.sortOrder) || 0,
     isActive: career.isActive,
     createdAt: career.createdAt,
@@ -43900,6 +43904,7 @@ function createCareerFormData(payload) {
   formData.append("applyEmail", payload.applyEmail.trim());
   formData.append("applyLink", payload.applyLink.trim());
   formData.append("status", payload.status);
+  formData.append("seo", JSON.stringify(payload.seo || {}));
   formData.append(
     "sortOrder",
     String(payload.sortOrder)
@@ -43957,6 +43962,836 @@ const deleteCareerApi = async (id) => {
     throw createApiRequestError(error, "Failed to delete career");
   }
 };
+var propTypes = { exports: {} };
+var ReactPropTypesSecret$1 = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
+var ReactPropTypesSecret_1 = ReactPropTypesSecret$1;
+var ReactPropTypesSecret = ReactPropTypesSecret_1;
+function emptyFunction() {
+}
+function emptyFunctionWithReset() {
+}
+emptyFunctionWithReset.resetWarningCache = emptyFunction;
+var factoryWithThrowingShims = function() {
+  function shim2(props, propName, componentName, location2, propFullName, secret) {
+    if (secret === ReactPropTypesSecret) {
+      return;
+    }
+    var err = new Error(
+      "Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types"
+    );
+    err.name = "Invariant Violation";
+    throw err;
+  }
+  shim2.isRequired = shim2;
+  function getShim() {
+    return shim2;
+  }
+  var ReactPropTypes = {
+    array: shim2,
+    bigint: shim2,
+    bool: shim2,
+    func: shim2,
+    number: shim2,
+    object: shim2,
+    string: shim2,
+    symbol: shim2,
+    any: shim2,
+    arrayOf: getShim,
+    element: shim2,
+    elementType: shim2,
+    instanceOf: getShim,
+    node: shim2,
+    objectOf: getShim,
+    oneOf: getShim,
+    oneOfType: getShim,
+    shape: getShim,
+    exact: getShim,
+    checkPropTypes: emptyFunctionWithReset,
+    resetWarningCache: emptyFunction
+  };
+  ReactPropTypes.PropTypes = ReactPropTypes;
+  return ReactPropTypes;
+};
+{
+  propTypes.exports = factoryWithThrowingShims();
+}
+var propTypesExports = propTypes.exports;
+const PropTypes = /* @__PURE__ */ getDefaultExportFromCjs(propTypesExports);
+var __assign$2 = function() {
+  __assign$2 = Object.assign || function(t2) {
+    for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
+      s2 = arguments[i2];
+      for (var p2 in s2) if (Object.prototype.hasOwnProperty.call(s2, p2))
+        t2[p2] = s2[p2];
+    }
+    return t2;
+  };
+  return __assign$2.apply(this, arguments);
+};
+var eventPropTypes = {
+  onActivate: propTypesExports.func,
+  onAddUndo: propTypesExports.func,
+  onBeforeAddUndo: propTypesExports.func,
+  onBeforeExecCommand: propTypesExports.func,
+  onBeforeGetContent: propTypesExports.func,
+  onBeforeRenderUI: propTypesExports.func,
+  onBeforeSetContent: propTypesExports.func,
+  onBeforePaste: propTypesExports.func,
+  onBlur: propTypesExports.func,
+  onChange: propTypesExports.func,
+  onClearUndos: propTypesExports.func,
+  onClick: propTypesExports.func,
+  onContextMenu: propTypesExports.func,
+  onCommentChange: propTypesExports.func,
+  onCompositionEnd: propTypesExports.func,
+  onCompositionStart: propTypesExports.func,
+  onCompositionUpdate: propTypesExports.func,
+  onCopy: propTypesExports.func,
+  onCut: propTypesExports.func,
+  onDblclick: propTypesExports.func,
+  onDeactivate: propTypesExports.func,
+  onDirty: propTypesExports.func,
+  onDrag: propTypesExports.func,
+  onDragDrop: propTypesExports.func,
+  onDragEnd: propTypesExports.func,
+  onDragGesture: propTypesExports.func,
+  onDragOver: propTypesExports.func,
+  onDrop: propTypesExports.func,
+  onExecCommand: propTypesExports.func,
+  onFocus: propTypesExports.func,
+  onFocusIn: propTypesExports.func,
+  onFocusOut: propTypesExports.func,
+  onGetContent: propTypesExports.func,
+  onHide: propTypesExports.func,
+  onInit: propTypesExports.func,
+  onInput: propTypesExports.func,
+  onKeyDown: propTypesExports.func,
+  onKeyPress: propTypesExports.func,
+  onKeyUp: propTypesExports.func,
+  onLoadContent: propTypesExports.func,
+  onMouseDown: propTypesExports.func,
+  onMouseEnter: propTypesExports.func,
+  onMouseLeave: propTypesExports.func,
+  onMouseMove: propTypesExports.func,
+  onMouseOut: propTypesExports.func,
+  onMouseOver: propTypesExports.func,
+  onMouseUp: propTypesExports.func,
+  onNodeChange: propTypesExports.func,
+  onObjectResizeStart: propTypesExports.func,
+  onObjectResized: propTypesExports.func,
+  onObjectSelected: propTypesExports.func,
+  onPaste: propTypesExports.func,
+  onPostProcess: propTypesExports.func,
+  onPostRender: propTypesExports.func,
+  onPreProcess: propTypesExports.func,
+  onProgressState: propTypesExports.func,
+  onRedo: propTypesExports.func,
+  onRemove: propTypesExports.func,
+  onReset: propTypesExports.func,
+  onSaveContent: propTypesExports.func,
+  onSelectionChange: propTypesExports.func,
+  onSetAttrib: propTypesExports.func,
+  onSetContent: propTypesExports.func,
+  onShow: propTypesExports.func,
+  onSubmit: propTypesExports.func,
+  onUndo: propTypesExports.func,
+  onVisualAid: propTypesExports.func,
+  onSkinLoadError: propTypesExports.func,
+  onThemeLoadError: propTypesExports.func,
+  onModelLoadError: propTypesExports.func,
+  onPluginLoadError: propTypesExports.func,
+  onIconsLoadError: propTypesExports.func,
+  onLanguageLoadError: propTypesExports.func,
+  onScriptsLoad: propTypesExports.func,
+  onScriptsLoadError: propTypesExports.func
+};
+var EditorPropTypes = __assign$2({ apiKey: propTypesExports.string, licenseKey: propTypesExports.string, id: propTypesExports.string, inline: propTypesExports.bool, init: propTypesExports.object, initialValue: propTypesExports.string, onEditorChange: propTypesExports.func, value: propTypesExports.string, tagName: propTypesExports.string, tabIndex: propTypesExports.number, cloudChannel: propTypesExports.string, plugins: propTypesExports.oneOfType([propTypesExports.string, propTypesExports.array]), toolbar: propTypesExports.oneOfType([propTypesExports.string, propTypesExports.array]), disabled: propTypesExports.bool, readonly: propTypesExports.bool, textareaName: propTypesExports.string, tinymceScriptSrc: propTypesExports.oneOfType([
+  propTypesExports.string,
+  propTypesExports.arrayOf(propTypesExports.string),
+  propTypesExports.arrayOf(propTypesExports.shape({
+    src: propTypesExports.string,
+    async: propTypesExports.bool,
+    defer: propTypesExports.bool
+  }))
+]), rollback: propTypesExports.oneOfType([propTypesExports.number, propTypesExports.oneOf([false])]), scriptLoading: propTypesExports.shape({
+  async: propTypesExports.bool,
+  defer: propTypesExports.bool,
+  delay: propTypesExports.number
+}) }, eventPropTypes);
+var getTinymce = function(view) {
+  var global2 = view;
+  return global2 && global2.tinymce ? global2.tinymce : null;
+};
+var isFunction$4 = function(x2) {
+  return typeof x2 === "function";
+};
+var isEventProp = function(name) {
+  return name in eventPropTypes;
+};
+var eventAttrToEventName = function(attrName) {
+  return attrName.substr(2);
+};
+var configHandlers2 = function(handlerLookup, on, off, adapter, prevProps, props, boundHandlers) {
+  var prevEventKeys = Object.keys(prevProps).filter(isEventProp);
+  var currEventKeys = Object.keys(props).filter(isEventProp);
+  var removedKeys = prevEventKeys.filter(function(key) {
+    return props[key] === void 0;
+  });
+  var addedKeys = currEventKeys.filter(function(key) {
+    return prevProps[key] === void 0;
+  });
+  removedKeys.forEach(function(key) {
+    var eventName = eventAttrToEventName(key);
+    var wrappedHandler = boundHandlers[eventName];
+    off(eventName, wrappedHandler);
+    delete boundHandlers[eventName];
+  });
+  addedKeys.forEach(function(key) {
+    var wrappedHandler = adapter(handlerLookup, key);
+    var eventName = eventAttrToEventName(key);
+    boundHandlers[eventName] = wrappedHandler;
+    on(eventName, wrappedHandler);
+  });
+};
+var configHandlers = function(editor, prevProps, props, boundHandlers, lookup) {
+  return configHandlers2(
+    lookup,
+    editor.on.bind(editor),
+    editor.off.bind(editor),
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    function(handlerLookup, key) {
+      return function(e3) {
+        var _a2;
+        return (_a2 = handlerLookup(key)) === null || _a2 === void 0 ? void 0 : _a2(e3, editor);
+      };
+    },
+    prevProps,
+    props,
+    boundHandlers
+  );
+};
+var unique = 0;
+var uuid = function(prefix2) {
+  var time2 = Date.now();
+  var random = Math.floor(Math.random() * 1e9);
+  unique++;
+  return prefix2 + "_" + random + unique + String(time2);
+};
+var isTextareaOrInput = function(element) {
+  return element !== null && (element.tagName.toLowerCase() === "textarea" || element.tagName.toLowerCase() === "input");
+};
+var normalizePluginArray = function(plugins) {
+  if (typeof plugins === "undefined" || plugins === "") {
+    return [];
+  }
+  return Array.isArray(plugins) ? plugins : plugins.split(" ");
+};
+var mergePlugins = function(initPlugins, inputPlugins) {
+  return normalizePluginArray(initPlugins).concat(normalizePluginArray(inputPlugins));
+};
+var isBeforeInputEventAvailable = function() {
+  return window.InputEvent && typeof InputEvent.prototype.getTargetRanges === "function";
+};
+var isInDoc = function(elem) {
+  if (!("isConnected" in Node.prototype)) {
+    var current = elem;
+    var parent_1 = elem.parentNode;
+    while (parent_1 != null) {
+      current = parent_1;
+      parent_1 = current.parentNode;
+    }
+    return current === elem.ownerDocument;
+  }
+  return elem.isConnected;
+};
+var setMode = function(editor, mode) {
+  if (editor !== void 0) {
+    if (editor.mode != null && typeof editor.mode === "object" && typeof editor.mode.set === "function") {
+      editor.mode.set(mode);
+    } else {
+      editor.setMode(mode);
+    }
+  }
+};
+var getTinymceOrError = function(view) {
+  var tinymce = getTinymce(view);
+  if (!tinymce) {
+    throw new Error("tinymce should have been loaded into global scope");
+  }
+  return tinymce;
+};
+var isDisabledOptionSupported = function(editor) {
+  return editor.options && editor.options.isRegistered("disabled");
+};
+var __assign$1 = function() {
+  __assign$1 = Object.assign || function(t2) {
+    for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
+      s2 = arguments[i2];
+      for (var p2 in s2) if (Object.prototype.hasOwnProperty.call(s2, p2))
+        t2[p2] = s2[p2];
+    }
+    return t2;
+  };
+  return __assign$1.apply(this, arguments);
+};
+var injectScriptTag = function(doc, item, handler) {
+  var _a2, _b2;
+  var scriptTag = doc.createElement("script");
+  scriptTag.referrerPolicy = "origin";
+  scriptTag.type = "application/javascript";
+  scriptTag.id = item.id;
+  scriptTag.src = item.src;
+  scriptTag.async = (_a2 = item.async) !== null && _a2 !== void 0 ? _a2 : false;
+  scriptTag.defer = (_b2 = item.defer) !== null && _b2 !== void 0 ? _b2 : false;
+  var loadHandler = function() {
+    scriptTag.removeEventListener("load", loadHandler);
+    scriptTag.removeEventListener("error", errorHandler);
+    handler(item.src);
+  };
+  var errorHandler = function(err) {
+    scriptTag.removeEventListener("load", loadHandler);
+    scriptTag.removeEventListener("error", errorHandler);
+    handler(item.src, err);
+  };
+  scriptTag.addEventListener("load", loadHandler);
+  scriptTag.addEventListener("error", errorHandler);
+  if (doc.head) {
+    doc.head.appendChild(scriptTag);
+  }
+};
+var createDocumentScriptLoader = function(doc) {
+  var lookup = {};
+  var scriptLoadOrErrorHandler = function(src, err) {
+    var item = lookup[src];
+    item.done = true;
+    item.error = err;
+    for (var _i2 = 0, _a2 = item.handlers; _i2 < _a2.length; _i2++) {
+      var h2 = _a2[_i2];
+      h2(src, err);
+    }
+    item.handlers = [];
+  };
+  var loadScripts = function(items, success, failure) {
+    var failureOrLog = function(err) {
+      return failure !== void 0 ? failure(err) : console.error(err);
+    };
+    if (items.length === 0) {
+      failureOrLog(new Error("At least one script must be provided"));
+      return;
+    }
+    var successCount = 0;
+    var failed = false;
+    var loaded = function(_src, err) {
+      if (failed) {
+        return;
+      }
+      if (err) {
+        failed = true;
+        failureOrLog(err);
+      } else if (++successCount === items.length) {
+        success();
+      }
+    };
+    for (var _i2 = 0, items_1 = items; _i2 < items_1.length; _i2++) {
+      var item = items_1[_i2];
+      var existing = lookup[item.src];
+      if (existing) {
+        if (existing.done) {
+          loaded(item.src, existing.error);
+        } else {
+          existing.handlers.push(loaded);
+        }
+      } else {
+        var id = uuid("tiny-");
+        lookup[item.src] = {
+          id,
+          src: item.src,
+          done: false,
+          error: null,
+          handlers: [loaded]
+        };
+        injectScriptTag(doc, __assign$1({ id }, item), scriptLoadOrErrorHandler);
+      }
+    }
+  };
+  var deleteScripts = function() {
+    var _a2;
+    for (var _i2 = 0, _b2 = Object.values(lookup); _i2 < _b2.length; _i2++) {
+      var item = _b2[_i2];
+      var scriptTag = doc.getElementById(item.id);
+      if (scriptTag != null && scriptTag.tagName === "SCRIPT") {
+        (_a2 = scriptTag.parentNode) === null || _a2 === void 0 ? void 0 : _a2.removeChild(scriptTag);
+      }
+    }
+    lookup = {};
+  };
+  var getDocument = function() {
+    return doc;
+  };
+  return {
+    loadScripts,
+    deleteScripts,
+    getDocument
+  };
+};
+var createScriptLoader = function() {
+  var cache = [];
+  var getDocumentScriptLoader = function(doc) {
+    var loader = cache.find(function(l2) {
+      return l2.getDocument() === doc;
+    });
+    if (loader === void 0) {
+      loader = createDocumentScriptLoader(doc);
+      cache.push(loader);
+    }
+    return loader;
+  };
+  var loadList = function(doc, items, delay, success, failure) {
+    var doLoad = function() {
+      return getDocumentScriptLoader(doc).loadScripts(items, success, failure);
+    };
+    if (delay > 0) {
+      setTimeout(doLoad, delay);
+    } else {
+      doLoad();
+    }
+  };
+  var reinitialize = function() {
+    for (var loader = cache.pop(); loader != null; loader = cache.pop()) {
+      loader.deleteScripts();
+    }
+  };
+  return {
+    loadList,
+    reinitialize
+  };
+};
+var ScriptLoader = createScriptLoader();
+var __extends = /* @__PURE__ */ function() {
+  var extendStatics = function(d2, b2) {
+    extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d3, b3) {
+      d3.__proto__ = b3;
+    } || function(d3, b3) {
+      for (var p2 in b3) if (Object.prototype.hasOwnProperty.call(b3, p2)) d3[p2] = b3[p2];
+    };
+    return extendStatics(d2, b2);
+  };
+  return function(d2, b2) {
+    if (typeof b2 !== "function" && b2 !== null)
+      throw new TypeError("Class extends value " + String(b2) + " is not a constructor or null");
+    extendStatics(d2, b2);
+    function __() {
+      this.constructor = d2;
+    }
+    d2.prototype = b2 === null ? Object.create(b2) : (__.prototype = b2.prototype, new __());
+  };
+}();
+var __assign = function() {
+  __assign = Object.assign || function(t2) {
+    for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
+      s2 = arguments[i2];
+      for (var p2 in s2) if (Object.prototype.hasOwnProperty.call(s2, p2))
+        t2[p2] = s2[p2];
+    }
+    return t2;
+  };
+  return __assign.apply(this, arguments);
+};
+var changeEvents = "change keyup compositionend setcontent CommentChange";
+var Editor = (
+  /** @class */
+  function(_super) {
+    __extends(Editor2, _super);
+    function Editor2(props) {
+      var _a2, _b2, _c2;
+      var _this = _super.call(this, props) || this;
+      _this.rollbackTimer = void 0;
+      _this.valueCursor = void 0;
+      _this.rollbackChange = function() {
+        var editor = _this.editor;
+        var value = _this.props.value;
+        if (editor && value && value !== _this.currentContent) {
+          editor.undoManager.ignore(function() {
+            editor.setContent(value);
+            if (_this.valueCursor && (!_this.inline || editor.hasFocus())) {
+              try {
+                editor.selection.moveToBookmark(_this.valueCursor);
+              } catch (_e3) {
+              }
+            }
+          });
+        }
+        _this.rollbackTimer = void 0;
+      };
+      _this.handleBeforeInput = function(_evt) {
+        if (_this.props.value !== void 0 && _this.props.value === _this.currentContent && _this.editor) {
+          if (!_this.inline || _this.editor.hasFocus()) {
+            try {
+              _this.valueCursor = _this.editor.selection.getBookmark(3);
+            } catch (_e3) {
+            }
+          }
+        }
+      };
+      _this.handleBeforeInputSpecial = function(evt) {
+        if (evt.key === "Enter" || evt.key === "Backspace" || evt.key === "Delete") {
+          _this.handleBeforeInput(evt);
+        }
+      };
+      _this.handleEditorChange = function(_evt) {
+        var editor = _this.editor;
+        if (editor && editor.initialized) {
+          var newContent = editor.getContent();
+          if (_this.props.value !== void 0 && _this.props.value !== newContent && _this.props.rollback !== false) {
+            if (!_this.rollbackTimer) {
+              _this.rollbackTimer = window.setTimeout(_this.rollbackChange, typeof _this.props.rollback === "number" ? _this.props.rollback : 200);
+            }
+          }
+          if (newContent !== _this.currentContent) {
+            _this.currentContent = newContent;
+            if (isFunction$4(_this.props.onEditorChange)) {
+              _this.props.onEditorChange(newContent, editor);
+            }
+          }
+        }
+      };
+      _this.handleEditorChangeSpecial = function(evt) {
+        if (evt.key === "Backspace" || evt.key === "Delete") {
+          _this.handleEditorChange(evt);
+        }
+      };
+      _this.initialise = function(attempts) {
+        var _a3, _b3, _c3;
+        if (attempts === void 0) {
+          attempts = 0;
+        }
+        var target = _this.elementRef.current;
+        if (!target) {
+          return;
+        }
+        if (!isInDoc(target)) {
+          if (attempts === 0) {
+            setTimeout(function() {
+              return _this.initialise(1);
+            }, 1);
+          } else if (attempts < 100) {
+            setTimeout(function() {
+              return _this.initialise(attempts + 1);
+            }, 100);
+          } else {
+            throw new Error("tinymce can only be initialised when in a document");
+          }
+          return;
+        }
+        var tinymce = getTinymceOrError(_this.view);
+        var finalInit = __assign(__assign(__assign(__assign({}, _this.props.init), { selector: void 0, target, disabled: _this.props.disabled, readonly: _this.props.readonly, inline: _this.inline, plugins: mergePlugins((_a3 = _this.props.init) === null || _a3 === void 0 ? void 0 : _a3.plugins, _this.props.plugins), toolbar: (_b3 = _this.props.toolbar) !== null && _b3 !== void 0 ? _b3 : (_c3 = _this.props.init) === null || _c3 === void 0 ? void 0 : _c3.toolbar }), _this.props.licenseKey ? { license_key: _this.props.licenseKey } : {}), { setup: function(editor) {
+          _this.editor = editor;
+          _this.bindHandlers({});
+          if (_this.inline && !isTextareaOrInput(target)) {
+            editor.once("PostRender", function(_evt) {
+              editor.setContent(_this.getInitialValue(), { no_events: true });
+            });
+          }
+          if (_this.props.init && isFunction$4(_this.props.init.setup)) {
+            _this.props.init.setup(editor);
+          }
+          if (_this.props.disabled) {
+            if (isDisabledOptionSupported(_this.editor)) {
+              _this.editor.options.set("disabled", _this.props.disabled);
+            } else {
+              _this.editor.mode.set("readonly");
+            }
+          }
+        }, init_instance_callback: function(editor) {
+          var _a4;
+          var initialValue = _this.getInitialValue();
+          _this.currentContent = (_a4 = _this.currentContent) !== null && _a4 !== void 0 ? _a4 : editor.getContent();
+          if (_this.currentContent !== initialValue) {
+            _this.currentContent = initialValue;
+            editor.setContent(initialValue);
+            editor.undoManager.clear();
+            editor.undoManager.add();
+            editor.setDirty(false);
+          }
+          if (_this.props.init && isFunction$4(_this.props.init.init_instance_callback)) {
+            _this.props.init.init_instance_callback(editor);
+          }
+        } });
+        if (!_this.inline) {
+          target.style.visibility = "";
+        }
+        if (isTextareaOrInput(target)) {
+          target.value = _this.getInitialValue();
+        }
+        tinymce.init(finalInit);
+      };
+      _this.id = _this.props.id || uuid("tiny-react");
+      _this.elementRef = reactExports.createRef();
+      _this.inline = (_c2 = (_a2 = _this.props.inline) !== null && _a2 !== void 0 ? _a2 : (_b2 = _this.props.init) === null || _b2 === void 0 ? void 0 : _b2.inline) !== null && _c2 !== void 0 ? _c2 : false;
+      _this.boundHandlers = {};
+      return _this;
+    }
+    Object.defineProperty(Editor2.prototype, "view", {
+      get: function() {
+        var _a2, _b2;
+        return (_b2 = (_a2 = this.elementRef.current) === null || _a2 === void 0 ? void 0 : _a2.ownerDocument.defaultView) !== null && _b2 !== void 0 ? _b2 : window;
+      },
+      enumerable: false,
+      configurable: true
+    });
+    Editor2.prototype.componentDidUpdate = function(prevProps) {
+      var _this = this;
+      var _a2, _b2;
+      if (this.rollbackTimer) {
+        clearTimeout(this.rollbackTimer);
+        this.rollbackTimer = void 0;
+      }
+      if (this.editor) {
+        this.bindHandlers(prevProps);
+        if (this.editor.initialized) {
+          this.currentContent = (_a2 = this.currentContent) !== null && _a2 !== void 0 ? _a2 : this.editor.getContent();
+          if (typeof this.props.initialValue === "string" && this.props.initialValue !== prevProps.initialValue) {
+            this.editor.setContent(this.props.initialValue);
+            this.editor.undoManager.clear();
+            this.editor.undoManager.add();
+            this.editor.setDirty(false);
+          } else if (typeof this.props.value === "string" && this.props.value !== this.currentContent) {
+            var localEditor_1 = this.editor;
+            localEditor_1.undoManager.transact(function() {
+              var cursor;
+              if (!_this.inline || localEditor_1.hasFocus()) {
+                try {
+                  cursor = localEditor_1.selection.getBookmark(3);
+                } catch (_e3) {
+                }
+              }
+              var valueCursor2 = _this.valueCursor;
+              localEditor_1.setContent(_this.props.value);
+              if (!_this.inline || localEditor_1.hasFocus()) {
+                for (var _i2 = 0, _a3 = [cursor, valueCursor2]; _i2 < _a3.length; _i2++) {
+                  var bookmark = _a3[_i2];
+                  if (bookmark) {
+                    try {
+                      localEditor_1.selection.moveToBookmark(bookmark);
+                      _this.valueCursor = bookmark;
+                      break;
+                    } catch (_e3) {
+                    }
+                  }
+                }
+              }
+            });
+          }
+          if (this.props.readonly !== prevProps.readonly) {
+            var readonly = (_b2 = this.props.readonly) !== null && _b2 !== void 0 ? _b2 : false;
+            setMode(this.editor, readonly ? "readonly" : "design");
+          }
+          if (this.props.disabled !== prevProps.disabled) {
+            if (isDisabledOptionSupported(this.editor)) {
+              this.editor.options.set("disabled", this.props.disabled);
+            } else {
+              setMode(this.editor, this.props.disabled ? "readonly" : "design");
+            }
+          }
+        }
+      }
+    };
+    Editor2.prototype.componentDidMount = function() {
+      var _this = this;
+      var _a2, _b2, _c2, _d2, _f2;
+      if (getTinymce(this.view) !== null) {
+        this.initialise();
+      } else if (Array.isArray(this.props.tinymceScriptSrc) && this.props.tinymceScriptSrc.length === 0) {
+        (_b2 = (_a2 = this.props).onScriptsLoadError) === null || _b2 === void 0 ? void 0 : _b2.call(_a2, new Error("No `tinymce` global is present but the `tinymceScriptSrc` prop was an empty array."));
+      } else if ((_c2 = this.elementRef.current) === null || _c2 === void 0 ? void 0 : _c2.ownerDocument) {
+        var successHandler = function() {
+          var _a3, _b3;
+          (_b3 = (_a3 = _this.props).onScriptsLoad) === null || _b3 === void 0 ? void 0 : _b3.call(_a3);
+          _this.initialise();
+        };
+        var errorHandler = function(err) {
+          var _a3, _b3;
+          (_b3 = (_a3 = _this.props).onScriptsLoadError) === null || _b3 === void 0 ? void 0 : _b3.call(_a3, err);
+        };
+        ScriptLoader.loadList(this.elementRef.current.ownerDocument, this.getScriptSources(), (_f2 = (_d2 = this.props.scriptLoading) === null || _d2 === void 0 ? void 0 : _d2.delay) !== null && _f2 !== void 0 ? _f2 : 0, successHandler, errorHandler);
+      }
+    };
+    Editor2.prototype.componentWillUnmount = function() {
+      var _this = this;
+      var editor = this.editor;
+      if (editor) {
+        editor.off(changeEvents, this.handleEditorChange);
+        editor.off(this.beforeInputEvent(), this.handleBeforeInput);
+        editor.off("keypress", this.handleEditorChangeSpecial);
+        editor.off("keydown", this.handleBeforeInputSpecial);
+        editor.off("NewBlock", this.handleEditorChange);
+        Object.keys(this.boundHandlers).forEach(function(eventName) {
+          editor.off(eventName, _this.boundHandlers[eventName]);
+        });
+        this.boundHandlers = {};
+        editor.remove();
+        this.editor = void 0;
+      }
+    };
+    Editor2.prototype.render = function() {
+      return this.inline ? this.renderInline() : this.renderIframe();
+    };
+    Editor2.prototype.beforeInputEvent = function() {
+      return isBeforeInputEventAvailable() ? "beforeinput SelectionChange" : "SelectionChange";
+    };
+    Editor2.prototype.renderInline = function() {
+      var _a2 = this.props.tagName, tagName = _a2 === void 0 ? "div" : _a2;
+      return reactExports.createElement(tagName, {
+        ref: this.elementRef,
+        id: this.id,
+        tabIndex: this.props.tabIndex
+      });
+    };
+    Editor2.prototype.renderIframe = function() {
+      return reactExports.createElement("textarea", {
+        ref: this.elementRef,
+        style: { visibility: "hidden" },
+        name: this.props.textareaName,
+        id: this.id,
+        tabIndex: this.props.tabIndex
+      });
+    };
+    Editor2.prototype.getScriptSources = function() {
+      var _a2, _b2;
+      var async = (_a2 = this.props.scriptLoading) === null || _a2 === void 0 ? void 0 : _a2.async;
+      var defer = (_b2 = this.props.scriptLoading) === null || _b2 === void 0 ? void 0 : _b2.defer;
+      if (this.props.tinymceScriptSrc !== void 0) {
+        if (typeof this.props.tinymceScriptSrc === "string") {
+          return [{ src: this.props.tinymceScriptSrc, async, defer }];
+        }
+        return this.props.tinymceScriptSrc.map(function(item) {
+          if (typeof item === "string") {
+            return { src: item, async, defer };
+          } else {
+            return item;
+          }
+        });
+      }
+      var channel = this.props.cloudChannel;
+      var apiKey = this.props.apiKey ? this.props.apiKey : "no-api-key";
+      var cloudTinyJs = "https://cdn.tiny.cloud/1/".concat(apiKey, "/tinymce/").concat(channel, "/tinymce.min.js");
+      return [{ src: cloudTinyJs, async, defer }];
+    };
+    Editor2.prototype.getInitialValue = function() {
+      if (typeof this.props.initialValue === "string") {
+        return this.props.initialValue;
+      } else if (typeof this.props.value === "string") {
+        return this.props.value;
+      } else {
+        return "";
+      }
+    };
+    Editor2.prototype.bindHandlers = function(prevProps) {
+      var _this = this;
+      if (this.editor !== void 0) {
+        configHandlers(this.editor, prevProps, this.props, this.boundHandlers, function(key) {
+          return _this.props[key];
+        });
+        var isValueControlled = function(p2) {
+          return p2.onEditorChange !== void 0 || p2.value !== void 0;
+        };
+        var wasControlled = isValueControlled(prevProps);
+        var nowControlled = isValueControlled(this.props);
+        if (!wasControlled && nowControlled) {
+          this.editor.on(changeEvents, this.handleEditorChange);
+          this.editor.on(this.beforeInputEvent(), this.handleBeforeInput);
+          this.editor.on("keydown", this.handleBeforeInputSpecial);
+          this.editor.on("keyup", this.handleEditorChangeSpecial);
+          this.editor.on("NewBlock", this.handleEditorChange);
+        } else if (wasControlled && !nowControlled) {
+          this.editor.off(changeEvents, this.handleEditorChange);
+          this.editor.off(this.beforeInputEvent(), this.handleBeforeInput);
+          this.editor.off("keydown", this.handleBeforeInputSpecial);
+          this.editor.off("keyup", this.handleEditorChangeSpecial);
+          this.editor.off("NewBlock", this.handleEditorChange);
+        }
+      }
+    };
+    Editor2.propTypes = EditorPropTypes;
+    Editor2.defaultProps = {
+      cloudChannel: "8"
+    };
+    return Editor2;
+  }(reactExports.Component)
+);
+function PageEditor({ value, onChange }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-slate-200 bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Editor,
+    {
+      tinymceScriptSrc: "https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js",
+      apiKey: "gz0vccrxxqfout41hqr8gthfroa4l5qnrgjmgdqmjhuw0tfr",
+      value,
+      onEditorChange: (content) => onChange(content),
+      init: {
+        height: 500,
+        menubar: true,
+        toolbar_mode: "wrap",
+        ui_mode: "split",
+        branding: false,
+        promotion: false,
+        zindex: 9999999,
+        plugins: [
+          "advlist",
+          "autolink",
+          "lists",
+          "link",
+          "image",
+          "charmap",
+          "preview",
+          "anchor",
+          "searchreplace",
+          "visualblocks",
+          "code",
+          "fullscreen",
+          "insertdatetime",
+          "media",
+          "table",
+          "help",
+          "wordcount"
+        ],
+        toolbar: "undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | code fullscreen preview",
+        image_title: true,
+        image_advtab: true,
+        automatic_uploads: true,
+        paste_data_images: true,
+        file_picker_types: "image",
+        dialog_type: "modal",
+        file_picker_callback: (callback, _value, meta) => {
+          if (meta.filetype !== "image") {
+            return;
+          }
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
+          input.onchange = () => {
+            var _a2;
+            const file = (_a2 = input.files) == null ? void 0 : _a2[0];
+            if (!file) {
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = reader.result;
+              if (typeof result === "string") {
+                callback(result, {
+                  alt: file.name,
+                  title: file.name
+                });
+              }
+            };
+            reader.readAsDataURL(file);
+          };
+          input.click();
+        }
+      }
+    }
+  ) });
+}
 function Card({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "div",
@@ -44009,6 +44844,238 @@ function CardContent({ className, ...props }) {
     {
       "data-slot": "card-content",
       className: cn("px-6", className),
+      ...props
+    }
+  );
+}
+var TABS_NAME = "Tabs";
+var [createTabsContext] = createContextScope(TABS_NAME, [
+  createRovingFocusGroupScope
+]);
+var useRovingFocusGroupScope = createRovingFocusGroupScope();
+var [TabsProvider, useTabsContext] = createTabsContext(TABS_NAME);
+var Tabs$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const {
+      __scopeTabs,
+      value: valueProp,
+      onValueChange,
+      defaultValue,
+      orientation = "horizontal",
+      dir,
+      activationMode = "automatic",
+      ...tabsProps
+    } = props;
+    const direction = useDirection(dir);
+    const [value, setValue] = useControllableState({
+      prop: valueProp,
+      onChange: onValueChange,
+      defaultProp: defaultValue ?? "",
+      caller: TABS_NAME
+    });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      TabsProvider,
+      {
+        scope: __scopeTabs,
+        baseId: useId(),
+        value,
+        onValueChange: setValue,
+        orientation,
+        dir: direction,
+        activationMode,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive$2.div,
+          {
+            dir: direction,
+            "data-orientation": orientation,
+            ...tabsProps,
+            ref: forwardedRef
+          }
+        )
+      }
+    );
+  }
+);
+Tabs$1.displayName = TABS_NAME;
+var TAB_LIST_NAME = "TabsList";
+var TabsList$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeTabs, loop = true, ...listProps } = props;
+    const context = useTabsContext(TAB_LIST_NAME, __scopeTabs);
+    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Root$5,
+      {
+        asChild: true,
+        ...rovingFocusGroupScope,
+        orientation: context.orientation,
+        dir: context.dir,
+        loop,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive$2.div,
+          {
+            role: "tablist",
+            "aria-orientation": context.orientation,
+            ...listProps,
+            ref: forwardedRef
+          }
+        )
+      }
+    );
+  }
+);
+TabsList$1.displayName = TAB_LIST_NAME;
+var TRIGGER_NAME = "TabsTrigger";
+var TabsTrigger$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeTabs, value, disabled = false, ...triggerProps } = props;
+    const context = useTabsContext(TRIGGER_NAME, __scopeTabs);
+    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
+    const triggerId = makeTriggerId(context.baseId, value);
+    const contentId = makeContentId(context.baseId, value);
+    const isSelected = value === context.value;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Item$1,
+      {
+        asChild: true,
+        ...rovingFocusGroupScope,
+        focusable: !disabled,
+        active: isSelected,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive$2.button,
+          {
+            type: "button",
+            role: "tab",
+            "aria-selected": isSelected,
+            "aria-controls": contentId,
+            "data-state": isSelected ? "active" : "inactive",
+            "data-disabled": disabled ? "" : void 0,
+            disabled,
+            id: triggerId,
+            ...triggerProps,
+            ref: forwardedRef,
+            onMouseDown: composeEventHandlers(props.onMouseDown, (event) => {
+              if (!disabled && event.button === 0 && event.ctrlKey === false) {
+                context.onValueChange(value);
+              } else {
+                event.preventDefault();
+              }
+            }),
+            onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
+              if ([" ", "Enter"].includes(event.key)) context.onValueChange(value);
+            }),
+            onFocus: composeEventHandlers(props.onFocus, () => {
+              const isAutomaticActivation = context.activationMode !== "manual";
+              if (!isSelected && !disabled && isAutomaticActivation) {
+                context.onValueChange(value);
+              }
+            })
+          }
+        )
+      }
+    );
+  }
+);
+TabsTrigger$1.displayName = TRIGGER_NAME;
+var CONTENT_NAME = "TabsContent";
+var TabsContent$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeTabs, value, forceMount, children, ...contentProps } = props;
+    const context = useTabsContext(CONTENT_NAME, __scopeTabs);
+    const triggerId = makeTriggerId(context.baseId, value);
+    const contentId = makeContentId(context.baseId, value);
+    const isSelected = value === context.value;
+    const isMountAnimationPreventedRef = reactExports.useRef(isSelected);
+    reactExports.useEffect(() => {
+      const rAF = requestAnimationFrame(() => isMountAnimationPreventedRef.current = false);
+      return () => cancelAnimationFrame(rAF);
+    }, []);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || isSelected, children: ({ present }) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive$2.div,
+      {
+        "data-state": isSelected ? "active" : "inactive",
+        "data-orientation": context.orientation,
+        role: "tabpanel",
+        "aria-labelledby": triggerId,
+        hidden: !present,
+        id: contentId,
+        tabIndex: 0,
+        ...contentProps,
+        ref: forwardedRef,
+        style: {
+          ...props.style,
+          animationDuration: isMountAnimationPreventedRef.current ? "0s" : void 0
+        },
+        children: present && children
+      }
+    ) });
+  }
+);
+TabsContent$1.displayName = CONTENT_NAME;
+function makeTriggerId(baseId, value) {
+  return `${baseId}-trigger-${value}`;
+}
+function makeContentId(baseId, value) {
+  return `${baseId}-content-${value}`;
+}
+var Root2 = Tabs$1;
+var List = TabsList$1;
+var Trigger = TabsTrigger$1;
+var Content = TabsContent$1;
+function Tabs({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Root2,
+    {
+      "data-slot": "tabs",
+      className: cn("flex flex-col gap-2", className),
+      ...props
+    }
+  );
+}
+function TabsList({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    List,
+    {
+      "data-slot": "tabs-list",
+      className: cn(
+        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function TabsTrigger({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Trigger,
+    {
+      "data-slot": "tabs-trigger",
+      className: cn(
+        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function TabsContent({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Content,
+    {
+      "data-slot": "tabs-content",
+      className: cn("flex-1 outline-none", className),
       ...props
     }
   );
@@ -44203,6 +45270,9 @@ const emptyCareerForm = {
   responsibilitiesText: "",
   applyEmail: "",
   applyLink: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: "",
   status: "open",
   sortOrder: "0",
   image: null
@@ -44391,6 +45461,7 @@ function CareerManagementPage() {
     setModalOpen(true);
   }
   function openEdit(career) {
+    var _a2, _b2, _c2, _d2;
     setEditTarget(career);
     setImagePreview(career.image || "");
     setFormData({
@@ -44405,6 +45476,9 @@ function CareerManagementPage() {
       responsibilitiesText: career.responsibilities.join("\n"),
       applyEmail: career.applyEmail,
       applyLink: career.applyLink,
+      metaTitle: ((_a2 = career.seo) == null ? void 0 : _a2.metaTitle) || "",
+      metaDescription: ((_b2 = career.seo) == null ? void 0 : _b2.metaDescription) || "",
+      keywords: ((_d2 = (_c2 = career.seo) == null ? void 0 : _c2.keywords) == null ? void 0 : _d2.join(", ")) || "",
       status: career.status,
       sortOrder: String(career.sortOrder ?? 0),
       image: null
@@ -44444,6 +45518,11 @@ function CareerManagementPage() {
       responsibilities: splitLines(formData.responsibilitiesText),
       applyEmail: formData.applyEmail.trim(),
       applyLink: formData.applyLink.trim(),
+      seo: {
+        metaTitle: formData.metaTitle.trim(),
+        metaDescription: formData.metaDescription.trim(),
+        keywords: formData.keywords.split(",").map((keyword) => keyword.trim()).filter(Boolean)
+      },
       status: formData.status,
       sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
       image: formData.image
@@ -44634,263 +45713,329 @@ function CareerManagementPage() {
             setFormErrors({});
           }
         },
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-4xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-foreground", children: editTarget ? "Edit Career" : "Add Career" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: "Manage the role title, hiring details, and application info shown on the careers section." })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { htmlFor: "career-title", children: [
-                  "Role Title ",
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "career-title",
-                    value: formData.title,
-                    onChange: (event) => setField("title", event.target.value),
-                    placeholder: "Senior Staff Nurse",
-                    className: `rounded-xl ${formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}`
-                  }
-                ),
-                formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
+        modal: false,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          DialogContent,
+          {
+            className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-4xl",
+            onInteractOutside: (e3) => {
+              const el = e3.target;
+              if (el.closest(".tox-tinymce-aux") || el.closest(".tox-dialog") || el.closest(".tox-menu") || el.closest(".tox-pop") || document.querySelector(".tox-dialog")) {
+                e3.preventDefault();
+              }
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-xl text-foreground", children: editTarget ? "Edit Career" : "Add Career" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: "Manage the role title, hiring details, and application info shown on the careers section." })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-status", children: "Status" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  Select,
-                  {
-                    value: formData.status,
-                    onValueChange: (value) => setField("status", value),
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "career-status", className: "rounded-xl w-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select status" }) }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "open", children: "Open" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "closed", children: "Closed" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "basic", className: "space-y-6 mt-0", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { htmlFor: "career-title", children: [
+                        "Role Title ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-title",
+                          value: formData.title,
+                          onChange: (event) => setField("title", event.target.value),
+                          placeholder: "Senior Staff Nurse",
+                          className: `rounded-xl ${formErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}`
+                        }
+                      ),
+                      formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-status", children: "Status" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Select,
+                        {
+                          value: formData.status,
+                          onValueChange: (value) => setField("status", value),
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "career-status", className: "rounded-xl w-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select status" }) }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "open", children: "Open" }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "closed", children: "Closed" }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
+                            ] })
+                          ]
+                        }
+                      )
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-slug", children: "Slug" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-slug",
+                          value: formData.slug,
+                          onChange: (event) => setField("slug", event.target.value),
+                          placeholder: "senior-staff-nurse",
+                          className: `rounded-xl ${formErrors.slug ? "border-destructive focus-visible:ring-destructive" : ""}`
+                        }
+                      ),
+                      formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
+                        "This will be saved as `/",
+                        formData.slug.trim() ? slugify$4(formData.slug) : slugify$4(formData.title) || "career-role",
+                        "`."
                       ] })
-                    ]
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-slug", children: "Slug" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "career-slug",
-                    value: formData.slug,
-                    onChange: (event) => setField("slug", event.target.value),
-                    placeholder: "senior-staff-nurse",
-                    className: `rounded-xl ${formErrors.slug ? "border-destructive focus-visible:ring-destructive" : ""}`
-                  }
-                ),
-                formErrors.slug ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.slug }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
-                  "This will be saved as `/",
-                  formData.slug.trim() ? slugify$4(formData.slug) : slugify$4(formData.title) || "career-role",
-                  "`."
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-sort-order", children: "Sort Order" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-sort-order",
+                          type: "number",
+                          value: formData.sortOrder,
+                          onChange: (event) => setField("sortOrder", event.target.value),
+                          placeholder: "0",
+                          className: `rounded-xl ${formErrors.sortOrder ? "border-destructive focus-visible:ring-destructive" : ""}`
+                        }
+                      ),
+                      formErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.sortOrder }) : null
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-image", children: "Career Image" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "career-image",
+                        type: "file",
+                        accept: "image/*",
+                        onChange: (event) => {
+                          var _a2;
+                          const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) || null;
+                          setField("image", file);
+                          if (file) {
+                            setImagePreview(URL.createObjectURL(file));
+                          }
+                        },
+                        className: "rounded-xl"
+                      }
+                    ),
+                    imagePreview ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "img",
+                      {
+                        src: imagePreview,
+                        alt: "Preview",
+                        className: "mt-3 h-28 w-28 rounded-2xl border object-cover"
+                      }
+                    ) : null
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2 lg:grid-cols-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-department", children: "Department" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-department",
+                          value: formData.department,
+                          onChange: (event) => setField("department", event.target.value),
+                          placeholder: "Nursing",
+                          className: "rounded-xl"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-type", children: "Employment Type" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-type",
+                          value: formData.employmentType,
+                          onChange: (event) => setField("employmentType", event.target.value),
+                          placeholder: "Full-time",
+                          className: "rounded-xl"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-experience", children: "Experience" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-experience",
+                          value: formData.experience,
+                          onChange: (event) => setField("experience", event.target.value),
+                          placeholder: "2-4 years",
+                          className: "rounded-xl"
+                        }
+                      )
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-summary", children: "Summary" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Textarea,
+                        {
+                          id: "career-summary",
+                          value: formData.summary,
+                          onChange: (event) => setField("summary", event.target.value),
+                          placeholder: "Short summary shown in the careers listing.",
+                          className: "rounded-2xl min-h-[110px] resize-none"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-description", children: "Description" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "career-description", className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        PageEditor,
+                        {
+                          value: formData.description,
+                          onChange: (content) => setField("description", content)
+                        }
+                      ) })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-requirements", children: "Requirements" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Textarea,
+                        {
+                          id: "career-requirements",
+                          value: formData.requirementsText,
+                          onChange: (event) => setField("requirementsText", event.target.value),
+                          placeholder: "Add one requirement per line",
+                          className: "rounded-2xl min-h-[160px]"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-responsibilities", children: "Responsibilities" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Textarea,
+                        {
+                          id: "career-responsibilities",
+                          value: formData.responsibilitiesText,
+                          onChange: (event) => setField("responsibilitiesText", event.target.value),
+                          placeholder: "Add one responsibility per line",
+                          className: "rounded-2xl min-h-[160px]"
+                        }
+                      )
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-apply-email", children: "Apply Email" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-apply-email",
+                          value: formData.applyEmail,
+                          onChange: (event) => setField("applyEmail", event.target.value),
+                          placeholder: "careers@samarpanhospital.com",
+                          className: `rounded-xl ${formErrors.applyEmail ? "border-destructive focus-visible:ring-destructive" : ""}`
+                        }
+                      ),
+                      formErrors.applyEmail ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.applyEmail }) : null
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-apply-link", children: "Apply Link" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "career-apply-link",
+                          value: formData.applyLink,
+                          onChange: (event) => setField("applyLink", event.target.value),
+                          placeholder: "https://forms.gle/...",
+                          className: `rounded-xl ${formErrors.applyLink ? "border-destructive focus-visible:ring-destructive" : ""}`
+                        }
+                      ),
+                      formErrors.applyLink ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.applyLink }) : null
+                    ] })
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "seo", className: "mt-0 space-y-4", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-meta-title", children: "Meta Title" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "career-meta-title",
+                        value: formData.metaTitle,
+                        onChange: (event) => setField("metaTitle", event.target.value),
+                        placeholder: "Career role meta title",
+                        maxLength: 60
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+                      formData.metaTitle.length,
+                      "/60"
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-meta-description", children: "Meta Description" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Textarea,
+                      {
+                        id: "career-meta-description",
+                        value: formData.metaDescription,
+                        onChange: (event) => setField("metaDescription", event.target.value),
+                        placeholder: "Short search description for this career role.",
+                        maxLength: 160,
+                        className: "resize-none min-h-[80px]",
+                        rows: 3
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+                      formData.metaDescription.length,
+                      "/160"
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-keywords", children: "Keywords (comma separated)" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "career-keywords",
+                        value: formData.keywords,
+                        onChange: (event) => setField("keywords", event.target.value),
+                        placeholder: "nursing jobs hisar, hospital career"
+                      }
+                    )
+                  ] })
                 ] })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-sort-order", children: "Sort Order" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-4 gap-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
+                  Button,
                   {
-                    id: "career-sort-order",
-                    type: "number",
-                    value: formData.sortOrder,
-                    onChange: (event) => setField("sortOrder", event.target.value),
-                    placeholder: "0",
-                    className: `rounded-xl ${formErrors.sortOrder ? "border-destructive focus-visible:ring-destructive" : ""}`
+                    type: "button",
+                    variant: "outline",
+                    className: "rounded-xl",
+                    onClick: () => setModalOpen(false),
+                    children: "Cancel"
                   }
                 ),
-                formErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.sortOrder }) : null
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-image", children: "Career Image" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  id: "career-image",
-                  type: "file",
-                  accept: "image/*",
-                  onChange: (event) => {
-                    var _a2;
-                    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) || null;
-                    setField("image", file);
-                    if (file) {
-                      setImagePreview(URL.createObjectURL(file));
-                    }
-                  },
-                  className: "rounded-xl"
-                }
-              ),
-              imagePreview ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "img",
-                {
-                  src: imagePreview,
-                  alt: "Preview",
-                  className: "mt-3 h-28 w-28 rounded-2xl border object-cover"
-                }
-              ) : null
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2 lg:grid-cols-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-department", children: "Department" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
+                  Button,
                   {
-                    id: "career-department",
-                    value: formData.department,
-                    onChange: (event) => setField("department", event.target.value),
-                    placeholder: "Nursing",
-                    className: "rounded-xl"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-type", children: "Employment Type" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "career-type",
-                    value: formData.employmentType,
-                    onChange: (event) => setField("employmentType", event.target.value),
-                    placeholder: "Full-time",
-                    className: "rounded-xl"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-experience", children: "Experience" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "career-experience",
-                    value: formData.experience,
-                    onChange: (event) => setField("experience", event.target.value),
-                    placeholder: "2-4 years",
-                    className: "rounded-xl"
+                    type: "button",
+                    className: "rounded-xl bg-primary",
+                    onClick: handleSave,
+                    disabled: addMutation.isPending || updateMutation.isPending,
+                    children: editTarget ? "Update Career" : "Create Career"
                   }
                 )
               ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-summary", children: "Summary" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
-                  {
-                    id: "career-summary",
-                    value: formData.summary,
-                    onChange: (event) => setField("summary", event.target.value),
-                    placeholder: "Short summary shown in the careers listing.",
-                    className: "rounded-2xl min-h-[110px] resize-none"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-description", children: "Description" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
-                  {
-                    id: "career-description",
-                    value: formData.description,
-                    onChange: (event) => setField("description", event.target.value),
-                    placeholder: "Describe the role, team, and what the candidate will work on.",
-                    className: "rounded-2xl min-h-[140px]"
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-requirements", children: "Requirements" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
-                  {
-                    id: "career-requirements",
-                    value: formData.requirementsText,
-                    onChange: (event) => setField("requirementsText", event.target.value),
-                    placeholder: "Add one requirement per line",
-                    className: "rounded-2xl min-h-[160px]"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-responsibilities", children: "Responsibilities" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
-                  {
-                    id: "career-responsibilities",
-                    value: formData.responsibilitiesText,
-                    onChange: (event) => setField("responsibilitiesText", event.target.value),
-                    placeholder: "Add one responsibility per line",
-                    className: "rounded-2xl min-h-[160px]"
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-apply-email", children: "Apply Email" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "career-apply-email",
-                    value: formData.applyEmail,
-                    onChange: (event) => setField("applyEmail", event.target.value),
-                    placeholder: "careers@samarpanhospital.com",
-                    className: `rounded-xl ${formErrors.applyEmail ? "border-destructive focus-visible:ring-destructive" : ""}`
-                  }
-                ),
-                formErrors.applyEmail ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.applyEmail }) : null
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "career-apply-link", children: "Apply Link" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "career-apply-link",
-                    value: formData.applyLink,
-                    onChange: (event) => setField("applyLink", event.target.value),
-                    placeholder: "https://forms.gle/...",
-                    className: `rounded-xl ${formErrors.applyLink ? "border-destructive focus-visible:ring-destructive" : ""}`
-                  }
-                ),
-                formErrors.applyLink ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.applyLink }) : null
-              ] })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "mt-4 gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                type: "button",
-                variant: "outline",
-                className: "rounded-xl",
-                onClick: () => setModalOpen(false),
-                children: "Cancel"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                type: "button",
-                className: "rounded-xl bg-primary",
-                onClick: handleSave,
-                disabled: addMutation.isPending || updateMutation.isPending,
-                children: editTarget ? "Update Career" : "Create Career"
-              }
-            )
-          ] })
-        ] })
+            ]
+          }
+        )
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -45212,15 +46357,15 @@ var isObject_1 = isObject$7;
 const isObject$8 = /* @__PURE__ */ getDefaultExportFromCjs(isObject_1);
 var baseGetTag$7 = _baseGetTag, isObject$6 = isObject_1;
 var asyncTag = "[object AsyncFunction]", funcTag$1 = "[object Function]", genTag = "[object GeneratorFunction]", proxyTag = "[object Proxy]";
-function isFunction$3(value) {
+function isFunction$2(value) {
   if (!isObject$6(value)) {
     return false;
   }
   var tag = baseGetTag$7(value);
   return tag == funcTag$1 || tag == genTag || tag == asyncTag || tag == proxyTag;
 }
-var isFunction_1 = isFunction$3;
-const isFunction$4 = /* @__PURE__ */ getDefaultExportFromCjs(isFunction_1);
+var isFunction_1 = isFunction$2;
+const isFunction$3 = /* @__PURE__ */ getDefaultExportFromCjs(isFunction_1);
 var root$7 = _root;
 var coreJsData$1 = root$7["__core-js_shared__"];
 var _coreJsData = coreJsData$1;
@@ -45249,7 +46394,7 @@ function toSource$2(func) {
   return "";
 }
 var _toSource = toSource$2;
-var isFunction$2 = isFunction_1, isMasked = _isMasked, isObject$5 = isObject_1, toSource$1 = _toSource;
+var isFunction$1 = isFunction_1, isMasked = _isMasked, isObject$5 = isObject_1, toSource$1 = _toSource;
 var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
 var reIsHostCtor = /^\[object .+?Constructor\]$/;
 var funcProto$1 = Function.prototype, objectProto$a = Object.prototype;
@@ -45262,7 +46407,7 @@ function baseIsNative$1(value) {
   if (!isObject$5(value) || isMasked(value)) {
     return false;
   }
-  var pattern = isFunction$2(value) ? reIsNative : reIsHostCtor;
+  var pattern = isFunction$1(value) ? reIsNative : reIsHostCtor;
   return pattern.test(toSource$1(value));
 }
 var _baseIsNative = baseIsNative$1;
@@ -46320,7 +47465,7 @@ var hasClipDot = function hasClipDot2(dot) {
 var isValidSpreadableProp = function isValidSpreadableProp2(property2, key, includeEvents, svgElementType) {
   var _FilteredElementKeyMa;
   var matchingElementTypeKeys = (_FilteredElementKeyMa = FilteredElementKeyMap === null || FilteredElementKeyMap === void 0 ? void 0 : FilteredElementKeyMap[svgElementType]) !== null && _FilteredElementKeyMa !== void 0 ? _FilteredElementKeyMa : [];
-  return key.startsWith("data-") || !isFunction$4(property2) && (svgElementType && matchingElementTypeKeys.includes(key) || SVGElementPropKeys.includes(key)) || includeEvents && EventKeys.includes(key);
+  return key.startsWith("data-") || !isFunction$3(property2) && (svgElementType && matchingElementTypeKeys.includes(key) || SVGElementPropKeys.includes(key)) || includeEvents && EventKeys.includes(key);
 };
 var filterProps = function filterProps2(props, includeEvents, svgElementType) {
   if (!props || typeof props === "function" || typeof props === "boolean") {
@@ -47869,9 +49014,9 @@ var DefaultLegendContent = /* @__PURE__ */ function(_PureComponent) {
         if (entry.type === "none") {
           return null;
         }
-        var entryValue = !isFunction$4(entry.value) ? entry.value : null;
+        var entryValue = !isFunction$3(entry.value) ? entry.value : null;
         warn(
-          !isFunction$4(entry.value),
+          !isFunction$3(entry.value),
           `The name property is also required when using a function for the dataKey of a chart's cartesian components. Ex: <Bar name="Name of my Data"/>`
           // eslint-disable-line max-len
         );
@@ -48307,9 +49452,9 @@ function baseKeys$1(object2) {
   return result;
 }
 var _baseKeys = baseKeys$1;
-var isFunction$1 = isFunction_1, isLength$1 = isLength_1;
+var isFunction = isFunction_1, isLength$1 = isLength_1;
 function isArrayLike$5(value) {
-  return value != null && isLength$1(value.length) && !isFunction$1(value);
+  return value != null && isLength$1(value.length) && !isFunction(value);
 }
 var isArrayLike_1 = isArrayLike$5;
 var arrayLikeKeys = _arrayLikeKeys, baseKeys = _baseKeys, isArrayLike$4 = isArrayLike_1;
@@ -48706,7 +49851,7 @@ function getUniqPayload(payload, option, defaultUniqBy2) {
   if (option === true) {
     return uniqBy$1(payload, defaultUniqBy2);
   }
-  if (isFunction$4(option)) {
+  if (isFunction$3(option)) {
     return uniqBy$1(payload, option);
   }
   return payload;
@@ -55476,7 +56621,7 @@ function getValueByDataKey(obj, dataKey, defaultValue) {
   if (isNumOrStr(dataKey)) {
     return get$2(obj, dataKey, defaultValue);
   }
-  if (isFunction$4(dataKey)) {
+  if (isFunction$3(dataKey)) {
     return dataKey(obj);
   }
   return defaultValue;
@@ -55924,7 +57069,7 @@ var parseScale = function parseScale2(axis, chartType, hasBar) {
       realScaleType: d3Scales[name] ? name : "point"
     };
   }
-  return isFunction$4(scale) ? {
+  return isFunction$3(scale) ? {
     scale
   } : {
     scale: point(),
@@ -56195,7 +57340,7 @@ var getDomainOfStackGroups = function getDomainOfStackGroups2(stackGroups, start
 var MIN_VALUE_REG = /^dataMin[\s]*-[\s]*([0-9]+([.]{1}[0-9]+){0,1})$/;
 var MAX_VALUE_REG = /^dataMax[\s]*\+[\s]*([0-9]+([.]{1}[0-9]+){0,1})$/;
 var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataDomain, allowDataOverflow) {
-  if (isFunction$4(specifiedDomain)) {
+  if (isFunction$3(specifiedDomain)) {
     return specifiedDomain(dataDomain, allowDataOverflow);
   }
   if (!Array.isArray(specifiedDomain)) {
@@ -56207,7 +57352,7 @@ var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataD
   } else if (MIN_VALUE_REG.test(specifiedDomain[0])) {
     var value = +MIN_VALUE_REG.exec(specifiedDomain[0])[1];
     domain[0] = dataDomain[0] - value;
-  } else if (isFunction$4(specifiedDomain[0])) {
+  } else if (isFunction$3(specifiedDomain[0])) {
     domain[0] = specifiedDomain[0](dataDomain[0]);
   } else {
     domain[0] = dataDomain[0];
@@ -56217,7 +57362,7 @@ var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataD
   } else if (MAX_VALUE_REG.test(specifiedDomain[1])) {
     var _value = +MAX_VALUE_REG.exec(specifiedDomain[1])[1];
     domain[1] = dataDomain[1] + _value;
-  } else if (isFunction$4(specifiedDomain[1])) {
+  } else if (isFunction$3(specifiedDomain[1])) {
     domain[1] = specifiedDomain[1](dataDomain[1]);
   } else {
     domain[1] = dataDomain[1];
@@ -56542,7 +57687,7 @@ function _extends$j() {
 var getLabel = function getLabel2(props) {
   var value = props.value, formatter = props.formatter;
   var label = isNil$1(props.children) ? value : props.children;
-  if (isFunction$4(formatter)) {
+  if (isFunction$3(formatter)) {
     return formatter(label);
   }
   return label;
@@ -56781,14 +57926,14 @@ function Label(_ref4) {
     offset: offset2
   }, restProps);
   var viewBox = props.viewBox, position2 = props.position, value = props.value, children = props.children, content = props.content, _props$className = props.className, className = _props$className === void 0 ? "" : _props$className, textBreakAll = props.textBreakAll;
-  if (!viewBox || isNil$1(value) && isNil$1(children) && !/* @__PURE__ */ reactExports.isValidElement(content) && !isFunction$4(content)) {
+  if (!viewBox || isNil$1(value) && isNil$1(children) && !/* @__PURE__ */ reactExports.isValidElement(content) && !isFunction$3(content)) {
     return null;
   }
   if (/* @__PURE__ */ reactExports.isValidElement(content)) {
     return /* @__PURE__ */ reactExports.cloneElement(content, props);
   }
   var label;
-  if (isFunction$4(content)) {
+  if (isFunction$3(content)) {
     label = /* @__PURE__ */ reactExports.createElement(content, props);
     if (/* @__PURE__ */ reactExports.isValidElement(label)) {
       return label;
@@ -56886,7 +58031,7 @@ var parseLabel = function parseLabel2(label, viewBox) {
       viewBox
     });
   }
-  if (isFunction$4(label)) {
+  if (isFunction$3(label)) {
     return /* @__PURE__ */ React$5.createElement(Label, {
       key: "label-implicit",
       content: label,
@@ -57087,7 +58232,7 @@ function parseLabelList(label, data) {
       data
     });
   }
-  if (/* @__PURE__ */ React$5.isValidElement(label) || isFunction$4(label)) {
+  if (/* @__PURE__ */ React$5.isValidElement(label) || isFunction$3(label)) {
     return /* @__PURE__ */ React$5.createElement(LabelList, {
       key: "labelList-implicit",
       data,
@@ -57433,7 +58578,7 @@ var getY = function getY2(p2) {
   return p2.y;
 };
 var getCurveFactory = function getCurveFactory2(type, layout) {
-  if (isFunction$4(type)) {
+  if (isFunction$3(type)) {
     return type;
   }
   var name = "curve".concat(upperFirst$1(type));
@@ -57492,61 +58637,6 @@ var Curve = function Curve2(props) {
     ref: pathRef
   }));
 };
-var propTypes = { exports: {} };
-var ReactPropTypesSecret$1 = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
-var ReactPropTypesSecret_1 = ReactPropTypesSecret$1;
-var ReactPropTypesSecret = ReactPropTypesSecret_1;
-function emptyFunction() {
-}
-function emptyFunctionWithReset() {
-}
-emptyFunctionWithReset.resetWarningCache = emptyFunction;
-var factoryWithThrowingShims = function() {
-  function shim2(props, propName, componentName, location2, propFullName, secret) {
-    if (secret === ReactPropTypesSecret) {
-      return;
-    }
-    var err = new Error(
-      "Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types"
-    );
-    err.name = "Invariant Violation";
-    throw err;
-  }
-  shim2.isRequired = shim2;
-  function getShim() {
-    return shim2;
-  }
-  var ReactPropTypes = {
-    array: shim2,
-    bigint: shim2,
-    bool: shim2,
-    func: shim2,
-    number: shim2,
-    object: shim2,
-    string: shim2,
-    symbol: shim2,
-    any: shim2,
-    arrayOf: getShim,
-    element: shim2,
-    elementType: shim2,
-    instanceOf: getShim,
-    node: shim2,
-    objectOf: getShim,
-    oneOf: getShim,
-    oneOfType: getShim,
-    shape: getShim,
-    exact: getShim,
-    checkPropTypes: emptyFunctionWithReset,
-    resetWarningCache: emptyFunction
-  };
-  ReactPropTypes.PropTypes = ReactPropTypes;
-  return ReactPropTypes;
-};
-{
-  propTypes.exports = factoryWithThrowingShims();
-}
-var propTypesExports = propTypes.exports;
-const PropTypes = /* @__PURE__ */ getDefaultExportFromCjs(propTypesExports);
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty: hasOwnProperty$1 } = Object.prototype;
 function combineComparators(comparatorA, comparatorB) {
@@ -59734,7 +60824,7 @@ function Shape(_ref2) {
   var shape;
   if (/* @__PURE__ */ reactExports.isValidElement(option)) {
     shape = /* @__PURE__ */ reactExports.cloneElement(option, _objectSpread$e(_objectSpread$e({}, props), getPropsFromShapeOption(option)));
-  } else if (isFunction$4(option)) {
+  } else if (isFunction$3(option)) {
     shape = option(props);
   } else if (isPlainObject$1(option) && !isBoolean$1(option)) {
     var nextProps = propTransformer(option, props);
@@ -60198,7 +61288,7 @@ var Brush = /* @__PURE__ */ function(_PureComponent) {
     value: function getTextOfTick(index2) {
       var _this$props3 = this.props, data = _this$props3.data, tickFormatter = _this$props3.tickFormatter, dataKey = _this$props3.dataKey;
       var text2 = getValueByDataKey(data[index2], dataKey, index2);
-      return isFunction$4(tickFormatter) ? tickFormatter(text2, index2) : text2;
+      return isFunction$3(tickFormatter) ? tickFormatter(text2, index2) : text2;
     }
   }, {
     key: "attachDragEndListener",
@@ -60486,7 +61576,7 @@ var Brush = /* @__PURE__ */ function(_PureComponent) {
       var rectangle;
       if (/* @__PURE__ */ React$5.isValidElement(option)) {
         rectangle = /* @__PURE__ */ React$5.cloneElement(option, props);
-      } else if (isFunction$4(option)) {
+      } else if (isFunction$3(option)) {
         rectangle = option(props);
       } else {
         rectangle = Brush2.renderDefaultTraveller(props);
@@ -61872,7 +62962,7 @@ var renderLine = function renderLine2(option, props) {
   var line2;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     line2 = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$4(option)) {
+  } else if (isFunction$3(option)) {
     line2 = option(props);
   } else {
     line2 = /* @__PURE__ */ React$5.createElement("line", _extends$8({}, props, {
@@ -62204,7 +63294,7 @@ _defineProperty$a(ReferenceDot, "renderDot", function(option, props) {
   var dot;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     dot = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$4(option)) {
+  } else if (isFunction$3(option)) {
     dot = option(props);
   } else {
     dot = /* @__PURE__ */ React$5.createElement(Dot, _extends$7({}, props, {
@@ -62424,7 +63514,7 @@ _defineProperty$9(ReferenceArea, "renderRect", function(option, props) {
   var rect;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     rect = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$4(option)) {
+  } else if (isFunction$3(option)) {
     rect = option(props);
   } else {
     rect = /* @__PURE__ */ React$5.createElement(Rectangle, _extends$6({}, props, {
@@ -62679,7 +63769,7 @@ function getTicks(props, fontSize, letterSpacing) {
     height: 0
   };
   var getTickSize = function getTickSize2(content, index2) {
-    var value = isFunction$4(tickFormatter) ? tickFormatter(content.value, index2) : content.value;
+    var value = isFunction$3(tickFormatter) ? tickFormatter(content.value, index2) : content.value;
     return sizeKey === "width" ? getAngledTickWidth(getStringSize(value, {
       fontSize,
       letterSpacing
@@ -63059,7 +64149,7 @@ var CartesianAxis = /* @__PURE__ */ function(_Component) {
             key: "tick-".concat(entry.value, "-").concat(entry.coordinate, "-").concat(entry.tickCoord)
           }, adaptEventsOfChild(_this2.props, entry, i2)), tickLine && /* @__PURE__ */ React$5.createElement("line", _extends$5({}, tickLineProps, lineCoord, {
             className: clsx("recharts-cartesian-axis-tick-line", get$2(tickLine, "className"))
-          })), tick && CartesianAxis2.renderTickItem(tick, tickProps, "".concat(isFunction$4(tickFormatter) ? tickFormatter(entry.value, i2) : entry.value).concat(unit2 || "")));
+          })), tick && CartesianAxis2.renderTickItem(tick, tickProps, "".concat(isFunction$3(tickFormatter) ? tickFormatter(entry.value, i2) : entry.value).concat(unit2 || "")));
         });
         return /* @__PURE__ */ React$5.createElement("g", {
           className: "recharts-cartesian-axis-ticks"
@@ -63076,7 +64166,7 @@ var CartesianAxis = /* @__PURE__ */ function(_Component) {
       }
       var _this$props8 = this.props, ticks2 = _this$props8.ticks, noTicksProps = _objectWithoutProperties$3(_this$props8, _excluded3);
       var finalTicks = ticks2;
-      if (isFunction$4(ticksGenerator)) {
+      if (isFunction$3(ticksGenerator)) {
         finalTicks = ticks2 && ticks2.length > 0 ? ticksGenerator(this.props) : ticksGenerator(noTicksProps);
       }
       if (width <= 0 || height <= 0 || !finalTicks || !finalTicks.length) {
@@ -63098,7 +64188,7 @@ var CartesianAxis = /* @__PURE__ */ function(_Component) {
         tickItem = /* @__PURE__ */ React$5.cloneElement(option, _objectSpread$4(_objectSpread$4({}, props), {}, {
           className: combinedClassName
         }));
-      } else if (isFunction$4(option)) {
+      } else if (isFunction$3(option)) {
         tickItem = option(_objectSpread$4(_objectSpread$4({}, props), {}, {
           className: combinedClassName
         }));
@@ -63253,7 +64343,7 @@ function renderLineItem(option, props) {
   var lineItem;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     lineItem = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$4(option)) {
+  } else if (isFunction$3(option)) {
     lineItem = option(props);
   } else {
     var x1 = props.x1, y1 = props.y1, x2 = props.x2, y2 = props.y2, key = props.key, others = _objectWithoutProperties$2(props, _excluded$2);
@@ -63442,7 +64532,7 @@ function CartesianGrid(props) {
   var verticalCoordinatesGenerator = propsIncludingDefaults.verticalCoordinatesGenerator || defaultVerticalCoordinatesGenerator;
   var horizontalCoordinatesGenerator = propsIncludingDefaults.horizontalCoordinatesGenerator || defaultHorizontalCoordinatesGenerator;
   var horizontalPoints = propsIncludingDefaults.horizontalPoints, verticalPoints = propsIncludingDefaults.verticalPoints;
-  if ((!horizontalPoints || !horizontalPoints.length) && isFunction$4(horizontalCoordinatesGenerator)) {
+  if ((!horizontalPoints || !horizontalPoints.length) && isFunction$3(horizontalCoordinatesGenerator)) {
     var isHorizontalValues = horizontalValues && horizontalValues.length;
     var generatorResult = horizontalCoordinatesGenerator({
       yAxis: yAxis ? _objectSpread$3(_objectSpread$3({}, yAxis), {}, {
@@ -63457,7 +64547,7 @@ function CartesianGrid(props) {
       horizontalPoints = generatorResult;
     }
   }
-  if ((!verticalPoints || !verticalPoints.length) && isFunction$4(verticalCoordinatesGenerator)) {
+  if ((!verticalPoints || !verticalPoints.length) && isFunction$3(verticalCoordinatesGenerator)) {
     var isVerticalValues = verticalValues && verticalValues.length;
     var _generatorResult = verticalCoordinatesGenerator({
       xAxis: xAxis ? _objectSpread$3(_objectSpread$3({}, xAxis), {}, {
@@ -64013,7 +65103,7 @@ var Line = /* @__PURE__ */ function(_PureComponent) {
       var dotItem;
       if (/* @__PURE__ */ React$5.isValidElement(option)) {
         dotItem = /* @__PURE__ */ React$5.cloneElement(option, props);
-      } else if (isFunction$4(option)) {
+      } else if (isFunction$3(option)) {
         dotItem = option(props);
       } else {
         var key = props.key, dotProps = _objectWithoutProperties$1(props, _excluded2$1);
@@ -65774,7 +66864,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
           _this.setState(_nextState);
           _this.triggerSyncEvent(_nextState);
           var onMouseEnter = _this.props.onMouseEnter;
-          if (isFunction$4(onMouseEnter)) {
+          if (isFunction$3(onMouseEnter)) {
             onMouseEnter(_nextState, e3);
           }
         }
@@ -65789,7 +66879,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
         _this.setState(nextState);
         _this.triggerSyncEvent(nextState);
         var onMouseMove = _this.props.onMouseMove;
-        if (isFunction$4(onMouseMove)) {
+        if (isFunction$3(onMouseMove)) {
           onMouseMove(nextState, e3);
         }
       });
@@ -65825,14 +66915,14 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
         _this.setState(nextState);
         _this.triggerSyncEvent(nextState);
         var onMouseLeave = _this.props.onMouseLeave;
-        if (isFunction$4(onMouseLeave)) {
+        if (isFunction$3(onMouseLeave)) {
           onMouseLeave(nextState, e3);
         }
       });
       _defineProperty(_this, "handleOuterEvent", function(e3) {
         var eventName = getReactEventByType(e3);
         var event = get$2(_this.props, "".concat(eventName));
-        if (eventName && isFunction$4(event)) {
+        if (eventName && isFunction$3(event)) {
           var _mouse;
           var mouse;
           if (/.*touch.*/i.test(eventName)) {
@@ -65852,21 +66942,21 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
           _this.setState(_nextState2);
           _this.triggerSyncEvent(_nextState2);
           var onClick = _this.props.onClick;
-          if (isFunction$4(onClick)) {
+          if (isFunction$3(onClick)) {
             onClick(_nextState2, e3);
           }
         }
       });
       _defineProperty(_this, "handleMouseDown", function(e3) {
         var onMouseDown = _this.props.onMouseDown;
-        if (isFunction$4(onMouseDown)) {
+        if (isFunction$3(onMouseDown)) {
           var _nextState3 = _this.getMouseInfo(e3);
           onMouseDown(_nextState3, e3);
         }
       });
       _defineProperty(_this, "handleMouseUp", function(e3) {
         var onMouseUp = _this.props.onMouseUp;
-        if (isFunction$4(onMouseUp)) {
+        if (isFunction$3(onMouseUp)) {
           var _nextState4 = _this.getMouseInfo(e3);
           onMouseUp(_nextState4, e3);
         }
@@ -65888,14 +66978,14 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
       });
       _defineProperty(_this, "handleDoubleClick", function(e3) {
         var onDoubleClick = _this.props.onDoubleClick;
-        if (isFunction$4(onDoubleClick)) {
+        if (isFunction$3(onDoubleClick)) {
           var _nextState5 = _this.getMouseInfo(e3);
           onDoubleClick(_nextState5, e3);
         }
       });
       _defineProperty(_this, "handleContextMenu", function(e3) {
         var onContextMenu = _this.props.onContextMenu;
-        if (isFunction$4(onContextMenu)) {
+        if (isFunction$3(onContextMenu)) {
           var _nextState6 = _this.getMouseInfo(e3);
           onContextMenu(_nextState6, e3);
         }
@@ -66739,7 +67829,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
     var dot;
     if (/* @__PURE__ */ reactExports.isValidElement(option)) {
       dot = /* @__PURE__ */ reactExports.cloneElement(option, props);
-    } else if (isFunction$4(option)) {
+    } else if (isFunction$3(option)) {
       dot = option(props);
     } else {
       dot = /* @__PURE__ */ React$5.createElement(Dot, props);
@@ -67802,7 +68892,10 @@ const emptyForm$4 = {
   image: "",
   qualification: "",
   description: "",
-  expertise: ""
+  expertise: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: ""
 };
 function getInitials(name) {
   return name.split(" ").filter(Boolean).map((n2) => n2[0]).join("").slice(0, 2).toUpperCase();
@@ -67874,6 +68967,11 @@ function buildPayload$1(form, mode) {
     experience: form.experience.trim(),
     qualification: form.qualification.trim(),
     expertise: splitCommaList(form.expertise),
+    seo: {
+      metaTitle: form.metaTitle.trim(),
+      metaDescription: form.metaDescription.trim(),
+      keywords: splitCommaList(form.keywords)
+    },
     image: form.image,
     ...availabilityToFlags(form.availability)
   };
@@ -67909,7 +69007,7 @@ function DoctorsPage() {
       ue.success("Doctor added successfully.");
       queryClient2.invalidateQueries({ queryKey: ["doctors"] });
       setIsAddModalOpen(false);
-      resetForm();
+      resetForm2();
     },
     onError: (error2) => ue.error(error2.message)
   });
@@ -67923,7 +69021,7 @@ function DoctorsPage() {
       queryClient2.invalidateQueries({ queryKey: ["doctors"] });
       setIsEditModalOpen(false);
       setSelectedDoctor(null);
-      resetForm();
+      resetForm2();
     },
     onError: (error2) => ue.error(error2.message)
   });
@@ -67954,7 +69052,7 @@ function DoctorsPage() {
       ].filter(Boolean).some((value) => String(value).toLowerCase().includes(q2))
     );
   }, [doctors, searchQuery]);
-  function resetForm() {
+  function resetForm2() {
     setFormData(emptyForm$4);
     setFormErrors({});
     setImageFileName("");
@@ -67962,11 +69060,11 @@ function DoctorsPage() {
   }
   function openAdd() {
     setSelectedDoctor(null);
-    resetForm();
+    resetForm2();
     setIsAddModalOpen(true);
   }
   function openEdit(doctor) {
-    var _a2;
+    var _a2, _b2, _c2, _d2;
     setSelectedDoctor(doctor);
     setFormData({
       name: doctor.name ?? "",
@@ -67979,7 +69077,10 @@ function DoctorsPage() {
       image: doctor.image ?? "",
       qualification: doctor.qualification ?? "",
       description: doctor.description ?? "",
-      expertise: (doctor.expertise ?? []).join(", ")
+      expertise: (doctor.expertise ?? []).join(", "),
+      metaTitle: ((_b2 = doctor.seo) == null ? void 0 : _b2.metaTitle) ?? "",
+      metaDescription: ((_c2 = doctor.seo) == null ? void 0 : _c2.metaDescription) ?? "",
+      keywords: (((_d2 = doctor.seo) == null ? void 0 : _d2.keywords) ?? []).join(", ")
     });
     setFormErrors({});
     setImageFileName(getImageLabel(doctor.image ?? ""));
@@ -68248,11 +69349,17 @@ function DoctorsPage() {
         }
       ) : filtered.map((doctor, idx) => renderMobileCard(doctor, idx)) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: isAddModalOpen, onOpenChange: setIsAddModalOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: isAddModalOpen, onOpenChange: setIsAddModalOpen, modal: false, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
       DialogContent,
       {
         className: "rounded-3xl w-[95vw] max-w-2xl max-h-[90vh] !max-w-[40vw] overflow-y-auto",
         "data-ocid": "doctors.dialog",
+        onInteractOutside: (e3) => {
+          const el = e3.target;
+          if (el.closest(".tox-tinymce-aux") || el.closest(".tox-dialog") || el.closest(".tox-menu") || el.closest(".tox-pop") || document.querySelector(".tox-dialog")) {
+            e3.preventDefault();
+          }
+        },
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-foreground text-lg font-semibold", children: "Add New Doctor" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -68300,11 +69407,17 @@ function DoctorsPage() {
         ]
       }
     ) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: isEditModalOpen, onOpenChange: setIsEditModalOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: isEditModalOpen, onOpenChange: setIsEditModalOpen, modal: false, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
       DialogContent,
       {
         className: "rounded-3xl w-[95vw] max-w-2xl !max-w-[40vw] max-h-[90vh] overflow-y-auto",
         "data-ocid": "doctors.dialog",
+        onInteractOutside: (e3) => {
+          const el = e3.target;
+          if (el.closest(".tox-tinymce-aux") || el.closest(".tox-dialog") || el.closest(".tox-menu") || el.closest(".tox-pop") || document.querySelector(".tox-dialog")) {
+            e3.preventDefault();
+          }
+        },
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "text-foreground text-lg font-semibold", children: "Edit Doctor" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -68415,289 +69528,352 @@ function DoctorForm({
   onFileChange,
   onFileClick
 }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4 py-2", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Full Name ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          value: formData.name,
-          onChange: (e3) => onFieldChange("name", e3.target.value),
-          placeholder: "Dr. Full Name",
-          className: `rounded-xl ${formErrors.name ? "border-destructive focus-visible:ring-destructive" : "border-border"}`,
-          "data-ocid": "doctors.name_input"
-        }
-      ),
-      formErrors.name && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.name_input.field_error",
-          children: formErrors.name
-        }
-      )
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full py-2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "description", className: "flex-1", children: "Description" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Email ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "basic", className: "grid grid-cols-1 sm:grid-cols-2 gap-4 mt-0", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Full Name ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            value: formData.name,
+            onChange: (e3) => onFieldChange("name", e3.target.value),
+            placeholder: "Dr. Full Name",
+            className: `rounded-xl ${formErrors.name ? "border-destructive focus-visible:ring-destructive" : "border-border"}`,
+            "data-ocid": "doctors.name_input"
+          }
+        ),
+        formErrors.name && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.name_input.field_error",
+            children: formErrors.name
+          }
+        )
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          type: "email",
-          value: formData.email,
-          onChange: (e3) => onFieldChange("email", e3.target.value),
-          placeholder: "doctor@samarpan.com",
-          className: `rounded-xl ${formErrors.email ? "border-destructive" : "border-border"}`,
-          "data-ocid": "doctors.email_input"
-        }
-      ),
-      formErrors.email && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.email_input.field_error",
-          children: formErrors.email
-        }
-      )
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Email ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "email",
+            value: formData.email,
+            onChange: (e3) => onFieldChange("email", e3.target.value),
+            placeholder: "doctor@samarpan.com",
+            className: `rounded-xl ${formErrors.email ? "border-destructive" : "border-border"}`,
+            "data-ocid": "doctors.email_input"
+          }
+        ),
+        formErrors.email && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.email_input.field_error",
+            children: formErrors.email
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Password ",
+          mode === "add" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "password",
+            value: formData.password,
+            onChange: (e3) => onFieldChange("password", e3.target.value),
+            placeholder: mode === "add" ? "Set login password" : "Leave blank to keep",
+            className: `rounded-xl ${formErrors.password ? "border-destructive" : "border-border"}`,
+            "data-ocid": "doctors.password_input"
+          }
+        ),
+        formErrors.password && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.password_input.field_error",
+            children: formErrors.password
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Phone ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            value: formData.phone,
+            onChange: (e3) => onFieldChange("phone", e3.target.value),
+            placeholder: "9876543210",
+            className: `rounded-xl ${formErrors.phone ? "border-destructive" : "border-border"}`,
+            "data-ocid": "doctors.phone_input"
+          }
+        ),
+        formErrors.phone && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.phone_input.field_error",
+            children: formErrors.phone
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Specialization ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Select,
+          {
+            value: formData.specialization,
+            onValueChange: (v2) => onFieldChange("specialization", v2),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                SelectTrigger,
+                {
+                  className: `rounded-xl ${formErrors.specialization ? "border-destructive" : "border-border"}`,
+                  "data-ocid": "doctors.specialization_select",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select" })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: specializations.map((spec) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: spec.name, children: spec.name }, spec._id)) })
+            ]
+          }
+        ),
+        formErrors.specialization && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.specialization_select.field_error",
+            children: formErrors.specialization
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Experience (years) ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "number",
+            min: 0,
+            value: formData.experience,
+            onChange: (e3) => onFieldChange("experience", e3.target.value),
+            placeholder: "8",
+            className: `rounded-xl ${formErrors.experience ? "border-destructive" : "border-border"}`,
+            "data-ocid": "doctors.experience_input"
+          }
+        ),
+        formErrors.experience && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.experience_input.field_error",
+            children: formErrors.experience
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Qualification ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            value: formData.qualification,
+            onChange: (e3) => onFieldChange("qualification", e3.target.value),
+            placeholder: "MD, DM Cardiology",
+            className: `rounded-xl ${formErrors.qualification ? "border-destructive" : "border-border"}`,
+            "data-ocid": "doctors.qualification_input"
+          }
+        ),
+        formErrors.qualification && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.qualification_input.field_error",
+            children: formErrors.qualification
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm font-medium text-foreground", children: "Availability" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Select,
+          {
+            value: formData.availability,
+            onValueChange: (v2) => onFieldChange("availability", v2),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                SelectTrigger,
+                {
+                  className: "rounded-xl border-border",
+                  "data-ocid": "doctors.availability_select",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {})
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "available", children: "Available" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "busy", children: "Busy" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "on-leave", children: "On Leave" })
+              ] })
+            ]
+          }
+        )
+      ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Password ",
-        mode === "add" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          type: "password",
-          value: formData.password,
-          onChange: (e3) => onFieldChange("password", e3.target.value),
-          placeholder: mode === "add" ? "Set login password" : "Leave blank to keep",
-          className: `rounded-xl ${formErrors.password ? "border-destructive" : "border-border"}`,
-          "data-ocid": "doctors.password_input"
-        }
-      ),
-      formErrors.password && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.password_input.field_error",
-          children: formErrors.password
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Phone ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          value: formData.phone,
-          onChange: (e3) => onFieldChange("phone", e3.target.value),
-          placeholder: "9876543210",
-          className: `rounded-xl ${formErrors.phone ? "border-destructive" : "border-border"}`,
-          "data-ocid": "doctors.phone_input"
-        }
-      ),
-      formErrors.phone && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.phone_input.field_error",
-          children: formErrors.phone
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Specialization ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
-        {
-          value: formData.specialization,
-          onValueChange: (v2) => onFieldChange("specialization", v2),
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              SelectTrigger,
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "description", className: "mt-0 space-y-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Description ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: formErrors.description ? "rounded-2xl border border-destructive" : "",
+            "data-ocid": "doctors.description_editor",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              PageEditor,
               {
-                className: `rounded-xl ${formErrors.specialization ? "border-destructive" : "border-border"}`,
-                "data-ocid": "doctors.specialization_select",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select" })
+                value: formData.description,
+                onChange: (content) => onFieldChange("description", content)
               }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: specializations.map((spec) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: spec.name, children: spec.name }, spec._id)) })
-          ]
-        }
-      ),
-      formErrors.specialization && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.specialization_select.field_error",
-          children: formErrors.specialization
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Experience (years) ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+            )
+          }
+        ),
+        formErrors.description && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.description_editor.field_error",
+            children: formErrors.description
+          }
+        )
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          type: "number",
-          min: 0,
-          value: formData.experience,
-          onChange: (e3) => onFieldChange("experience", e3.target.value),
-          placeholder: "8",
-          className: `rounded-xl ${formErrors.experience ? "border-destructive" : "border-border"}`,
-          "data-ocid": "doctors.experience_input"
-        }
-      ),
-      formErrors.experience && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.experience_input.field_error",
-          children: formErrors.experience
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Qualification ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm font-medium text-foreground", children: "Expertise" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Textarea,
+          {
+            value: formData.expertise,
+            onChange: (e3) => onFieldChange("expertise", e3.target.value),
+            placeholder: "Cardiac surgery, Angioplasty, Preventive cardiology",
+            className: "rounded-xl min-h-[70px] resize-none border-border",
+            "data-ocid": "doctors.expertise_textarea"
+          }
+        )
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          value: formData.qualification,
-          onChange: (e3) => onFieldChange("qualification", e3.target.value),
-          placeholder: "MD, DM Cardiology",
-          className: `rounded-xl ${formErrors.qualification ? "border-destructive" : "border-border"}`,
-          "data-ocid": "doctors.qualification_input"
-        }
-      ),
-      formErrors.qualification && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.qualification_input.field_error",
-          children: formErrors.qualification
-        }
-      )
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
+          "Profile Image (1380 × 1000)",
+          " ",
+          mode === "add" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            type: "button",
+            onClick: onFileClick,
+            className: `w-full border-2 border-dashed rounded-xl py-4 px-4 flex flex-col items-center gap-2 hover:border-primary hover:bg-accent/30 transition-colors cursor-pointer text-center ${formErrors.image ? "border-destructive/40" : "border-border"}`,
+            "data-ocid": "doctors.upload_button",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 20, className: "text-muted-foreground" }),
+              imageFileName ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-primary font-medium truncate max-w-full px-2", children: imageFileName }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground font-medium", children: "Click to upload photo (1380 × 1000)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: "PNG, JPG up to 2MB" })
+              ] })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            ref: fileInputRef,
+            type: "file",
+            accept: "image/*",
+            className: "hidden",
+            onChange: onFileChange
+          }
+        ),
+        formErrors.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "p",
+          {
+            className: "text-xs text-destructive mt-1",
+            "data-ocid": "doctors.upload_button.field_error",
+            children: formErrors.image
+          }
+        )
+      ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm font-medium text-foreground", children: "Availability" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
-        {
-          value: formData.availability,
-          onValueChange: (v2) => onFieldChange("availability", v2),
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              SelectTrigger,
-              {
-                className: "rounded-xl border-border",
-                "data-ocid": "doctors.availability_select",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {})
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "available", children: "Available" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "busy", children: "Busy" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "on-leave", children: "On Leave" })
-            ] })
-          ]
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Description ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "seo", className: "mt-0 space-y-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Meta Title" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            value: formData.metaTitle,
+            onChange: (e3) => onFieldChange("metaTitle", e3.target.value),
+            placeholder: "Doctor profile meta title",
+            maxLength: 60,
+            "data-ocid": "doctors.meta_title_input"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+          formData.metaTitle.length,
+          "/60"
+        ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Textarea,
-        {
-          value: formData.description,
-          onChange: (e3) => onFieldChange("description", e3.target.value),
-          placeholder: "Short professional bio shown on the website",
-          className: `rounded-xl min-h-[90px] resize-none ${formErrors.description ? "border-destructive" : "border-border"}`,
-          "data-ocid": "doctors.description_textarea"
-        }
-      ),
-      formErrors.description && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.description_textarea.field_error",
-          children: formErrors.description
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm font-medium text-foreground", children: "Expertise" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Textarea,
-        {
-          value: formData.expertise,
-          onChange: (e3) => onFieldChange("expertise", e3.target.value),
-          placeholder: "Cardiac surgery, Angioplasty, Preventive cardiology",
-          className: "rounded-xl min-h-[70px] resize-none border-border",
-          "data-ocid": "doctors.expertise_textarea"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 sm:col-span-2 space-y-1.5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-medium text-foreground", children: [
-        "Profile Image (1380 × 1000)",
-        " ",
-        mode === "add" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Meta Description" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Textarea,
+          {
+            value: formData.metaDescription,
+            onChange: (e3) => onFieldChange("metaDescription", e3.target.value),
+            placeholder: "Short search description for this doctor",
+            maxLength: 160,
+            className: "resize-none min-h-[80px]",
+            rows: 3,
+            "data-ocid": "doctors.meta_description_textarea"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+          formData.metaDescription.length,
+          "/160"
+        ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "button",
-        {
-          type: "button",
-          onClick: onFileClick,
-          className: `w-full border-2 border-dashed rounded-xl py-4 px-4 flex flex-col items-center gap-2 hover:border-primary hover:bg-accent/30 transition-colors cursor-pointer text-center ${formErrors.image ? "border-destructive/40" : "border-border"}`,
-          "data-ocid": "doctors.upload_button",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 20, className: "text-muted-foreground" }),
-            imageFileName ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-primary font-medium truncate max-w-full px-2", children: imageFileName }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground font-medium", children: "Click to upload photo (1380 × 1000)" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: "PNG, JPG up to 2MB" })
-            ] })
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "input",
-        {
-          ref: fileInputRef,
-          type: "file",
-          accept: "image/*",
-          className: "hidden",
-          onChange: onFileChange
-        }
-      ),
-      formErrors.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "p",
-        {
-          className: "text-xs text-destructive mt-1",
-          "data-ocid": "doctors.upload_button.field_error",
-          children: formErrors.image
-        }
-      )
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Keywords (comma separated)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            value: formData.keywords,
+            onChange: (e3) => onFieldChange("keywords", e3.target.value),
+            placeholder: "gynecologist hisar, doctor name, specialist",
+            "data-ocid": "doctors.keywords_input"
+          }
+        )
+      ] })
     ] })
   ] });
 }
@@ -69556,7 +70732,7 @@ function HonorsPage() {
       ].some((value) => value.toLowerCase().includes(query))
     );
   }, [data, search]);
-  function resetForm() {
+  function resetForm2() {
     setModalOpen(false);
     setEditTarget(null);
     setFormData(emptyHonorForm);
@@ -69754,7 +70930,7 @@ function HonorsPage() {
       Dialog,
       {
         open: modalOpen,
-        onOpenChange: (nextOpen) => !nextOpen && resetForm(),
+        onOpenChange: (nextOpen) => !nextOpen && resetForm2(),
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-2xl", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editTarget ? "Edit honor" : "Add honor" }),
@@ -69823,7 +70999,7 @@ function HonorsPage() {
                 type: "button",
                 variant: "outline",
                 className: "rounded-xl border-border",
-                onClick: resetForm,
+                onClick: resetForm2,
                 children: "Cancel"
               }
             ),
@@ -72051,6 +73227,7 @@ function normalizePageItem(page) {
     seo: {
       metaTitle: seo.metaTitle || page.metaTitle || "",
       metaDescription: seo.metaDescription || page.metaDescription || "",
+      keywords: Array.isArray(seo.keywords) ? seo.keywords : [],
       canonicalUrl: seo.canonicalUrl || page.canonicalUrl || "",
       schemaMarkup: seo.schemaMarkup || page.schemaMarkup || ""
     },
@@ -72068,11 +73245,13 @@ function toRequestPayload(payload) {
     isActive: payload.status === "published",
     metaTitle: payload.metaTitle.trim(),
     metaDescription: payload.metaDescription.trim(),
+    keywords: payload.keywords,
     canonicalUrl: payload.canonicalUrl.trim(),
     schemaMarkup: payload.schemaMarkup,
     seo: {
       metaTitle: payload.metaTitle.trim(),
       metaDescription: payload.metaDescription.trim(),
+      keywords: payload.keywords,
       canonicalUrl: payload.canonicalUrl.trim(),
       schemaMarkup: payload.schemaMarkup
     }
@@ -72120,781 +73299,6 @@ const deletePageApi = async (id) => {
     throw createApiRequestError(error, "Failed to delete page");
   }
 };
-var __assign$2 = function() {
-  __assign$2 = Object.assign || function(t2) {
-    for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
-      s2 = arguments[i2];
-      for (var p2 in s2) if (Object.prototype.hasOwnProperty.call(s2, p2))
-        t2[p2] = s2[p2];
-    }
-    return t2;
-  };
-  return __assign$2.apply(this, arguments);
-};
-var eventPropTypes = {
-  onActivate: propTypesExports.func,
-  onAddUndo: propTypesExports.func,
-  onBeforeAddUndo: propTypesExports.func,
-  onBeforeExecCommand: propTypesExports.func,
-  onBeforeGetContent: propTypesExports.func,
-  onBeforeRenderUI: propTypesExports.func,
-  onBeforeSetContent: propTypesExports.func,
-  onBeforePaste: propTypesExports.func,
-  onBlur: propTypesExports.func,
-  onChange: propTypesExports.func,
-  onClearUndos: propTypesExports.func,
-  onClick: propTypesExports.func,
-  onContextMenu: propTypesExports.func,
-  onCommentChange: propTypesExports.func,
-  onCompositionEnd: propTypesExports.func,
-  onCompositionStart: propTypesExports.func,
-  onCompositionUpdate: propTypesExports.func,
-  onCopy: propTypesExports.func,
-  onCut: propTypesExports.func,
-  onDblclick: propTypesExports.func,
-  onDeactivate: propTypesExports.func,
-  onDirty: propTypesExports.func,
-  onDrag: propTypesExports.func,
-  onDragDrop: propTypesExports.func,
-  onDragEnd: propTypesExports.func,
-  onDragGesture: propTypesExports.func,
-  onDragOver: propTypesExports.func,
-  onDrop: propTypesExports.func,
-  onExecCommand: propTypesExports.func,
-  onFocus: propTypesExports.func,
-  onFocusIn: propTypesExports.func,
-  onFocusOut: propTypesExports.func,
-  onGetContent: propTypesExports.func,
-  onHide: propTypesExports.func,
-  onInit: propTypesExports.func,
-  onInput: propTypesExports.func,
-  onKeyDown: propTypesExports.func,
-  onKeyPress: propTypesExports.func,
-  onKeyUp: propTypesExports.func,
-  onLoadContent: propTypesExports.func,
-  onMouseDown: propTypesExports.func,
-  onMouseEnter: propTypesExports.func,
-  onMouseLeave: propTypesExports.func,
-  onMouseMove: propTypesExports.func,
-  onMouseOut: propTypesExports.func,
-  onMouseOver: propTypesExports.func,
-  onMouseUp: propTypesExports.func,
-  onNodeChange: propTypesExports.func,
-  onObjectResizeStart: propTypesExports.func,
-  onObjectResized: propTypesExports.func,
-  onObjectSelected: propTypesExports.func,
-  onPaste: propTypesExports.func,
-  onPostProcess: propTypesExports.func,
-  onPostRender: propTypesExports.func,
-  onPreProcess: propTypesExports.func,
-  onProgressState: propTypesExports.func,
-  onRedo: propTypesExports.func,
-  onRemove: propTypesExports.func,
-  onReset: propTypesExports.func,
-  onSaveContent: propTypesExports.func,
-  onSelectionChange: propTypesExports.func,
-  onSetAttrib: propTypesExports.func,
-  onSetContent: propTypesExports.func,
-  onShow: propTypesExports.func,
-  onSubmit: propTypesExports.func,
-  onUndo: propTypesExports.func,
-  onVisualAid: propTypesExports.func,
-  onSkinLoadError: propTypesExports.func,
-  onThemeLoadError: propTypesExports.func,
-  onModelLoadError: propTypesExports.func,
-  onPluginLoadError: propTypesExports.func,
-  onIconsLoadError: propTypesExports.func,
-  onLanguageLoadError: propTypesExports.func,
-  onScriptsLoad: propTypesExports.func,
-  onScriptsLoadError: propTypesExports.func
-};
-var EditorPropTypes = __assign$2({ apiKey: propTypesExports.string, licenseKey: propTypesExports.string, id: propTypesExports.string, inline: propTypesExports.bool, init: propTypesExports.object, initialValue: propTypesExports.string, onEditorChange: propTypesExports.func, value: propTypesExports.string, tagName: propTypesExports.string, tabIndex: propTypesExports.number, cloudChannel: propTypesExports.string, plugins: propTypesExports.oneOfType([propTypesExports.string, propTypesExports.array]), toolbar: propTypesExports.oneOfType([propTypesExports.string, propTypesExports.array]), disabled: propTypesExports.bool, readonly: propTypesExports.bool, textareaName: propTypesExports.string, tinymceScriptSrc: propTypesExports.oneOfType([
-  propTypesExports.string,
-  propTypesExports.arrayOf(propTypesExports.string),
-  propTypesExports.arrayOf(propTypesExports.shape({
-    src: propTypesExports.string,
-    async: propTypesExports.bool,
-    defer: propTypesExports.bool
-  }))
-]), rollback: propTypesExports.oneOfType([propTypesExports.number, propTypesExports.oneOf([false])]), scriptLoading: propTypesExports.shape({
-  async: propTypesExports.bool,
-  defer: propTypesExports.bool,
-  delay: propTypesExports.number
-}) }, eventPropTypes);
-var getTinymce = function(view) {
-  var global2 = view;
-  return global2 && global2.tinymce ? global2.tinymce : null;
-};
-var isFunction = function(x2) {
-  return typeof x2 === "function";
-};
-var isEventProp = function(name) {
-  return name in eventPropTypes;
-};
-var eventAttrToEventName = function(attrName) {
-  return attrName.substr(2);
-};
-var configHandlers2 = function(handlerLookup, on, off, adapter, prevProps, props, boundHandlers) {
-  var prevEventKeys = Object.keys(prevProps).filter(isEventProp);
-  var currEventKeys = Object.keys(props).filter(isEventProp);
-  var removedKeys = prevEventKeys.filter(function(key) {
-    return props[key] === void 0;
-  });
-  var addedKeys = currEventKeys.filter(function(key) {
-    return prevProps[key] === void 0;
-  });
-  removedKeys.forEach(function(key) {
-    var eventName = eventAttrToEventName(key);
-    var wrappedHandler = boundHandlers[eventName];
-    off(eventName, wrappedHandler);
-    delete boundHandlers[eventName];
-  });
-  addedKeys.forEach(function(key) {
-    var wrappedHandler = adapter(handlerLookup, key);
-    var eventName = eventAttrToEventName(key);
-    boundHandlers[eventName] = wrappedHandler;
-    on(eventName, wrappedHandler);
-  });
-};
-var configHandlers = function(editor, prevProps, props, boundHandlers, lookup) {
-  return configHandlers2(
-    lookup,
-    editor.on.bind(editor),
-    editor.off.bind(editor),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    function(handlerLookup, key) {
-      return function(e3) {
-        var _a2;
-        return (_a2 = handlerLookup(key)) === null || _a2 === void 0 ? void 0 : _a2(e3, editor);
-      };
-    },
-    prevProps,
-    props,
-    boundHandlers
-  );
-};
-var unique = 0;
-var uuid = function(prefix2) {
-  var time2 = Date.now();
-  var random = Math.floor(Math.random() * 1e9);
-  unique++;
-  return prefix2 + "_" + random + unique + String(time2);
-};
-var isTextareaOrInput = function(element) {
-  return element !== null && (element.tagName.toLowerCase() === "textarea" || element.tagName.toLowerCase() === "input");
-};
-var normalizePluginArray = function(plugins) {
-  if (typeof plugins === "undefined" || plugins === "") {
-    return [];
-  }
-  return Array.isArray(plugins) ? plugins : plugins.split(" ");
-};
-var mergePlugins = function(initPlugins, inputPlugins) {
-  return normalizePluginArray(initPlugins).concat(normalizePluginArray(inputPlugins));
-};
-var isBeforeInputEventAvailable = function() {
-  return window.InputEvent && typeof InputEvent.prototype.getTargetRanges === "function";
-};
-var isInDoc = function(elem) {
-  if (!("isConnected" in Node.prototype)) {
-    var current = elem;
-    var parent_1 = elem.parentNode;
-    while (parent_1 != null) {
-      current = parent_1;
-      parent_1 = current.parentNode;
-    }
-    return current === elem.ownerDocument;
-  }
-  return elem.isConnected;
-};
-var setMode = function(editor, mode) {
-  if (editor !== void 0) {
-    if (editor.mode != null && typeof editor.mode === "object" && typeof editor.mode.set === "function") {
-      editor.mode.set(mode);
-    } else {
-      editor.setMode(mode);
-    }
-  }
-};
-var getTinymceOrError = function(view) {
-  var tinymce = getTinymce(view);
-  if (!tinymce) {
-    throw new Error("tinymce should have been loaded into global scope");
-  }
-  return tinymce;
-};
-var isDisabledOptionSupported = function(editor) {
-  return editor.options && editor.options.isRegistered("disabled");
-};
-var __assign$1 = function() {
-  __assign$1 = Object.assign || function(t2) {
-    for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
-      s2 = arguments[i2];
-      for (var p2 in s2) if (Object.prototype.hasOwnProperty.call(s2, p2))
-        t2[p2] = s2[p2];
-    }
-    return t2;
-  };
-  return __assign$1.apply(this, arguments);
-};
-var injectScriptTag = function(doc, item, handler) {
-  var _a2, _b2;
-  var scriptTag = doc.createElement("script");
-  scriptTag.referrerPolicy = "origin";
-  scriptTag.type = "application/javascript";
-  scriptTag.id = item.id;
-  scriptTag.src = item.src;
-  scriptTag.async = (_a2 = item.async) !== null && _a2 !== void 0 ? _a2 : false;
-  scriptTag.defer = (_b2 = item.defer) !== null && _b2 !== void 0 ? _b2 : false;
-  var loadHandler = function() {
-    scriptTag.removeEventListener("load", loadHandler);
-    scriptTag.removeEventListener("error", errorHandler);
-    handler(item.src);
-  };
-  var errorHandler = function(err) {
-    scriptTag.removeEventListener("load", loadHandler);
-    scriptTag.removeEventListener("error", errorHandler);
-    handler(item.src, err);
-  };
-  scriptTag.addEventListener("load", loadHandler);
-  scriptTag.addEventListener("error", errorHandler);
-  if (doc.head) {
-    doc.head.appendChild(scriptTag);
-  }
-};
-var createDocumentScriptLoader = function(doc) {
-  var lookup = {};
-  var scriptLoadOrErrorHandler = function(src, err) {
-    var item = lookup[src];
-    item.done = true;
-    item.error = err;
-    for (var _i2 = 0, _a2 = item.handlers; _i2 < _a2.length; _i2++) {
-      var h2 = _a2[_i2];
-      h2(src, err);
-    }
-    item.handlers = [];
-  };
-  var loadScripts = function(items, success, failure) {
-    var failureOrLog = function(err) {
-      return failure !== void 0 ? failure(err) : console.error(err);
-    };
-    if (items.length === 0) {
-      failureOrLog(new Error("At least one script must be provided"));
-      return;
-    }
-    var successCount = 0;
-    var failed = false;
-    var loaded = function(_src, err) {
-      if (failed) {
-        return;
-      }
-      if (err) {
-        failed = true;
-        failureOrLog(err);
-      } else if (++successCount === items.length) {
-        success();
-      }
-    };
-    for (var _i2 = 0, items_1 = items; _i2 < items_1.length; _i2++) {
-      var item = items_1[_i2];
-      var existing = lookup[item.src];
-      if (existing) {
-        if (existing.done) {
-          loaded(item.src, existing.error);
-        } else {
-          existing.handlers.push(loaded);
-        }
-      } else {
-        var id = uuid("tiny-");
-        lookup[item.src] = {
-          id,
-          src: item.src,
-          done: false,
-          error: null,
-          handlers: [loaded]
-        };
-        injectScriptTag(doc, __assign$1({ id }, item), scriptLoadOrErrorHandler);
-      }
-    }
-  };
-  var deleteScripts = function() {
-    var _a2;
-    for (var _i2 = 0, _b2 = Object.values(lookup); _i2 < _b2.length; _i2++) {
-      var item = _b2[_i2];
-      var scriptTag = doc.getElementById(item.id);
-      if (scriptTag != null && scriptTag.tagName === "SCRIPT") {
-        (_a2 = scriptTag.parentNode) === null || _a2 === void 0 ? void 0 : _a2.removeChild(scriptTag);
-      }
-    }
-    lookup = {};
-  };
-  var getDocument = function() {
-    return doc;
-  };
-  return {
-    loadScripts,
-    deleteScripts,
-    getDocument
-  };
-};
-var createScriptLoader = function() {
-  var cache = [];
-  var getDocumentScriptLoader = function(doc) {
-    var loader = cache.find(function(l2) {
-      return l2.getDocument() === doc;
-    });
-    if (loader === void 0) {
-      loader = createDocumentScriptLoader(doc);
-      cache.push(loader);
-    }
-    return loader;
-  };
-  var loadList = function(doc, items, delay, success, failure) {
-    var doLoad = function() {
-      return getDocumentScriptLoader(doc).loadScripts(items, success, failure);
-    };
-    if (delay > 0) {
-      setTimeout(doLoad, delay);
-    } else {
-      doLoad();
-    }
-  };
-  var reinitialize = function() {
-    for (var loader = cache.pop(); loader != null; loader = cache.pop()) {
-      loader.deleteScripts();
-    }
-  };
-  return {
-    loadList,
-    reinitialize
-  };
-};
-var ScriptLoader = createScriptLoader();
-var __extends = /* @__PURE__ */ function() {
-  var extendStatics = function(d2, b2) {
-    extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d3, b3) {
-      d3.__proto__ = b3;
-    } || function(d3, b3) {
-      for (var p2 in b3) if (Object.prototype.hasOwnProperty.call(b3, p2)) d3[p2] = b3[p2];
-    };
-    return extendStatics(d2, b2);
-  };
-  return function(d2, b2) {
-    if (typeof b2 !== "function" && b2 !== null)
-      throw new TypeError("Class extends value " + String(b2) + " is not a constructor or null");
-    extendStatics(d2, b2);
-    function __() {
-      this.constructor = d2;
-    }
-    d2.prototype = b2 === null ? Object.create(b2) : (__.prototype = b2.prototype, new __());
-  };
-}();
-var __assign = function() {
-  __assign = Object.assign || function(t2) {
-    for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
-      s2 = arguments[i2];
-      for (var p2 in s2) if (Object.prototype.hasOwnProperty.call(s2, p2))
-        t2[p2] = s2[p2];
-    }
-    return t2;
-  };
-  return __assign.apply(this, arguments);
-};
-var changeEvents = "change keyup compositionend setcontent CommentChange";
-var Editor = (
-  /** @class */
-  function(_super) {
-    __extends(Editor2, _super);
-    function Editor2(props) {
-      var _a2, _b2, _c2;
-      var _this = _super.call(this, props) || this;
-      _this.rollbackTimer = void 0;
-      _this.valueCursor = void 0;
-      _this.rollbackChange = function() {
-        var editor = _this.editor;
-        var value = _this.props.value;
-        if (editor && value && value !== _this.currentContent) {
-          editor.undoManager.ignore(function() {
-            editor.setContent(value);
-            if (_this.valueCursor && (!_this.inline || editor.hasFocus())) {
-              try {
-                editor.selection.moveToBookmark(_this.valueCursor);
-              } catch (_e3) {
-              }
-            }
-          });
-        }
-        _this.rollbackTimer = void 0;
-      };
-      _this.handleBeforeInput = function(_evt) {
-        if (_this.props.value !== void 0 && _this.props.value === _this.currentContent && _this.editor) {
-          if (!_this.inline || _this.editor.hasFocus()) {
-            try {
-              _this.valueCursor = _this.editor.selection.getBookmark(3);
-            } catch (_e3) {
-            }
-          }
-        }
-      };
-      _this.handleBeforeInputSpecial = function(evt) {
-        if (evt.key === "Enter" || evt.key === "Backspace" || evt.key === "Delete") {
-          _this.handleBeforeInput(evt);
-        }
-      };
-      _this.handleEditorChange = function(_evt) {
-        var editor = _this.editor;
-        if (editor && editor.initialized) {
-          var newContent = editor.getContent();
-          if (_this.props.value !== void 0 && _this.props.value !== newContent && _this.props.rollback !== false) {
-            if (!_this.rollbackTimer) {
-              _this.rollbackTimer = window.setTimeout(_this.rollbackChange, typeof _this.props.rollback === "number" ? _this.props.rollback : 200);
-            }
-          }
-          if (newContent !== _this.currentContent) {
-            _this.currentContent = newContent;
-            if (isFunction(_this.props.onEditorChange)) {
-              _this.props.onEditorChange(newContent, editor);
-            }
-          }
-        }
-      };
-      _this.handleEditorChangeSpecial = function(evt) {
-        if (evt.key === "Backspace" || evt.key === "Delete") {
-          _this.handleEditorChange(evt);
-        }
-      };
-      _this.initialise = function(attempts) {
-        var _a3, _b3, _c3;
-        if (attempts === void 0) {
-          attempts = 0;
-        }
-        var target = _this.elementRef.current;
-        if (!target) {
-          return;
-        }
-        if (!isInDoc(target)) {
-          if (attempts === 0) {
-            setTimeout(function() {
-              return _this.initialise(1);
-            }, 1);
-          } else if (attempts < 100) {
-            setTimeout(function() {
-              return _this.initialise(attempts + 1);
-            }, 100);
-          } else {
-            throw new Error("tinymce can only be initialised when in a document");
-          }
-          return;
-        }
-        var tinymce = getTinymceOrError(_this.view);
-        var finalInit = __assign(__assign(__assign(__assign({}, _this.props.init), { selector: void 0, target, disabled: _this.props.disabled, readonly: _this.props.readonly, inline: _this.inline, plugins: mergePlugins((_a3 = _this.props.init) === null || _a3 === void 0 ? void 0 : _a3.plugins, _this.props.plugins), toolbar: (_b3 = _this.props.toolbar) !== null && _b3 !== void 0 ? _b3 : (_c3 = _this.props.init) === null || _c3 === void 0 ? void 0 : _c3.toolbar }), _this.props.licenseKey ? { license_key: _this.props.licenseKey } : {}), { setup: function(editor) {
-          _this.editor = editor;
-          _this.bindHandlers({});
-          if (_this.inline && !isTextareaOrInput(target)) {
-            editor.once("PostRender", function(_evt) {
-              editor.setContent(_this.getInitialValue(), { no_events: true });
-            });
-          }
-          if (_this.props.init && isFunction(_this.props.init.setup)) {
-            _this.props.init.setup(editor);
-          }
-          if (_this.props.disabled) {
-            if (isDisabledOptionSupported(_this.editor)) {
-              _this.editor.options.set("disabled", _this.props.disabled);
-            } else {
-              _this.editor.mode.set("readonly");
-            }
-          }
-        }, init_instance_callback: function(editor) {
-          var _a4;
-          var initialValue = _this.getInitialValue();
-          _this.currentContent = (_a4 = _this.currentContent) !== null && _a4 !== void 0 ? _a4 : editor.getContent();
-          if (_this.currentContent !== initialValue) {
-            _this.currentContent = initialValue;
-            editor.setContent(initialValue);
-            editor.undoManager.clear();
-            editor.undoManager.add();
-            editor.setDirty(false);
-          }
-          if (_this.props.init && isFunction(_this.props.init.init_instance_callback)) {
-            _this.props.init.init_instance_callback(editor);
-          }
-        } });
-        if (!_this.inline) {
-          target.style.visibility = "";
-        }
-        if (isTextareaOrInput(target)) {
-          target.value = _this.getInitialValue();
-        }
-        tinymce.init(finalInit);
-      };
-      _this.id = _this.props.id || uuid("tiny-react");
-      _this.elementRef = reactExports.createRef();
-      _this.inline = (_c2 = (_a2 = _this.props.inline) !== null && _a2 !== void 0 ? _a2 : (_b2 = _this.props.init) === null || _b2 === void 0 ? void 0 : _b2.inline) !== null && _c2 !== void 0 ? _c2 : false;
-      _this.boundHandlers = {};
-      return _this;
-    }
-    Object.defineProperty(Editor2.prototype, "view", {
-      get: function() {
-        var _a2, _b2;
-        return (_b2 = (_a2 = this.elementRef.current) === null || _a2 === void 0 ? void 0 : _a2.ownerDocument.defaultView) !== null && _b2 !== void 0 ? _b2 : window;
-      },
-      enumerable: false,
-      configurable: true
-    });
-    Editor2.prototype.componentDidUpdate = function(prevProps) {
-      var _this = this;
-      var _a2, _b2;
-      if (this.rollbackTimer) {
-        clearTimeout(this.rollbackTimer);
-        this.rollbackTimer = void 0;
-      }
-      if (this.editor) {
-        this.bindHandlers(prevProps);
-        if (this.editor.initialized) {
-          this.currentContent = (_a2 = this.currentContent) !== null && _a2 !== void 0 ? _a2 : this.editor.getContent();
-          if (typeof this.props.initialValue === "string" && this.props.initialValue !== prevProps.initialValue) {
-            this.editor.setContent(this.props.initialValue);
-            this.editor.undoManager.clear();
-            this.editor.undoManager.add();
-            this.editor.setDirty(false);
-          } else if (typeof this.props.value === "string" && this.props.value !== this.currentContent) {
-            var localEditor_1 = this.editor;
-            localEditor_1.undoManager.transact(function() {
-              var cursor;
-              if (!_this.inline || localEditor_1.hasFocus()) {
-                try {
-                  cursor = localEditor_1.selection.getBookmark(3);
-                } catch (_e3) {
-                }
-              }
-              var valueCursor2 = _this.valueCursor;
-              localEditor_1.setContent(_this.props.value);
-              if (!_this.inline || localEditor_1.hasFocus()) {
-                for (var _i2 = 0, _a3 = [cursor, valueCursor2]; _i2 < _a3.length; _i2++) {
-                  var bookmark = _a3[_i2];
-                  if (bookmark) {
-                    try {
-                      localEditor_1.selection.moveToBookmark(bookmark);
-                      _this.valueCursor = bookmark;
-                      break;
-                    } catch (_e3) {
-                    }
-                  }
-                }
-              }
-            });
-          }
-          if (this.props.readonly !== prevProps.readonly) {
-            var readonly = (_b2 = this.props.readonly) !== null && _b2 !== void 0 ? _b2 : false;
-            setMode(this.editor, readonly ? "readonly" : "design");
-          }
-          if (this.props.disabled !== prevProps.disabled) {
-            if (isDisabledOptionSupported(this.editor)) {
-              this.editor.options.set("disabled", this.props.disabled);
-            } else {
-              setMode(this.editor, this.props.disabled ? "readonly" : "design");
-            }
-          }
-        }
-      }
-    };
-    Editor2.prototype.componentDidMount = function() {
-      var _this = this;
-      var _a2, _b2, _c2, _d2, _f2;
-      if (getTinymce(this.view) !== null) {
-        this.initialise();
-      } else if (Array.isArray(this.props.tinymceScriptSrc) && this.props.tinymceScriptSrc.length === 0) {
-        (_b2 = (_a2 = this.props).onScriptsLoadError) === null || _b2 === void 0 ? void 0 : _b2.call(_a2, new Error("No `tinymce` global is present but the `tinymceScriptSrc` prop was an empty array."));
-      } else if ((_c2 = this.elementRef.current) === null || _c2 === void 0 ? void 0 : _c2.ownerDocument) {
-        var successHandler = function() {
-          var _a3, _b3;
-          (_b3 = (_a3 = _this.props).onScriptsLoad) === null || _b3 === void 0 ? void 0 : _b3.call(_a3);
-          _this.initialise();
-        };
-        var errorHandler = function(err) {
-          var _a3, _b3;
-          (_b3 = (_a3 = _this.props).onScriptsLoadError) === null || _b3 === void 0 ? void 0 : _b3.call(_a3, err);
-        };
-        ScriptLoader.loadList(this.elementRef.current.ownerDocument, this.getScriptSources(), (_f2 = (_d2 = this.props.scriptLoading) === null || _d2 === void 0 ? void 0 : _d2.delay) !== null && _f2 !== void 0 ? _f2 : 0, successHandler, errorHandler);
-      }
-    };
-    Editor2.prototype.componentWillUnmount = function() {
-      var _this = this;
-      var editor = this.editor;
-      if (editor) {
-        editor.off(changeEvents, this.handleEditorChange);
-        editor.off(this.beforeInputEvent(), this.handleBeforeInput);
-        editor.off("keypress", this.handleEditorChangeSpecial);
-        editor.off("keydown", this.handleBeforeInputSpecial);
-        editor.off("NewBlock", this.handleEditorChange);
-        Object.keys(this.boundHandlers).forEach(function(eventName) {
-          editor.off(eventName, _this.boundHandlers[eventName]);
-        });
-        this.boundHandlers = {};
-        editor.remove();
-        this.editor = void 0;
-      }
-    };
-    Editor2.prototype.render = function() {
-      return this.inline ? this.renderInline() : this.renderIframe();
-    };
-    Editor2.prototype.beforeInputEvent = function() {
-      return isBeforeInputEventAvailable() ? "beforeinput SelectionChange" : "SelectionChange";
-    };
-    Editor2.prototype.renderInline = function() {
-      var _a2 = this.props.tagName, tagName = _a2 === void 0 ? "div" : _a2;
-      return reactExports.createElement(tagName, {
-        ref: this.elementRef,
-        id: this.id,
-        tabIndex: this.props.tabIndex
-      });
-    };
-    Editor2.prototype.renderIframe = function() {
-      return reactExports.createElement("textarea", {
-        ref: this.elementRef,
-        style: { visibility: "hidden" },
-        name: this.props.textareaName,
-        id: this.id,
-        tabIndex: this.props.tabIndex
-      });
-    };
-    Editor2.prototype.getScriptSources = function() {
-      var _a2, _b2;
-      var async = (_a2 = this.props.scriptLoading) === null || _a2 === void 0 ? void 0 : _a2.async;
-      var defer = (_b2 = this.props.scriptLoading) === null || _b2 === void 0 ? void 0 : _b2.defer;
-      if (this.props.tinymceScriptSrc !== void 0) {
-        if (typeof this.props.tinymceScriptSrc === "string") {
-          return [{ src: this.props.tinymceScriptSrc, async, defer }];
-        }
-        return this.props.tinymceScriptSrc.map(function(item) {
-          if (typeof item === "string") {
-            return { src: item, async, defer };
-          } else {
-            return item;
-          }
-        });
-      }
-      var channel = this.props.cloudChannel;
-      var apiKey = this.props.apiKey ? this.props.apiKey : "no-api-key";
-      var cloudTinyJs = "https://cdn.tiny.cloud/1/".concat(apiKey, "/tinymce/").concat(channel, "/tinymce.min.js");
-      return [{ src: cloudTinyJs, async, defer }];
-    };
-    Editor2.prototype.getInitialValue = function() {
-      if (typeof this.props.initialValue === "string") {
-        return this.props.initialValue;
-      } else if (typeof this.props.value === "string") {
-        return this.props.value;
-      } else {
-        return "";
-      }
-    };
-    Editor2.prototype.bindHandlers = function(prevProps) {
-      var _this = this;
-      if (this.editor !== void 0) {
-        configHandlers(this.editor, prevProps, this.props, this.boundHandlers, function(key) {
-          return _this.props[key];
-        });
-        var isValueControlled = function(p2) {
-          return p2.onEditorChange !== void 0 || p2.value !== void 0;
-        };
-        var wasControlled = isValueControlled(prevProps);
-        var nowControlled = isValueControlled(this.props);
-        if (!wasControlled && nowControlled) {
-          this.editor.on(changeEvents, this.handleEditorChange);
-          this.editor.on(this.beforeInputEvent(), this.handleBeforeInput);
-          this.editor.on("keydown", this.handleBeforeInputSpecial);
-          this.editor.on("keyup", this.handleEditorChangeSpecial);
-          this.editor.on("NewBlock", this.handleEditorChange);
-        } else if (wasControlled && !nowControlled) {
-          this.editor.off(changeEvents, this.handleEditorChange);
-          this.editor.off(this.beforeInputEvent(), this.handleBeforeInput);
-          this.editor.off("keydown", this.handleBeforeInputSpecial);
-          this.editor.off("keyup", this.handleEditorChangeSpecial);
-          this.editor.off("NewBlock", this.handleEditorChange);
-        }
-      }
-    };
-    Editor2.propTypes = EditorPropTypes;
-    Editor2.defaultProps = {
-      cloudChannel: "8"
-    };
-    return Editor2;
-  }(reactExports.Component)
-);
-function PageEditor({ value, onChange }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-slate-200 bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Editor,
-    {
-      tinymceScriptSrc: "https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js",
-      apiKey: "gz0vccrxxqfout41hqr8gthfroa4l5qnrgjmgdqmjhuw0tfr",
-      value,
-      onEditorChange: (content) => onChange(content),
-      init: {
-        height: 500,
-        menubar: true,
-        toolbar_mode: "wrap",
-        ui_mode: "split",
-        branding: false,
-        promotion: false,
-        zindex: 9999999,
-        plugins: [
-          "advlist",
-          "autolink",
-          "lists",
-          "link",
-          "image",
-          "charmap",
-          "preview",
-          "anchor",
-          "searchreplace",
-          "visualblocks",
-          "code",
-          "fullscreen",
-          "insertdatetime",
-          "media",
-          "table",
-          "help",
-          "wordcount"
-        ],
-        toolbar: "undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | code fullscreen preview",
-        image_title: true,
-        image_advtab: true,
-        automatic_uploads: true,
-        paste_data_images: true,
-        file_picker_types: "image",
-        dialog_type: "modal",
-        file_picker_callback: (callback, _value, meta) => {
-          if (meta.filetype !== "image") {
-            return;
-          }
-          const input = document.createElement("input");
-          input.type = "file";
-          input.accept = "image/*";
-          input.onchange = () => {
-            var _a2;
-            const file = (_a2 = input.files) == null ? void 0 : _a2[0];
-            if (!file) {
-              return;
-            }
-            const reader = new FileReader();
-            reader.onload = () => {
-              const result = reader.result;
-              if (typeof result === "string") {
-                callback(result, {
-                  alt: file.name,
-                  title: file.name
-                });
-              }
-            };
-            reader.readAsDataURL(file);
-          };
-          input.click();
-        }
-      }
-    }
-  ) });
-}
 const emptyPageForm = {
   title: "",
   slug: "",
@@ -72902,6 +73306,7 @@ const emptyPageForm = {
   status: "published",
   metaTitle: "",
   metaDescription: "",
+  keywords: [],
   canonicalUrl: "",
   schemaMarkup: ""
 };
@@ -73079,6 +73484,7 @@ function PagesPage() {
         page.content,
         page.seo.metaTitle,
         page.seo.metaDescription,
+        page.seo.keywords.join(", "),
         page.status
       ].filter(Boolean).some((value) => String(value).toLowerCase().includes(query))
     );
@@ -73098,6 +73504,7 @@ function PagesPage() {
       status: page.status,
       metaTitle: page.seo.metaTitle,
       metaDescription: page.seo.metaDescription,
+      keywords: page.seo.keywords,
       canonicalUrl: page.seo.canonicalUrl,
       schemaMarkup: page.seo.schemaMarkup
     });
@@ -73140,6 +73547,7 @@ function PagesPage() {
       status: formData.status,
       metaTitle: formData.metaTitle.trim(),
       metaDescription: formData.metaDescription.trim(),
+      keywords: formData.keywords,
       canonicalUrl: formData.canonicalUrl.trim(),
       schemaMarkup: formData.schemaMarkup
     };
@@ -73262,6 +73670,11 @@ function PagesPage() {
                   slug: "home",
                   metaTitle: "Samarpan Hospital",
                   metaDescription: "Samarpan Hospital provides expert healthcare services in Hisar.",
+                  keywords: [
+                    "Samarpan Hospital Hisar",
+                    "hospital in Hisar",
+                    "healthcare services"
+                  ],
                   canonicalUrl: "https://samarpanhospitalhisar.com/",
                   schemaMarkup: JSON.stringify(
                     {
@@ -73480,6 +73893,22 @@ function PagesPage() {
                       ] })
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-keywords", children: "Keywords (comma separated)" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          id: "page-keywords",
+                          value: formData.keywords.join(", "),
+                          onChange: (event) => setField(
+                            "keywords",
+                            event.target.value.split(",").map((keyword) => keyword.trim()).filter(Boolean)
+                          ),
+                          placeholder: "hospital in hisar, maternity care, cosmetic surgery",
+                          className: "rounded-xl bg-card"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "page-canonical-url", children: "Canonical URL" }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx(
                         Input,
@@ -73538,6 +73967,7 @@ function PagesPage() {
                         seo: {
                           metaTitle: formData.metaTitle,
                           metaDescription: formData.metaDescription,
+                          keywords: formData.keywords,
                           canonicalUrl: formData.canonicalUrl,
                           schemaMarkup: formData.schemaMarkup
                         }
@@ -73608,6 +74038,10 @@ function PagesPage() {
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold uppercase tracking-wide text-muted-foreground", children: "Meta Description" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-foreground", children: previewPage.seo.metaDescription || "No meta description" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold uppercase tracking-wide text-muted-foreground", children: "Keywords" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-foreground", children: previewPage.seo.keywords.length > 0 ? previewPage.seo.keywords.join(", ") : "No keywords" })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold uppercase tracking-wide text-muted-foreground", children: "Canonical URL" }),
@@ -74568,238 +75002,6 @@ const deleteShortApi = async (id) => {
     throw new Error(((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete short");
   }
 };
-var TABS_NAME = "Tabs";
-var [createTabsContext] = createContextScope(TABS_NAME, [
-  createRovingFocusGroupScope
-]);
-var useRovingFocusGroupScope = createRovingFocusGroupScope();
-var [TabsProvider, useTabsContext] = createTabsContext(TABS_NAME);
-var Tabs$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const {
-      __scopeTabs,
-      value: valueProp,
-      onValueChange,
-      defaultValue,
-      orientation = "horizontal",
-      dir,
-      activationMode = "automatic",
-      ...tabsProps
-    } = props;
-    const direction = useDirection(dir);
-    const [value, setValue] = useControllableState({
-      prop: valueProp,
-      onChange: onValueChange,
-      defaultProp: defaultValue ?? "",
-      caller: TABS_NAME
-    });
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      TabsProvider,
-      {
-        scope: __scopeTabs,
-        baseId: useId(),
-        value,
-        onValueChange: setValue,
-        orientation,
-        dir: direction,
-        activationMode,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Primitive$2.div,
-          {
-            dir: direction,
-            "data-orientation": orientation,
-            ...tabsProps,
-            ref: forwardedRef
-          }
-        )
-      }
-    );
-  }
-);
-Tabs$1.displayName = TABS_NAME;
-var TAB_LIST_NAME = "TabsList";
-var TabsList$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeTabs, loop = true, ...listProps } = props;
-    const context = useTabsContext(TAB_LIST_NAME, __scopeTabs);
-    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Root$5,
-      {
-        asChild: true,
-        ...rovingFocusGroupScope,
-        orientation: context.orientation,
-        dir: context.dir,
-        loop,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Primitive$2.div,
-          {
-            role: "tablist",
-            "aria-orientation": context.orientation,
-            ...listProps,
-            ref: forwardedRef
-          }
-        )
-      }
-    );
-  }
-);
-TabsList$1.displayName = TAB_LIST_NAME;
-var TRIGGER_NAME = "TabsTrigger";
-var TabsTrigger$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeTabs, value, disabled = false, ...triggerProps } = props;
-    const context = useTabsContext(TRIGGER_NAME, __scopeTabs);
-    const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
-    const triggerId = makeTriggerId(context.baseId, value);
-    const contentId = makeContentId(context.baseId, value);
-    const isSelected = value === context.value;
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Item$1,
-      {
-        asChild: true,
-        ...rovingFocusGroupScope,
-        focusable: !disabled,
-        active: isSelected,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Primitive$2.button,
-          {
-            type: "button",
-            role: "tab",
-            "aria-selected": isSelected,
-            "aria-controls": contentId,
-            "data-state": isSelected ? "active" : "inactive",
-            "data-disabled": disabled ? "" : void 0,
-            disabled,
-            id: triggerId,
-            ...triggerProps,
-            ref: forwardedRef,
-            onMouseDown: composeEventHandlers(props.onMouseDown, (event) => {
-              if (!disabled && event.button === 0 && event.ctrlKey === false) {
-                context.onValueChange(value);
-              } else {
-                event.preventDefault();
-              }
-            }),
-            onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
-              if ([" ", "Enter"].includes(event.key)) context.onValueChange(value);
-            }),
-            onFocus: composeEventHandlers(props.onFocus, () => {
-              const isAutomaticActivation = context.activationMode !== "manual";
-              if (!isSelected && !disabled && isAutomaticActivation) {
-                context.onValueChange(value);
-              }
-            })
-          }
-        )
-      }
-    );
-  }
-);
-TabsTrigger$1.displayName = TRIGGER_NAME;
-var CONTENT_NAME = "TabsContent";
-var TabsContent$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeTabs, value, forceMount, children, ...contentProps } = props;
-    const context = useTabsContext(CONTENT_NAME, __scopeTabs);
-    const triggerId = makeTriggerId(context.baseId, value);
-    const contentId = makeContentId(context.baseId, value);
-    const isSelected = value === context.value;
-    const isMountAnimationPreventedRef = reactExports.useRef(isSelected);
-    reactExports.useEffect(() => {
-      const rAF = requestAnimationFrame(() => isMountAnimationPreventedRef.current = false);
-      return () => cancelAnimationFrame(rAF);
-    }, []);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || isSelected, children: ({ present }) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Primitive$2.div,
-      {
-        "data-state": isSelected ? "active" : "inactive",
-        "data-orientation": context.orientation,
-        role: "tabpanel",
-        "aria-labelledby": triggerId,
-        hidden: !present,
-        id: contentId,
-        tabIndex: 0,
-        ...contentProps,
-        ref: forwardedRef,
-        style: {
-          ...props.style,
-          animationDuration: isMountAnimationPreventedRef.current ? "0s" : void 0
-        },
-        children: present && children
-      }
-    ) });
-  }
-);
-TabsContent$1.displayName = CONTENT_NAME;
-function makeTriggerId(baseId, value) {
-  return `${baseId}-trigger-${value}`;
-}
-function makeContentId(baseId, value) {
-  return `${baseId}-content-${value}`;
-}
-var Root2 = Tabs$1;
-var List = TabsList$1;
-var Trigger = TabsTrigger$1;
-var Content = TabsContent$1;
-function Tabs({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Root2,
-    {
-      "data-slot": "tabs",
-      className: cn("flex flex-col gap-2", className),
-      ...props
-    }
-  );
-}
-function TabsList({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    List,
-    {
-      "data-slot": "tabs-list",
-      className: cn(
-        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
-        className
-      ),
-      ...props
-    }
-  );
-}
-function TabsTrigger({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Trigger,
-    {
-      "data-slot": "tabs-trigger",
-      className: cn(
-        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      ),
-      ...props
-    }
-  );
-}
-function TabsContent({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Content,
-    {
-      "data-slot": "tabs-content",
-      className: cn("flex-1 outline-none", className),
-      ...props
-    }
-  );
-}
 const SHORT_QUERY_KEY = ["shorts-management"];
 const emptyShortForm = {
   title: "",
@@ -76347,7 +76549,10 @@ const emptyForm$3 = {
   slug: "",
   content: "",
   serviceId: "",
-  image: ""
+  image: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: ""
 };
 const tableStyles$3 = {
   table: {
@@ -76468,13 +76673,17 @@ function ServiceFeaturesPage() {
     setModalOpen(true);
   }
   function openEdit(feature) {
+    var _a2, _b2, _c2, _d2;
     setEditing(feature);
     setFormData({
       title: feature.title || "",
       slug: feature.slug || "",
       content: feature.content || "",
       image: feature.image || "",
-      serviceId: getServiceFeatureRelationId(feature.serviceId)
+      serviceId: getServiceFeatureRelationId(feature.serviceId),
+      metaTitle: ((_a2 = feature.seo) == null ? void 0 : _a2.metaTitle) || "",
+      metaDescription: ((_b2 = feature.seo) == null ? void 0 : _b2.metaDescription) || "",
+      keywords: ((_d2 = (_c2 = feature.seo) == null ? void 0 : _c2.keywords) == null ? void 0 : _d2.join(", ")) || ""
     });
     setModalOpen(true);
   }
@@ -76485,8 +76694,16 @@ function ServiceFeaturesPage() {
       return;
     }
     const payload = {
-      ...formData,
-      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify$2(formData.slug) : slugify$2(formData.title)
+      title: formData.title,
+      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify$2(formData.slug) : slugify$2(formData.title),
+      content: formData.content,
+      image: formData.image,
+      serviceId: formData.serviceId,
+      seo: {
+        metaTitle: formData.metaTitle.trim(),
+        metaDescription: formData.metaDescription.trim(),
+        keywords: formData.keywords.split(",").map((keyword) => keyword.trim()).filter(Boolean)
+      }
     };
     if (editing) {
       await updateMutation.mutateAsync({
@@ -76604,81 +76821,88 @@ function ServiceFeaturesPage() {
         },
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editing ? "Update Feature" : "Add Feature" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  value: formData.title,
-                  onChange: (e3) => setFormData((p2) => ({
-                    ...p2,
-                    title: e3.target.value
-                  })),
-                  placeholder: "Feature title"
-                }
-              )
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "content", className: "flex-1", children: "Content" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  value: formData.slug,
-                  onChange: (e3) => setFormData((p2) => ({
-                    ...p2,
-                    slug: e3.target.value
-                  })),
-                  placeholder: "feature-slug"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Select,
-                {
-                  value: formData.serviceId,
-                  onValueChange: (value) => setFormData((p2) => ({
-                    ...p2,
-                    serviceId: value
-                  })),
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select service" }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((service) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: service._id, children: service.title }, service._id)) })
-                  ]
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Feature Image" }),
-              editing && typeof formData.image === "string" && formData.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "img",
-                {
-                  src: resolveAssetUrl$1(formData.image),
-                  alt: formData.title,
-                  className: "w-32 h-20 object-cover rounded-lg border"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  type: "file",
-                  accept: "image/*",
-                  onChange: (e3) => {
-                    var _a2;
-                    const file = (_a2 = e3.target.files) == null ? void 0 : _a2[0];
-                    if (file) {
-                      setFormData((p2) => ({
-                        ...p2,
-                        image: file
-                      }));
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "basic", className: "space-y-5 mt-0", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.title,
+                    onChange: (e3) => setFormData((p2) => ({
+                      ...p2,
+                      title: e3.target.value
+                    })),
+                    placeholder: "Feature title"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.slug,
+                    onChange: (e3) => setFormData((p2) => ({
+                      ...p2,
+                      slug: e3.target.value
+                    })),
+                    placeholder: "feature-slug"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    value: formData.serviceId,
+                    onValueChange: (value) => setFormData((p2) => ({
+                      ...p2,
+                      serviceId: value
+                    })),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select service" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((service) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: service._id, children: service.title }, service._id)) })
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Feature Image" }),
+                editing && typeof formData.image === "string" && formData.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "img",
+                  {
+                    src: resolveAssetUrl$1(formData.image),
+                    alt: formData.title,
+                    className: "w-32 h-20 object-cover rounded-lg border"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    type: "file",
+                    accept: "image/*",
+                    onChange: (e3) => {
+                      var _a2;
+                      const file = (_a2 = e3.target.files) == null ? void 0 : _a2[0];
+                      if (file) {
+                        setFormData((p2) => ({
+                          ...p2,
+                          image: file
+                        }));
+                      }
                     }
                   }
-                }
-              )
+                )
+              ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "content", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Content" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                 PageEditor,
@@ -76690,6 +76914,62 @@ function ServiceFeaturesPage() {
                   }))
                 }
               ) })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "seo", className: "mt-0 space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Meta Title" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.metaTitle,
+                    onChange: (e3) => setFormData((p2) => ({
+                      ...p2,
+                      metaTitle: e3.target.value
+                    })),
+                    placeholder: "Feature meta title",
+                    maxLength: 60
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+                  formData.metaTitle.length,
+                  "/60"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Meta Description" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Textarea,
+                  {
+                    value: formData.metaDescription,
+                    onChange: (e3) => setFormData((p2) => ({
+                      ...p2,
+                      metaDescription: e3.target.value
+                    })),
+                    placeholder: "Short search description for this feature",
+                    maxLength: 160,
+                    className: "min-h-[80px] resize-none",
+                    rows: 3
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+                  formData.metaDescription.length,
+                  "/160"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Keywords (comma separated)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.keywords,
+                    onChange: (e3) => setFormData((p2) => ({
+                      ...p2,
+                      keywords: e3.target.value
+                    })),
+                    placeholder: "service keyword, treatment keyword"
+                  }
+                )
+              ] })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
@@ -77363,7 +77643,10 @@ const emptyForm$1 = {
   content: "",
   serviceId: "",
   serviceSubCategoryId: "",
-  image: ""
+  image: "",
+  metaTitle: "",
+  metaDescription: "",
+  keywords: ""
 };
 const tableStyles$1 = {
   table: {
@@ -77493,6 +77776,7 @@ function ServiceSubCategoriesPage() {
     setModalOpen(true);
   }
   function openEdit(item) {
+    var _a2, _b2, _c2, _d2;
     setEditing(item);
     setFormData({
       title: item.title || "",
@@ -77500,7 +77784,10 @@ function ServiceSubCategoriesPage() {
       content: item.content || "",
       image: item.image || "",
       serviceId: getServiceFeatureRelationId(item.serviceId),
-      serviceSubCategoryId: getServiceFeatureRelationId(item.serviceSubCategoryId)
+      serviceSubCategoryId: getServiceFeatureRelationId(item.serviceSubCategoryId),
+      metaTitle: ((_a2 = item.seo) == null ? void 0 : _a2.metaTitle) || "",
+      metaDescription: ((_b2 = item.seo) == null ? void 0 : _b2.metaDescription) || "",
+      keywords: ((_d2 = (_c2 = item.seo) == null ? void 0 : _c2.keywords) == null ? void 0 : _d2.join(", ")) || ""
     });
     setModalOpen(true);
   }
@@ -77511,8 +77798,17 @@ function ServiceSubCategoriesPage() {
       return;
     }
     const payload = {
-      ...formData,
-      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify(formData.slug) : slugify(formData.title)
+      title: formData.title,
+      slug: ((_a2 = formData.slug) == null ? void 0 : _a2.trim()) ? slugify(formData.slug) : slugify(formData.title),
+      content: formData.content,
+      image: formData.image,
+      serviceId: formData.serviceId,
+      serviceSubCategoryId: formData.serviceSubCategoryId,
+      seo: {
+        metaTitle: formData.metaTitle.trim(),
+        metaDescription: formData.metaDescription.trim(),
+        keywords: formData.keywords.split(",").map((keyword) => keyword.trim()).filter(Boolean)
+      }
     };
     if (editing) {
       await updateMutation.mutateAsync({
@@ -77643,114 +77939,121 @@ function ServiceSubCategoriesPage() {
         },
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editing ? "Update Sub Category" : "Add Sub Category" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  value: formData.title,
-                  onChange: (e3) => setFormData((previous) => ({
-                    ...previous,
-                    title: e3.target.value
-                  })),
-                  placeholder: "Sub category title"
-                }
-              )
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "content", className: "flex-1", children: "Content" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  value: formData.slug,
-                  onChange: (e3) => setFormData((previous) => ({
-                    ...previous,
-                    slug: e3.target.value
-                  })),
-                  placeholder: "sub-category-slug"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Select,
-                {
-                  value: formData.serviceId,
-                  onValueChange: (value) => setFormData((previous) => {
-                    const nextCategories = categories.filter(
-                      (category) => getServiceFeatureRelationId(category.serviceId) === value
-                    );
-                    const hasSelectedCategory = nextCategories.some(
-                      (category) => category._id === previous.serviceSubCategoryId
-                    );
-                    return {
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "basic", className: "space-y-5 mt-0", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Title" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.title,
+                    onChange: (e3) => setFormData((previous) => ({
                       ...previous,
-                      serviceId: value,
-                      serviceSubCategoryId: hasSelectedCategory ? previous.serviceSubCategoryId : ""
-                    };
-                  }),
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select service" }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((service) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: service._id, children: service.title }, service._id)) })
-                  ]
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service Category" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Select,
-                {
-                  value: formData.serviceSubCategoryId,
-                  disabled: !formData.serviceId,
-                  onValueChange: (value) => setFormData((previous) => ({
-                    ...previous,
-                    serviceSubCategoryId: value
-                  })),
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      SelectValue,
-                      {
-                        placeholder: formData.serviceId ? "Select category" : "Select service first"
-                      }
-                    ) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: filteredCategories.map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: category._id, children: category.title }, category._id)) })
-                  ]
-                }
-              ),
-              formData.serviceId && filteredCategories.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "No service categories found for this service." })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Sub Category Image" }),
-              editing && typeof formData.image === "string" && formData.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "img",
-                {
-                  src: resolveAssetUrl$1(formData.image),
-                  alt: formData.title,
-                  className: "w-32 h-20 object-cover rounded-lg border"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  type: "file",
-                  accept: "image/*",
-                  onChange: (e3) => {
-                    var _a2;
-                    const file = (_a2 = e3.target.files) == null ? void 0 : _a2[0];
-                    if (file) {
-                      setFormData((previous) => ({
+                      title: e3.target.value
+                    })),
+                    placeholder: "Sub category title"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.slug,
+                    onChange: (e3) => setFormData((previous) => ({
+                      ...previous,
+                      slug: e3.target.value
+                    })),
+                    placeholder: "sub-category-slug"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    value: formData.serviceId,
+                    onValueChange: (value) => setFormData((previous) => {
+                      const nextCategories = categories.filter(
+                        (category) => getServiceFeatureRelationId(category.serviceId) === value
+                      );
+                      const hasSelectedCategory = nextCategories.some(
+                        (category) => category._id === previous.serviceSubCategoryId
+                      );
+                      return {
                         ...previous,
-                        image: file
-                      }));
+                        serviceId: value,
+                        serviceSubCategoryId: hasSelectedCategory ? previous.serviceSubCategoryId : ""
+                      };
+                    }),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select service" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((service) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: service._id, children: service.title }, service._id)) })
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Service Category" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    value: formData.serviceSubCategoryId,
+                    disabled: !formData.serviceId,
+                    onValueChange: (value) => setFormData((previous) => ({
+                      ...previous,
+                      serviceSubCategoryId: value
+                    })),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        SelectValue,
+                        {
+                          placeholder: formData.serviceId ? "Select category" : "Select service first"
+                        }
+                      ) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: filteredCategories.map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: category._id, children: category.title }, category._id)) })
+                    ]
+                  }
+                ),
+                formData.serviceId && filteredCategories.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "No service categories found for this service." })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Sub Category Image" }),
+                editing && typeof formData.image === "string" && formData.image && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "img",
+                  {
+                    src: resolveAssetUrl$1(formData.image),
+                    alt: formData.title,
+                    className: "w-32 h-20 object-cover rounded-lg border"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    type: "file",
+                    accept: "image/*",
+                    onChange: (e3) => {
+                      var _a2;
+                      const file = (_a2 = e3.target.files) == null ? void 0 : _a2[0];
+                      if (file) {
+                        setFormData((previous) => ({
+                          ...previous,
+                          image: file
+                        }));
+                      }
                     }
                   }
-                }
-              )
+                )
+              ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "content", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Content" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                 PageEditor,
@@ -77762,6 +78065,62 @@ function ServiceSubCategoriesPage() {
                   }))
                 }
               ) })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "seo", className: "mt-0 space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Meta Title" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.metaTitle,
+                    onChange: (e3) => setFormData((previous) => ({
+                      ...previous,
+                      metaTitle: e3.target.value
+                    })),
+                    placeholder: "Sub-category meta title",
+                    maxLength: 60
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+                  formData.metaTitle.length,
+                  "/60"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Meta Description" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Textarea,
+                  {
+                    value: formData.metaDescription,
+                    onChange: (e3) => setFormData((previous) => ({
+                      ...previous,
+                      metaDescription: e3.target.value
+                    })),
+                    placeholder: "Short search description for this sub-category",
+                    maxLength: 160,
+                    className: "min-h-[80px] resize-none",
+                    rows: 3
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground text-right", children: [
+                  formData.metaDescription.length,
+                  "/160"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Keywords (comma separated)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: formData.keywords,
+                    onChange: (e3) => setFormData((previous) => ({
+                      ...previous,
+                      keywords: e3.target.value
+                    })),
+                    placeholder: "service keyword, treatment keyword"
+                  }
+                )
+              ] })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
@@ -78483,17 +78842,28 @@ async function deleteAppointmentSlotApi(id) {
     throw createApiRequestError(error, "Failed to delete appointment slot");
   }
 }
+const createTimeSlotLine = (overrides = {}) => ({
+  id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  startTime: "09:00",
+  endTime: "10:00",
+  maximumPatients: 10,
+  ...overrides
+});
+const createWeeklyDayLine = (overrides = {}) => ({
+  id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  date: "",
+  slots: [createTimeSlotLine()],
+  ...overrides
+});
 const emptyForm = {
   doctorId: "",
   slotType: "daily",
   date: "",
-  weekday: void 0,
-  startTime: "09:00",
-  endTime: "10:00",
-  maximumPatients: 10,
   appointmentPrice: 0,
-  slotDurationMinutes: 30,
-  isActive: true
+  bookingCloseMinutesBeforeEnd: 10,
+  isActive: true,
+  slots: [createTimeSlotLine()],
+  weeklyDays: [createWeeklyDayLine()]
 };
 function SlotManagementPage() {
   const queryClient2 = useQueryClient();
@@ -78502,7 +78872,7 @@ function SlotManagementPage() {
   const [dialogOpen, setDialogOpen] = reactExports.useState(false);
   const [deleteOpen, setDeleteOpen] = reactExports.useState(false);
   const [editingSlot, setEditingSlot] = reactExports.useState(null);
-  const [form, setForm] = reactExports.useState(emptyForm);
+  const [form, setForm] = reactExports.useState(() => resetForm());
   const { data: doctors = [] } = useQuery({
     queryKey: ["doctors"],
     queryFn: getAllDoctorsApi
@@ -78517,7 +78887,7 @@ function SlotManagementPage() {
     queryFn: () => getAppointmentSlotsApi({ date: selectedDate || void 0 })
   });
   const addMutation = useMutation({
-    mutationFn: addAppointmentSlotApi,
+    mutationFn: (payloads) => Promise.all(payloads.map((payload) => addAppointmentSlotApi(payload))),
     onSuccess: () => {
       ue.success("Slot created successfully.");
       queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
@@ -78528,8 +78898,14 @@ function SlotManagementPage() {
   const updateMutation = useMutation({
     mutationFn: ({
       id,
-      payload
-    }) => updateAppointmentSlotApi(id, payload),
+      payload,
+      extraPayloads
+    }) => Promise.all([
+      updateAppointmentSlotApi(id, payload),
+      ...extraPayloads.map(
+        (extraPayload) => addAppointmentSlotApi(extraPayload)
+      )
+    ]),
     onSuccess: () => {
       ue.success("Slot updated successfully.");
       queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
@@ -78551,23 +78927,29 @@ function SlotManagementPage() {
     const term = search.trim().toLowerCase();
     if (!term) return slots;
     return slots.filter(
-      (slot) => [
-        slot.doctorName,
-        slot.slotType,
-        slot.startTime,
-        slot.endTime,
-        slot.appointmentPrice,
-        slot.disabledReason,
-        slot.dateKey,
-        slot.appliesOnDateKey,
-        formatSlotType(slot.slotType),
-        formatSlotDate(slot)
-      ].filter(Boolean).some((value) => String(value).toLowerCase().includes(term))
+      (slot) => {
+        var _a2;
+        return [
+          slot.doctorName,
+          slot.slotType,
+          slot.startTime,
+          slot.endTime,
+          (_a2 = slot.timeSlots) == null ? void 0 : _a2.map(
+            (timeSlot) => `${timeSlot.startTime} ${timeSlot.endTime} ${timeSlot.maximumPatients}`
+          ).join(" "),
+          slot.appointmentPrice,
+          slot.disabledReason,
+          slot.dateKey,
+          slot.appliesOnDateKey,
+          formatSlotType(slot.slotType),
+          formatSlotDate(slot)
+        ].filter(Boolean).some((value) => String(value).toLowerCase().includes(term));
+      }
     );
   }, [search, slots]);
   function openAdd() {
     setEditingSlot(null);
-    setForm(emptyForm);
+    setForm(resetForm());
     setDialogOpen(true);
   }
   function openEdit(slot) {
@@ -78576,20 +78958,18 @@ function SlotManagementPage() {
       doctorId: String(slot.doctorId),
       slotType: slot.slotType,
       date: slot.dateKey || (slot.date ? slot.date.slice(0, 10) : ""),
-      weekday: slot.weekday ?? void 0,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-      maximumPatients: slot.maximumPatients,
       appointmentPrice: slot.appointmentPrice ?? 0,
-      slotDurationMinutes: slot.slotDurationMinutes ?? 30,
-      isActive: slot.isActive
+      bookingCloseMinutesBeforeEnd: slot.bookingCloseMinutesBeforeEnd ?? 10,
+      isActive: slot.isActive,
+      slots: slot.slotType === "daily" ? getFormTimeSlots(slot) : [createTimeSlotLine()],
+      weeklyDays: slot.slotType === "weekly" ? getFormWeeklyDays(slot) : [createWeeklyDayLine()]
     });
     setDialogOpen(true);
   }
   function closeDialog() {
     setDialogOpen(false);
     setEditingSlot(null);
-    setForm(emptyForm);
+    setForm(resetForm());
   }
   function saveSlot() {
     if (!form.doctorId) {
@@ -78600,32 +78980,44 @@ function SlotManagementPage() {
       ue.error("Please select a date for the day wise slot.");
       return;
     }
-    if (!form.startTime || !form.endTime || form.startTime >= form.endTime) {
-      ue.error("Please enter a valid time range.");
+    const payloads = buildSlotPayloads(form);
+    if (!payloads.length) {
+      ue.error("Please add at least one slot time.");
       return;
     }
-    if (form.maximumPatients < 1) {
-      ue.error("Maximum patients must be at least 1.");
+    const invalidLine = form.slotType === "daily" ? form.slots.find(isInvalidTimeSlot) : form.weeklyDays.find(
+      (day) => !day.date || !day.slots.length || day.slots.some(isInvalidTimeSlot)
+    );
+    if (invalidLine) {
+      ue.error(
+        form.slotType === "weekly" ? "Please enter a date, valid time range and patient capacity for every weekly day." : "Please enter a valid time range and patient capacity for every slot."
+      );
       return;
     }
     if (form.appointmentPrice < 0) {
       ue.error("Appointment price must be 0 or more.");
       return;
     }
-    if (form.slotDurationMinutes < 1) {
-      ue.error("Booking time gap must be at least 1 minute.");
+    if (!Number.isInteger(form.bookingCloseMinutesBeforeEnd) || form.bookingCloseMinutesBeforeEnd < 0) {
+      ue.error("Booking close time must be 0 minutes or more.");
       return;
     }
-    if (form.slotDurationMinutes > timeToMinutes(form.endTime) - timeToMinutes(form.startTime)) {
+    if (getAllFormTimeSlots(form).some(
+      (slot) => form.bookingCloseMinutesBeforeEnd > timeToMinutes(slot.endTime) - timeToMinutes(slot.startTime)
+    )) {
       ue.error(
-        "Booking time gap cannot be longer than the slot time range."
+        "Booking close time cannot be longer than a slot time range."
       );
       return;
     }
     if (editingSlot) {
-      updateMutation.mutate({ id: editingSlot._id, payload: form });
+      updateMutation.mutate({
+        id: editingSlot._id,
+        payload: payloads[0],
+        extraPayloads: payloads.slice(1)
+      });
     } else {
-      addMutation.mutate(form);
+      addMutation.mutate(payloads);
     }
   }
   const isSaving = addMutation.isPending || updateMutation.isPending;
@@ -78684,15 +79076,11 @@ function SlotManagementPage() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: slot.doctorName }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatSlotType(slot.slotType) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatSlotDate(slot) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
-          slot.startTime,
-          " - ",
-          slot.endTime
-        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatSlotTimes(slot) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
           slot.bookedCount ?? 0,
           "/",
-          slot.maximumPatients
+          sumSlotCapacity(slot)
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
           "₹",
@@ -78778,9 +79166,90 @@ function SlotDialog({
   onSave
 }) {
   const setField = (key, value) => onChange({ ...form, [key]: value });
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-2xl", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: isEditing ? "Edit Slot" : "Add Slot" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
+  const updateDailySlotLine = (id, key, value) => onChange({
+    ...form,
+    slots: form.slots.map(
+      (slot) => slot.id === id ? { ...slot, [key]: value } : slot
+    )
+  });
+  const addDailySlotLine = () => {
+    var _a2, _b2, _c2, _d2;
+    return onChange({
+      ...form,
+      slots: [
+        ...form.slots,
+        createTimeSlotLine({
+          startTime: ((_a2 = form.slots.at(-1)) == null ? void 0 : _a2.endTime) ?? "09:00",
+          endTime: ((_b2 = form.slots.at(-1)) == null ? void 0 : _b2.endTime) ? addOneHour(((_c2 = form.slots.at(-1)) == null ? void 0 : _c2.endTime) ?? "09:00") : "10:00",
+          maximumPatients: ((_d2 = form.slots.at(-1)) == null ? void 0 : _d2.maximumPatients) ?? 10
+        })
+      ]
+    });
+  };
+  const removeDailySlotLine = (id) => onChange({
+    ...form,
+    slots: form.slots.filter((slot) => slot.id !== id)
+  });
+  const updateWeeklyDayDate = (dayId, date2) => onChange({
+    ...form,
+    weeklyDays: form.weeklyDays.map(
+      (day) => day.id === dayId ? { ...day, date: date2 } : day
+    )
+  });
+  const addWeeklyDay = () => {
+    var _a2;
+    return onChange({
+      ...form,
+      weeklyDays: [
+        ...form.weeklyDays,
+        createWeeklyDayLine({
+          date: nextWeeklyDate((_a2 = form.weeklyDays.at(-1)) == null ? void 0 : _a2.date)
+        })
+      ]
+    });
+  };
+  const removeWeeklyDay = (dayId) => onChange({
+    ...form,
+    weeklyDays: form.weeklyDays.filter((day) => day.id !== dayId)
+  });
+  const updateWeeklyTimeLine = (dayId, slotId, key, value) => onChange({
+    ...form,
+    weeklyDays: form.weeklyDays.map(
+      (day) => day.id === dayId ? {
+        ...day,
+        slots: day.slots.map(
+          (slot) => slot.id === slotId ? { ...slot, [key]: value } : slot
+        )
+      } : day
+    )
+  });
+  const addWeeklyTimeLine = (dayId) => onChange({
+    ...form,
+    weeklyDays: form.weeklyDays.map((day) => {
+      if (day.id !== dayId) return day;
+      const previousSlot = day.slots.at(-1);
+      return {
+        ...day,
+        slots: [
+          ...day.slots,
+          createTimeSlotLine({
+            startTime: (previousSlot == null ? void 0 : previousSlot.endTime) ?? "09:00",
+            endTime: (previousSlot == null ? void 0 : previousSlot.endTime) ? addOneHour(previousSlot.endTime) : "10:00",
+            maximumPatients: (previousSlot == null ? void 0 : previousSlot.maximumPatients) ?? 10
+          })
+        ]
+      };
+    })
+  });
+  const removeWeeklyTimeLine = (dayId, slotId) => onChange({
+    ...form,
+    weeklyDays: form.weeklyDays.map(
+      (day) => day.id === dayId ? { ...day, slots: day.slots.filter((slot) => slot.id !== slotId) } : day
+    )
+  });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] w-[calc(100vw-1rem)] max-w-7xl overflow-y-auto p-0", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-border px-6 py-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: isEditing ? "Edit Slot" : "Add Slot" }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-5 px-6 py-5 sm:grid-cols-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 sm:col-span-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Doctor" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -78805,7 +79274,10 @@ function SlotDialog({
               ...form,
               slotType: value,
               date: value === "daily" ? form.date : "",
-              weekday: void 0
+              weeklyDays: value === "weekly" ? form.weeklyDays.map((day, index2) => ({
+                ...day,
+                date: day.date || dateFromToday(index2)
+              })) : form.weeklyDays
             }),
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
@@ -78828,42 +79300,8 @@ function SlotDialog({
           }
         )
       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Applies On" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex min-h-10 items-center rounded-md border border-border bg-muted/40 px-3 text-sm text-muted-foreground", children: "Full week" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Start Time" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "time",
-            value: form.startTime,
-            onChange: (event) => setField("startTime", event.target.value)
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "End Time" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "time",
-            value: form.endTime,
-            onChange: (event) => setField("endTime", event.target.value)
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Maximum Patients" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "number",
-            min: 1,
-            value: form.maximumPatients,
-            onChange: (event) => setField("maximumPatients", Number(event.target.value))
-          }
-        )
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Week Dates" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex min-h-10 items-center rounded-md border border-border bg-muted/40 px-3 text-sm text-muted-foreground", children: "Select each day needed for this week" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Appointment Price (INR)" }),
@@ -78878,17 +79316,19 @@ function SlotDialog({
         )
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Booking Time Gap (Minutes)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Booking Closes Before End (Minutes)" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
             type: "number",
-            min: 1,
-            value: form.slotDurationMinutes,
-            onChange: (event) => setField("slotDurationMinutes", Number(event.target.value))
+            min: 0,
+            value: form.bookingCloseMinutesBeforeEnd,
+            onChange: (event) => setField(
+              "bookingCloseMinutesBeforeEnd",
+              Number(event.target.value)
+            )
           }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: "Splits this slot into bookable times. Example: 10:00 AM to 2:00 PM with 30 minutes allows bookings up to 1:30 PM." })
+        )
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-lg border border-border px-3 py-2 sm:col-span-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
@@ -78902,17 +79342,194 @@ function SlotDialog({
             }
           )
         ] })
+      ] }),
+      form.slotType === "daily" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 sm:col-span-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slot Times" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              size: "sm",
+              onClick: addDailySlotLine,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
+                "Add More"
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: form.slots.map((slot, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          TimeSlotFields,
+          {
+            slot,
+            canRemove: form.slots.length > 1,
+            onChange: (key, value) => updateDailySlotLine(slot.id, key, value),
+            onRemove: () => removeDailySlotLine(slot.id),
+            removeLabel: `Remove slot ${index2 + 1}`
+          },
+          slot.id
+        )) })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 sm:col-span-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Weekly Days" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              size: "sm",
+              onClick: addWeeklyDay,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
+                "Add Day"
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: form.weeklyDays.map((day, dayIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "space-y-4 rounded-lg border border-border bg-muted/20 p-4",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Date" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "date",
+                      value: day.date,
+                      onChange: (event) => updateWeeklyDayDate(day.id, event.target.value)
+                    }
+                  ),
+                  day.date && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
+                    "Applies on ",
+                    weekdayNames[getWeekday(day.date)]
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "outline",
+                      size: "sm",
+                      onClick: () => addWeeklyTimeLine(day.id),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
+                        "Add Time"
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Button,
+                    {
+                      type: "button",
+                      variant: "ghost",
+                      size: "icon",
+                      disabled: form.weeklyDays.length === 1,
+                      onClick: () => removeWeeklyDay(day.id),
+                      "aria-label": `Remove day ${dayIndex + 1}`,
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(X$2, { className: "h-4 w-4" })
+                    }
+                  )
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: day.slots.map((slot, slotIndex) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                TimeSlotFields,
+                {
+                  slot,
+                  canRemove: day.slots.length > 1,
+                  onChange: (key, value) => updateWeeklyTimeLine(day.id, slot.id, key, value),
+                  onRemove: () => removeWeeklyTimeLine(day.id, slot.id),
+                  removeLabel: `Remove day ${dayIndex + 1} time ${slotIndex + 1}`
+                },
+                slot.id
+              )) })
+            ]
+          },
+          day.id
+        )) })
       ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "border-t border-border px-6 py-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: () => onOpenChange(false), children: "Cancel" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: onSave, disabled: isSaving, children: isSaving ? "Saving..." : "Save Slot" })
     ] })
   ] }) });
 }
+function TimeSlotFields({
+  slot,
+  canRemove,
+  onChange,
+  onRemove,
+  removeLabel
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 rounded-lg border border-border bg-background/70 p-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_2.5rem] md:items-end", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Start Time" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          type: "time",
+          value: slot.startTime,
+          onChange: (event) => onChange("startTime", event.target.value)
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "End Time" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          type: "time",
+          value: slot.endTime,
+          onChange: (event) => onChange("endTime", event.target.value)
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Patient Capacity" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          type: "number",
+          min: 1,
+          value: slot.maximumPatients,
+          onChange: (event) => onChange("maximumPatients", Number(event.target.value))
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Button,
+      {
+        type: "button",
+        variant: "ghost",
+        size: "icon",
+        disabled: !canRemove,
+        onClick: onRemove,
+        "aria-label": removeLabel,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(X$2, { className: "h-4 w-4" })
+      }
+    ) })
+  ] });
+}
 function formatSlotDate(slot) {
+  var _a2, _b2;
   if (slot.slotType === "weekly") {
-    return "Full week";
+    if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
+      return slot.weeklyDays.map((day) => {
+        const dateKey = getDateKey(day.date, day.dateKey);
+        return `${dateKey} (${weekdayNames[day.weekday]})`;
+      }).join(", ");
+    }
+    if (slot.dateKey || slot.date) {
+      const dateKey = slot.dateKey || ((_b2 = slot.date) == null ? void 0 : _b2.slice(0, 10)) || "";
+      return `${dateKey} (${weekdayNames[getWeekday(dateKey)]})`;
+    }
+    return typeof slot.weekday === "number" ? `Week slot (${weekdayNames[slot.weekday]})` : "Week slot";
   }
   return slot.dateKey || (slot.date ? slot.date.slice(0, 10) : "Not set");
 }
@@ -78922,6 +79539,223 @@ function formatSlotType(slotType) {
 function timeToMinutes(time2) {
   const [hours, minutes] = time2.split(":").map(Number);
   return hours * 60 + minutes;
+}
+function isInvalidTimeSlot(slot) {
+  return !slot.startTime || !slot.endTime || slot.startTime >= slot.endTime || slot.maximumPatients < 1;
+}
+function resetForm() {
+  return {
+    ...emptyForm,
+    slots: [createTimeSlotLine()],
+    weeklyDays: [createWeeklyDayLine()]
+  };
+}
+function buildSlotPayloads(form) {
+  if (form.slotType === "daily") {
+    return [buildSlotPayload(form, form.slots, form.date)];
+  }
+  return [buildWeeklySlotPayload(form)];
+}
+function buildSlotPayload(form, slots, weeklyDate) {
+  const timeSlots = [...slots].map((slot) => ({
+    startTime: slot.startTime,
+    endTime: slot.endTime,
+    maximumPatients: Number(slot.maximumPatients)
+  })).sort((a2, b2) => a2.startTime.localeCompare(b2.startTime));
+  const firstSlot = timeSlots[0];
+  const lastSlot = timeSlots[timeSlots.length - 1];
+  const slotDurationMinutes = timeToMinutes(firstSlot.endTime) - timeToMinutes(firstSlot.startTime);
+  return {
+    doctorId: form.doctorId,
+    slotType: form.slotType,
+    date: form.slotType === "daily" ? form.date : weeklyDate,
+    weekday: form.slotType === "weekly" && weeklyDate ? getWeekday(weeklyDate) : void 0,
+    startTime: firstSlot.startTime,
+    endTime: lastSlot.endTime,
+    maximumPatients: sumTimeSlotCapacity(timeSlots),
+    timeSlots,
+    appointmentPrice: form.appointmentPrice,
+    slotDurationMinutes,
+    bookingCloseMinutesBeforeEnd: form.bookingCloseMinutesBeforeEnd,
+    isActive: form.isActive
+  };
+}
+function buildWeeklySlotPayload(form) {
+  const weeklyDays = form.weeklyDays.map((day) => ({
+    date: day.date,
+    weekday: getWeekday(day.date),
+    timeSlots: normalizeTimeSlots(day.slots)
+  })).sort((a2, b2) => a2.date.localeCompare(b2.date));
+  const flattenedSlots = weeklyDays.flatMap((day) => day.timeSlots);
+  const sortedSlots = [...flattenedSlots].sort(
+    (a2, b2) => a2.startTime.localeCompare(b2.startTime)
+  );
+  const firstSlot = sortedSlots[0];
+  const lastSlot = sortedSlots[sortedSlots.length - 1];
+  const firstDay = weeklyDays[0];
+  const slotDurationMinutes = timeToMinutes(firstSlot.endTime) - timeToMinutes(firstSlot.startTime);
+  return {
+    doctorId: form.doctorId,
+    slotType: "weekly",
+    date: firstDay.date,
+    weekday: firstDay.weekday,
+    startTime: firstSlot.startTime,
+    endTime: lastSlot.endTime,
+    maximumPatients: sumTimeSlotCapacity(flattenedSlots),
+    timeSlots: firstDay.timeSlots,
+    weeklyDays,
+    appointmentPrice: form.appointmentPrice,
+    slotDurationMinutes,
+    bookingCloseMinutesBeforeEnd: form.bookingCloseMinutesBeforeEnd,
+    isActive: form.isActive
+  };
+}
+function normalizeTimeSlots(slots) {
+  return [...slots].map((slot) => ({
+    startTime: slot.startTime,
+    endTime: slot.endTime,
+    maximumPatients: Number(slot.maximumPatients)
+  })).sort((a2, b2) => a2.startTime.localeCompare(b2.startTime));
+}
+function getFormTimeSlots(slot) {
+  var _a2;
+  const source = ((_a2 = slot.timeSlots) == null ? void 0 : _a2.length) ? slot.timeSlots : [
+    {
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      maximumPatients: slot.maximumPatients
+    }
+  ];
+  return source.map(
+    (timeSlot) => createTimeSlotLine({
+      startTime: timeSlot.startTime,
+      endTime: timeSlot.endTime,
+      maximumPatients: timeSlot.maximumPatients
+    })
+  );
+}
+function getFormWeeklyDays(slot) {
+  var _a2;
+  if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
+    return slot.weeklyDays.map(
+      (day) => createWeeklyDayLine({
+        date: getDateKey(day.date, day.dateKey),
+        slots: day.timeSlots.map(
+          (timeSlot) => createTimeSlotLine({
+            startTime: timeSlot.startTime,
+            endTime: timeSlot.endTime,
+            maximumPatients: timeSlot.maximumPatients
+          })
+        )
+      })
+    );
+  }
+  return [
+    createWeeklyDayLine({
+      date: slot.dateKey || (slot.date ? slot.date.slice(0, 10) : "") || dateForWeekday(slot.weekday ?? void 0),
+      slots: getFormTimeSlots(slot)
+    })
+  ];
+}
+function getAllFormTimeSlots(form) {
+  return form.slotType === "daily" ? form.slots : form.weeklyDays.flatMap((day) => day.slots);
+}
+function sumSlotCapacity(slot) {
+  var _a2, _b2;
+  if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
+    return sumTimeSlotCapacity(slot.weeklyDays.flatMap((day) => day.timeSlots));
+  }
+  return sumTimeSlotCapacity(
+    ((_b2 = slot.timeSlots) == null ? void 0 : _b2.length) ? slot.timeSlots : [
+      {
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        maximumPatients: slot.maximumPatients
+      }
+    ]
+  );
+}
+function sumTimeSlotCapacity(slots) {
+  return slots.reduce(
+    (total, slot) => total + Number(slot.maximumPatients || 0),
+    0
+  );
+}
+function formatSlotTimes(slot) {
+  var _a2, _b2;
+  if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
+    return slot.weeklyDays.map((day) => {
+      const dateKey = getDateKey(day.date, day.dateKey);
+      const times = day.timeSlots.map(
+        (timeSlot) => `${formatTime12Hour(timeSlot.startTime)} - ${formatTime12Hour(
+          timeSlot.endTime
+        )}`
+      ).join(", ");
+      return `${dateKey}: ${times}`;
+    }).join(" | ");
+  }
+  const timeSlots = ((_b2 = slot.timeSlots) == null ? void 0 : _b2.length) ? slot.timeSlots : [
+    {
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      maximumPatients: slot.maximumPatients
+    }
+  ];
+  return timeSlots.map(
+    (timeSlot) => `${formatTime12Hour(timeSlot.startTime)} - ${formatTime12Hour(
+      timeSlot.endTime
+    )}`
+  ).join(", ");
+}
+function formatTime12Hour(time2) {
+  const [rawHours, rawMinutes] = time2.split(":").map(Number);
+  if (!Number.isFinite(rawHours) || !Number.isFinite(rawMinutes)) return time2;
+  const period = rawHours >= 12 ? "PM" : "AM";
+  const hours = rawHours % 12 || 12;
+  return `${hours}:${String(rawMinutes).padStart(2, "0")} ${period}`;
+}
+const weekdayNames = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday"
+];
+function getWeekday(dateKey) {
+  return (/* @__PURE__ */ new Date(`${dateKey}T00:00:00`)).getDay();
+}
+function dateForWeekday(weekday = (/* @__PURE__ */ new Date()).getDay()) {
+  const today = /* @__PURE__ */ new Date();
+  const date2 = new Date(today);
+  date2.setDate(today.getDate() + (weekday - today.getDay() + 7) % 7);
+  return formatDateInput(date2);
+}
+function dateFromToday(offset2) {
+  const date2 = /* @__PURE__ */ new Date();
+  date2.setDate(date2.getDate() + offset2);
+  return formatDateInput(date2);
+}
+function nextWeeklyDate(dateKey) {
+  const base = dateKey ? /* @__PURE__ */ new Date(`${dateKey}T00:00:00`) : /* @__PURE__ */ new Date();
+  base.setDate(base.getDate() + 1);
+  return formatDateInput(base);
+}
+function addOneHour(time2) {
+  const nextMinutes = Math.min(timeToMinutes(time2) + 60, 24 * 60 - 1);
+  const hours = Math.floor(nextMinutes / 60);
+  const minutes = nextMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+function formatDateInput(date2) {
+  const year = date2.getFullYear();
+  const month = String(date2.getMonth() + 1).padStart(2, "0");
+  const day = String(date2.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+function getDateKey(date2, fallback) {
+  return fallback || (date2 ? date2.slice(0, 10) : "");
 }
 const defaultWebsiteColors = {
   primary: "#ab2548",
@@ -82881,194 +83715,202 @@ function BlogsPage() {
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: mode === "edit" ? "Edit Blog" : "Create Blog" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                    "Title ",
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "content", className: "flex-1", children: "Content" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "image", className: "flex-1", children: "Image" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "basic", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                      "Title ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        value: form.title,
+                        onChange: (e3) => setField("title", e3.target.value),
+                        className: formErrors.title ? "border-destructive focus-visible:ring-destructive" : void 0
+                      }
+                    ),
+                    formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      value: form.title,
-                      onChange: (e3) => setField("title", e3.target.value),
-                      className: formErrors.title ? "border-destructive focus-visible:ring-destructive" : void 0
-                    }
-                  ),
-                  formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                    "Service ",
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                      "Service ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      Select,
+                      {
+                        value: form.serviceId,
+                        onValueChange: (v2) => setField("serviceId", v2),
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            SelectTrigger,
+                            {
+                              className: formErrors.serviceId ? "border-destructive focus-visible:ring-destructive" : void 0,
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Service" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: s2._id, children: s2.title }, s2._id)) })
+                        ]
+                      }
+                    ),
+                    formErrors.serviceId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.serviceId }) : null
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    Select,
-                    {
-                      value: form.serviceId,
-                      onValueChange: (v2) => setField("serviceId", v2),
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          SelectTrigger,
-                          {
-                            className: formErrors.serviceId ? "border-destructive focus-visible:ring-destructive" : void 0,
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Service" })
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: s2._id, children: s2.title }, s2._id)) })
-                      ]
-                    }
-                  ),
-                  formErrors.serviceId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.serviceId }) : null
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                    "Blog Category ",
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                      "Blog Category ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      Select,
+                      {
+                        value: form.blogCategoryId,
+                        onValueChange: (v2) => setField("blogCategoryId", v2),
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            SelectTrigger,
+                            {
+                              className: formErrors.blogCategoryId ? "border-destructive focus-visible:ring-destructive" : void 0,
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Blog Category" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: categories.filter((category) => category.isActive !== false).map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: category._id, children: category.title }, category._id)) })
+                        ]
+                      }
+                    ),
+                    formErrors.blogCategoryId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.blogCategoryId }) : null
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    Select,
-                    {
-                      value: form.blogCategoryId,
-                      onValueChange: (v2) => setField("blogCategoryId", v2),
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          SelectTrigger,
-                          {
-                            className: formErrors.blogCategoryId ? "border-destructive focus-visible:ring-destructive" : void 0,
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Blog Category" })
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: categories.filter((category) => category.isActive !== false).map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: category._id, children: category.title }, category._id)) })
-                      ]
-                    }
-                  ),
-                  formErrors.blogCategoryId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.blogCategoryId }) : null
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    Select,
-                    {
-                      value: form.status,
-                      onValueChange: (v2) => setField("status", v2),
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "published", children: "Published" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
-                        ] })
-                      ]
-                    }
-                  )
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      Select,
+                      {
+                        value: form.status,
+                        onValueChange: (v2) => setField("status", v2),
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "published", children: "Published" }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
+                          ] })
+                        ]
+                      }
+                    )
+                  ] })
                 ] })
-              ] })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              ] }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "content", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Textarea,
+                    {
+                      placeholder: "Short Description",
+                      value: form.shortDescription,
+                      onChange: (e3) => setField("shortDescription", e3.target.value),
+                      maxLength: 300,
+                      className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
+                    formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for blog cards and listings." }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                      form.shortDescription.length,
+                      "/300"
+                    ] })
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
+                  PageEditor,
                   {
-                    placeholder: "Short Description",
-                    value: form.shortDescription,
-                    onChange: (e3) => setField("shortDescription", e3.target.value),
-                    maxLength: 300,
-                    className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
+                    value: form.content,
+                    onChange: (val) => setField("content", val)
+                  }
+                ),
+                formErrors.content ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.content }) : null
+              ] }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "seo", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    placeholder: "Meta Title",
+                    value: form.metaTitle,
+                    onChange: (e3) => setField("metaTitle", e3.target.value),
+                    maxLength: 60,
+                    className: formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : void 0
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
-                  formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for blog cards and listings." }),
+                  formErrors.metaTitle ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaTitle }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search engines usually show about 60 characters." }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                    form.shortDescription.length,
-                    "/300"
+                    form.metaTitle.length,
+                    "/60"
                   ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                PageEditor,
-                {
-                  value: form.content,
-                  onChange: (val) => setField("content", val)
-                }
-              ),
-              formErrors.content ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.content }) : null
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  placeholder: "Meta Title",
-                  value: form.metaTitle,
-                  onChange: (e3) => setField("metaTitle", e3.target.value),
-                  maxLength: 60,
-                  className: formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : void 0
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
-                formErrors.metaTitle ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaTitle }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search engines usually show about 60 characters." }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                  form.metaTitle.length,
-                  "/60"
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Textarea,
-                {
-                  placeholder: "Meta Description",
-                  value: form.metaDescription,
-                  onChange: (e3) => setField("metaDescription", e3.target.value),
-                  maxLength: 160,
-                  className: formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : void 0
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
-                formErrors.metaDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search snippets usually fit within 160 characters." }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                  form.metaDescription.length,
-                  "/160"
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  placeholder: "Keywords (comma separated)",
-                  value: form.keywords,
-                  onChange: (e3) => setField("keywords", e3.target.value)
-                }
-              )
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
-              imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "img",
-                {
-                  src: imagePreview,
-                  alt: "Blog preview",
-                  className: "w-full h-48 object-cover rounded-lg"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image (1215 × 576)" }),
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "input",
+                  Textarea,
                   {
-                    type: "file",
-                    accept: "image/*",
-                    hidden: true,
-                    onChange: (e3) => {
-                      var _a2;
-                      return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
-                    }
+                    placeholder: "Meta Description",
+                    value: form.metaDescription,
+                    onChange: (e3) => setField("metaDescription", e3.target.value),
+                    maxLength: 160,
+                    className: formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : void 0
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
+                  formErrors.metaDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search snippets usually fit within 160 characters." }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                    form.metaDescription.length,
+                    "/160"
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    placeholder: "Keywords (comma separated)",
+                    value: form.keywords,
+                    onChange: (e3) => setField("keywords", e3.target.value)
                   }
                 )
-              ] }),
-              formErrors.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.image }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: "Upload a featured image for new blog posts." })
-            ] }) }),
+              ] }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "image", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
+                imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "img",
+                  {
+                    src: imagePreview,
+                    alt: "Blog preview",
+                    className: "w-full h-48 object-cover rounded-lg"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image (1215 × 576)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "file",
+                      accept: "image/*",
+                      hidden: true,
+                      onChange: (e3) => {
+                        var _a2;
+                        return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
+                      }
+                    }
+                  )
+                ] }),
+                formErrors.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.image }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: "Upload a featured image for new blog posts." })
+              ] }) }) })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full bg-primary", children: mode === "edit" ? "Update Blog" : "Create Blog" })
           ] })
         ] })
@@ -83543,146 +84385,154 @@ function ProceduresPage() {
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: mode === "edit" ? "Edit Procedure" : "Create Procedure" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                    "Title ",
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "content", className: "flex-1", children: "Content" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "image", className: "flex-1", children: "Image" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "basic", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                      "Title ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        value: form.title,
+                        onChange: (e3) => setField("title", e3.target.value)
+                      }
+                    ),
+                    formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
                   ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        value: form.slug,
+                        onChange: (e3) => setField("slug", e3.target.value)
+                      }
+                    )
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Sort Order" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        type: "number",
+                        value: form.sortOrder,
+                        onChange: (e3) => setField("sortOrder", Number(e3.target.value))
+                      }
+                    )
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "select",
+                      {
+                        value: form.isActive ? "active" : "inactive",
+                        onChange: (e3) => setField("isActive", e3.target.value === "active"),
+                        className: "w-full border rounded-md px-3 py-2 bg-background",
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: "Active" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: "Inactive" })
+                        ]
+                      }
+                    )
+                  ] })
+                ] })
+              ] }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "content", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
+                    Textarea,
                     {
-                      value: form.title,
-                      onChange: (e3) => setField("title", e3.target.value)
+                      placeholder: "Short Description",
+                      value: form.shortDescription,
+                      onChange: (e3) => setField("shortDescription", e3.target.value),
+                      maxLength: 300,
+                      className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
                     }
                   ),
-                  formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
+                    formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for cards and listings." }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                      form.shortDescription.length,
+                      "/300"
+                    ] })
+                  ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slug" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      value: form.slug,
-                      onChange: (e3) => setField("slug", e3.target.value)
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Sort Order" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      type: "number",
-                      value: form.sortOrder,
-                      onChange: (e3) => setField("sortOrder", Number(e3.target.value))
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    "select",
-                    {
-                      value: form.isActive ? "active" : "inactive",
-                      onChange: (e3) => setField("isActive", e3.target.value === "active"),
-                      className: "w-full border rounded-md px-3 py-2 bg-background",
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: "Active" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: "Inactive" })
-                      ]
-                    }
-                  )
-                ] })
-              ] })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  PageEditor,
+                  {
+                    value: form.content,
+                    onChange: (val) => setField("content", val)
+                  }
+                ),
+                formErrors.content ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.content }) : null
+              ] }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "seo", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    placeholder: "Meta Title",
+                    value: form.metaTitle,
+                    onChange: (e3) => setField("metaTitle", e3.target.value)
+                  }
+                ),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   Textarea,
                   {
-                    placeholder: "Short Description",
-                    value: form.shortDescription,
-                    onChange: (e3) => setField("shortDescription", e3.target.value),
-                    maxLength: 300,
-                    className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
+                    placeholder: "Meta Description",
+                    value: form.metaDescription,
+                    onChange: (e3) => setField("metaDescription", e3.target.value)
                   }
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
-                  formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for cards and listings." }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                    form.shortDescription.length,
-                    "/300"
-                  ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                PageEditor,
-                {
-                  value: form.content,
-                  onChange: (val) => setField("content", val)
-                }
-              ),
-              formErrors.content ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.content }) : null
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  placeholder: "Meta Title",
-                  value: form.metaTitle,
-                  onChange: (e3) => setField("metaTitle", e3.target.value)
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Textarea,
-                {
-                  placeholder: "Meta Description",
-                  value: form.metaDescription,
-                  onChange: (e3) => setField("metaDescription", e3.target.value)
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Input,
-                {
-                  placeholder: "Keywords (comma separated)",
-                  value: form.keywords,
-                  onChange: (e3) => setField("keywords", e3.target.value)
-                }
-              )
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
-              imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "img",
-                {
-                  src: imagePreview,
-                  alt: "Procedure preview",
-                  className: "w-full h-48 object-cover rounded-lg"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "input",
+                  Input,
                   {
-                    type: "file",
-                    accept: "image/*",
-                    hidden: true,
-                    onChange: (e3) => {
-                      var _a2;
-                      return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
-                    }
+                    placeholder: "Keywords (comma separated)",
+                    value: form.keywords,
+                    onChange: (e3) => setField("keywords", e3.target.value)
                   }
                 )
-              ] }),
-              formErrors.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.image }) : null
-            ] }) }),
+              ] }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "image", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
+                imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "img",
+                  {
+                    src: imagePreview,
+                    alt: "Procedure preview",
+                    className: "w-full h-48 object-cover rounded-lg"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "file",
+                      accept: "image/*",
+                      hidden: true,
+                      onChange: (e3) => {
+                        var _a2;
+                        return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
+                      }
+                    }
+                  )
+                ] }),
+                formErrors.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.image }) : null
+              ] }) }) })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full bg-primary", children: mode === "edit" ? "Update Procedure" : "Create Procedure" })
           ] })
         ] })

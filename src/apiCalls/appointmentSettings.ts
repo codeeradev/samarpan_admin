@@ -16,8 +16,26 @@ export interface AppointmentSlot {
   startTime: string;
   endTime: string;
   maximumPatients: number;
+  timeSlots?: Array<{
+    startTime: string;
+    endTime: string;
+    maximumPatients: number;
+  }>;
+  weeklyDays?: Array<{
+    date: string;
+    dateKey?: string | null;
+    weekday: number;
+    timeSlots: Array<{
+      startTime: string;
+      endTime: string;
+      maximumPatients: number;
+    }>;
+  }>;
   appointmentPrice: number;
   slotDurationMinutes: number;
+  bookingCloseMinutesBeforeEnd?: number;
+  bookingCloseTime?: string;
+  bookingCloseAt?: string | Date;
   isActive: boolean;
   bookedCount?: number;
   remainingPatients?: number;
@@ -36,8 +54,23 @@ export interface AppointmentSlotPayload {
   startTime: string;
   endTime: string;
   maximumPatients: number;
+  timeSlots?: Array<{
+    startTime: string;
+    endTime: string;
+    maximumPatients: number;
+  }>;
+  weeklyDays?: Array<{
+    date: string;
+    weekday: number;
+    timeSlots: Array<{
+      startTime: string;
+      endTime: string;
+      maximumPatients: number;
+    }>;
+  }>;
   appointmentPrice: number;
   slotDurationMinutes: number;
+  bookingCloseMinutesBeforeEnd: number;
   isActive: boolean;
 }
 
