@@ -132,8 +132,13 @@ export default function LeadsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ leadId, payload }: { leadId: string; payload: { status?: MetaLeadStatus; notes?: string } }) =>
-      updateMetaLeadApi(leadId, payload),
+    mutationFn: ({
+      leadId,
+      payload,
+    }: {
+      leadId: string;
+      payload: { status?: MetaLeadStatus; notes?: string };
+    }) => updateMetaLeadApi(leadId, payload),
     onSuccess: (result) => {
       toast.success("Lead updated");
       setSelectedLead(result.lead);
@@ -177,7 +182,10 @@ export default function LeadsPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4 mb-4 sm:mb-6">
         {leadsLoading
           ? SKELETON_ROW_KEYS.slice(0, 5).map((k) => (
-              <Card key={k} className="rounded-2xl shadow-card border border-border">
+              <Card
+                key={k}
+                className="rounded-2xl shadow-card border border-border"
+              >
                 <CardContent className="p-5 space-y-3">
                   <Skeleton className="h-11 w-11 rounded-xl" />
                   <Skeleton className="h-4 w-20 rounded" />
@@ -218,8 +226,13 @@ export default function LeadsPage() {
             }}
           >
             <SelectTrigger className="w-full lg:w-56 rounded-xl">
-              <SelectValue placeholder="All forms" />
+              <span className="block flex-1 truncate text-left">
+                {formId === "all"
+                  ? "All forms"
+                  : forms.find((f) => f.formId === formId)?.formName}
+              </span>
             </SelectTrigger>
+
             <SelectContent>
               <SelectItem value="all">All forms</SelectItem>
               {forms.map((form) => (
@@ -259,14 +272,16 @@ export default function LeadsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted">
-                  {["Lead", "Contact", "Form", "Received", "Status"].map((col) => (
-                    <th
-                      key={col}
-                      className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap"
-                    >
-                      {col}
-                    </th>
-                  ))}
+                  {["Lead", "Contact", "Form", "Received", "Status"].map(
+                    (col) => (
+                      <th
+                        key={col}
+                        className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap"
+                      >
+                        {col}
+                      </th>
+                    ),
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -309,7 +324,8 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-5 py-3 text-muted-foreground whitespace-nowrap text-xs">
                         <span className="flex items-center gap-1.5">
-                          <Calendar size={12} /> {formatDateTime(lead.createdTime)}
+                          <Calendar size={12} />{" "}
+                          {formatDateTime(lead.createdTime)}
                         </span>
                       </td>
                       <td className="px-5 py-3">
@@ -319,7 +335,10 @@ export default function LeadsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-5 py-8 text-sm text-muted-foreground text-center">
+                    <td
+                      colSpan={5}
+                      className="px-5 py-8 text-sm text-muted-foreground text-center"
+                    >
                       No leads found. Try syncing or adjusting filters.
                     </td>
                   </tr>
@@ -331,7 +350,8 @@ export default function LeadsPage() {
           {pagination && pagination.totalPages > 1 ? (
             <div className="flex items-center justify-between px-5 py-3 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                Page {pagination.page} of {pagination.totalPages} · {pagination.total} leads
+                Page {pagination.page} of {pagination.totalPages} ·{" "}
+                {pagination.total} leads
                 {leadsFetching ? " · updating..." : ""}
               </p>
               <div className="flex items-center gap-2">
@@ -368,7 +388,9 @@ export default function LeadsPage() {
       >
         <DialogContent className="sm:max-w-lg max-h-[86vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{selectedLead?.fullName || "Lead details"}</DialogTitle>
+            <DialogTitle>
+              {selectedLead?.fullName || "Lead details"}
+            </DialogTitle>
             <DialogDescription>
               Submitted via {selectedLead?.formName} on{" "}
               {selectedLead ? formatDateTime(selectedLead.createdTime) : ""}
@@ -379,17 +401,24 @@ export default function LeadsPage() {
             <div className="space-y-4">
               <div className="rounded-xl border border-border divide-y divide-border/60">
                 {Object.entries(selectedLead.fieldData).map(([key, value]) => (
-                  <div key={key} className="flex items-start justify-between gap-3 px-4 py-2.5 text-sm">
+                  <div
+                    key={key}
+                    className="flex items-start justify-between gap-3 px-4 py-2.5 text-sm"
+                  >
                     <span className="text-muted-foreground capitalize">
                       {key.replace(/_/g, " ")}
                     </span>
-                    <span className="font-medium text-foreground text-right">{value || "—"}</span>
+                    <span className="font-medium text-foreground text-right">
+                      {value || "—"}
+                    </span>
                   </div>
                 ))}
               </div>
 
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1.5">Status</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1.5">
+                  Status
+                </p>
                 <Select
                   value={selectedLead.status}
                   onValueChange={(value) =>

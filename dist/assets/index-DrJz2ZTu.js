@@ -71061,6 +71061,7 @@ const formatDateTime = (value) => new Date(value).toLocaleString(void 0, {
 });
 const SKELETON_ROW_KEYS = ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5", "sk-6"];
 function LeadsPage() {
+  var _a2;
   const queryClient2 = useQueryClient();
   const [search, setSearch] = reactExports.useState("");
   const [debouncedSearch, setDebouncedSearch] = reactExports.useState("");
@@ -71103,7 +71104,10 @@ function LeadsPage() {
     onError: () => ue.error("Failed to sync leads. Please try again.")
   });
   const updateMutation = useMutation({
-    mutationFn: ({ leadId, payload }) => updateMetaLeadApi(leadId, payload),
+    mutationFn: ({
+      leadId,
+      payload
+    }) => updateMetaLeadApi(leadId, payload),
     onSuccess: (result) => {
       ue.success("Lead updated");
       setSelectedLead(result.lead);
@@ -71138,11 +71142,18 @@ function LeadsPage() {
         )
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4 mb-4 sm:mb-6", children: leadsLoading ? SKELETON_ROW_KEYS.slice(0, 5).map((k2) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "rounded-2xl shadow-card border border-border", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-5 space-y-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-xl" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20 rounded" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-14 rounded" })
-    ] }) }, k2)) : STATUS_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4 mb-4 sm:mb-6", children: leadsLoading ? SKELETON_ROW_KEYS.slice(0, 5).map((k2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Card,
+      {
+        className: "rounded-2xl shadow-card border border-border",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-5 space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-11 rounded-xl" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20 rounded" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-7 w-14 rounded" })
+        ] })
+      },
+      k2
+    )) : STATUS_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       StatCard,
       {
         icon: UserRound,
@@ -71175,7 +71186,7 @@ function LeadsPage() {
             setPage(1);
           },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full lg:w-56 rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "All forms" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full lg:w-56 rounded-xl", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block flex-1 truncate text-left", children: formId === "all" ? "All forms" : (_a2 = forms.find((f2) => f2.formId === formId)) == null ? void 0 : _a2.formName }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "all", children: "All forms" }),
               forms.map((form) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: form.formId, children: form.formName }, form.formId))
@@ -71203,14 +71214,16 @@ function LeadsPage() {
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "shadow-card border border-border rounded-2xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-0", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border bg-muted", children: ["Lead", "Contact", "Form", "Received", "Status"].map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "th",
-          {
-            className: "text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap",
-            children: col
-          },
-          col
-        )) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border bg-muted", children: ["Lead", "Contact", "Form", "Received", "Status"].map(
+          (col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "th",
+            {
+              className: "text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide py-3 px-5 whitespace-nowrap",
+              children: col
+            },
+            col
+          )
+        ) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: leadsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: ["a", "b", "c", "d", "e"].map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, rk)) : leads.length > 0 ? leads.map((lead) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "tr",
           {
@@ -71240,7 +71253,14 @@ function LeadsPage() {
             ]
           },
           lead._id
-        )) : /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 5, className: "px-5 py-8 text-sm text-muted-foreground text-center", children: "No leads found. Try syncing or adjusting filters." }) }) })
+        )) : /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "td",
+          {
+            colSpan: 5,
+            className: "px-5 py-8 text-sm text-muted-foreground text-center",
+            children: "No leads found. Try syncing or adjusting filters."
+          }
+        ) }) })
       ] }) }),
       pagination && pagination.totalPages > 1 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between px-5 py-3 border-t border-border", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
@@ -71248,7 +71268,8 @@ function LeadsPage() {
           pagination.page,
           " of ",
           pagination.totalPages,
-          " · ",
+          " ·",
+          " ",
           pagination.total,
           " leads",
           leadsFetching ? " · updating..." : ""
@@ -71298,10 +71319,17 @@ function LeadsPage() {
             ] })
           ] }),
           selectedLead ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl border border-border divide-y divide-border/60", children: Object.entries(selectedLead.fieldData).map(([key, value]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3 px-4 py-2.5 text-sm", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground capitalize", children: key.replace(/_/g, " ") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-foreground text-right", children: value || "—" })
-            ] }, key)) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl border border-border divide-y divide-border/60", children: Object.entries(selectedLead.fieldData).map(([key, value]) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "flex items-start justify-between gap-3 px-4 py-2.5 text-sm",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground capitalize", children: key.replace(/_/g, " ") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-foreground text-right", children: value || "—" })
+                ]
+              },
+              key
+            )) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-medium text-muted-foreground mb-1.5", children: "Status" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs(
