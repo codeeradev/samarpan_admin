@@ -52,6 +52,7 @@ const STATUS_OPTIONS: { value: MetaLeadStatus; label: string }[] = [
 ];
 
 const STATUS_BADGE_CLASS: Record<MetaLeadStatus, string> = {
+  CREATED: "bg-blue-100 text-blue-700 border-blue-300",
   new: "bg-primary/10 text-primary border-primary/20",
   contacted: "bg-chart-2/10 text-chart-2 border-chart-2/20",
   qualified: "bg-chart-1/10 text-chart-1 border-chart-1/20",
@@ -150,6 +151,10 @@ export default function LeadsPage() {
   const leads = leadsData?.leads ?? [];
   const pagination = leadsData?.pagination;
   const statusCounts = leadsData?.statusCounts ?? {};
+  const normalizedStatusCounts = {
+    ...statusCounts,
+    new: (statusCounts.new ?? 0) + (statusCounts.CREATED ?? 0),
+  };
   const forms = formsData?.forms ?? [];
 
   return (
@@ -198,7 +203,9 @@ export default function LeadsPage() {
                 key={option.value}
                 icon={UserRound}
                 label={option.label}
-                value={(statusCounts[option.value] ?? 0).toLocaleString()}
+                value={(
+                  normalizedStatusCounts[option.value] ?? 0
+                ).toLocaleString()}
                 subtitle="leads"
                 color="gold"
               />
@@ -296,43 +303,101 @@ export default function LeadsPage() {
                     </tr>
                   ))
                 ) : leads.length > 0 ? (
-                  leads.map((lead) => (
-                    <tr
-                      key={lead._id}
-                      className="border-b border-border/60 hover:bg-muted transition-colors cursor-pointer"
-                      onClick={() => setSelectedLead(lead)}
-                    >
-                      <td className="px-5 py-3 font-medium text-foreground whitespace-nowrap">
-                        {lead.fullName || "—"}
-                      </td>
-                      <td className="px-5 py-3 text-muted-foreground">
-                        <div className="flex flex-col gap-0.5">
-                          {lead.email ? (
-                            <span className="flex items-center gap-1.5 text-xs">
-                              <Mail size={12} /> {lead.email}
-                            </span>
-                          ) : null}
-                          {lead.phoneNumber ? (
-                            <span className="flex items-center gap-1.5 text-xs">
-                              <Phone size={12} /> {lead.phoneNumber}
-                            </span>
-                          ) : null}
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 text-muted-foreground max-w-[200px] truncate">
-                        {lead.formName}
-                      </td>
-                      <td className="px-5 py-3 text-muted-foreground whitespace-nowrap text-xs">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar size={12} />{" "}
-                          {formatDateTime(lead.createdTime)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3">
-                        <LeadStatusBadge status={lead.status} />
-                      </td>
-                    </tr>
-                  ))
+                  leads.map((lead) => {
+                    const currentStatus =
+                      lead.status === "CREATED"
+                        ? "new"
+                        : (lead.status as MetaLeadStatus);
+
+                    return (
+                      <tr
+                        key={lead._id}
+                        className="border-b border-border/60 hover:bg-muted transition-colors cursor-pointer"
+                        onClick={() => setSelectedLead(lead)}
+                      >
+                        <td className="px-5 py-3 font-medium text-foreground whitespace-nowrap">
+                          {lead.fullName || "—"}
+                        </td>
+                        <td className="px-5 py-3 text-muted-foreground">
+                          <div className="flex flex-col gap-0.5">
+                            {lead.email ? (
+                              <span className="flex items-center gap-1.5 text-xs">
+                                <Mail size={12} /> {lead.email}
+                              </span>
+                            ) : null}
+                            {lead.phoneNumber ? (
+                              <span className="flex items-center gap-1.5 text-xs">
+                                <Phone size={12} /> {lead.phoneNumber}
+                              </span>
+                            ) : null}
+                          </div>
+                        </td>
+                        <td className="px-5 py-3 text-muted-foreground max-w-[200px] truncate">
+                          {lead.formName}
+                        </td>
+                        <td className="px-5 py-3 text-muted-foreground whitespace-nowrap text-xs">
+                          <span className="flex items-center gap-1.5">
+                            <Calendar size={12} />{" "}
+                            {formatDateTime(lead.createdTime)}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3">
+                          <Select
+                            value={
+                              lead.status === "CREATED" ? "new" : lead.status
+                            }
+                            onValueChange={(value) =>
+                              updateMutation.mutate({
+                                leadId: lead._id,
+                                payload: {
+                                  status: value as MetaLeadStatus,
+                                },
+                              })
+                            }
+                            disabled={updateMutation.isPending}
+                          >
+                            <SelectTrigger
+                              className={`w-[170px] rounded-full h-9 ${
+                                STATUS_BADGE_CLASS[
+                                  (lead.status === "CREATED"
+                                    ? "new"
+                                    : lead.status) as MetaLeadStatus
+                                ]
+                              }`}
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                              {STATUS_OPTIONS.map((option) => (
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={`h-2 w-2 rounded-full ${
+                                        option.value === "new"
+                                          ? "bg-blue-500"
+                                          : option.value === "contacted"
+                                            ? "bg-yellow-500"
+                                            : option.value === "qualified"
+                                              ? "bg-purple-500"
+                                              : option.value === "converted"
+                                                ? "bg-green-500"
+                                                : "bg-gray-500"
+                                      }`}
+                                    />
+                                    {option.label}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td

@@ -71035,23 +71035,13 @@ const STATUS_OPTIONS = [
   { value: "closed", label: "Closed" }
 ];
 const STATUS_BADGE_CLASS = {
+  CREATED: "bg-blue-100 text-blue-700 border-blue-300",
   new: "bg-primary/10 text-primary border-primary/20",
   contacted: "bg-chart-2/10 text-chart-2 border-chart-2/20",
   qualified: "bg-chart-1/10 text-chart-1 border-chart-1/20",
   converted: "bg-green-600/10 text-green-600 border-green-600/20",
   closed: "bg-muted text-muted-foreground border-border"
 };
-function LeadStatusBadge({ status }) {
-  const option = STATUS_OPTIONS.find((s2) => s2.value === status);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Badge,
-    {
-      variant: "outline",
-      className: `rounded-full font-medium ${STATUS_BADGE_CLASS[status]}`,
-      children: (option == null ? void 0 : option.label) ?? status
-    }
-  );
-}
 const formatDateTime = (value) => new Date(value).toLocaleString(void 0, {
   day: "2-digit",
   month: "short",
@@ -71118,6 +71108,10 @@ function LeadsPage() {
   const leads = (leadsData == null ? void 0 : leadsData.leads) ?? [];
   const pagination = leadsData == null ? void 0 : leadsData.pagination;
   const statusCounts = (leadsData == null ? void 0 : leadsData.statusCounts) ?? {};
+  const normalizedStatusCounts = {
+    ...statusCounts,
+    new: (statusCounts.new ?? 0) + (statusCounts.CREATED ?? 0)
+  };
   const forms = (formsData == null ? void 0 : formsData.forms) ?? [];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "leads.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -71158,7 +71152,7 @@ function LeadsPage() {
       {
         icon: UserRound,
         label: option.label,
-        value: (statusCounts[option.value] ?? 0).toLocaleString(),
+        value: (normalizedStatusCounts[option.value] ?? 0).toLocaleString(),
         subtitle: "leads",
         color: "gold"
       },
@@ -71224,36 +71218,76 @@ function LeadsPage() {
             col
           )
         ) }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: leadsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: ["a", "b", "c", "d", "e"].map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, rk)) : leads.length > 0 ? leads.map((lead) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "tr",
-          {
-            className: "border-b border-border/60 hover:bg-muted transition-colors cursor-pointer",
-            onClick: () => setSelectedLead(lead),
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground whitespace-nowrap", children: lead.fullName || "—" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5", children: [
-                lead.email ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5 text-xs", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { size: 12 }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: leadsLoading ? SKELETON_ROW_KEYS.map((rk) => /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "border-b border-border/60", children: ["a", "b", "c", "d", "e"].map((ck) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-3/4 rounded" }) }, ck)) }, rk)) : leads.length > 0 ? leads.map((lead) => {
+          lead.status === "CREATED" ? "new" : lead.status;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "tr",
+            {
+              className: "border-b border-border/60 hover:bg-muted transition-colors cursor-pointer",
+              onClick: () => setSelectedLead(lead),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground whitespace-nowrap", children: lead.fullName || "—" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5", children: [
+                  lead.email ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5 text-xs", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { size: 12 }),
+                    " ",
+                    lead.email
+                  ] }) : null,
+                  lead.phoneNumber ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5 text-xs", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { size: 12 }),
+                    " ",
+                    lead.phoneNumber
+                  ] }) : null
+                ] }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground max-w-[200px] truncate", children: lead.formName }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap text-xs", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { size: 12 }),
                   " ",
-                  lead.email
-                ] }) : null,
-                lead.phoneNumber ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5 text-xs", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { size: 12 }),
-                  " ",
-                  lead.phoneNumber
-                ] }) : null
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground max-w-[200px] truncate", children: lead.formName }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap text-xs", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { size: 12 }),
-                " ",
-                formatDateTime(lead.createdTime)
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LeadStatusBadge, { status: lead.status }) })
-            ]
-          },
-          lead._id
-        )) : /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  formatDateTime(lead.createdTime)
+                ] }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    value: lead.status === "CREATED" ? "new" : lead.status,
+                    onValueChange: (value) => updateMutation.mutate({
+                      leadId: lead._id,
+                      payload: {
+                        status: value
+                      }
+                    }),
+                    disabled: updateMutation.isPending,
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        SelectTrigger,
+                        {
+                          className: `w-[170px] rounded-full h-9 ${STATUS_BADGE_CLASS[lead.status === "CREATED" ? "new" : lead.status]}`,
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {})
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: STATUS_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        SelectItem,
+                        {
+                          value: option.value,
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "span",
+                              {
+                                className: `h-2 w-2 rounded-full ${option.value === "new" ? "bg-blue-500" : option.value === "contacted" ? "bg-yellow-500" : option.value === "qualified" ? "bg-purple-500" : option.value === "converted" ? "bg-green-500" : "bg-gray-500"}`
+                              }
+                            ),
+                            option.label
+                          ] })
+                        },
+                        option.value
+                      )) })
+                    ]
+                  }
+                ) })
+              ]
+            },
+            lead._id
+          );
+        }) : /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           "td",
           {
             colSpan: 5,

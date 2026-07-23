@@ -215,7 +215,7 @@ export interface MetaLeadForm {
   leadsCount: number;
 }
 
-export type MetaLeadStatus = "new" | "contacted" | "qualified" | "converted" | "closed";
+export type MetaLeadStatus = "new" | "contacted" | "qualified" | "converted" | "closed" | "CREATED";
 
 export interface MetaLead {
   _id: string;
