@@ -109,21 +109,10 @@ function validateBlogForm(
 
   if (!form.shortDescription.trim()) {
     errors.shortDescription = "Short description is required.";
-  } else if (form.shortDescription.trim().length > 300) {
-    errors.shortDescription = "Short description cannot exceed 300 characters.";
   }
 
   if (!form.content) {
     errors.content = "Content is required.";
-  }
-
-  if (form.metaTitle.trim().length > 60) {
-    errors.metaTitle = "Meta title should stay within 60 characters.";
-  }
-
-  if (form.metaDescription.trim().length > 160) {
-    errors.metaDescription =
-      "Meta description should stay within 160 characters.";
   }
 
   if (mode === "add" && !form.image) {
@@ -608,7 +597,6 @@ export default function BlogsPage() {
                     onChange={(e) =>
                       setField("shortDescription", e.target.value)
                     }
-                    maxLength={300}
                     className={
                       formErrors.shortDescription
                         ? "border-destructive focus-visible:ring-destructive"
@@ -626,7 +614,7 @@ export default function BlogsPage() {
                       </p>
                     )}
                     <span className="text-muted-foreground">
-                      {form.shortDescription.length}/300
+                      {form.shortDescription.length} characters
                     </span>
                   </div>
                 </div>
@@ -654,7 +642,6 @@ export default function BlogsPage() {
                   placeholder="Meta Title"
                   value={form.metaTitle}
                   onChange={(e) => setField("metaTitle", e.target.value)}
-                  maxLength={60}
                   className={
                     formErrors.metaTitle
                       ? "border-destructive focus-visible:ring-destructive"
@@ -670,7 +657,7 @@ export default function BlogsPage() {
                     </p>
                   )}
                   <span className="text-muted-foreground">
-                    {form.metaTitle.length}/60
+                    {form.metaTitle.length} characters
                   </span>
                 </div>
 
@@ -678,7 +665,6 @@ export default function BlogsPage() {
                   placeholder="Meta Description"
                   value={form.metaDescription}
                   onChange={(e) => setField("metaDescription", e.target.value)}
-                  maxLength={160}
                   className={
                     formErrors.metaDescription
                       ? "border-destructive focus-visible:ring-destructive"
@@ -696,7 +682,7 @@ export default function BlogsPage() {
                     </p>
                   )}
                   <span className="text-muted-foreground">
-                    {form.metaDescription.length}/160
+                    {form.shortDescription.length} characters
                   </span>
                 </div>
 

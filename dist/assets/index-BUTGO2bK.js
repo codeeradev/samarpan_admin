@@ -83693,17 +83693,9 @@ function validateBlogForm(form, mode) {
   }
   if (!form.shortDescription.trim()) {
     errors.shortDescription = "Short description is required.";
-  } else if (form.shortDescription.trim().length > 300) {
-    errors.shortDescription = "Short description cannot exceed 300 characters.";
   }
   if (!form.content) {
     errors.content = "Content is required.";
-  }
-  if (form.metaTitle.trim().length > 60) {
-    errors.metaTitle = "Meta title should stay within 60 characters.";
-  }
-  if (form.metaDescription.trim().length > 160) {
-    errors.metaDescription = "Meta description should stay within 160 characters.";
   }
   if (mode === "add" && !form.image) {
     errors.image = "Featured image is required.";
@@ -84086,7 +84078,6 @@ function BlogsPage() {
                       placeholder: "Short Description",
                       value: form.shortDescription,
                       onChange: (e3) => setField("shortDescription", e3.target.value),
-                      maxLength: 300,
                       className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
                     }
                   ),
@@ -84094,7 +84085,7 @@ function BlogsPage() {
                     formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for blog cards and listings." }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
                       form.shortDescription.length,
-                      "/300"
+                      " characters"
                     ] })
                   ] })
                 ] }),
@@ -84115,7 +84106,6 @@ function BlogsPage() {
                     placeholder: "Meta Title",
                     value: form.metaTitle,
                     onChange: (e3) => setField("metaTitle", e3.target.value),
-                    maxLength: 60,
                     className: formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : void 0
                   }
                 ),
@@ -84123,7 +84113,7 @@ function BlogsPage() {
                   formErrors.metaTitle ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaTitle }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search engines usually show about 60 characters." }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
                     form.metaTitle.length,
-                    "/60"
+                    " characters"
                   ] })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -84132,15 +84122,14 @@ function BlogsPage() {
                     placeholder: "Meta Description",
                     value: form.metaDescription,
                     onChange: (e3) => setField("metaDescription", e3.target.value),
-                    maxLength: 160,
                     className: formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : void 0
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
                   formErrors.metaDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search snippets usually fit within 160 characters." }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                    form.metaDescription.length,
-                    "/160"
+                    form.shortDescription.length,
+                    " characters"
                   ] })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
