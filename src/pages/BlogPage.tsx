@@ -419,9 +419,9 @@ export default function BlogsPage() {
         description="Manage blog content, SEO, and preview posts."
         action={
           <Button onClick={openAdd} className="rounded-xl gap-2 bg-primary">
-          <Plus className="h-4 w-4" />
-          Add Blog
-        </Button>
+            <Plus className="h-4 w-4" />
+            Add Blog
+          </Button>
         }
       />
 
@@ -446,8 +446,24 @@ export default function BlogsPage() {
             setFormErrors({});
           }
         }}
+        modal={false}
       >
-        <DialogContent className="max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]">
+        <DialogContent
+          className="max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]"
+          onInteractOutside={(e) => {
+            const el = e.target as HTMLElement;
+
+            if (
+              el.closest(".tox-tinymce-aux") ||
+              el.closest(".tox-dialog") ||
+              el.closest(".tox-menu") ||
+              el.closest(".tox-pop") ||
+              document.querySelector(".tox-dialog")
+            ) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>
               {mode === "edit" ? "Edit Blog" : "Create Blog"}
@@ -472,261 +488,273 @@ export default function BlogsPage() {
               </TabsList>
 
               <TabsContent value="basic" className="mt-0">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <h3 className="font-semibold">Basic Info</h3>
+                <Card>
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="font-semibold">Basic Info</h3>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>
-                      Title <span className="text-destructive">*</span>
-                    </Label>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label>
+                          Title <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          value={form.title}
+                          onChange={(e) => setField("title", e.target.value)}
+                          className={
+                            formErrors.title
+                              ? "border-destructive focus-visible:ring-destructive"
+                              : undefined
+                          }
+                        />
+                        {formErrors.title ? (
+                          <p className="text-xs text-destructive">
+                            {formErrors.title}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>
+                          Service <span className="text-destructive">*</span>
+                        </Label>
+                        <Select
+                          value={form.serviceId}
+                          onValueChange={(v) => setField("serviceId", v)}
+                        >
+                          <SelectTrigger
+                            className={
+                              formErrors.serviceId
+                                ? "border-destructive focus-visible:ring-destructive"
+                                : undefined
+                            }
+                          >
+                            <SelectValue placeholder="Select Service" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {services.map((s) => (
+                              <SelectItem key={s._id} value={s._id}>
+                                {s.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {formErrors.serviceId ? (
+                          <p className="text-xs text-destructive">
+                            {formErrors.serviceId}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>
+                          Blog Category{" "}
+                          <span className="text-destructive">*</span>
+                        </Label>
+                        <Select
+                          value={form.blogCategoryId}
+                          onValueChange={(v) => setField("blogCategoryId", v)}
+                        >
+                          <SelectTrigger
+                            className={
+                              formErrors.blogCategoryId
+                                ? "border-destructive focus-visible:ring-destructive"
+                                : undefined
+                            }
+                          >
+                            <SelectValue placeholder="Select Blog Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories
+                              .filter((category) => category.isActive !== false)
+                              .map((category) => (
+                                <SelectItem
+                                  key={category._id}
+                                  value={category._id}
+                                >
+                                  {category.title}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        {formErrors.blogCategoryId ? (
+                          <p className="text-xs text-destructive">
+                            {formErrors.blogCategoryId}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Status</Label>
+                        <Select
+                          value={form.status}
+                          onValueChange={(v) =>
+                            setField("status", v as "draft" | "published")
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="published">Published</SelectItem>
+                            <SelectItem value="draft">Draft</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="content" className="mt-0">
+                <Card>
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="font-semibold">Content</h3>
+
+                    <div className="space-y-2">
+                      <Textarea
+                        placeholder="Short Description"
+                        value={form.shortDescription}
+                        onChange={(e) =>
+                          setField("shortDescription", e.target.value)
+                        }
+                        className={
+                          formErrors.shortDescription
+                            ? "border-destructive focus-visible:ring-destructive"
+                            : undefined
+                        }
+                      />
+                      <div className="flex items-center justify-between gap-3 text-xs">
+                        {formErrors.shortDescription ? (
+                          <p className="text-destructive">
+                            {formErrors.shortDescription}
+                          </p>
+                        ) : (
+                          <p className="text-muted-foreground">
+                            Keep this concise for blog cards and listings.
+                          </p>
+                        )}
+                        <span className="text-muted-foreground">
+                          {form.shortDescription.length} characters
+                        </span>
+                      </div>
+                    </div>
+
+                    <PageEditor
+                      value={form.content}
+                      onChange={(val) => setField("content", val)}
+                      // className={formErrors.content ? "border-destructive focus-visible:ring-destructive" : undefined}
+                    />
+                    {formErrors.content ? (
+                      <p className="text-xs text-destructive">
+                        {formErrors.content}
+                      </p>
+                    ) : null}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="seo" className="mt-0">
+                <Card>
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="font-semibold">SEO</h3>
+
                     <Input
-                      value={form.title}
-                      onChange={(e) => setField("title", e.target.value)}
+                      placeholder="Meta Title"
+                      value={form.metaTitle}
+                      onChange={(e) => setField("metaTitle", e.target.value)}
                       className={
-                        formErrors.title
+                        formErrors.metaTitle
                           ? "border-destructive focus-visible:ring-destructive"
                           : undefined
                       }
                     />
-                    {formErrors.title ? (
-                      <p className="text-xs text-destructive">
-                        {formErrors.title}
-                      </p>
-                    ) : null}
-                  </div>
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      {formErrors.metaTitle ? (
+                        <p className="text-destructive">
+                          {formErrors.metaTitle}
+                        </p>
+                      ) : (
+                        <p className="text-muted-foreground">
+                          Search engines usually show about 60 characters.
+                        </p>
+                      )}
+                      <span className="text-muted-foreground">
+                        {form.metaTitle.length} characters
+                      </span>
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label>
-                      Service <span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={form.serviceId}
-                      onValueChange={(v) => setField("serviceId", v)}
-                    >
-                      <SelectTrigger
-                        className={
-                          formErrors.serviceId
-                            ? "border-destructive focus-visible:ring-destructive"
-                            : undefined
-                        }
-                      >
-                        <SelectValue placeholder="Select Service" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {services.map((s) => (
-                          <SelectItem key={s._id} value={s._id}>
-                            {s.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {formErrors.serviceId ? (
-                      <p className="text-xs text-destructive">
-                        {formErrors.serviceId}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>
-                      Blog Category <span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={form.blogCategoryId}
-                      onValueChange={(v) => setField("blogCategoryId", v)}
-                    >
-                      <SelectTrigger
-                        className={
-                          formErrors.blogCategoryId
-                            ? "border-destructive focus-visible:ring-destructive"
-                            : undefined
-                        }
-                      >
-                        <SelectValue placeholder="Select Blog Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories
-                          .filter((category) => category.isActive !== false)
-                          .map((category) => (
-                            <SelectItem key={category._id} value={category._id}>
-                              {category.title}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    {formErrors.blogCategoryId ? (
-                      <p className="text-xs text-destructive">
-                        {formErrors.blogCategoryId}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Status</Label>
-                    <Select
-                      value={form.status}
-                      onValueChange={(v) =>
-                        setField("status", v as "draft" | "published")
+                    <Textarea
+                      placeholder="Meta Description"
+                      value={form.metaDescription}
+                      onChange={(e) =>
+                        setField("metaDescription", e.target.value)
                       }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="published">Published</SelectItem>
-                        <SelectItem value="draft">Draft</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-              </TabsContent>
+                      className={
+                        formErrors.metaDescription
+                          ? "border-destructive focus-visible:ring-destructive"
+                          : undefined
+                      }
+                    />
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      {formErrors.metaDescription ? (
+                        <p className="text-destructive">
+                          {formErrors.metaDescription}
+                        </p>
+                      ) : (
+                        <p className="text-muted-foreground">
+                          Search snippets usually fit within 160 characters.
+                        </p>
+                      )}
+                      <span className="text-muted-foreground">
+                        {form.shortDescription.length} characters
+                      </span>
+                    </div>
 
-              <TabsContent value="content" className="mt-0">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <h3 className="font-semibold">Content</h3>
-
-                <div className="space-y-2">
-                  <Textarea
-                    placeholder="Short Description"
-                    value={form.shortDescription}
-                    onChange={(e) =>
-                      setField("shortDescription", e.target.value)
-                    }
-                    className={
-                      formErrors.shortDescription
-                        ? "border-destructive focus-visible:ring-destructive"
-                        : undefined
-                    }
-                  />
-                  <div className="flex items-center justify-between gap-3 text-xs">
-                    {formErrors.shortDescription ? (
-                      <p className="text-destructive">
-                        {formErrors.shortDescription}
-                      </p>
-                    ) : (
-                      <p className="text-muted-foreground">
-                        Keep this concise for blog cards and listings.
-                      </p>
-                    )}
-                    <span className="text-muted-foreground">
-                      {form.shortDescription.length} characters
-                    </span>
-                  </div>
-                </div>
-
-                <PageEditor
-                  value={form.content}
-                  onChange={(val) => setField("content", val)}
-                  // className={formErrors.content ? "border-destructive focus-visible:ring-destructive" : undefined}
-                />
-                {formErrors.content ? (
-                  <p className="text-xs text-destructive">
-                    {formErrors.content}
-                  </p>
-                ) : null}
-              </CardContent>
-            </Card>
-              </TabsContent>
-
-              <TabsContent value="seo" className="mt-0">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <h3 className="font-semibold">SEO</h3>
-
-                <Input
-                  placeholder="Meta Title"
-                  value={form.metaTitle}
-                  onChange={(e) => setField("metaTitle", e.target.value)}
-                  className={
-                    formErrors.metaTitle
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : undefined
-                  }
-                />
-                <div className="flex items-center justify-between gap-3 text-xs">
-                  {formErrors.metaTitle ? (
-                    <p className="text-destructive">{formErrors.metaTitle}</p>
-                  ) : (
-                    <p className="text-muted-foreground">
-                      Search engines usually show about 60 characters.
-                    </p>
-                  )}
-                  <span className="text-muted-foreground">
-                    {form.metaTitle.length} characters
-                  </span>
-                </div>
-
-                <Textarea
-                  placeholder="Meta Description"
-                  value={form.metaDescription}
-                  onChange={(e) => setField("metaDescription", e.target.value)}
-                  className={
-                    formErrors.metaDescription
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : undefined
-                  }
-                />
-                <div className="flex items-center justify-between gap-3 text-xs">
-                  {formErrors.metaDescription ? (
-                    <p className="text-destructive">
-                      {formErrors.metaDescription}
-                    </p>
-                  ) : (
-                    <p className="text-muted-foreground">
-                      Search snippets usually fit within 160 characters.
-                    </p>
-                  )}
-                  <span className="text-muted-foreground">
-                    {form.shortDescription.length} characters
-                  </span>
-                </div>
-
-                <Input
-                  placeholder="Keywords (comma separated)"
-                  value={form.keywords}
-                  onChange={(e) => setField("keywords", e.target.value)}
-                />
-              </CardContent>
-            </Card>
+                    <Input
+                      placeholder="Keywords (comma separated)"
+                      value={form.keywords}
+                      onChange={(e) => setField("keywords", e.target.value)}
+                    />
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="image" className="mt-0">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <h3 className="font-semibold">Featured Image</h3>
+                <Card>
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="font-semibold">Featured Image</h3>
 
-                {imagePreview && (
-                  <img
-                    src={imagePreview}
-                    alt="Blog preview"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                )}
+                    {imagePreview && (
+                      <img
+                        src={imagePreview}
+                        alt="Blog preview"
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    )}
 
-                <label className="flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted">
-                  <Upload size={16} />
-                  <span className="text-sm">Upload Image (1215 × 576)</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={(e) => handleImage(e.target.files?.[0] || null)}
-                  />
-                </label>
-                {formErrors.image ? (
-                  <p className="text-xs text-destructive">{formErrors.image}</p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    Upload a featured image for new blog posts.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                    <label className="flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted">
+                      <Upload size={16} />
+                      <span className="text-sm">Upload Image (1215 × 576)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={(e) =>
+                          handleImage(e.target.files?.[0] || null)
+                        }
+                      />
+                    </label>
+                    {formErrors.image ? (
+                      <p className="text-xs text-destructive">
+                        {formErrors.image}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Upload a featured image for new blog posts.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
 
@@ -800,7 +828,6 @@ export default function BlogsPage() {
         }}
         onCancel={() => setDeleteTarget(null)}
       />
-
     </div>
   );
 }

@@ -83974,205 +83974,226 @@ function BlogsPage() {
             setFormErrors({});
           }
         },
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: mode === "edit" ? "Edit Blog" : "Create Blog" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "content", className: "flex-1", children: "Content" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "image", className: "flex-1", children: "Image" })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "basic", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                      "Title ",
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+        modal: false,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          DialogContent,
+          {
+            className: "max-w-3xl rounded-3xl overflow-y-auto !max-w-[50vw] max-h-[90vh]",
+            onInteractOutside: (e3) => {
+              const el = e3.target;
+              if (el.closest(".tox-tinymce-aux") || el.closest(".tox-dialog") || el.closest(".tox-menu") || el.closest(".tox-pop") || document.querySelector(".tox-dialog")) {
+                e3.preventDefault();
+              }
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: mode === "edit" ? "Edit Blog" : "Create Blog" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "basic", className: "w-full", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "content", className: "flex-1", children: "Content" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "image", className: "flex-1", children: "Image" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "basic", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Basic Info" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                          "Title ",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          Input,
+                          {
+                            value: form.title,
+                            onChange: (e3) => setField("title", e3.target.value),
+                            className: formErrors.title ? "border-destructive focus-visible:ring-destructive" : void 0
+                          }
+                        ),
+                        formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                          "Service ",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Select,
+                          {
+                            value: form.serviceId,
+                            onValueChange: (v2) => setField("serviceId", v2),
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                SelectTrigger,
+                                {
+                                  className: formErrors.serviceId ? "border-destructive focus-visible:ring-destructive" : void 0,
+                                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Service" })
+                                }
+                              ),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: s2._id, children: s2.title }, s2._id)) })
+                            ]
+                          }
+                        ),
+                        formErrors.serviceId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.serviceId }) : null
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
+                          "Blog Category",
+                          " ",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Select,
+                          {
+                            value: form.blogCategoryId,
+                            onValueChange: (v2) => setField("blogCategoryId", v2),
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                SelectTrigger,
+                                {
+                                  className: formErrors.blogCategoryId ? "border-destructive focus-visible:ring-destructive" : void 0,
+                                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Blog Category" })
+                                }
+                              ),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: categories.filter((category) => category.isActive !== false).map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                SelectItem,
+                                {
+                                  value: category._id,
+                                  children: category.title
+                                },
+                                category._id
+                              )) })
+                            ]
+                          }
+                        ),
+                        formErrors.blogCategoryId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.blogCategoryId }) : null
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Select,
+                          {
+                            value: form.status,
+                            onValueChange: (v2) => setField("status", v2),
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "published", children: "Published" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
+                              ] })
+                            ]
+                          }
+                        )
+                      ] })
+                    ] })
+                  ] }) }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "content", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Textarea,
+                        {
+                          placeholder: "Short Description",
+                          value: form.shortDescription,
+                          onChange: (e3) => setField("shortDescription", e3.target.value),
+                          className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
+                        formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for blog cards and listings." }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                          form.shortDescription.length,
+                          " characters"
+                        ] })
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      PageEditor,
+                      {
+                        value: form.content,
+                        onChange: (val) => setField("content", val)
+                      }
+                    ),
+                    formErrors.content ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.content }) : null
+                  ] }) }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "seo", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        placeholder: "Meta Title",
+                        value: form.metaTitle,
+                        onChange: (e3) => setField("metaTitle", e3.target.value),
+                        className: formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : void 0
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
+                      formErrors.metaTitle ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaTitle }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search engines usually show about 60 characters." }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                        form.metaTitle.length,
+                        " characters"
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Textarea,
+                      {
+                        placeholder: "Meta Description",
+                        value: form.metaDescription,
+                        onChange: (e3) => setField("metaDescription", e3.target.value),
+                        className: formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : void 0
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
+                      formErrors.metaDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search snippets usually fit within 160 characters." }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
+                        form.shortDescription.length,
+                        " characters"
+                      ] })
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(
                       Input,
                       {
-                        value: form.title,
-                        onChange: (e3) => setField("title", e3.target.value),
-                        className: formErrors.title ? "border-destructive focus-visible:ring-destructive" : void 0
-                      }
-                    ),
-                    formErrors.title ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.title }) : null
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                      "Service ",
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      Select,
-                      {
-                        value: form.serviceId,
-                        onValueChange: (v2) => setField("serviceId", v2),
-                        children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            SelectTrigger,
-                            {
-                              className: formErrors.serviceId ? "border-destructive focus-visible:ring-destructive" : void 0,
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Service" })
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: services.map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: s2._id, children: s2.title }, s2._id)) })
-                        ]
-                      }
-                    ),
-                    formErrors.serviceId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.serviceId }) : null
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { children: [
-                      "Blog Category ",
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-destructive", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      Select,
-                      {
-                        value: form.blogCategoryId,
-                        onValueChange: (v2) => setField("blogCategoryId", v2),
-                        children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            SelectTrigger,
-                            {
-                              className: formErrors.blogCategoryId ? "border-destructive focus-visible:ring-destructive" : void 0,
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select Blog Category" })
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: categories.filter((category) => category.isActive !== false).map((category) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: category._id, children: category.title }, category._id)) })
-                        ]
-                      }
-                    ),
-                    formErrors.blogCategoryId ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.blogCategoryId }) : null
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      Select,
-                      {
-                        value: form.status,
-                        onValueChange: (v2) => setField("status", v2),
-                        children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "published", children: "Published" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "draft", children: "Draft" })
-                          ] })
-                        ]
+                        placeholder: "Keywords (comma separated)",
+                        value: form.keywords,
+                        onChange: (e3) => setField("keywords", e3.target.value)
                       }
                     )
-                  ] })
-                ] })
-              ] }) }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "content", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Content" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Textarea,
-                    {
-                      placeholder: "Short Description",
-                      value: form.shortDescription,
-                      onChange: (e3) => setField("shortDescription", e3.target.value),
-                      className: formErrors.shortDescription ? "border-destructive focus-visible:ring-destructive" : void 0
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
-                    formErrors.shortDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.shortDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Keep this concise for blog cards and listings." }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                      form.shortDescription.length,
-                      " characters"
-                    ] })
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  PageEditor,
-                  {
-                    value: form.content,
-                    onChange: (val) => setField("content", val)
-                  }
-                ),
-                formErrors.content ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.content }) : null
-              ] }) }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "seo", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "SEO" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    placeholder: "Meta Title",
-                    value: form.metaTitle,
-                    onChange: (e3) => setField("metaTitle", e3.target.value),
-                    className: formErrors.metaTitle ? "border-destructive focus-visible:ring-destructive" : void 0
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
-                  formErrors.metaTitle ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaTitle }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search engines usually show about 60 characters." }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                    form.metaTitle.length,
-                    " characters"
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Textarea,
-                  {
-                    placeholder: "Meta Description",
-                    value: form.metaDescription,
-                    onChange: (e3) => setField("metaDescription", e3.target.value),
-                    className: formErrors.metaDescription ? "border-destructive focus-visible:ring-destructive" : void 0
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3 text-xs", children: [
-                  formErrors.metaDescription ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-destructive", children: formErrors.metaDescription }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Search snippets usually fit within 160 characters." }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                    form.shortDescription.length,
-                    " characters"
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    placeholder: "Keywords (comma separated)",
-                    value: form.keywords,
-                    onChange: (e3) => setField("keywords", e3.target.value)
-                  }
-                )
-              ] }) }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "image", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
-                imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "img",
-                  {
-                    src: imagePreview,
-                    alt: "Blog preview",
-                    className: "w-full h-48 object-cover rounded-lg"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image (1215 × 576)" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "file",
-                      accept: "image/*",
-                      hidden: true,
-                      onChange: (e3) => {
-                        var _a2;
-                        return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
+                  ] }) }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "image", className: "mt-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold", children: "Featured Image" }),
+                    imagePreview && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "img",
+                      {
+                        src: imagePreview,
+                        alt: "Blog preview",
+                        className: "w-full h-48 object-cover rounded-lg"
                       }
-                    }
-                  )
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 border rounded-md px-4 py-3 cursor-pointer hover:bg-muted", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { size: 16 }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Upload Image (1215 × 576)" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "file",
+                          accept: "image/*",
+                          hidden: true,
+                          onChange: (e3) => {
+                            var _a2;
+                            return handleImage(((_a2 = e3.target.files) == null ? void 0 : _a2[0]) || null);
+                          }
+                        }
+                      )
+                    ] }),
+                    formErrors.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.image }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: "Upload a featured image for new blog posts." })
+                  ] }) }) })
                 ] }),
-                formErrors.image ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.image }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: "Upload a featured image for new blog posts." })
-              ] }) }) })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full bg-primary", children: mode === "edit" ? "Update Blog" : "Create Blog" })
-          ] })
-        ] })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full bg-primary", children: mode === "edit" ? "Update Blog" : "Create Blog" })
+              ] })
+            ]
+          }
+        )
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
