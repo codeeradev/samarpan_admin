@@ -24,16 +24,20 @@ import {
   EMPTY_ABOUT_FORM,
   EMPTY_HERO_FORM,
   EMPTY_HOW_IT_WORK_FORM,
+  EMPTY_TRUST_COMPLIANCE_FORM,
   EMPTY_WHY_CHOOSE_US_FORM,
   HeroFormState,
   HowItWorksFormState,
   SECTION_META,
   SectionKey,
+  TrustComplianceFormState,
   WhyChooseUsFormState,
   mapContentToAboutForm,
   mapContentToHeroForm,
   mapContentToHowItWorksForm,
+  mapContentToTrustComplianceForm,
   mapContentToWhyChooseUsForm,
+  resolveAssetUrl,
 } from "./website-content/types";
 import {
   AboutPreview,
@@ -42,6 +46,7 @@ import {
   HeroSectionEditor,
   HowItWorksPreview,
   HowItWorksSectionEditor,
+  TrustComplianceSectionEditor,
   WhyChooseUsPreview,
   WhyChooseUsSectionEditor,
 } from "./website-content/SectionEditor";
@@ -58,6 +63,8 @@ export default function WebsiteContentPageImpl() {
     EMPTY_WHY_CHOOSE_US_FORM,
   );
   const [aboutForm, setAboutForm] = useState<AboutFormState>(EMPTY_ABOUT_FORM);
+  const [trustComplianceForm, setTrustComplianceForm] =
+    useState<TrustComplianceFormState>(EMPTY_TRUST_COMPLIANCE_FORM);
   const [previewOpen, setPreviewOpen] = useState(false);
 
   const { data: contentItem, isLoading } = useQuery<ContentItem | null, Error>({
@@ -72,8 +79,12 @@ export default function WebsiteContentPageImpl() {
       setHowItWorksForm(mapContentToHowItWorksForm(contentItem ?? null));
     } else if (selectedSection === "why_choose_us") {
       setWhyChooseUsForm(mapContentToWhyChooseUsForm(contentItem ?? null));
-    } else {
+    } else if (selectedSection === "about") {
       setAboutForm(mapContentToAboutForm(contentItem ?? null));
+    } else {
+      setTrustComplianceForm(
+        mapContentToTrustComplianceForm(contentItem ?? null),
+      );
     }
   }, [contentItem, selectedSection]);
 
@@ -91,8 +102,10 @@ export default function WebsiteContentPageImpl() {
         setHowItWorksForm(mapContentToHowItWorksForm(data));
       } else if (selectedSection === "why_choose_us") {
         setWhyChooseUsForm(mapContentToWhyChooseUsForm(data));
-      } else {
+      } else if (selectedSection === "about") {
         setAboutForm(mapContentToAboutForm(data));
+      } else {
+        setTrustComplianceForm(mapContentToTrustComplianceForm(data));
       }
     },
     onError: (error: Error) => toast.error(error.message),
@@ -138,6 +151,13 @@ export default function WebsiteContentPageImpl() {
     value: AboutFormState[K],
   ) {
     setAboutForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function updateTrustComplianceField<K extends keyof TrustComplianceFormState>(
+    key: K,
+    value: TrustComplianceFormState[K],
+  ) {
+    setTrustComplianceForm((prev) => ({ ...prev, [key]: value }));
   }
 
   function handleSave() {
@@ -262,35 +282,64 @@ export default function WebsiteContentPageImpl() {
       return;
     }
 
-    if (!aboutForm.heading.trim()) {
+    if (selectedSection === "about" && !aboutForm.heading.trim()) {
       toast.error("Section heading is required.");
       return;
     }
 
-    saveMutation.mutate({
-      modelKey: selectedSection,
-      title: SECTION_META[selectedSection].title,
-      isActive: aboutForm.isActive,
-      content: {
-        eyebrowText: aboutForm.eyebrowText.trim(),
-        heading: aboutForm.heading.trim(),
-        subheading: aboutForm.subheading.trim(),
-        description: aboutForm.description.trim(),
-        bulletOne: aboutForm.bulletOne.trim(),
-        bulletTwo: aboutForm.bulletTwo.trim(),
-        bulletThree: aboutForm.bulletThree.trim(),
-        bulletFour: aboutForm.bulletFour.trim(),
-        ctaText: aboutForm.ctaText.trim(),
-        ctaLink: aboutForm.ctaLink.trim(),
-        sectionImage:
-          typeof aboutForm.sectionImage === "string"
-            ? aboutForm.sectionImage
-            : "",
-      },
-      files: {
-        sectionImage: aboutForm.sectionImage,
-      },
-    });
+    if (selectedSection === "about") {
+      saveMutation.mutate({
+        modelKey: selectedSection,
+        title: SECTION_META[selectedSection].title,
+        isActive: aboutForm.isActive,
+        content: {
+          eyebrowText: aboutForm.eyebrowText.trim(),
+          heading: aboutForm.heading.trim(),
+          subheading: aboutForm.subheading.trim(),
+          description: aboutForm.description.trim(),
+          bulletOne: aboutForm.bulletOne.trim(),
+          bulletTwo: aboutForm.bulletTwo.trim(),
+          bulletThree: aboutForm.bulletThree.trim(),
+          bulletFour: aboutForm.bulletFour.trim(),
+          ctaText: aboutForm.ctaText.trim(),
+          ctaLink: aboutForm.ctaLink.trim(),
+          sectionImage:
+            typeof aboutForm.sectionImage === "string"
+              ? aboutForm.sectionImage
+              : "",
+        },
+        files: {
+          sectionImage: aboutForm.sectionImage,
+        },
+      });
+      return;
+    }
+
+    if (selectedSection === "trust_compliance") {
+      saveMutation.mutate({
+        modelKey: selectedSection,
+        title: SECTION_META[selectedSection].title,
+        isActive: trustComplianceForm.isActive,
+        content: {
+          haryanaLogo:
+            typeof trustComplianceForm.haryanaLogo === "string"
+              ? trustComplianceForm.haryanaLogo
+              : "",
+          haryanaDescription: trustComplianceForm.haryanaDescription,
+          nabhLogo:
+            typeof trustComplianceForm.nabhLogo === "string"
+              ? trustComplianceForm.nabhLogo
+              : "",
+          nabhDescription: trustComplianceForm.nabhDescription,
+        },
+        files: {
+          haryanaLogo: trustComplianceForm.haryanaLogo,
+          nabhLogo: trustComplianceForm.nabhLogo,
+        },
+      });
+      return;
+    }
+
   }
 
   return (
@@ -343,6 +392,9 @@ export default function WebsiteContentPageImpl() {
           <TabsTrigger value="about" className="flex-1 rounded-2xl">
             About
           </TabsTrigger>
+          <TabsTrigger value="trust_compliance" className="flex-1 rounded-2xl">
+            Trust & Compliance
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -393,10 +445,15 @@ export default function WebsiteContentPageImpl() {
                 form={whyChooseUsForm}
                 updateField={updateWhyChooseUsField}
               />
-            ) : (
+            ) : selectedSection === "about" ? (
               <AboutSectionEditor
                 form={aboutForm}
                 updateField={updateAboutField}
+              />
+            ) : (
+              <TrustComplianceSectionEditor
+                form={trustComplianceForm}
+                updateField={updateTrustComplianceField}
               />
             )}
           </CardContent>
@@ -416,8 +473,38 @@ export default function WebsiteContentPageImpl() {
             <HowItWorksPreview form={howItWorksForm} />
           ) : selectedSection === "why_choose_us" ? (
             <WhyChooseUsPreview form={whyChooseUsForm} />
-          ) : (
+          ) : selectedSection === "about" ? (
             <AboutPreview form={aboutForm} />
+          ) : (
+            <div className="space-y-5 rounded-[32px] border border-slate-200 bg-white p-8">
+              <p className="text-sm text-slate-500">
+                Trust & Compliance previews
+              </p>
+              <div className="grid gap-5 md:grid-cols-2">
+                {(
+                  [
+                    ["Haryana Government", trustComplianceForm.haryanaLogo],
+                    ["NABH", trustComplianceForm.nabhLogo],
+                  ] as Array<[string, File | string]>
+                ).map(([label, logo]) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-slate-100 p-5"
+                  >
+                    <p className="mb-4 text-sm font-semibold text-slate-800">{label}</p>
+                    {typeof logo === "string" && logo ? (
+                      <img
+                        src={resolveAssetUrl(logo)}
+                        alt={label}
+                        className="h-16 max-w-full object-contain"
+                      />
+                    ) : (
+                      <p className="text-sm text-slate-400">No logo selected</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

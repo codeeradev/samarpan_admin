@@ -19240,7 +19240,7 @@ const typeOfTest = (type) => (thing) => typeof thing === type;
 const { isArray: isArray$f } = Array;
 const isUndefined = typeOfTest("undefined");
 function isBuffer$3(val) {
-  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor) && isFunction$8(val.constructor.isBuffer) && val.constructor.isBuffer(val);
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor) && isFunction$9(val.constructor.isBuffer) && val.constructor.isBuffer(val);
 }
 const isArrayBuffer = kindOfTest("ArrayBuffer");
 function isArrayBufferView(val) {
@@ -19253,7 +19253,7 @@ function isArrayBufferView(val) {
   return result;
 }
 const isString$2 = typeOfTest("string");
-const isFunction$8 = typeOfTest("function");
+const isFunction$9 = typeOfTest("function");
 const isNumber$5 = typeOfTest("number");
 const isObject$a = (thing) => thing !== null && typeof thing === "object";
 const isBoolean$2 = (thing) => thing === true || thing === false;
@@ -19282,7 +19282,7 @@ const isReactNativeBlob = (value) => {
 const isReactNative = (formData) => formData && typeof formData.getParts !== "undefined";
 const isBlob = kindOfTest("Blob");
 const isFileList = kindOfTest("FileList");
-const isStream = (val) => isObject$a(val) && isFunction$8(val.pipe);
+const isStream = (val) => isObject$a(val) && isFunction$9(val.pipe);
 function getGlobal$1() {
   if (typeof globalThis !== "undefined") return globalThis;
   if (typeof self !== "undefined") return self;
@@ -19294,8 +19294,8 @@ const G$2 = getGlobal$1();
 const FormDataCtor = typeof G$2.FormData !== "undefined" ? G$2.FormData : void 0;
 const isFormData = (thing) => {
   let kind;
-  return thing && (FormDataCtor && thing instanceof FormDataCtor || isFunction$8(thing.append) && ((kind = kindOf(thing)) === "formdata" || // detect form-data instance
-  kind === "object" && isFunction$8(thing.toString) && thing.toString() === "[object FormData]"));
+  return thing && (FormDataCtor && thing instanceof FormDataCtor || isFunction$9(thing.append) && ((kind = kindOf(thing)) === "formdata" || // detect form-data instance
+  kind === "object" && isFunction$9(thing.toString) && thing.toString() === "[object FormData]"));
 };
 const isURLSearchParams = kindOfTest("URLSearchParams");
 const [isReadableStream, isRequest, isResponse, isHeaders] = [
@@ -19381,7 +19381,7 @@ const extend$1 = (a2, b2, thisArg, { allOwnKeys } = {}) => {
   forEach(
     b2,
     (val, key) => {
-      if (thisArg && isFunction$8(val)) {
+      if (thisArg && isFunction$9(val)) {
         Object.defineProperty(a2, key, {
           value: bind(val, thisArg),
           writable: true,
@@ -19504,11 +19504,11 @@ const reduceDescriptors = (obj, reducer) => {
 };
 const freezeMethods = (obj) => {
   reduceDescriptors(obj, (descriptor, name) => {
-    if (isFunction$8(obj) && ["arguments", "caller", "callee"].indexOf(name) !== -1) {
+    if (isFunction$9(obj) && ["arguments", "caller", "callee"].indexOf(name) !== -1) {
       return false;
     }
     const value = obj[name];
-    if (!isFunction$8(value)) return;
+    if (!isFunction$9(value)) return;
     descriptor.enumerable = false;
     if ("writable" in descriptor) {
       descriptor.writable = false;
@@ -19537,7 +19537,7 @@ const toFiniteNumber = (value, defaultValue) => {
   return value != null && Number.isFinite(value = +value) ? value : defaultValue;
 };
 function isSpecCompliantForm(thing) {
-  return !!(thing && isFunction$8(thing.append) && thing[toStringTag] === "FormData" && thing[iterator]);
+  return !!(thing && isFunction$9(thing.append) && thing[toStringTag] === "FormData" && thing[iterator]);
 }
 const toJSONObject = (obj) => {
   const stack = new Array(10);
@@ -19565,7 +19565,7 @@ const toJSONObject = (obj) => {
   return visit(obj, 0);
 };
 const isAsyncFn = kindOfTest("AsyncFunction");
-const isThenable = (thing) => thing && (isObject$a(thing) || isFunction$8(thing)) && isFunction$8(thing.then) && isFunction$8(thing.catch);
+const isThenable = (thing) => thing && (isObject$a(thing) || isFunction$9(thing)) && isFunction$9(thing.then) && isFunction$9(thing.catch);
 const _setImmediate = ((setImmediateSupported, postMessageSupported) => {
   if (setImmediateSupported) {
     return setImmediate;
@@ -19585,9 +19585,9 @@ const _setImmediate = ((setImmediateSupported, postMessageSupported) => {
       _global.postMessage(token2, "*");
     };
   })(`axios@${Math.random()}`, []) : (cb) => setTimeout(cb);
-})(typeof setImmediate === "function", isFunction$8(_global.postMessage));
+})(typeof setImmediate === "function", isFunction$9(_global.postMessage));
 const asap = typeof queueMicrotask !== "undefined" ? queueMicrotask.bind(_global) : typeof process !== "undefined" && process.nextTick || _setImmediate;
-const isIterable = (thing) => thing != null && isFunction$8(thing[iterator]);
+const isIterable = (thing) => thing != null && isFunction$9(thing[iterator]);
 const utils$1 = {
   isArray: isArray$f,
   isArrayBuffer,
@@ -19611,7 +19611,7 @@ const utils$1 = {
   isReactNative,
   isBlob,
   isRegExp,
-  isFunction: isFunction$8,
+  isFunction: isFunction$9,
   isStream,
   isURLSearchParams,
   isTypedArray: isTypedArray$3,
@@ -21060,7 +21060,7 @@ const trackStream = (stream, chunkSize, onProgress, onFinish) => {
   );
 };
 const DEFAULT_CHUNK_SIZE = 64 * 1024;
-const { isFunction: isFunction$7 } = utils$1;
+const { isFunction: isFunction$8 } = utils$1;
 const globalFetchAPI = (({ Request, Response: Response2 }) => ({
   Request,
   Response: Response2
@@ -21082,13 +21082,13 @@ const factory = (env) => {
     env
   );
   const { fetch: envFetch, Request, Response: Response2 } = env;
-  const isFetchSupported = envFetch ? isFunction$7(envFetch) : typeof fetch === "function";
-  const isRequestSupported = isFunction$7(Request);
-  const isResponseSupported = isFunction$7(Response2);
+  const isFetchSupported = envFetch ? isFunction$8(envFetch) : typeof fetch === "function";
+  const isRequestSupported = isFunction$8(Request);
+  const isResponseSupported = isFunction$8(Response2);
   if (!isFetchSupported) {
     return false;
   }
-  const isReadableStreamSupported = isFetchSupported && isFunction$7(ReadableStream$1);
+  const isReadableStreamSupported = isFetchSupported && isFunction$8(ReadableStream$1);
   const encodeText = isFetchSupported && (typeof TextEncoder$1 === "function" ? /* @__PURE__ */ ((encoder) => (str) => encoder.encode(str))(new TextEncoder$1()) : async (str) => new Uint8Array(await new Request(str).arrayBuffer()));
   const supportsRequestStream = isRequestSupported && isReadableStreamSupported && test(() => {
     let duplexAccessed = false;
@@ -21871,7 +21871,10 @@ const {
   getAdapter,
   mergeConfig
 } = axios;
-const BASE_URL = "https://api.samarpanhospitalhisar.com/admin";
+const BASE_URL = (
+  // import.meta.env.VITE_API_URL || "https://api.samarpanhospitalhisar.com/admin";
+  "http://localhost:9010/admin"
+);
 const ENDPOINT = {
   LOGIN: "/admin-login",
   ADD_SERVICE: "/add-service",
@@ -21901,6 +21904,10 @@ const ENDPOINT = {
   ADD_GALLERY: "/add-gallery",
   UPDATE_GALLERY: "/update-gallery",
   DELETE_GALLERY: "/delete-gallery",
+  GET_ALL_TPA: "/get-all-tpa",
+  ADD_TPA: "/add-tpa",
+  UPDATE_TPA: "/update-tpa",
+  DELETE_TPA: "/delete-tpa",
   GET_ALL_CAREERS: "/get-all-careers",
   ADD_CAREER: "/add-career",
   UPDATE_CAREER: "/update-career",
@@ -22122,6 +22129,8 @@ const PERMISSION_LABELS = {
   view_blogs: "View blogs",
   manage_gallery: "Manage gallery",
   view_gallery: "View gallery",
+  manage_tpa: "Manage TPA",
+  view_tpa: "View TPA",
   view_settings: "View settings",
   manage_settings: "Manage settings",
   view_admin_staff: "View admin staff",
@@ -22176,6 +22185,11 @@ const PERMISSION_GROUPS = [
     permissions: ["view_gallery", "manage_gallery"]
   },
   {
+    title: "TPA",
+    description: "Manage TPA partner logos and titles shown on the website.",
+    permissions: ["view_tpa", "manage_tpa"]
+  },
+  {
     title: "Settings",
     description: "Access and update business settings and CMS settings.",
     permissions: ["view_settings", "manage_settings"]
@@ -22211,6 +22225,7 @@ const PATH_PERMISSION_RULES = {
   },
   "/blogs": { permissions: ["view_blogs", "manage_blogs"] },
   "/gallery": { permissions: ["view_gallery", "manage_gallery"] },
+  "/tpa": { permissions: ["view_tpa", "manage_tpa"] },
   "/reviews-shorts": {
     permissions: [
       "view_reviews",
@@ -25525,7 +25540,7 @@ function useControllableState({
     (nextValue) => {
       var _a2;
       if (isControlled) {
-        const value2 = isFunction$6(nextValue) ? nextValue(prop) : nextValue;
+        const value2 = isFunction$7(nextValue) ? nextValue(prop) : nextValue;
         if (value2 !== prop) {
           (_a2 = onChangeRef.current) == null ? void 0 : _a2.call(onChangeRef, value2);
         }
@@ -25556,7 +25571,7 @@ function useUncontrolledState({
   }, [value, prevValueRef]);
   return [value, setValue, onChangeRef];
 }
-function isFunction$6(value) {
+function isFunction$7(value) {
   return typeof value === "function";
 }
 // @__NO_SIDE_EFFECTS__
@@ -30174,13 +30189,13 @@ var MenuCheckboxItem = reactExports.forwardRef(
       MenuItem,
       {
         role: "menuitemcheckbox",
-        "aria-checked": isIndeterminate(checked) ? "mixed" : checked,
+        "aria-checked": isIndeterminate$1(checked) ? "mixed" : checked,
         ...checkboxItemProps,
         ref: forwardedRef,
         "data-state": getCheckedState(checked),
         onSelect: composeEventHandlers(
           checkboxItemProps.onSelect,
-          () => onCheckedChange == null ? void 0 : onCheckedChange(isIndeterminate(checked) ? true : !checked),
+          () => onCheckedChange == null ? void 0 : onCheckedChange(isIndeterminate$1(checked) ? true : !checked),
           { checkForDefaultPrevented: false }
         )
       }
@@ -30241,7 +30256,7 @@ var MenuItemIndicator = reactExports.forwardRef(
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       Presence,
       {
-        present: forceMount || isIndeterminate(indicatorContext.checked) || indicatorContext.checked === true,
+        present: forceMount || isIndeterminate$1(indicatorContext.checked) || indicatorContext.checked === true,
         children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           Primitive$2.span,
           {
@@ -30439,11 +30454,11 @@ MenuSubContent.displayName = SUB_CONTENT_NAME$1;
 function getOpenState(open) {
   return open ? "open" : "closed";
 }
-function isIndeterminate(checked) {
+function isIndeterminate$1(checked) {
   return checked === "indeterminate";
 }
 function getCheckedState(checked) {
-  return isIndeterminate(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
+  return isIndeterminate$1(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
 }
 function focusFirst(candidates) {
   const PREVIOUSLY_FOCUSED_ELEMENT = document.activeElement;
@@ -30547,11 +30562,11 @@ var DropdownMenu$1 = (props) => {
   );
 };
 DropdownMenu$1.displayName = DROPDOWN_MENU_NAME;
-var TRIGGER_NAME$4 = "DropdownMenuTrigger";
+var TRIGGER_NAME$5 = "DropdownMenuTrigger";
 var DropdownMenuTrigger$1 = reactExports.forwardRef(
   (props, forwardedRef) => {
     const { __scopeDropdownMenu, disabled = false, ...triggerProps } = props;
-    const context = useDropdownMenuContext(TRIGGER_NAME$4, __scopeDropdownMenu);
+    const context = useDropdownMenuContext(TRIGGER_NAME$5, __scopeDropdownMenu);
     const menuScope = useMenuScope(__scopeDropdownMenu);
     return /* @__PURE__ */ jsxRuntimeExports.jsx(Anchor2, { asChild: true, ...menuScope, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
       Primitive$2.button,
@@ -30582,7 +30597,7 @@ var DropdownMenuTrigger$1 = reactExports.forwardRef(
     ) });
   }
 );
-DropdownMenuTrigger$1.displayName = TRIGGER_NAME$4;
+DropdownMenuTrigger$1.displayName = TRIGGER_NAME$5;
 var PORTAL_NAME$3 = "DropdownMenuPortal";
 var DropdownMenuPortal = (props) => {
   const { __scopeDropdownMenu, ...portalProps } = props;
@@ -30681,13 +30696,13 @@ var DropdownMenuRadioItem = reactExports.forwardRef((props, forwardedRef) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(RadioItem, { ...menuScope, ...radioItemProps, ref: forwardedRef });
 });
 DropdownMenuRadioItem.displayName = RADIO_ITEM_NAME;
-var INDICATOR_NAME = "DropdownMenuItemIndicator";
+var INDICATOR_NAME$1 = "DropdownMenuItemIndicator";
 var DropdownMenuItemIndicator = reactExports.forwardRef((props, forwardedRef) => {
   const { __scopeDropdownMenu, ...itemIndicatorProps } = props;
   const menuScope = useMenuScope(__scopeDropdownMenu);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ItemIndicator$1, { ...menuScope, ...itemIndicatorProps, ref: forwardedRef });
 });
-DropdownMenuItemIndicator.displayName = INDICATOR_NAME;
+DropdownMenuItemIndicator.displayName = INDICATOR_NAME$1;
 var SEPARATOR_NAME$1 = "DropdownMenuSeparator";
 var DropdownMenuSeparator$1 = reactExports.forwardRef((props, forwardedRef) => {
   const { __scopeDropdownMenu, ...separatorProps } = props;
@@ -31943,11 +31958,11 @@ var Dialog$1 = (props) => {
   );
 };
 Dialog$1.displayName = DIALOG_NAME;
-var TRIGGER_NAME$3 = "DialogTrigger";
+var TRIGGER_NAME$4 = "DialogTrigger";
 var DialogTrigger = reactExports.forwardRef(
   (props, forwardedRef) => {
     const { __scopeDialog, ...triggerProps } = props;
-    const context = useDialogContext(TRIGGER_NAME$3, __scopeDialog);
+    const context = useDialogContext(TRIGGER_NAME$4, __scopeDialog);
     const composedTriggerRef = useComposedRefs(forwardedRef, context.triggerRef);
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       Primitive$2.button,
@@ -31956,7 +31971,7 @@ var DialogTrigger = reactExports.forwardRef(
         "aria-haspopup": "dialog",
         "aria-expanded": context.open,
         "aria-controls": context.contentId,
-        "data-state": getState$1(context.open),
+        "data-state": getState$2(context.open),
         ...triggerProps,
         ref: composedTriggerRef,
         onClick: composeEventHandlers(props.onClick, context.onOpenToggle)
@@ -31964,7 +31979,7 @@ var DialogTrigger = reactExports.forwardRef(
     );
   }
 );
-DialogTrigger.displayName = TRIGGER_NAME$3;
+DialogTrigger.displayName = TRIGGER_NAME$4;
 var PORTAL_NAME$2 = "DialogPortal";
 var [PortalProvider, usePortalContext] = createDialogContext(PORTAL_NAME$2, {
   forceMount: void 0
@@ -31996,7 +32011,7 @@ var DialogOverlayImpl = reactExports.forwardRef(
       /* @__PURE__ */ jsxRuntimeExports.jsx(ReactRemoveScroll, { as: Slot$1, allowPinchZoom: true, shards: [context.contentRef], children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         Primitive$2.div,
         {
-          "data-state": getState$1(context.open),
+          "data-state": getState$2(context.open),
           ...overlayProps,
           ref: forwardedRef,
           style: { pointerEvents: "auto", ...overlayProps.style }
@@ -32115,7 +32130,7 @@ var DialogContentImpl = reactExports.forwardRef(
               id: context.contentId,
               "aria-describedby": context.descriptionId,
               "aria-labelledby": context.titleId,
-              "data-state": getState$1(context.open),
+              "data-state": getState$2(context.open),
               ...contentProps,
               ref: composedRefs,
               onDismiss: () => context.onOpenChange(false)
@@ -32165,7 +32180,7 @@ var DialogClose$1 = reactExports.forwardRef(
   }
 );
 DialogClose$1.displayName = CLOSE_NAME;
-function getState$1(open) {
+function getState$2(open) {
   return open ? "open" : "closed";
 }
 var TITLE_WARNING_NAME = "DialogTitleWarning";
@@ -33468,11 +33483,11 @@ function createRandomKey() {
 function last$2(arr) {
   return arr[arr.length - 1];
 }
-function isFunction$5(d2) {
+function isFunction$6(d2) {
   return typeof d2 === "function";
 }
 function functionalUpdate(updater, previous) {
-  if (isFunction$5(updater)) {
+  if (isFunction$6(updater)) {
     return updater(previous);
   }
   return updater;
@@ -38080,6 +38095,12 @@ const ALL_NAV_ITEMS = [
     permissionPath: "/gallery"
   },
   {
+    label: "TPA",
+    icon: Shield,
+    path: "/tpa",
+    permissionPath: "/tpa"
+  },
+  {
     label: "Shorts",
     icon: Star,
     path: "/shorts",
@@ -38403,6 +38424,9 @@ function toFormData$4(payload) {
   if (payload.expertise) {
     fd.append("expertise", JSON.stringify(payload.expertise));
   }
+  if (payload.honors) {
+    fd.append("honors", JSON.stringify(payload.honors));
+  }
   if (payload.seo) {
     fd.append("seo", JSON.stringify(payload.seo));
   }
@@ -38474,7 +38498,7 @@ var AlertDialog$1 = (props) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Root$4, { ...dialogScope, ...alertDialogProps, modal: true });
 };
 AlertDialog$1.displayName = ROOT_NAME;
-var TRIGGER_NAME$2 = "AlertDialogTrigger";
+var TRIGGER_NAME$3 = "AlertDialogTrigger";
 var AlertDialogTrigger = reactExports.forwardRef(
   (props, forwardedRef) => {
     const { __scopeAlertDialog, ...triggerProps } = props;
@@ -38482,7 +38506,7 @@ var AlertDialogTrigger = reactExports.forwardRef(
     return /* @__PURE__ */ jsxRuntimeExports.jsx(Trigger$2, { ...dialogScope, ...triggerProps, ref: forwardedRef });
   }
 );
-AlertDialogTrigger.displayName = TRIGGER_NAME$2;
+AlertDialogTrigger.displayName = TRIGGER_NAME$3;
 var PORTAL_NAME$1 = "AlertDialogPortal";
 var AlertDialogPortal$1 = (props) => {
   const { __scopeAlertDialog, ...portalProps } = props;
@@ -39382,12 +39406,12 @@ var Select$1 = (props) => {
   ) });
 };
 Select$1.displayName = SELECT_NAME;
-var TRIGGER_NAME$1 = "SelectTrigger";
+var TRIGGER_NAME$2 = "SelectTrigger";
 var SelectTrigger$1 = reactExports.forwardRef(
   (props, forwardedRef) => {
     const { __scopeSelect, disabled = false, ...triggerProps } = props;
     const popperScope = usePopperScope(__scopeSelect);
-    const context = useSelectContext(TRIGGER_NAME$1, __scopeSelect);
+    const context = useSelectContext(TRIGGER_NAME$2, __scopeSelect);
     const isDisabled = context.disabled || disabled;
     const composedRefs = useComposedRefs(forwardedRef, context.onTriggerChange);
     const getItems = useCollection(__scopeSelect);
@@ -39459,7 +39483,7 @@ var SelectTrigger$1 = reactExports.forwardRef(
     ) });
   }
 );
-SelectTrigger$1.displayName = TRIGGER_NAME$1;
+SelectTrigger$1.displayName = TRIGGER_NAME$2;
 var VALUE_NAME = "SelectValue";
 var SelectValue$1 = reactExports.forwardRef(
   (props, forwardedRef) => {
@@ -40323,7 +40347,7 @@ var SelectArrow = reactExports.forwardRef(
   }
 );
 SelectArrow.displayName = ARROW_NAME;
-var BUBBLE_INPUT_NAME$1 = "SelectBubbleInput";
+var BUBBLE_INPUT_NAME$2 = "SelectBubbleInput";
 var SelectBubbleInput = reactExports.forwardRef(
   ({ __scopeSelect, value, ...props }, forwardedRef) => {
     const ref = reactExports.useRef(null);
@@ -40355,7 +40379,7 @@ var SelectBubbleInput = reactExports.forwardRef(
     );
   }
 );
-SelectBubbleInput.displayName = BUBBLE_INPUT_NAME$1;
+SelectBubbleInput.displayName = BUBBLE_INPUT_NAME$2;
 function shouldShowPlaceholder(value) {
   return value === "" || value === void 0;
 }
@@ -44119,7 +44143,7 @@ var getTinymce = function(view) {
   var global2 = view;
   return global2 && global2.tinymce ? global2.tinymce : null;
 };
-var isFunction$4 = function(x2) {
+var isFunction$5 = function(x2) {
   return typeof x2 === "function";
 };
 var isEventProp = function(name) {
@@ -44446,7 +44470,7 @@ var Editor = (
           }
           if (newContent !== _this.currentContent) {
             _this.currentContent = newContent;
-            if (isFunction$4(_this.props.onEditorChange)) {
+            if (isFunction$5(_this.props.onEditorChange)) {
               _this.props.onEditorChange(newContent, editor);
             }
           }
@@ -44489,7 +44513,7 @@ var Editor = (
               editor.setContent(_this.getInitialValue(), { no_events: true });
             });
           }
-          if (_this.props.init && isFunction$4(_this.props.init.setup)) {
+          if (_this.props.init && isFunction$5(_this.props.init.setup)) {
             _this.props.init.setup(editor);
           }
           if (_this.props.disabled) {
@@ -44510,7 +44534,7 @@ var Editor = (
             editor.undoManager.add();
             editor.setDirty(false);
           }
-          if (_this.props.init && isFunction$4(_this.props.init.init_instance_callback)) {
+          if (_this.props.init && isFunction$5(_this.props.init.init_instance_callback)) {
             _this.props.init.init_instance_callback(editor);
           }
         } });
@@ -44922,11 +44946,11 @@ var TabsList$1 = reactExports.forwardRef(
   }
 );
 TabsList$1.displayName = TAB_LIST_NAME;
-var TRIGGER_NAME = "TabsTrigger";
+var TRIGGER_NAME$1 = "TabsTrigger";
 var TabsTrigger$1 = reactExports.forwardRef(
   (props, forwardedRef) => {
     const { __scopeTabs, value, disabled = false, ...triggerProps } = props;
-    const context = useTabsContext(TRIGGER_NAME, __scopeTabs);
+    const context = useTabsContext(TRIGGER_NAME$1, __scopeTabs);
     const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
     const triggerId = makeTriggerId(context.baseId, value);
     const contentId = makeContentId(context.baseId, value);
@@ -44973,7 +44997,7 @@ var TabsTrigger$1 = reactExports.forwardRef(
     );
   }
 );
-TabsTrigger$1.displayName = TRIGGER_NAME;
+TabsTrigger$1.displayName = TRIGGER_NAME$1;
 var CONTENT_NAME = "TabsContent";
 var TabsContent$1 = reactExports.forwardRef(
   (props, forwardedRef) => {
@@ -45094,6 +45118,10 @@ const SECTION_META = {
   about: {
     title: "About Section",
     description: "Manage the homepage About section content."
+  },
+  trust_compliance: {
+    title: "Trust & Compliance Section",
+    description: "Manage the Haryana Government and NABH cards shown on the homepage."
   }
 };
 const EMPTY_HERO_FORM = {
@@ -45160,6 +45188,13 @@ const EMPTY_ABOUT_FORM = {
   ctaText: "",
   ctaLink: "",
   sectionImage: "",
+  isActive: true
+};
+const EMPTY_TRUST_COMPLIANCE_FORM = {
+  haryanaLogo: "",
+  haryanaDescription: "",
+  nabhLogo: "",
+  nabhDescription: "",
   isActive: true
 };
 function readString(value) {
@@ -45252,6 +45287,16 @@ function mapContentToAboutForm(item) {
     ctaText: readString(content.ctaText),
     ctaLink: readString(content.ctaLink),
     sectionImage: readString(content.sectionImage),
+    isActive: readBoolean(item == null ? void 0 : item.isActive, true)
+  };
+}
+function mapContentToTrustComplianceForm(item) {
+  const content = (item == null ? void 0 : item.content) ?? {};
+  return {
+    haryanaLogo: readString(content.haryanaLogo) || readString(content.mainLogo),
+    haryanaDescription: readString(content.haryanaDescription) || readString(content.mainDescription),
+    nabhLogo: readString(content.nabhLogo) || readString(content.appointmentLogo),
+    nabhDescription: readString(content.nabhDescription) || readString(content.appointmentDescription),
     isActive: readBoolean(item == null ? void 0 : item.isActive, true)
   };
 }
@@ -46354,15 +46399,15 @@ var isObject_1 = isObject$7;
 const isObject$8 = /* @__PURE__ */ getDefaultExportFromCjs(isObject_1);
 var baseGetTag$7 = _baseGetTag, isObject$6 = isObject_1;
 var asyncTag = "[object AsyncFunction]", funcTag$1 = "[object Function]", genTag = "[object GeneratorFunction]", proxyTag = "[object Proxy]";
-function isFunction$2(value) {
+function isFunction$3(value) {
   if (!isObject$6(value)) {
     return false;
   }
   var tag = baseGetTag$7(value);
   return tag == funcTag$1 || tag == genTag || tag == asyncTag || tag == proxyTag;
 }
-var isFunction_1 = isFunction$2;
-const isFunction$3 = /* @__PURE__ */ getDefaultExportFromCjs(isFunction_1);
+var isFunction_1 = isFunction$3;
+const isFunction$4 = /* @__PURE__ */ getDefaultExportFromCjs(isFunction_1);
 var root$7 = _root;
 var coreJsData$1 = root$7["__core-js_shared__"];
 var _coreJsData = coreJsData$1;
@@ -46391,7 +46436,7 @@ function toSource$2(func) {
   return "";
 }
 var _toSource = toSource$2;
-var isFunction$1 = isFunction_1, isMasked = _isMasked, isObject$5 = isObject_1, toSource$1 = _toSource;
+var isFunction$2 = isFunction_1, isMasked = _isMasked, isObject$5 = isObject_1, toSource$1 = _toSource;
 var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
 var reIsHostCtor = /^\[object .+?Constructor\]$/;
 var funcProto$1 = Function.prototype, objectProto$a = Object.prototype;
@@ -46404,7 +46449,7 @@ function baseIsNative$1(value) {
   if (!isObject$5(value) || isMasked(value)) {
     return false;
   }
-  var pattern = isFunction$1(value) ? reIsNative : reIsHostCtor;
+  var pattern = isFunction$2(value) ? reIsNative : reIsHostCtor;
   return pattern.test(toSource$1(value));
 }
 var _baseIsNative = baseIsNative$1;
@@ -47462,7 +47507,7 @@ var hasClipDot = function hasClipDot2(dot) {
 var isValidSpreadableProp = function isValidSpreadableProp2(property2, key, includeEvents, svgElementType) {
   var _FilteredElementKeyMa;
   var matchingElementTypeKeys = (_FilteredElementKeyMa = FilteredElementKeyMap === null || FilteredElementKeyMap === void 0 ? void 0 : FilteredElementKeyMap[svgElementType]) !== null && _FilteredElementKeyMa !== void 0 ? _FilteredElementKeyMa : [];
-  return key.startsWith("data-") || !isFunction$3(property2) && (svgElementType && matchingElementTypeKeys.includes(key) || SVGElementPropKeys.includes(key)) || includeEvents && EventKeys.includes(key);
+  return key.startsWith("data-") || !isFunction$4(property2) && (svgElementType && matchingElementTypeKeys.includes(key) || SVGElementPropKeys.includes(key)) || includeEvents && EventKeys.includes(key);
 };
 var filterProps = function filterProps2(props, includeEvents, svgElementType) {
   if (!props || typeof props === "function" || typeof props === "boolean") {
@@ -49011,9 +49056,9 @@ var DefaultLegendContent = /* @__PURE__ */ function(_PureComponent) {
         if (entry.type === "none") {
           return null;
         }
-        var entryValue = !isFunction$3(entry.value) ? entry.value : null;
+        var entryValue = !isFunction$4(entry.value) ? entry.value : null;
         warn(
-          !isFunction$3(entry.value),
+          !isFunction$4(entry.value),
           `The name property is also required when using a function for the dataKey of a chart's cartesian components. Ex: <Bar name="Name of my Data"/>`
           // eslint-disable-line max-len
         );
@@ -49449,9 +49494,9 @@ function baseKeys$1(object2) {
   return result;
 }
 var _baseKeys = baseKeys$1;
-var isFunction = isFunction_1, isLength$1 = isLength_1;
+var isFunction$1 = isFunction_1, isLength$1 = isLength_1;
 function isArrayLike$5(value) {
-  return value != null && isLength$1(value.length) && !isFunction(value);
+  return value != null && isLength$1(value.length) && !isFunction$1(value);
 }
 var isArrayLike_1 = isArrayLike$5;
 var arrayLikeKeys = _arrayLikeKeys, baseKeys = _baseKeys, isArrayLike$4 = isArrayLike_1;
@@ -49848,7 +49893,7 @@ function getUniqPayload(payload, option, defaultUniqBy2) {
   if (option === true) {
     return uniqBy$1(payload, defaultUniqBy2);
   }
-  if (isFunction$3(option)) {
+  if (isFunction$4(option)) {
     return uniqBy$1(payload, option);
   }
   return payload;
@@ -56618,7 +56663,7 @@ function getValueByDataKey(obj, dataKey, defaultValue) {
   if (isNumOrStr(dataKey)) {
     return get$2(obj, dataKey, defaultValue);
   }
-  if (isFunction$3(dataKey)) {
+  if (isFunction$4(dataKey)) {
     return dataKey(obj);
   }
   return defaultValue;
@@ -57066,7 +57111,7 @@ var parseScale = function parseScale2(axis, chartType, hasBar) {
       realScaleType: d3Scales[name] ? name : "point"
     };
   }
-  return isFunction$3(scale) ? {
+  return isFunction$4(scale) ? {
     scale
   } : {
     scale: point(),
@@ -57337,7 +57382,7 @@ var getDomainOfStackGroups = function getDomainOfStackGroups2(stackGroups, start
 var MIN_VALUE_REG = /^dataMin[\s]*-[\s]*([0-9]+([.]{1}[0-9]+){0,1})$/;
 var MAX_VALUE_REG = /^dataMax[\s]*\+[\s]*([0-9]+([.]{1}[0-9]+){0,1})$/;
 var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataDomain, allowDataOverflow) {
-  if (isFunction$3(specifiedDomain)) {
+  if (isFunction$4(specifiedDomain)) {
     return specifiedDomain(dataDomain, allowDataOverflow);
   }
   if (!Array.isArray(specifiedDomain)) {
@@ -57349,7 +57394,7 @@ var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataD
   } else if (MIN_VALUE_REG.test(specifiedDomain[0])) {
     var value = +MIN_VALUE_REG.exec(specifiedDomain[0])[1];
     domain[0] = dataDomain[0] - value;
-  } else if (isFunction$3(specifiedDomain[0])) {
+  } else if (isFunction$4(specifiedDomain[0])) {
     domain[0] = specifiedDomain[0](dataDomain[0]);
   } else {
     domain[0] = dataDomain[0];
@@ -57359,7 +57404,7 @@ var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataD
   } else if (MAX_VALUE_REG.test(specifiedDomain[1])) {
     var _value = +MAX_VALUE_REG.exec(specifiedDomain[1])[1];
     domain[1] = dataDomain[1] + _value;
-  } else if (isFunction$3(specifiedDomain[1])) {
+  } else if (isFunction$4(specifiedDomain[1])) {
     domain[1] = specifiedDomain[1](dataDomain[1]);
   } else {
     domain[1] = dataDomain[1];
@@ -57684,7 +57729,7 @@ function _extends$j() {
 var getLabel = function getLabel2(props) {
   var value = props.value, formatter = props.formatter;
   var label = isNil$1(props.children) ? value : props.children;
-  if (isFunction$3(formatter)) {
+  if (isFunction$4(formatter)) {
     return formatter(label);
   }
   return label;
@@ -57923,14 +57968,14 @@ function Label(_ref4) {
     offset: offset2
   }, restProps);
   var viewBox = props.viewBox, position2 = props.position, value = props.value, children = props.children, content = props.content, _props$className = props.className, className = _props$className === void 0 ? "" : _props$className, textBreakAll = props.textBreakAll;
-  if (!viewBox || isNil$1(value) && isNil$1(children) && !/* @__PURE__ */ reactExports.isValidElement(content) && !isFunction$3(content)) {
+  if (!viewBox || isNil$1(value) && isNil$1(children) && !/* @__PURE__ */ reactExports.isValidElement(content) && !isFunction$4(content)) {
     return null;
   }
   if (/* @__PURE__ */ reactExports.isValidElement(content)) {
     return /* @__PURE__ */ reactExports.cloneElement(content, props);
   }
   var label;
-  if (isFunction$3(content)) {
+  if (isFunction$4(content)) {
     label = /* @__PURE__ */ reactExports.createElement(content, props);
     if (/* @__PURE__ */ reactExports.isValidElement(label)) {
       return label;
@@ -58028,7 +58073,7 @@ var parseLabel = function parseLabel2(label, viewBox) {
       viewBox
     });
   }
-  if (isFunction$3(label)) {
+  if (isFunction$4(label)) {
     return /* @__PURE__ */ React$5.createElement(Label, {
       key: "label-implicit",
       content: label,
@@ -58229,7 +58274,7 @@ function parseLabelList(label, data) {
       data
     });
   }
-  if (/* @__PURE__ */ React$5.isValidElement(label) || isFunction$3(label)) {
+  if (/* @__PURE__ */ React$5.isValidElement(label) || isFunction$4(label)) {
     return /* @__PURE__ */ React$5.createElement(LabelList, {
       key: "labelList-implicit",
       data,
@@ -58575,7 +58620,7 @@ var getY = function getY2(p2) {
   return p2.y;
 };
 var getCurveFactory = function getCurveFactory2(type, layout) {
-  if (isFunction$3(type)) {
+  if (isFunction$4(type)) {
     return type;
   }
   var name = "curve".concat(upperFirst$1(type));
@@ -60821,7 +60866,7 @@ function Shape(_ref2) {
   var shape;
   if (/* @__PURE__ */ reactExports.isValidElement(option)) {
     shape = /* @__PURE__ */ reactExports.cloneElement(option, _objectSpread$e(_objectSpread$e({}, props), getPropsFromShapeOption(option)));
-  } else if (isFunction$3(option)) {
+  } else if (isFunction$4(option)) {
     shape = option(props);
   } else if (isPlainObject$1(option) && !isBoolean$1(option)) {
     var nextProps = propTransformer(option, props);
@@ -61285,7 +61330,7 @@ var Brush = /* @__PURE__ */ function(_PureComponent) {
     value: function getTextOfTick(index2) {
       var _this$props3 = this.props, data = _this$props3.data, tickFormatter = _this$props3.tickFormatter, dataKey = _this$props3.dataKey;
       var text2 = getValueByDataKey(data[index2], dataKey, index2);
-      return isFunction$3(tickFormatter) ? tickFormatter(text2, index2) : text2;
+      return isFunction$4(tickFormatter) ? tickFormatter(text2, index2) : text2;
     }
   }, {
     key: "attachDragEndListener",
@@ -61573,7 +61618,7 @@ var Brush = /* @__PURE__ */ function(_PureComponent) {
       var rectangle;
       if (/* @__PURE__ */ React$5.isValidElement(option)) {
         rectangle = /* @__PURE__ */ React$5.cloneElement(option, props);
-      } else if (isFunction$3(option)) {
+      } else if (isFunction$4(option)) {
         rectangle = option(props);
       } else {
         rectangle = Brush2.renderDefaultTraveller(props);
@@ -62959,7 +63004,7 @@ var renderLine = function renderLine2(option, props) {
   var line2;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     line2 = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$3(option)) {
+  } else if (isFunction$4(option)) {
     line2 = option(props);
   } else {
     line2 = /* @__PURE__ */ React$5.createElement("line", _extends$8({}, props, {
@@ -63291,7 +63336,7 @@ _defineProperty$a(ReferenceDot, "renderDot", function(option, props) {
   var dot;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     dot = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$3(option)) {
+  } else if (isFunction$4(option)) {
     dot = option(props);
   } else {
     dot = /* @__PURE__ */ React$5.createElement(Dot, _extends$7({}, props, {
@@ -63511,7 +63556,7 @@ _defineProperty$9(ReferenceArea, "renderRect", function(option, props) {
   var rect;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     rect = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$3(option)) {
+  } else if (isFunction$4(option)) {
     rect = option(props);
   } else {
     rect = /* @__PURE__ */ React$5.createElement(Rectangle, _extends$6({}, props, {
@@ -63766,7 +63811,7 @@ function getTicks(props, fontSize, letterSpacing) {
     height: 0
   };
   var getTickSize = function getTickSize2(content, index2) {
-    var value = isFunction$3(tickFormatter) ? tickFormatter(content.value, index2) : content.value;
+    var value = isFunction$4(tickFormatter) ? tickFormatter(content.value, index2) : content.value;
     return sizeKey === "width" ? getAngledTickWidth(getStringSize(value, {
       fontSize,
       letterSpacing
@@ -64146,7 +64191,7 @@ var CartesianAxis = /* @__PURE__ */ function(_Component) {
             key: "tick-".concat(entry.value, "-").concat(entry.coordinate, "-").concat(entry.tickCoord)
           }, adaptEventsOfChild(_this2.props, entry, i2)), tickLine && /* @__PURE__ */ React$5.createElement("line", _extends$5({}, tickLineProps, lineCoord, {
             className: clsx("recharts-cartesian-axis-tick-line", get$2(tickLine, "className"))
-          })), tick && CartesianAxis2.renderTickItem(tick, tickProps, "".concat(isFunction$3(tickFormatter) ? tickFormatter(entry.value, i2) : entry.value).concat(unit2 || "")));
+          })), tick && CartesianAxis2.renderTickItem(tick, tickProps, "".concat(isFunction$4(tickFormatter) ? tickFormatter(entry.value, i2) : entry.value).concat(unit2 || "")));
         });
         return /* @__PURE__ */ React$5.createElement("g", {
           className: "recharts-cartesian-axis-ticks"
@@ -64163,7 +64208,7 @@ var CartesianAxis = /* @__PURE__ */ function(_Component) {
       }
       var _this$props8 = this.props, ticks2 = _this$props8.ticks, noTicksProps = _objectWithoutProperties$3(_this$props8, _excluded3);
       var finalTicks = ticks2;
-      if (isFunction$3(ticksGenerator)) {
+      if (isFunction$4(ticksGenerator)) {
         finalTicks = ticks2 && ticks2.length > 0 ? ticksGenerator(this.props) : ticksGenerator(noTicksProps);
       }
       if (width <= 0 || height <= 0 || !finalTicks || !finalTicks.length) {
@@ -64185,7 +64230,7 @@ var CartesianAxis = /* @__PURE__ */ function(_Component) {
         tickItem = /* @__PURE__ */ React$5.cloneElement(option, _objectSpread$4(_objectSpread$4({}, props), {}, {
           className: combinedClassName
         }));
-      } else if (isFunction$3(option)) {
+      } else if (isFunction$4(option)) {
         tickItem = option(_objectSpread$4(_objectSpread$4({}, props), {}, {
           className: combinedClassName
         }));
@@ -64340,7 +64385,7 @@ function renderLineItem(option, props) {
   var lineItem;
   if (/* @__PURE__ */ React$5.isValidElement(option)) {
     lineItem = /* @__PURE__ */ React$5.cloneElement(option, props);
-  } else if (isFunction$3(option)) {
+  } else if (isFunction$4(option)) {
     lineItem = option(props);
   } else {
     var x1 = props.x1, y1 = props.y1, x2 = props.x2, y2 = props.y2, key = props.key, others = _objectWithoutProperties$2(props, _excluded$2);
@@ -64529,7 +64574,7 @@ function CartesianGrid(props) {
   var verticalCoordinatesGenerator = propsIncludingDefaults.verticalCoordinatesGenerator || defaultVerticalCoordinatesGenerator;
   var horizontalCoordinatesGenerator = propsIncludingDefaults.horizontalCoordinatesGenerator || defaultHorizontalCoordinatesGenerator;
   var horizontalPoints = propsIncludingDefaults.horizontalPoints, verticalPoints = propsIncludingDefaults.verticalPoints;
-  if ((!horizontalPoints || !horizontalPoints.length) && isFunction$3(horizontalCoordinatesGenerator)) {
+  if ((!horizontalPoints || !horizontalPoints.length) && isFunction$4(horizontalCoordinatesGenerator)) {
     var isHorizontalValues = horizontalValues && horizontalValues.length;
     var generatorResult = horizontalCoordinatesGenerator({
       yAxis: yAxis ? _objectSpread$3(_objectSpread$3({}, yAxis), {}, {
@@ -64544,7 +64589,7 @@ function CartesianGrid(props) {
       horizontalPoints = generatorResult;
     }
   }
-  if ((!verticalPoints || !verticalPoints.length) && isFunction$3(verticalCoordinatesGenerator)) {
+  if ((!verticalPoints || !verticalPoints.length) && isFunction$4(verticalCoordinatesGenerator)) {
     var isVerticalValues = verticalValues && verticalValues.length;
     var _generatorResult = verticalCoordinatesGenerator({
       xAxis: xAxis ? _objectSpread$3(_objectSpread$3({}, xAxis), {}, {
@@ -65100,7 +65145,7 @@ var Line = /* @__PURE__ */ function(_PureComponent) {
       var dotItem;
       if (/* @__PURE__ */ React$5.isValidElement(option)) {
         dotItem = /* @__PURE__ */ React$5.cloneElement(option, props);
-      } else if (isFunction$3(option)) {
+      } else if (isFunction$4(option)) {
         dotItem = option(props);
       } else {
         var key = props.key, dotProps = _objectWithoutProperties$1(props, _excluded2$1);
@@ -66861,7 +66906,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
           _this.setState(_nextState);
           _this.triggerSyncEvent(_nextState);
           var onMouseEnter = _this.props.onMouseEnter;
-          if (isFunction$3(onMouseEnter)) {
+          if (isFunction$4(onMouseEnter)) {
             onMouseEnter(_nextState, e3);
           }
         }
@@ -66876,7 +66921,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
         _this.setState(nextState);
         _this.triggerSyncEvent(nextState);
         var onMouseMove = _this.props.onMouseMove;
-        if (isFunction$3(onMouseMove)) {
+        if (isFunction$4(onMouseMove)) {
           onMouseMove(nextState, e3);
         }
       });
@@ -66912,14 +66957,14 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
         _this.setState(nextState);
         _this.triggerSyncEvent(nextState);
         var onMouseLeave = _this.props.onMouseLeave;
-        if (isFunction$3(onMouseLeave)) {
+        if (isFunction$4(onMouseLeave)) {
           onMouseLeave(nextState, e3);
         }
       });
       _defineProperty(_this, "handleOuterEvent", function(e3) {
         var eventName = getReactEventByType(e3);
         var event = get$2(_this.props, "".concat(eventName));
-        if (eventName && isFunction$3(event)) {
+        if (eventName && isFunction$4(event)) {
           var _mouse;
           var mouse;
           if (/.*touch.*/i.test(eventName)) {
@@ -66939,21 +66984,21 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
           _this.setState(_nextState2);
           _this.triggerSyncEvent(_nextState2);
           var onClick = _this.props.onClick;
-          if (isFunction$3(onClick)) {
+          if (isFunction$4(onClick)) {
             onClick(_nextState2, e3);
           }
         }
       });
       _defineProperty(_this, "handleMouseDown", function(e3) {
         var onMouseDown = _this.props.onMouseDown;
-        if (isFunction$3(onMouseDown)) {
+        if (isFunction$4(onMouseDown)) {
           var _nextState3 = _this.getMouseInfo(e3);
           onMouseDown(_nextState3, e3);
         }
       });
       _defineProperty(_this, "handleMouseUp", function(e3) {
         var onMouseUp = _this.props.onMouseUp;
-        if (isFunction$3(onMouseUp)) {
+        if (isFunction$4(onMouseUp)) {
           var _nextState4 = _this.getMouseInfo(e3);
           onMouseUp(_nextState4, e3);
         }
@@ -66975,14 +67020,14 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
       });
       _defineProperty(_this, "handleDoubleClick", function(e3) {
         var onDoubleClick = _this.props.onDoubleClick;
-        if (isFunction$3(onDoubleClick)) {
+        if (isFunction$4(onDoubleClick)) {
           var _nextState5 = _this.getMouseInfo(e3);
           onDoubleClick(_nextState5, e3);
         }
       });
       _defineProperty(_this, "handleContextMenu", function(e3) {
         var onContextMenu = _this.props.onContextMenu;
-        if (isFunction$3(onContextMenu)) {
+        if (isFunction$4(onContextMenu)) {
           var _nextState6 = _this.getMouseInfo(e3);
           onContextMenu(_nextState6, e3);
         }
@@ -67826,7 +67871,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
     var dot;
     if (/* @__PURE__ */ reactExports.isValidElement(option)) {
       dot = /* @__PURE__ */ reactExports.cloneElement(option, props);
-    } else if (isFunction$3(option)) {
+    } else if (isFunction$4(option)) {
       dot = option(props);
     } else {
       dot = /* @__PURE__ */ React$5.createElement(Dot, props);
@@ -68727,6 +68772,71 @@ function DashboardPage() {
     ] }) })
   ] });
 }
+function normalizeHonorItem(honor) {
+  return {
+    _id: honor._id,
+    title: honor.title || "",
+    image: honor.image || "",
+    sortOrder: typeof honor.sortOrder === "number" ? honor.sortOrder : Number(honor.sortOrder) || 0,
+    isActive: honor.isActive !== false,
+    createdAt: honor.createdAt,
+    updatedAt: honor.updatedAt
+  };
+}
+const getAllHonorsApi = async () => {
+  var _a2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_HONORS, { needAuth: true });
+    return (((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honors) ?? []).map(normalizeHonorItem);
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to fetch honors");
+  }
+};
+const addHonorApi = async (payload) => {
+  var _a2;
+  try {
+    const formData = new FormData();
+    formData.append("title", payload.title);
+    formData.append("sortOrder", String(payload.sortOrder ?? 0));
+    formData.append("isActive", String(payload.isActive ?? true));
+    if (payload.image instanceof File) {
+      formData.append("image", payload.image);
+    }
+    const res = await post(ENDPOINT.ADD_HONOR, formData, {
+      needAuth: true
+    });
+    return normalizeHonorItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honor) ?? {});
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to add honor");
+  }
+};
+const updateHonorApi = async (id, payload) => {
+  var _a2;
+  try {
+    const formData = new FormData();
+    formData.append("title", payload.title);
+    formData.append("sortOrder", String(payload.sortOrder ?? 0));
+    formData.append("isActive", String(payload.isActive ?? true));
+    if (payload.image instanceof File) {
+      formData.append("image", payload.image);
+    }
+    const res = await post(`${ENDPOINT.UPDATE_HONOR}/${id}`, formData, {
+      needAuth: true
+    });
+    return normalizeHonorItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honor) ?? {});
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to update honor");
+  }
+};
+const deleteHonorApi = async (id) => {
+  try {
+    await post(`${ENDPOINT.DELETE_HONOR}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to delete honor");
+  }
+};
 const getAllSpecializationsApi = async (params) => {
   var _a2;
   try {
@@ -68799,6 +68909,287 @@ function useDeleteSpecialization() {
       queryClient2.invalidateQueries({ queryKey: ["specializations"] });
     }
   });
+}
+var CHECKBOX_NAME = "Checkbox";
+var [createCheckboxContext] = createContextScope(CHECKBOX_NAME);
+var [CheckboxProviderImpl, useCheckboxContext] = createCheckboxContext(CHECKBOX_NAME);
+function CheckboxProvider(props) {
+  const {
+    __scopeCheckbox,
+    checked: checkedProp,
+    children,
+    defaultChecked,
+    disabled,
+    form,
+    name,
+    onCheckedChange,
+    required,
+    value = "on",
+    // @ts-expect-error
+    internal_do_not_use_render
+  } = props;
+  const [checked, setChecked] = useControllableState({
+    prop: checkedProp,
+    defaultProp: defaultChecked ?? false,
+    onChange: onCheckedChange,
+    caller: CHECKBOX_NAME
+  });
+  const [control, setControl] = reactExports.useState(null);
+  const [bubbleInput, setBubbleInput] = reactExports.useState(null);
+  const hasConsumerStoppedPropagationRef = reactExports.useRef(false);
+  const isFormControl = control ? !!form || !!control.closest("form") : (
+    // We set this to true by default so that events bubble to forms without JS (SSR)
+    true
+  );
+  const context = {
+    checked,
+    disabled,
+    setChecked,
+    control,
+    setControl,
+    name,
+    form,
+    value,
+    hasConsumerStoppedPropagationRef,
+    required,
+    defaultChecked: isIndeterminate(defaultChecked) ? false : defaultChecked,
+    isFormControl,
+    bubbleInput,
+    setBubbleInput
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    CheckboxProviderImpl,
+    {
+      scope: __scopeCheckbox,
+      ...context,
+      children: isFunction(internal_do_not_use_render) ? internal_do_not_use_render(context) : children
+    }
+  );
+}
+var TRIGGER_NAME = "CheckboxTrigger";
+var CheckboxTrigger = reactExports.forwardRef(
+  ({ __scopeCheckbox, onKeyDown, onClick, ...checkboxProps }, forwardedRef) => {
+    const {
+      control,
+      value,
+      disabled,
+      checked,
+      required,
+      setControl,
+      setChecked,
+      hasConsumerStoppedPropagationRef,
+      isFormControl,
+      bubbleInput
+    } = useCheckboxContext(TRIGGER_NAME, __scopeCheckbox);
+    const composedRefs = useComposedRefs(forwardedRef, setControl);
+    const initialCheckedStateRef = reactExports.useRef(checked);
+    reactExports.useEffect(() => {
+      const form = control == null ? void 0 : control.form;
+      if (form) {
+        const reset = () => setChecked(initialCheckedStateRef.current);
+        form.addEventListener("reset", reset);
+        return () => form.removeEventListener("reset", reset);
+      }
+    }, [control, setChecked]);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive$2.button,
+      {
+        type: "button",
+        role: "checkbox",
+        "aria-checked": isIndeterminate(checked) ? "mixed" : checked,
+        "aria-required": required,
+        "data-state": getState$1(checked),
+        "data-disabled": disabled ? "" : void 0,
+        disabled,
+        value,
+        ...checkboxProps,
+        ref: composedRefs,
+        onKeyDown: composeEventHandlers(onKeyDown, (event) => {
+          if (event.key === "Enter") event.preventDefault();
+        }),
+        onClick: composeEventHandlers(onClick, (event) => {
+          setChecked((prevChecked) => isIndeterminate(prevChecked) ? true : !prevChecked);
+          if (bubbleInput && isFormControl) {
+            hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+            if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+          }
+        })
+      }
+    );
+  }
+);
+CheckboxTrigger.displayName = TRIGGER_NAME;
+var Checkbox$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const {
+      __scopeCheckbox,
+      name,
+      checked,
+      defaultChecked,
+      required,
+      disabled,
+      value,
+      onCheckedChange,
+      form,
+      ...checkboxProps
+    } = props;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      CheckboxProvider,
+      {
+        __scopeCheckbox,
+        checked,
+        defaultChecked,
+        disabled,
+        required,
+        onCheckedChange,
+        name,
+        form,
+        value,
+        internal_do_not_use_render: ({ isFormControl }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CheckboxTrigger,
+            {
+              ...checkboxProps,
+              ref: forwardedRef,
+              __scopeCheckbox
+            }
+          ),
+          isFormControl && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CheckboxBubbleInput,
+            {
+              __scopeCheckbox
+            }
+          )
+        ] })
+      }
+    );
+  }
+);
+Checkbox$1.displayName = CHECKBOX_NAME;
+var INDICATOR_NAME = "CheckboxIndicator";
+var CheckboxIndicator = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeCheckbox, forceMount, ...indicatorProps } = props;
+    const context = useCheckboxContext(INDICATOR_NAME, __scopeCheckbox);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Presence,
+      {
+        present: forceMount || isIndeterminate(context.checked) || context.checked === true,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive$2.span,
+          {
+            "data-state": getState$1(context.checked),
+            "data-disabled": context.disabled ? "" : void 0,
+            ...indicatorProps,
+            ref: forwardedRef,
+            style: { pointerEvents: "none", ...props.style }
+          }
+        )
+      }
+    );
+  }
+);
+CheckboxIndicator.displayName = INDICATOR_NAME;
+var BUBBLE_INPUT_NAME$1 = "CheckboxBubbleInput";
+var CheckboxBubbleInput = reactExports.forwardRef(
+  ({ __scopeCheckbox, ...props }, forwardedRef) => {
+    const {
+      control,
+      hasConsumerStoppedPropagationRef,
+      checked,
+      defaultChecked,
+      required,
+      disabled,
+      name,
+      value,
+      form,
+      bubbleInput,
+      setBubbleInput
+    } = useCheckboxContext(BUBBLE_INPUT_NAME$1, __scopeCheckbox);
+    const composedRefs = useComposedRefs(forwardedRef, setBubbleInput);
+    const prevChecked = usePrevious(checked);
+    const controlSize = useSize(control);
+    reactExports.useEffect(() => {
+      const input = bubbleInput;
+      if (!input) return;
+      const inputProto = window.HTMLInputElement.prototype;
+      const descriptor = Object.getOwnPropertyDescriptor(
+        inputProto,
+        "checked"
+      );
+      const setChecked = descriptor.set;
+      const bubbles = !hasConsumerStoppedPropagationRef.current;
+      if (prevChecked !== checked && setChecked) {
+        const event = new Event("click", { bubbles });
+        input.indeterminate = isIndeterminate(checked);
+        setChecked.call(input, isIndeterminate(checked) ? false : checked);
+        input.dispatchEvent(event);
+      }
+    }, [bubbleInput, prevChecked, checked, hasConsumerStoppedPropagationRef]);
+    const defaultCheckedRef = reactExports.useRef(isIndeterminate(checked) ? false : checked);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive$2.input,
+      {
+        type: "checkbox",
+        "aria-hidden": true,
+        defaultChecked: defaultChecked ?? defaultCheckedRef.current,
+        required,
+        disabled,
+        name,
+        value,
+        form,
+        ...props,
+        tabIndex: -1,
+        ref: composedRefs,
+        style: {
+          ...props.style,
+          ...controlSize,
+          position: "absolute",
+          pointerEvents: "none",
+          opacity: 0,
+          margin: 0,
+          // We transform because the input is absolutely positioned but we have
+          // rendered it **after** the button. This pulls it back to sit on top
+          // of the button.
+          transform: "translateX(-100%)"
+        }
+      }
+    );
+  }
+);
+CheckboxBubbleInput.displayName = BUBBLE_INPUT_NAME$1;
+function isFunction(value) {
+  return typeof value === "function";
+}
+function isIndeterminate(checked) {
+  return checked === "indeterminate";
+}
+function getState$1(checked) {
+  return isIndeterminate(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
+}
+function Checkbox({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Checkbox$1,
+    {
+      "data-slot": "checkbox",
+      className: cn(
+        "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      ),
+      ...props,
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        CheckboxIndicator,
+        {
+          "data-slot": "checkbox-indicator",
+          className: "flex items-center justify-center text-current transition-none",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "size-3.5" })
+        }
+      )
+    }
+  );
 }
 function Table({ className, ...props }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -68892,7 +69283,8 @@ const emptyForm$4 = {
   expertise: "",
   metaTitle: "",
   metaDescription: "",
-  keywords: ""
+  keywords: "",
+  honors: []
 };
 function getInitials(name) {
   return name.split(" ").filter(Boolean).map((n2) => n2[0]).join("").slice(0, 2).toUpperCase();
@@ -68913,6 +69305,9 @@ function availabilityToFlags(availability) {
 }
 function splitCommaList(value) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
+}
+function getHonorIds(doctor) {
+  return (doctor.honors ?? []).map((honor) => typeof honor === "string" ? honor : honor == null ? void 0 : honor._id).filter((id) => Boolean(id));
 }
 function resolveAssetUrl(path) {
   if (!path) return void 0;
@@ -68969,6 +69364,7 @@ function buildPayload$1(form, mode) {
       metaDescription: form.metaDescription.trim(),
       keywords: splitCommaList(form.keywords)
     },
+    honors: form.honors,
     image: form.image,
     ...availabilityToFlags(form.availability)
   };
@@ -68989,6 +69385,14 @@ function DoctorsPage() {
     queryKey: ["doctors"],
     queryFn: getAllDoctorsApi
   });
+  const { data: honors = [], isLoading: honorsLoading } = useQuery({
+    queryKey: ["honors", "doctor-form"],
+    queryFn: getAllHonorsApi
+  });
+  const activeHonors = reactExports.useMemo(
+    () => honors.filter((honor) => honor.isActive),
+    [honors]
+  );
   const [searchQuery, setSearchQuery] = reactExports.useState("");
   const [isAddModalOpen, setIsAddModalOpen] = reactExports.useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = reactExports.useState(false);
@@ -69077,7 +69481,8 @@ function DoctorsPage() {
       expertise: (doctor.expertise ?? []).join(", "),
       metaTitle: ((_b2 = doctor.seo) == null ? void 0 : _b2.metaTitle) ?? "",
       metaDescription: ((_c2 = doctor.seo) == null ? void 0 : _c2.metaDescription) ?? "",
-      keywords: (((_d2 = doctor.seo) == null ? void 0 : _d2.keywords) ?? []).join(", ")
+      keywords: (((_d2 = doctor.seo) == null ? void 0 : _d2.keywords) ?? []).join(", "),
+      honors: getHonorIds(doctor)
     });
     setFormErrors({});
     setImageFileName(getImageLabel(doctor.image ?? ""));
@@ -69368,6 +69773,8 @@ function DoctorsPage() {
               imageFileName,
               fileInputRef,
               specializations,
+              honors: activeHonors,
+              honorsLoading,
               onFieldChange: setField,
               onFileChange: handleFileChange,
               onFileClick: () => {
@@ -69426,6 +69833,8 @@ function DoctorsPage() {
               imageFileName,
               fileInputRef,
               specializations,
+              honors: activeHonors,
+              honorsLoading,
               onFieldChange: setField,
               onFileChange: handleFileChange,
               onFileClick: () => {
@@ -69521,6 +69930,8 @@ function DoctorForm({
   imageFileName,
   fileInputRef,
   specializations,
+  honors,
+  honorsLoading,
   onFieldChange,
   onFileChange,
   onFileClick
@@ -69529,6 +69940,7 @@ function DoctorForm({
     /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "w-full mb-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "basic", className: "flex-1", children: "Basic Info" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "description", className: "flex-1", children: "Description" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "honors", className: "flex-1", children: "Honors" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "seo", className: "flex-1", children: "SEO" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "basic", className: "grid grid-cols-1 sm:grid-cols-2 gap-4 mt-0", children: [
@@ -69821,6 +70233,36 @@ function DoctorForm({
           }
         )
       ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "honors", className: "mt-0 space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm font-medium text-foreground", children: "Honors And Recognitions" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-2xl border border-border divide-y divide-border overflow-hidden", children: honorsLoading ? SKELETON_ROWS$1.slice(0, 3).map((key) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 p-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-4 rounded" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-40 rounded" })
+      ] }, key)) : honors.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "p-4 text-sm text-muted-foreground", children: "No active honors available." }) : honors.map((honor) => {
+        const checked = formData.honors.includes(honor._id);
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "label",
+          {
+            className: "flex cursor-pointer items-center gap-3 p-3 text-sm hover:bg-muted",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Checkbox,
+                {
+                  checked,
+                  onCheckedChange: (value) => {
+                    const nextHonors = value ? [...formData.honors, honor._id] : formData.honors.filter((id) => id !== honor._id);
+                    onFieldChange("honors", nextHonors);
+                  },
+                  "data-ocid": `doctors.honor_checkbox.${honor._id}`
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-foreground", children: honor.title })
+            ]
+          },
+          honor._id
+        );
+      }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsContent, { value: "seo", className: "mt-0 space-y-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
@@ -70365,71 +70807,6 @@ function GalleryPage() {
     ] }) })
   ] });
 }
-function normalizeHonorItem(honor) {
-  return {
-    _id: honor._id,
-    title: honor.title || "",
-    image: honor.image || "",
-    sortOrder: typeof honor.sortOrder === "number" ? honor.sortOrder : Number(honor.sortOrder) || 0,
-    isActive: honor.isActive !== false,
-    createdAt: honor.createdAt,
-    updatedAt: honor.updatedAt
-  };
-}
-const getAllHonorsApi = async () => {
-  var _a2;
-  try {
-    const res = await get$3(ENDPOINT.GET_ALL_HONORS, { needAuth: true });
-    return (((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honors) ?? []).map(normalizeHonorItem);
-  } catch (error) {
-    throw createApiRequestError(error, "Failed to fetch honors");
-  }
-};
-const addHonorApi = async (payload) => {
-  var _a2;
-  try {
-    const formData = new FormData();
-    formData.append("title", payload.title);
-    formData.append("sortOrder", String(payload.sortOrder ?? 0));
-    formData.append("isActive", String(payload.isActive ?? true));
-    if (payload.image instanceof File) {
-      formData.append("image", payload.image);
-    }
-    const res = await post(ENDPOINT.ADD_HONOR, formData, {
-      needAuth: true
-    });
-    return normalizeHonorItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honor) ?? {});
-  } catch (error) {
-    throw createApiRequestError(error, "Failed to add honor");
-  }
-};
-const updateHonorApi = async (id, payload) => {
-  var _a2;
-  try {
-    const formData = new FormData();
-    formData.append("title", payload.title);
-    formData.append("sortOrder", String(payload.sortOrder ?? 0));
-    formData.append("isActive", String(payload.isActive ?? true));
-    if (payload.image instanceof File) {
-      formData.append("image", payload.image);
-    }
-    const res = await post(`${ENDPOINT.UPDATE_HONOR}/${id}`, formData, {
-      needAuth: true
-    });
-    return normalizeHonorItem(((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.honor) ?? {});
-  } catch (error) {
-    throw createApiRequestError(error, "Failed to update honor");
-  }
-};
-const deleteHonorApi = async (id) => {
-  try {
-    await post(`${ENDPOINT.DELETE_HONOR}/${id}`, void 0, {
-      needAuth: true
-    });
-  } catch (error) {
-    throw createApiRequestError(error, "Failed to delete honor");
-  }
-};
 var SWITCH_NAME = "Switch";
 var [createSwitchContext] = createContextScope(SWITCH_NAME);
 var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
@@ -80507,6 +80884,287 @@ function ThemePage() {
     ] })
   ] });
 }
+const getAllTpaApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_TPA, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa) ?? [];
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch TPA items"
+    );
+  }
+};
+const addTpaApi = async (image, title) => {
+  var _a2, _b2, _c2;
+  try {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("image", image);
+    const res = await post(ENDPOINT.ADD_TPA, formData, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa;
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add TPA item");
+  }
+};
+const updateTpaApi = async (id, title) => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_TPA}/${id}`,
+      { title },
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update TPA item"
+    );
+  }
+};
+const deleteTpaApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_TPA}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(
+      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete TPA item"
+    );
+  }
+};
+const TPA_QUERY_KEY = ["tpa"];
+function TPAPage() {
+  const queryClient2 = useQueryClient();
+  const [open, setOpen] = reactExports.useState(false);
+  const [title, setTitle] = reactExports.useState("");
+  const [image, setImage] = reactExports.useState(null);
+  const [previewUrl, setPreviewUrl] = reactExports.useState(null);
+  const [previewTarget, setPreviewTarget] = reactExports.useState(null);
+  const [editTarget, setEditTarget] = reactExports.useState(null);
+  const [editTitle, setEditTitle] = reactExports.useState("");
+  const { data: tpaItems = [], isLoading } = useQuery({
+    queryKey: TPA_QUERY_KEY,
+    queryFn: getAllTpaApi
+  });
+  const addMutation = useMutation({
+    mutationFn: ({ image: image2, title: title2 }) => addTpaApi(image2, title2)
+  });
+  const deleteMutation = useMutation({ mutationFn: deleteTpaApi });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, title: title2 }) => updateTpaApi(id, title2)
+  });
+  const handleImageChange = (event) => {
+    var _a2;
+    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
+    setImage(file);
+    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
+  function resolveAssetUrl2(path) {
+    if (!path) return "";
+    if (/^https?:\/\//.test(path)) return path;
+    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+  const resetForm2 = () => {
+    setOpen(false);
+    setTitle("");
+    setImage(null);
+    setPreviewUrl(null);
+  };
+  const handleSave = async () => {
+    if (!image) {
+      ue.error("Please select an image to upload.");
+      return;
+    }
+    try {
+      await addMutation.mutateAsync({ image, title: title.trim() });
+      ue.success("TPA item added");
+      queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
+      resetForm2();
+    } catch {
+      ue.error("Unable to upload TPA image.");
+    }
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this TPA item?")) return;
+    await deleteMutation.mutateAsync(id);
+    queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
+    ue.success("TPA item deleted");
+  };
+  const tpaRows = reactExports.useMemo(() => tpaItems, [tpaItems]);
+  const columns = [
+    {
+      key: "title",
+      header: "Title",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm truncate block max-w-[220px]", children: item.title || "—" })
+    },
+    {
+      key: "image",
+      header: "Image",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-14 w-20 overflow-hidden rounded-lg border border-border bg-muted/60", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "img",
+        {
+          src: resolveAssetUrl2(item.image),
+          alt: item.title || "TPA",
+          className: "h-full w-full object-cover"
+        }
+      ) })
+    },
+    {
+      key: "createdAt",
+      header: "Uploaded",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: item.createdAt ? new Date(item.createdAt).toLocaleString() : "—" })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-lg border-border",
+            onClick: () => setPreviewTarget(item),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "ghost",
+            onClick: () => {
+              setEditTarget(item);
+              setEditTitle(item.title || "");
+            },
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "ghost",
+            onClick: () => handleDelete(item._id),
+            "aria-label": "Delete TPA item",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+          }
+        )
+      ] })
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "TPA",
+        description: "Manage website TPA partner logos. Title is optional and stays internal.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: () => setOpen(true),
+            className: "rounded-xl gap-2 bg-primary",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 14 }),
+              " Add TPA"
+            ]
+          }
+        )
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataTable,
+      {
+        columns,
+        data: tpaRows,
+        isLoading,
+        searchable: true,
+        searchKeys: ["title", "image"],
+        emptyText: "No TPA items uploaded yet.",
+        rowKey: (row) => row._id
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add TPA Item" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          type: "text",
+          placeholder: "Title (optional, not shown on website)",
+          value: title,
+          onChange: (e3) => setTitle(e3.target.value)
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { type: "file", accept: "image/*", onChange: handleImageChange }),
+        previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: previewUrl,
+            alt: "Preview",
+            className: "h-56 w-full object-contain bg-white"
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save TPA" })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!previewTarget,
+        onOpenChange: (nextOpen) => !nextOpen && setPreviewTarget(null),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "TPA Preview" }) }),
+          previewTarget && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted/60 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "img",
+            {
+              src: resolveAssetUrl2(previewTarget.image),
+              alt: previewTarget.title || "TPA preview",
+              className: "w-full max-h-[60vh] object-contain bg-card"
+            }
+          ) }),
+          (previewTarget == null ? void 0 : previewTarget.title) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm text-muted-foreground text-center", children: previewTarget.title })
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: !!editTarget, onOpenChange: () => setEditTarget(null), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Edit TPA Title (Optional)" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          value: editTitle,
+          onChange: (e3) => setEditTitle(e3.target.value)
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          onClick: async () => {
+            if (!editTarget) return;
+            await updateMutation.mutateAsync({
+              id: editTarget._id,
+              title: editTitle.trim()
+            });
+            queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
+            ue.success("TPA title updated");
+            setEditTarget(null);
+          },
+          children: "Save Changes"
+        }
+      )
+    ] }) })
+  ] });
+}
 function toFormData$2(payload) {
   var _a2;
   const formData = new FormData();
@@ -80599,6 +81257,65 @@ function ImageUploadField({
         }
       }
     )
+  ] });
+}
+function TrustComplianceSectionEditor({
+  form,
+  updateField
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-slate-200 p-5 space-y-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-slate-900", children: "Haryana Government Card" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500 mt-1", children: "This logo appears in the homepage Trust & Compliance section and opens the Haryana information page on click." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ImageUploadField,
+        {
+          id: "trust-compliance-haryana-logo",
+          label: "Haryana Government Logo",
+          hint: "Transparent PNG/WebP only, tightly cropped. Horizontal logo: 360 x 120 px; round seal: 160 x 160 px.",
+          value: form.haryanaLogo,
+          onPick: (file) => updateField("haryanaLogo", file)
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Haryana Information Page Description" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
+          {
+            value: form.haryanaDescription,
+            onChange: (content) => updateField("haryanaDescription", content)
+          }
+        ) })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl border border-slate-200 p-5 space-y-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-slate-900", children: "NABH Card" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500 mt-1", children: "This logo appears in the homepage Trust & Compliance section and opens the NABH information page on click." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ImageUploadField,
+        {
+          id: "trust-compliance-nabh-logo",
+          label: "NABH Logo",
+          hint: "Transparent PNG/WebP only, tightly cropped. Horizontal logo: 360 x 120 px; round seal: 160 x 160 px.",
+          value: form.nabhLogo,
+          onPick: (file) => updateField("nabhLogo", file)
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "NABH Information Page Description" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "website-page-editor", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PageEditor,
+          {
+            value: form.nabhDescription,
+            onChange: (content) => updateField("nabhDescription", content)
+          }
+        ) })
+      ] })
+    ] })
   ] });
 }
 function HeroSectionEditor({
@@ -81612,6 +82329,7 @@ function WebsiteContentPageImpl() {
     EMPTY_WHY_CHOOSE_US_FORM
   );
   const [aboutForm, setAboutForm] = reactExports.useState(EMPTY_ABOUT_FORM);
+  const [trustComplianceForm, setTrustComplianceForm] = reactExports.useState(EMPTY_TRUST_COMPLIANCE_FORM);
   const [previewOpen, setPreviewOpen] = reactExports.useState(false);
   const { data: contentItem, isLoading } = useQuery({
     queryKey: ["content", selectedSection],
@@ -81624,8 +82342,12 @@ function WebsiteContentPageImpl() {
       setHowItWorksForm(mapContentToHowItWorksForm(contentItem ?? null));
     } else if (selectedSection === "why_choose_us") {
       setWhyChooseUsForm(mapContentToWhyChooseUsForm(contentItem ?? null));
-    } else {
+    } else if (selectedSection === "about") {
       setAboutForm(mapContentToAboutForm(contentItem ?? null));
+    } else {
+      setTrustComplianceForm(
+        mapContentToTrustComplianceForm(contentItem ?? null)
+      );
     }
   }, [contentItem, selectedSection]);
   const saveMutation = useMutation({
@@ -81641,8 +82363,10 @@ function WebsiteContentPageImpl() {
         setHowItWorksForm(mapContentToHowItWorksForm(data));
       } else if (selectedSection === "why_choose_us") {
         setWhyChooseUsForm(mapContentToWhyChooseUsForm(data));
-      } else {
+      } else if (selectedSection === "about") {
         setAboutForm(mapContentToAboutForm(data));
+      } else {
+        setTrustComplianceForm(mapContentToTrustComplianceForm(data));
       }
     },
     onError: (error) => ue.error(error.message)
@@ -81670,6 +82394,9 @@ function WebsiteContentPageImpl() {
   }
   function updateAboutField(key, value) {
     setAboutForm((prev2) => ({ ...prev2, [key]: value }));
+  }
+  function updateTrustComplianceField(key, value) {
+    setTrustComplianceForm((prev2) => ({ ...prev2, [key]: value }));
   }
   function handleSave() {
     if (selectedSection === "home_hero") {
@@ -81769,31 +82496,52 @@ function WebsiteContentPageImpl() {
       });
       return;
     }
-    if (!aboutForm.heading.trim()) {
+    if (selectedSection === "about" && !aboutForm.heading.trim()) {
       ue.error("Section heading is required.");
       return;
     }
-    saveMutation.mutate({
-      modelKey: selectedSection,
-      title: SECTION_META[selectedSection].title,
-      isActive: aboutForm.isActive,
-      content: {
-        eyebrowText: aboutForm.eyebrowText.trim(),
-        heading: aboutForm.heading.trim(),
-        subheading: aboutForm.subheading.trim(),
-        description: aboutForm.description.trim(),
-        bulletOne: aboutForm.bulletOne.trim(),
-        bulletTwo: aboutForm.bulletTwo.trim(),
-        bulletThree: aboutForm.bulletThree.trim(),
-        bulletFour: aboutForm.bulletFour.trim(),
-        ctaText: aboutForm.ctaText.trim(),
-        ctaLink: aboutForm.ctaLink.trim(),
-        sectionImage: typeof aboutForm.sectionImage === "string" ? aboutForm.sectionImage : ""
-      },
-      files: {
-        sectionImage: aboutForm.sectionImage
-      }
-    });
+    if (selectedSection === "about") {
+      saveMutation.mutate({
+        modelKey: selectedSection,
+        title: SECTION_META[selectedSection].title,
+        isActive: aboutForm.isActive,
+        content: {
+          eyebrowText: aboutForm.eyebrowText.trim(),
+          heading: aboutForm.heading.trim(),
+          subheading: aboutForm.subheading.trim(),
+          description: aboutForm.description.trim(),
+          bulletOne: aboutForm.bulletOne.trim(),
+          bulletTwo: aboutForm.bulletTwo.trim(),
+          bulletThree: aboutForm.bulletThree.trim(),
+          bulletFour: aboutForm.bulletFour.trim(),
+          ctaText: aboutForm.ctaText.trim(),
+          ctaLink: aboutForm.ctaLink.trim(),
+          sectionImage: typeof aboutForm.sectionImage === "string" ? aboutForm.sectionImage : ""
+        },
+        files: {
+          sectionImage: aboutForm.sectionImage
+        }
+      });
+      return;
+    }
+    if (selectedSection === "trust_compliance") {
+      saveMutation.mutate({
+        modelKey: selectedSection,
+        title: SECTION_META[selectedSection].title,
+        isActive: trustComplianceForm.isActive,
+        content: {
+          haryanaLogo: typeof trustComplianceForm.haryanaLogo === "string" ? trustComplianceForm.haryanaLogo : "",
+          haryanaDescription: trustComplianceForm.haryanaDescription,
+          nabhLogo: typeof trustComplianceForm.nabhLogo === "string" ? trustComplianceForm.nabhLogo : "",
+          nabhDescription: trustComplianceForm.nabhDescription
+        },
+        files: {
+          haryanaLogo: trustComplianceForm.haryanaLogo,
+          nabhLogo: trustComplianceForm.nabhLogo
+        }
+      });
+      return;
+    }
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "website-content.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -81842,7 +82590,8 @@ function WebsiteContentPageImpl() {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "home_hero", className: "flex-1 rounded-2xl", children: "Home Hero" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "home_how_we_work", className: "flex-1 rounded-2xl", children: "How We Work" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "why_choose_us", className: "flex-1 rounded-2xl", children: "Why Choose Us" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "about", className: "flex-1 rounded-2xl", children: "About" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "about", className: "flex-1 rounded-2xl", children: "About" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "trust_compliance", className: "flex-1 rounded-2xl", children: "Trust & Compliance" })
         ] })
       }
     ),
@@ -81898,11 +82647,17 @@ function WebsiteContentPageImpl() {
             form: whyChooseUsForm,
             updateField: updateWhyChooseUsField
           }
-        ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ) : selectedSection === "about" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
           AboutSectionEditor,
           {
             form: aboutForm,
             updateField: updateAboutField
+          }
+        ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+          TrustComplianceSectionEditor,
+          {
+            form: trustComplianceForm,
+            updateField: updateTrustComplianceField
           }
         )
       ] })
@@ -81912,7 +82667,30 @@ function WebsiteContentPageImpl() {
         SECTION_META[selectedSection].title,
         " Preview"
       ] }) }),
-      selectedSection === "home_hero" ? /* @__PURE__ */ jsxRuntimeExports.jsx(HeroPreview, { form: heroForm }) : selectedSection === "home_how_we_work" ? /* @__PURE__ */ jsxRuntimeExports.jsx(HowItWorksPreview, { form: howItWorksForm }) : selectedSection === "why_choose_us" ? /* @__PURE__ */ jsxRuntimeExports.jsx(WhyChooseUsPreview, { form: whyChooseUsForm }) : /* @__PURE__ */ jsxRuntimeExports.jsx(AboutPreview, { form: aboutForm })
+      selectedSection === "home_hero" ? /* @__PURE__ */ jsxRuntimeExports.jsx(HeroPreview, { form: heroForm }) : selectedSection === "home_how_we_work" ? /* @__PURE__ */ jsxRuntimeExports.jsx(HowItWorksPreview, { form: howItWorksForm }) : selectedSection === "why_choose_us" ? /* @__PURE__ */ jsxRuntimeExports.jsx(WhyChooseUsPreview, { form: whyChooseUsForm }) : selectedSection === "about" ? /* @__PURE__ */ jsxRuntimeExports.jsx(AboutPreview, { form: aboutForm }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5 rounded-[32px] border border-slate-200 bg-white p-8", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-500", children: "Trust & Compliance previews" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-5 md:grid-cols-2", children: [
+          ["Haryana Government", trustComplianceForm.haryanaLogo],
+          ["NABH", trustComplianceForm.nabhLogo]
+        ].map(([label, logo]) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "rounded-2xl border border-slate-100 p-5",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mb-4 text-sm font-semibold text-slate-800", children: label }),
+              typeof logo === "string" && logo ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: resolveAssetUrl$1(logo),
+                  alt: label,
+                  className: "h-16 max-w-full object-contain"
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-slate-400", children: "No logo selected" })
+            ]
+          },
+          label
+        )) })
+      ] })
     ] }) })
   ] });
 }
@@ -88131,6 +88909,12 @@ const galleryRoute = createRoute({
   beforeLoad: () => checkPermission("/gallery"),
   component: GalleryPage
 });
+const tpaRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/tpa",
+  beforeLoad: () => checkPermission("/tpa"),
+  component: TPAPage
+});
 const reviewsAndShortsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/shorts",
@@ -88200,6 +88984,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     blogCategoryRoute,
     galleryRoute,
+    tpaRoute,
     reviewsAndShortsRoute,
     jobApplicationsRoute,
     themeRoute,

@@ -17,6 +17,8 @@ export type PermissionKey =
   | "view_blogs"
   | "manage_gallery"
   | "view_gallery"
+  | "manage_tpa"
+  | "view_tpa"
   | "view_settings"
   | "manage_settings"
   | "view_admin_staff"
@@ -57,6 +59,8 @@ export const PERMISSION_LABELS: Record<PermissionKey, string> = {
   view_blogs: "View blogs",
   manage_gallery: "Manage gallery",
   view_gallery: "View gallery",
+  manage_tpa: "Manage TPA",
+  view_tpa: "View TPA",
   view_settings: "View settings",
   manage_settings: "Manage settings",
   view_admin_staff: "View admin staff",
@@ -116,6 +120,11 @@ export const PERMISSION_GROUPS: Array<{
     permissions: ["view_gallery", "manage_gallery"],
   },
   {
+    title: "TPA",
+    description: "Manage TPA partner logos and titles shown on the website.",
+    permissions: ["view_tpa", "manage_tpa"],
+  },
+  {
     title: "Settings",
     description: "Access and update business settings and CMS settings.",
     permissions: ["view_settings", "manage_settings"],
@@ -160,6 +169,7 @@ const PATH_PERMISSION_RULES: Record<
   },
   "/blogs": { permissions: ["view_blogs", "manage_blogs"] },
   "/gallery": { permissions: ["view_gallery", "manage_gallery"] },
+  "/tpa": { permissions: ["view_tpa", "manage_tpa"] },
   "/reviews-shorts": {
     permissions: [
       "view_reviews",

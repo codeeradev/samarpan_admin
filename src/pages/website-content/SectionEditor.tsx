@@ -9,6 +9,7 @@ import {
   AboutFormState,
   HeroFormState,
   HowItWorksFormState,
+  TrustComplianceFormState,
   WhyChooseUsFormState,
   resolveAssetUrl,
 } from "./types";
@@ -73,6 +74,64 @@ function ImageUploadField({
           }
         }}
       />
+    </div>
+  );
+}
+
+export function TrustComplianceSectionEditor({
+  form,
+  updateField,
+}: {
+  form: TrustComplianceFormState;
+  updateField: FormUpdater<TrustComplianceFormState>;
+}) {
+  return (
+    <div className="space-y-8">
+      <div className="rounded-2xl border border-slate-200 p-5 space-y-4">
+        <div>
+          <h3 className="font-semibold text-slate-900">Haryana Government Card</h3>
+          <p className="text-sm text-slate-500 mt-1">This logo appears in the homepage Trust & Compliance section and opens the Haryana information page on click.</p>
+        </div>
+        <ImageUploadField
+          id="trust-compliance-haryana-logo"
+          label="Haryana Government Logo"
+          hint="Transparent PNG/WebP only, tightly cropped. Horizontal logo: 360 x 120 px; round seal: 160 x 160 px."
+          value={form.haryanaLogo}
+          onPick={(file) => updateField("haryanaLogo", file)}
+        />
+        <div className="space-y-2">
+          <Label>Haryana Information Page Description</Label>
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.haryanaDescription}
+              onChange={(content) => updateField("haryanaDescription", content)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 p-5 space-y-4">
+        <div>
+          <h3 className="font-semibold text-slate-900">NABH Card</h3>
+          <p className="text-sm text-slate-500 mt-1">This logo appears in the homepage Trust & Compliance section and opens the NABH information page on click.</p>
+        </div>
+        <ImageUploadField
+          id="trust-compliance-nabh-logo"
+          label="NABH Logo"
+          hint="Transparent PNG/WebP only, tightly cropped. Horizontal logo: 360 x 120 px; round seal: 160 x 160 px."
+          value={form.nabhLogo}
+          onPick={(file) => updateField("nabhLogo", file)}
+        />
+        <div className="space-y-2">
+          <Label>NABH Information Page Description</Label>
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.nabhDescription}
+              onChange={(content) => updateField("nabhDescription", content)}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

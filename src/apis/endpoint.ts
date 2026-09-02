@@ -1,6 +1,6 @@
 export const BASE_URL =
-  import.meta.env.VITE_API_URL || "https://api.samarpanhospitalhisar.com/admin";
-  // import.meta.env.VITE_API_URL || "http://localhost:9010/admin";
+  // import.meta.env.VITE_API_URL || "https://api.samarpanhospitalhisar.com/admin";
+  "http://localhost:9010/admin";
 
 export const ENDPOINT = {
   LOGIN: "/admin-login",
@@ -33,6 +33,10 @@ export const ENDPOINT = {
   ADD_GALLERY: "/add-gallery",
   UPDATE_GALLERY: "/update-gallery",
   DELETE_GALLERY: "/delete-gallery",
+  GET_ALL_TPA: "/get-all-tpa",
+  ADD_TPA: "/add-tpa",
+  UPDATE_TPA: "/update-tpa",
+  DELETE_TPA: "/delete-tpa",
   GET_ALL_CAREERS: "/get-all-careers",
   ADD_CAREER: "/add-career",
   UPDATE_CAREER: "/update-career",

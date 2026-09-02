@@ -153,6 +153,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/gallery",
   },
   {
+    label: "TPA",
+    icon: Shield,
+    path: "/tpa",
+    permissionPath: "/tpa",
+  },
+  {
     label: "Shorts",
     icon: Star,
     path: "/shorts",

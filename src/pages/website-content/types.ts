@@ -7,7 +7,8 @@ export type SectionKey =
   | "home_hero"
   | "home_how_we_work"
   | "why_choose_us"
-  | "about";
+  | "about"
+  | "trust_compliance";
 
 export const SECTION_META: Record<SectionKey, { title: string; description: string }> = {
   home_hero: {
@@ -25,6 +26,10 @@ export const SECTION_META: Record<SectionKey, { title: string; description: stri
   about: {
     title: "About Section",
     description: "Manage the homepage About section content.",
+  },
+  trust_compliance: {
+    title: "Trust & Compliance Section",
+    description: "Manage the Haryana Government and NABH cards shown on the homepage.",
   },
 };
 
@@ -98,6 +103,14 @@ export type AboutFormState = {
   isActive: boolean;
 };
 
+export type TrustComplianceFormState = {
+  haryanaLogo: File | string;
+  haryanaDescription: string;
+  nabhLogo: File | string;
+  nabhDescription: string;
+  isActive: boolean;
+};
+
 export const EMPTY_HERO_FORM: HeroFormState = {
   eyebrowText: "",
   titlePrefix: "",
@@ -165,6 +178,14 @@ export const EMPTY_ABOUT_FORM: AboutFormState = {
   ctaText: "",
   ctaLink: "",
   sectionImage: "",
+  isActive: true,
+};
+
+export const EMPTY_TRUST_COMPLIANCE_FORM: TrustComplianceFormState = {
+  haryanaLogo: "",
+  haryanaDescription: "",
+  nabhLogo: "",
+  nabhDescription: "",
   isActive: true,
 };
 
@@ -270,6 +291,25 @@ export function mapContentToAboutForm(item: ContentItem | null): AboutFormState 
     ctaText: readString(content.ctaText),
     ctaLink: readString(content.ctaLink),
     sectionImage: readString(content.sectionImage),
+    isActive: readBoolean(item?.isActive, true),
+  };
+}
+
+export function mapContentToTrustComplianceForm(
+  item: ContentItem | null,
+): TrustComplianceFormState {
+  const content = item?.content ?? {};
+
+  return {
+    haryanaLogo: readString(content.haryanaLogo) || readString(content.mainLogo),
+    haryanaDescription:
+      readString(content.haryanaDescription) ||
+      readString(content.mainDescription),
+    nabhLogo:
+      readString(content.nabhLogo) || readString(content.appointmentLogo),
+    nabhDescription:
+      readString(content.nabhDescription) ||
+      readString(content.appointmentDescription),
     isActive: readBoolean(item?.isActive, true),
   };
 }

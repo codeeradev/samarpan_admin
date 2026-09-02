@@ -12,6 +12,7 @@ export interface DoctorPayload {
   experience: string;
   qualification: string;
   expertise?: string[];
+  honors?: string[];
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -37,6 +38,7 @@ export interface DoctorItem {
   experience?: string;
   qualification?: string;
   expertise?: string[];
+  honors?: Array<string | { _id: string; title?: string; image?: string }>;
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -78,6 +80,10 @@ function toFormData(payload: Partial<DoctorPayload>): FormData {
 
   if (payload.expertise) {
     fd.append("expertise", JSON.stringify(payload.expertise));
+  }
+
+  if (payload.honors) {
+    fd.append("honors", JSON.stringify(payload.honors));
   }
 
   if (payload.seo) {

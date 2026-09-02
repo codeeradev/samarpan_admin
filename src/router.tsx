@@ -22,6 +22,7 @@ import ServiceSubCategoriesPage from "@/pages/ServiceSubCategoriesPage";
 import SettingsPage from "@/pages/SettingsPage";
 import SlotManagementPage from "@/pages/SlotManagementPage";
 import ThemePage from "@/pages/ThemePage";
+import TPAPage from "@/pages/TPAPage";
 import WebsiteContentPage from "@/pages/WebsiteContentPage";
 
 import JobApplicationsPage from "@/pages/JobApplicationsPage";
@@ -222,6 +223,13 @@ const galleryRoute = createRoute({
   component: GalleryPage,
 });
 
+const tpaRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/tpa",
+  beforeLoad: () => checkPermission("/tpa"),
+  component: TPAPage,
+});
+
 const reviewsAndShortsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/shorts",
@@ -311,6 +319,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     blogCategoryRoute,
     galleryRoute,
+    tpaRoute,
     reviewsAndShortsRoute,
     jobApplicationsRoute,
     themeRoute,

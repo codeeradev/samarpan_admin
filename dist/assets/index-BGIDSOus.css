@@ -2166,6 +2166,9 @@ video {
   border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
   border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
 }
+.divide-border > :not([hidden]) ~ :not([hidden]) {
+  border-color: oklch(var(--border));
+}
 .self-start {
   align-self: flex-start;
 }
@@ -3069,6 +3072,18 @@ video {
 }
 .text-sidebar-primary-foreground {
   color: oklch(var(--sidebar-primary-foreground));
+}
+.text-slate-400 {
+  --tw-text-opacity: 1;
+  color: rgb(148 163 184 / var(--tw-text-opacity, 1));
+}
+.text-slate-500 {
+  --tw-text-opacity: 1;
+  color: rgb(100 116 139 / var(--tw-text-opacity, 1));
+}
+.text-slate-800 {
+  --tw-text-opacity: 1;
+  color: rgb(30 41 59 / var(--tw-text-opacity, 1));
 }
 .text-slate-900 {
   --tw-text-opacity: 1;

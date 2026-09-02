@@ -6,6 +6,7 @@ import {
   getAllDoctorsApi,
   updateDoctorApi,
 } from "@/apiCalls/doctors";
+import { type HonorItem, getAllHonorsApi } from "@/apiCalls/honors";
 import { BASE_URL } from "@/apis/endpoint";
 import PageEditor from "@/components/editor/pageEditor";
 import { useSpecializations } from "@/hooks/useSpecializations";
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -103,6 +105,7 @@ type DoctorFormData = {
   metaTitle: string;
   metaDescription: string;
   keywords: string;
+  honors: string[];
 };
 
 type FormErrors = Partial<Record<keyof DoctorFormData, string>>;
@@ -124,6 +127,7 @@ const emptyForm: DoctorFormData = {
   metaTitle: "",
   metaDescription: "",
   keywords: "",
+  honors: [],
 };
 
 function getInitials(name: string): string {
@@ -159,6 +163,12 @@ function splitCommaList(value: string): string[] {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function getHonorIds(doctor: DoctorItem): string[] {
+  return (doctor.honors ?? [])
+    .map((honor) => (typeof honor === "string" ? honor : honor?._id))
+    .filter((id): id is string => Boolean(id));
 }
 
 function resolveAssetUrl(path?: string) {
@@ -225,6 +235,7 @@ function buildPayload(
       metaDescription: form.metaDescription.trim(),
       keywords: splitCommaList(form.keywords),
     },
+    honors: form.honors,
     image: form.image,
     ...availabilityToFlags(form.availability),
   };
@@ -252,6 +263,19 @@ export default function DoctorsPage() {
     queryKey: ["doctors"],
     queryFn: getAllDoctorsApi,
   });
+
+  const { data: honors = [], isLoading: honorsLoading } = useQuery<
+    HonorItem[],
+    Error
+  >({
+    queryKey: ["honors", "doctor-form"],
+    queryFn: getAllHonorsApi,
+  });
+
+  const activeHonors = useMemo(
+    () => honors.filter((honor) => honor.isActive),
+    [honors],
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -363,6 +387,7 @@ export default function DoctorsPage() {
       metaTitle: doctor.seo?.metaTitle ?? "",
       metaDescription: doctor.seo?.metaDescription ?? "",
       keywords: (doctor.seo?.keywords ?? []).join(", "),
+      honors: getHonorIds(doctor),
     });
     setFormErrors({});
     setImageFileName(getImageLabel(doctor.image ?? ""));
@@ -758,6 +783,8 @@ export default function DoctorsPage() {
             imageFileName={imageFileName}
             fileInputRef={fileInputRef}
             specializations={specializations}
+            honors={activeHonors}
+            honorsLoading={honorsLoading}
             onFieldChange={setField}
             onFileChange={handleFileChange}
             onFileClick={() => fileInputRef.current?.click()}
@@ -816,6 +843,8 @@ export default function DoctorsPage() {
             imageFileName={imageFileName}
             fileInputRef={fileInputRef}
             specializations={specializations}
+            honors={activeHonors}
+            honorsLoading={honorsLoading}
             onFieldChange={setField}
             onFileChange={handleFileChange}
             onFileClick={() => fileInputRef.current?.click()}
@@ -901,6 +930,8 @@ type DoctorFormProps = {
   imageFileName: string;
   fileInputRef: RefObject<HTMLInputElement | null>;
   specializations: any[];
+  honors: HonorItem[];
+  honorsLoading: boolean;
   onFieldChange: <K extends keyof DoctorFormData>(
     key: K,
     value: DoctorFormData[K],
@@ -916,6 +947,8 @@ function DoctorForm({
   imageFileName,
   fileInputRef,
   specializations,
+  honors,
+  honorsLoading,
   onFieldChange,
   onFileChange,
   onFileClick,
@@ -928,6 +961,9 @@ function DoctorForm({
         </TabsTrigger>
         <TabsTrigger value="description" className="flex-1">
           Description
+        </TabsTrigger>
+        <TabsTrigger value="honors" className="flex-1">
+          Honors
         </TabsTrigger>
         <TabsTrigger value="seo" className="flex-1">
           SEO
@@ -1217,6 +1253,54 @@ function DoctorForm({
           </p>
         )}
       </div>
+      </TabsContent>
+
+      <TabsContent value="honors" className="mt-0 space-y-3">
+        <div className="space-y-1">
+          <Label className="text-sm font-medium text-foreground">
+            Honors And Recognitions
+          </Label>
+        </div>
+
+        <div className="rounded-2xl border border-border divide-y divide-border overflow-hidden">
+          {honorsLoading ? (
+            SKELETON_ROWS.slice(0, 3).map((key) => (
+              <div key={key} className="flex items-center gap-3 p-3">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-40 rounded" />
+              </div>
+            ))
+          ) : honors.length === 0 ? (
+            <p className="p-4 text-sm text-muted-foreground">
+              No active honors available.
+            </p>
+          ) : (
+            honors.map((honor) => {
+              const checked = formData.honors.includes(honor._id);
+
+              return (
+                <label
+                  key={honor._id}
+                  className="flex cursor-pointer items-center gap-3 p-3 text-sm hover:bg-muted"
+                >
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={(value) => {
+                      const nextHonors = value
+                        ? [...formData.honors, honor._id]
+                        : formData.honors.filter((id) => id !== honor._id);
+                      onFieldChange("honors", nextHonors);
+                    }}
+                    data-ocid={`doctors.honor_checkbox.${honor._id}`}
+                  />
+                  <span className="font-medium text-foreground">
+                    {honor.title}
+                  </span>
+                </label>
+              );
+            })
+          )}
+        </div>
       </TabsContent>
 
       <TabsContent value="seo" className="mt-0 space-y-4">
