@@ -21871,10 +21871,7 @@ const {
   getAdapter,
   mergeConfig
 } = axios;
-const BASE_URL = (
-  // import.meta.env.VITE_API_URL || "https://api.samarpanhospitalhisar.com/admin";
-  "http://localhost:9010/admin"
-);
+const BASE_URL = "https://api.samarpanhospitalhisar.com/admin";
 const ENDPOINT = {
   LOGIN: "/admin-login",
   ADD_SERVICE: "/add-service",
