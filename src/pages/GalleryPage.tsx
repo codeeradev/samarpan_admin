@@ -1,8 +1,7 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState, type ChangeEvent } from "react";
-import { DataTable, type Column } from "@/components/admin/DataTable";
+import { BASE_URL } from "@/apis/endpoint";
+import { type Column, DataTable } from "@/components/admin/DataTable";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,51 +11,141 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { BASE_URL } from "@/apis/endpoint";
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { type ChangeEvent, useMemo, useState } from "react";
+import { toast } from "sonner";
+
 import {
+  type GalleryItem,
   addGalleryApi,
   deleteGalleryApi,
   getAllGalleryApi,
   updateGalleryApi,
-  type GalleryItem,
 } from "@/apiCalls/gallery";
 
 const GALLERY_QUERY_KEY = ["gallery"];
+
+const CATEGORIES = [
+  { value: "festival", label: "Festival" },
+  { value: "patients", label: "Patients" },
+  { value: "events", label: "Events" },
+  { value: "facilities", label: "Facilities" },
+  { value: "team", label: "Team" },
+  { value: "awards", label: "Awards" },
+  { value: "hospital", label: "Hospital" },
+  { value: "other", label: "Other" },
+];
+
+function normalizeCategory(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function formatCategoryLabel(value: string) {
+  return value
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 export default function GalleryPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [caption, setCaption] = useState("");
+  const [category, setCategory] = useState("other");
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewTarget, setPreviewTarget] = useState<GalleryItem | null>(null);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [addingCategoryFor, setAddingCategoryFor] = useState<
+    "create" | "edit" | null
+  >(null);
+  const [newCategoryTitle, setNewCategoryTitle] = useState("");
 
   const [editTarget, setEditTarget] = useState<GalleryItem | null>(null);
   const [editCaption, setEditCaption] = useState("");
+  const [editCategory, setEditCategory] = useState("other");
+  const [editImage, setEditImage] = useState<File | null>(null);
+  const [editPreviewUrl, setEditPreviewUrl] = useState<string | null>(null);
 
   const { data: gallery = [], isLoading } = useQuery({
     queryKey: GALLERY_QUERY_KEY,
     queryFn: getAllGalleryApi,
   });
 
+  const categoryOptions = useMemo(() => {
+    const optionMap = new Map(CATEGORIES.map((cat) => [cat.value, cat.label]));
+
+    [...gallery.map((item) => item.category), ...customCategories]
+      .filter((value): value is string => Boolean(value))
+      .forEach((value) => {
+        const normalized = normalizeCategory(value);
+        if (normalized && !optionMap.has(normalized)) {
+          optionMap.set(normalized, formatCategoryLabel(normalized));
+        }
+      });
+
+    return Array.from(optionMap, ([value, label]) => ({ value, label }));
+  }, [gallery, customCategories]);
+
   const addMutation = useMutation({
-    mutationFn: ({ image, caption }: { image: File; caption: string }) =>
-      addGalleryApi(image, caption),
+    mutationFn: ({
+      image,
+      caption,
+      category,
+    }: { image: File; caption: string; category: string }) =>
+      addGalleryApi(image, caption, category),
   });
   const deleteMutation = useMutation({ mutationFn: deleteGalleryApi });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, caption }: { id: string; caption: string }) =>
-      updateGalleryApi(id, caption),
+    mutationFn: ({
+      id,
+      caption,
+      category,
+      image,
+    }: { id: string; caption: string; category: string; image?: File }) =>
+      updateGalleryApi(id, caption, category, image),
   });
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
     setImage(file);
     setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+
+  const handleEditImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setEditImage(file);
+    setEditPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+
+  const startAddCategory = (target: "create" | "edit") => {
+    setAddingCategoryFor(target);
+    setNewCategoryTitle("");
+  };
+
+  const applyNewCategory = () => {
+    const normalized = normalizeCategory(newCategoryTitle);
+
+    if (!normalized) {
+      toast.error("Please enter a category title.");
+      return;
+    }
+
+    setCustomCategories((previous) =>
+      previous.includes(normalized) ? previous : [...previous, normalized],
+    );
+
+    if (addingCategoryFor === "edit") {
+      setEditCategory(normalized);
+    } else {
+      setCategory(normalized);
+    }
+
+    setAddingCategoryFor(null);
+    setNewCategoryTitle("");
   };
 
   const API_ASSET_ORIGIN = BASE_URL.replace(/\/admin\/?$/, "");
@@ -74,14 +163,17 @@ export default function GalleryPage() {
     }
 
     try {
-      await addMutation.mutateAsync({ image, caption });
+      await addMutation.mutateAsync({ image, caption, category });
       toast.success("Gallery image added");
       queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
       setOpen(false);
       setImage(null);
       setPreviewUrl(null);
       setCaption("");
-    } catch (error) {
+      setCategory("other");
+      setAddingCategoryFor(null);
+      setNewCategoryTitle("");
+    } catch (_error) {
       toast.error("Unable to upload image.");
     }
   };
@@ -93,7 +185,6 @@ export default function GalleryPage() {
     toast.success("Gallery image deleted");
   };
 
-  const totalImages = gallery.length;
   const galleryRows = useMemo(() => gallery, [gallery]);
 
   const columns: Column<GalleryItem>[] = [
@@ -103,6 +194,15 @@ export default function GalleryPage() {
       render: (item) => (
         <span className="text-sm truncate block max-w-[220px]">
           {item.caption || "—"}
+        </span>
+      ),
+    },
+    {
+      key: "category",
+      header: "Category",
+      render: (item) => (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary capitalize">
+          {item.category || "other"}
         </span>
       ),
     },
@@ -150,6 +250,9 @@ export default function GalleryPage() {
             onClick={() => {
               setEditTarget(item);
               setEditCaption(item.caption || "");
+              setEditCategory(item.category || "other");
+              setEditImage(null);
+              setEditPreviewUrl(null);
             }}
           >
             <Pencil size={14} />
@@ -193,20 +296,104 @@ export default function GalleryPage() {
         data-ocid="gallery.table"
       />
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(nextOpen) => {
+          setOpen(nextOpen);
+          if (!nextOpen) {
+            setAddingCategoryFor(null);
+            setNewCategoryTitle("");
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Gallery Image (1170 × 1560)</DialogTitle>
           </DialogHeader>
 
-          <Input
-            type="text"
-            placeholder="Enter caption"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-          />
           <div className="space-y-4">
-            <Input type="file" accept="image/*" onChange={handleImageChange} />
+            <div>
+              <label
+                htmlFor="gallery-caption"
+                className="text-sm font-medium mb-1.5 block"
+              >
+                Caption
+              </label>
+              <Input
+                id="gallery-caption"
+                type="text"
+                placeholder="Enter caption"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <div className="mb-1.5 flex items-center justify-between gap-3">
+                <label
+                  htmlFor="gallery-category"
+                  className="text-sm font-medium"
+                >
+                  Category
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 gap-1 px-2 text-xs"
+                  onClick={() => startAddCategory("create")}
+                >
+                  <Plus size={13} /> Add
+                </Button>
+              </div>
+              {addingCategoryFor === "create" ? (
+                <div className="flex gap-2">
+                  <Input
+                    value={newCategoryTitle}
+                    onChange={(e) => setNewCategoryTitle(e.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        applyNewCategory();
+                      }
+                    }}
+                    placeholder="Category title"
+                  />
+                  <Button type="button" onClick={applyNewCategory}>
+                    Use
+                  </Button>
+                </div>
+              ) : (
+                <select
+                  id="gallery-category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {categoryOptions.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="gallery-image"
+                className="text-sm font-medium mb-1.5 block"
+              >
+                Image
+              </label>
+              <Input
+                id="gallery-image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </div>
+
             {previewUrl && (
               <div className="overflow-hidden rounded-2xl border bg-muted">
                 <img
@@ -248,33 +435,158 @@ export default function GalleryPage() {
           )}
         </DialogContent>
       </Dialog>
-      <Dialog open={!!editTarget} onOpenChange={() => setEditTarget(null)}>
+      <Dialog
+        open={!!editTarget}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setEditTarget(null);
+            setAddingCategoryFor(null);
+            setNewCategoryTitle("");
+            setEditImage(null);
+            setEditPreviewUrl(null);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Caption</DialogTitle>
+            <DialogTitle>Edit Gallery Image</DialogTitle>
           </DialogHeader>
 
-          <Input
-            value={editCaption}
-            onChange={(e) => setEditCaption(e.target.value)}
-          />
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="edit-gallery-caption"
+                className="text-sm font-medium mb-1.5 block"
+              >
+                Caption
+              </label>
+              <Input
+                id="edit-gallery-caption"
+                value={editCaption}
+                onChange={(e) => setEditCaption(e.target.value)}
+                placeholder="Enter caption"
+              />
+            </div>
 
-          <Button
-            onClick={async () => {
-              if (!editTarget) return;
+            <div>
+              <div className="mb-1.5 flex items-center justify-between gap-3">
+                <label
+                  htmlFor="edit-gallery-category"
+                  className="text-sm font-medium"
+                >
+                  Category
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 gap-1 px-2 text-xs"
+                  onClick={() => startAddCategory("edit")}
+                >
+                  <Plus size={13} /> Add
+                </Button>
+              </div>
+              {addingCategoryFor === "edit" ? (
+                <div className="flex gap-2">
+                  <Input
+                    value={newCategoryTitle}
+                    onChange={(e) => setNewCategoryTitle(e.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        applyNewCategory();
+                      }
+                    }}
+                    placeholder="Category title"
+                  />
+                  <Button type="button" onClick={applyNewCategory}>
+                    Use
+                  </Button>
+                </div>
+              ) : (
+                <select
+                  id="edit-gallery-category"
+                  value={editCategory}
+                  onChange={(e) => setEditCategory(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {categoryOptions.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
 
-              await updateMutation.mutateAsync({
-                id: editTarget._id,
-                caption: editCaption,
-              });
+            <div>
+              <label
+                htmlFor="edit-gallery-image"
+                className="text-sm font-medium mb-1.5 block"
+              >
+                Update Image (Optional)
+              </label>
+              <Input
+                id="edit-gallery-image"
+                type="file"
+                accept="image/*"
+                onChange={handleEditImageChange}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Leave empty to keep the current image
+              </p>
+            </div>
 
-              toast.success("Caption updated");
-              queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
-              setEditTarget(null);
-            }}
-          >
-            Update
-          </Button>
+            {/* Current image preview */}
+            {editTarget && !editPreviewUrl && (
+              <div>
+                <p className="text-sm font-medium mb-1.5">Current Image</p>
+                <div className="overflow-hidden rounded-2xl border bg-muted">
+                  <img
+                    src={resolveAssetUrl(editTarget.image)}
+                    alt="Current"
+                    className="h-56 w-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* New image preview */}
+            {editPreviewUrl && (
+              <div>
+                <p className="text-sm font-medium mb-1.5">New Image Preview</p>
+                <div className="overflow-hidden rounded-2xl border bg-muted">
+                  <img
+                    src={editPreviewUrl}
+                    alt="Preview"
+                    className="h-56 w-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
+            <Button
+              onClick={async () => {
+                if (!editTarget) return;
+
+                await updateMutation.mutateAsync({
+                  id: editTarget._id,
+                  caption: editCaption,
+                  category: editCategory,
+                  image: editImage || undefined,
+                });
+
+                toast.success("Gallery image updated");
+                queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+                setEditTarget(null);
+                setEditImage(null);
+                setEditPreviewUrl(null);
+              }}
+              className="w-full"
+            >
+              Update
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

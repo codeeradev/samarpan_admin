@@ -25,6 +25,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquareText,
   Settings,
   Shield,
   Star,
@@ -153,7 +154,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/gallery",
   },
   {
-    label: "TPA",
+    label: "Feedback",
+    icon: MessageSquareText,
+    path: "/feedback",
+    permissionPath: "/feedback",
+  },
+  {
+    label: "Empanelled Corporate",
     icon: Shield,
     path: "/tpa",
     permissionPath: "/tpa",

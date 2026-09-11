@@ -169,6 +169,7 @@ const PATH_PERMISSION_RULES: Record<
   },
   "/blogs": { permissions: ["view_blogs", "manage_blogs"] },
   "/gallery": { permissions: ["view_gallery", "manage_gallery"] },
+  "/feedback": { superAdminOnly: true },
   "/tpa": { permissions: ["view_tpa", "manage_tpa"] },
   "/reviews-shorts": {
     permissions: [

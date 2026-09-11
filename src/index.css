@@ -98,6 +98,53 @@
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Typography Hierarchy for Admin Panel */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    line-height: 1.3;
+    font-weight: 700;
+  }
+
+  /* Main Headings: 18-20px */
+  h1 {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+
+  h2 {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+
+  /* Sub Headings: 16px */
+  h3 {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  h4 {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  h5 {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  h6 {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* Admin Panel Text: 14px */
+  p, span, div, li, a, button, input, textarea, select, label {
+    font-size: 14px;
+    line-height: 1.6;
   }
 }
 
@@ -114,6 +161,41 @@
     box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Typography Utility Classes */
+  .text-main-heading {
+    font-size: 20px;
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  .text-heading {
+    font-size: 18px;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+
+  .text-subheading {
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .text-body {
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-small {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .text-xs {
+    font-size: 11px;
+    line-height: 1.4;
   }
 }
 

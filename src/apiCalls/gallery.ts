@@ -5,6 +5,7 @@ export interface GalleryItem {
   _id: string;
   caption?: string;
   image: string;
+  category?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -20,10 +21,15 @@ export const getAllGalleryApi = async (): Promise<GalleryItem[]> => {
   }
 };
 
-export const addGalleryApi = async (image: File, caption: string): Promise<GalleryItem> => {
+export const addGalleryApi = async (
+  image: File,
+  caption: string,
+  category = "other",
+): Promise<GalleryItem> => {
   try {
     const formData = new FormData();
     formData.append("caption", caption);
+    formData.append("category", category);
     formData.append("image", image);
 
     const res = await post(ENDPOINT.ADD_GALLERY, formData, {
@@ -40,19 +46,33 @@ export const addGalleryApi = async (image: File, caption: string): Promise<Galle
 
 export const updateGalleryApi = async (
   id: string,
-  caption: string
+  caption: string,
+  category = "other",
+  image?: File,
 ): Promise<GalleryItem> => {
   try {
+    let payload: FormData | { caption: string; category: string };
+    
+    if (image) {
+      const formData = new FormData();
+      formData.append("caption", caption);
+      formData.append("category", category);
+      formData.append("image", image);
+      payload = formData;
+    } else {
+      payload = { caption, category };
+    }
+
     const res = await post(
       `${ENDPOINT.UPDATE_GALLERY}/${id}`,
-      { caption },
-      { needAuth: true }
+      payload,
+      { needAuth: true },
     );
 
     return res?.data?.gallery;
   } catch (error: any) {
     throw new Error(
-      error.response?.data?.message ?? "Failed to update gallery image"
+      error.response?.data?.message ?? "Failed to update gallery image",
     );
   }
 };

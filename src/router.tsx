@@ -6,6 +6,7 @@ import CareerManagementPage from "@/pages/CareerManagementPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DoctorsPage from "@/pages/DoctorsPage";
 // import EnquiriesPage from "@/pages/EnquiriesPage";
+import FeedbackPage from "@/pages/FeedbackPage";
 import GalleryPage from "@/pages/GalleryPage";
 import HonorsPage from "@/pages/HonorsPage";
 import LeadsPage from "@/pages/LeadsPage";
@@ -21,8 +22,8 @@ import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import ServiceSubCategoriesPage from "@/pages/ServiceSubCategoriesPage";
 import SettingsPage from "@/pages/SettingsPage";
 import SlotManagementPage from "@/pages/SlotManagementPage";
-import ThemePage from "@/pages/ThemePage";
 import TPAPage from "@/pages/TPAPage";
+import ThemePage from "@/pages/ThemePage";
 import WebsiteContentPage from "@/pages/WebsiteContentPage";
 
 import JobApplicationsPage from "@/pages/JobApplicationsPage";
@@ -223,6 +224,13 @@ const galleryRoute = createRoute({
   component: GalleryPage,
 });
 
+const feedbackRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/feedback",
+  beforeLoad: () => checkPermission("/feedback"),
+  component: FeedbackPage,
+});
+
 const tpaRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/tpa",
@@ -319,6 +327,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     blogCategoryRoute,
     galleryRoute,
+    feedbackRoute,
     tpaRoute,
     reviewsAndShortsRoute,
     jobApplicationsRoute,

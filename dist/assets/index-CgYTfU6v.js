@@ -21928,6 +21928,8 @@ const ENDPOINT = {
   DELETE_STAFF: "/delete-staff",
   GET_APPOINTMENTS: "/get-appointments",
   UPDATE_APPOINTMENT: "/update-appointment",
+  GET_FEEDBACK: "/get-feedback",
+  DELETE_FEEDBACK: "/delete-feedback",
   GET_APPOINTMENT_SLOTS: "/appointment-slots",
   ADD_APPOINTMENT_SLOT: "/appointment-slots",
   UPDATE_APPOINTMENT_SLOT: "/appointment-slots",
@@ -22222,6 +22224,7 @@ const PATH_PERMISSION_RULES = {
   },
   "/blogs": { permissions: ["view_blogs", "manage_blogs"] },
   "/gallery": { permissions: ["view_gallery", "manage_gallery"] },
+  "/feedback": { superAdminOnly: true },
   "/tpa": { permissions: ["view_tpa", "manage_tpa"] },
   "/reviews-shorts": {
     permissions: [
@@ -30859,7 +30862,7 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$14 = [
+const __iconNode$16 = [
   [
     "path",
     {
@@ -30868,14 +30871,14 @@ const __iconNode$14 = [
     }
   ]
 ];
-const Activity = createLucideIcon("activity", __iconNode$14);
+const Activity = createLucideIcon("activity", __iconNode$16);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$13 = [
+const __iconNode$15 = [
   [
     "path",
     {
@@ -30885,14 +30888,14 @@ const __iconNode$13 = [
   ],
   ["circle", { cx: "12", cy: "8", r: "6", key: "1vp47v" }]
 ];
-const Award = createLucideIcon("award", __iconNode$13);
+const Award = createLucideIcon("award", __iconNode$15);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$12 = [
+const __iconNode$14 = [
   [
     "path",
     {
@@ -30902,25 +30905,25 @@ const __iconNode$12 = [
   ],
   ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const BadgeCheck = createLucideIcon("badge-check", __iconNode$12);
+const BadgeCheck = createLucideIcon("badge-check", __iconNode$14);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$11 = [
+const __iconNode$13 = [
   ["path", { d: "M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16", key: "jecpp" }],
   ["rect", { width: "20", height: "14", x: "2", y: "6", rx: "2", key: "i6l2r4" }]
 ];
-const Briefcase = createLucideIcon("briefcase", __iconNode$11);
+const Briefcase = createLucideIcon("briefcase", __iconNode$13);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$10 = [
+const __iconNode$12 = [
   ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["path", { d: "M8 2v4", key: "1cmpym" }],
@@ -30928,14 +30931,14 @@ const __iconNode$10 = [
   ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
   ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
 ];
-const CalendarClock = createLucideIcon("calendar-clock", __iconNode$10);
+const CalendarClock = createLucideIcon("calendar-clock", __iconNode$12);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$$ = [
+const __iconNode$11 = [
   ["path", { d: "M8 2v4", key: "1cmpym" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
@@ -30947,73 +30950,95 @@ const __iconNode$$ = [
   ["path", { d: "M12 18h.01", key: "mhygvu" }],
   ["path", { d: "M16 18h.01", key: "kzsmim" }]
 ];
-const CalendarDays = createLucideIcon("calendar-days", __iconNode$$);
+const CalendarDays = createLucideIcon("calendar-days", __iconNode$11);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$_ = [
+const __iconNode$10 = [
   ["path", { d: "M8 2v4", key: "1cmpym" }],
   ["path", { d: "M16 2v4", key: "4m81vk" }],
   ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
   ["path", { d: "M3 10h18", key: "8toen8" }]
 ];
-const Calendar = createLucideIcon("calendar", __iconNode$_);
+const Calendar = createLucideIcon("calendar", __iconNode$10);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$Z = [
+const __iconNode$$ = [
   ["path", { d: "M3 3v16a2 2 0 0 0 2 2h16", key: "c24i48" }],
   ["path", { d: "M18 17V9", key: "2bz60n" }],
   ["path", { d: "M13 17V5", key: "1frdt8" }],
   ["path", { d: "M8 17v-3", key: "17ska0" }]
 ];
-const ChartColumn = createLucideIcon("chart-column", __iconNode$Z);
+const ChartColumn = createLucideIcon("chart-column", __iconNode$$);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$Y = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", __iconNode$Y);
+const __iconNode$_ = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
+const Check = createLucideIcon("check", __iconNode$_);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$X = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$X);
+const __iconNode$Z = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$Z);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$W = [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]];
-const ChevronLeft = createLucideIcon("chevron-left", __iconNode$W);
+const __iconNode$Y = [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]];
+const ChevronLeft = createLucideIcon("chevron-left", __iconNode$Y);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$V = [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]];
-const ChevronRight = createLucideIcon("chevron-right", __iconNode$V);
+const __iconNode$X = [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]];
+const ChevronRight = createLucideIcon("chevron-right", __iconNode$X);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$U = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$U);
+const __iconNode$W = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$W);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$V = [
+  ["path", { d: "m11 17-5-5 5-5", key: "13zhaf" }],
+  ["path", { d: "m18 17-5-5 5-5", key: "h8a8et" }]
+];
+const ChevronsLeft = createLucideIcon("chevrons-left", __iconNode$V);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$U = [
+  ["path", { d: "m6 17 5-5-5-5", key: "xnjwq" }],
+  ["path", { d: "m13 17 5-5-5-5", key: "17xmmf" }]
+];
+const ChevronsRight = createLucideIcon("chevrons-right", __iconNode$U);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31021,10 +31046,10 @@ const ChevronUp = createLucideIcon("chevron-up", __iconNode$U);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$T = [
-  ["path", { d: "m11 17-5-5 5-5", key: "13zhaf" }],
-  ["path", { d: "m18 17-5-5 5-5", key: "h8a8et" }]
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const ChevronsLeft = createLucideIcon("chevrons-left", __iconNode$T);
+const CircleCheck = createLucideIcon("circle-check", __iconNode$T);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31032,10 +31057,11 @@ const ChevronsLeft = createLucideIcon("chevrons-left", __iconNode$T);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$S = [
-  ["path", { d: "m6 17 5-5-5-5", key: "xnjwq" }],
-  ["path", { d: "m13 17 5-5-5-5", key: "17xmmf" }]
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
+  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
 ];
-const ChevronsRight = createLucideIcon("chevrons-right", __iconNode$S);
+const CircleX = createLucideIcon("circle-x", __iconNode$S);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31044,9 +31070,9 @@ const ChevronsRight = createLucideIcon("chevrons-right", __iconNode$S);
  */
 const __iconNode$R = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
 ];
-const CircleCheck = createLucideIcon("circle-check", __iconNode$R);
+const Clock = createLucideIcon("clock", __iconNode$R);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31054,11 +31080,13 @@ const CircleCheck = createLucideIcon("circle-check", __iconNode$R);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$Q = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
-  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
+  ["path", { d: "M16 2v2", key: "scm5qe" }],
+  ["path", { d: "M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2", key: "1waht3" }],
+  ["path", { d: "M8 2v2", key: "pbkmx" }],
+  ["circle", { cx: "12", cy: "11", r: "3", key: "itu57m" }],
+  ["rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", key: "12vinp" }]
 ];
-const CircleX = createLucideIcon("circle-x", __iconNode$Q);
+const Contact = createLucideIcon("contact", __iconNode$Q);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31066,10 +31094,10 @@ const CircleX = createLucideIcon("circle-x", __iconNode$Q);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$P = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
+  ["rect", { width: "20", height: "14", x: "2", y: "5", rx: "2", key: "ynyp8z" }],
+  ["line", { x1: "2", x2: "22", y1: "10", y2: "10", key: "1b3vmo" }]
 ];
-const Clock = createLucideIcon("clock", __iconNode$P);
+const CreditCard = createLucideIcon("credit-card", __iconNode$P);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31077,13 +31105,11 @@ const Clock = createLucideIcon("clock", __iconNode$P);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$O = [
-  ["path", { d: "M16 2v2", key: "scm5qe" }],
-  ["path", { d: "M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2", key: "1waht3" }],
-  ["path", { d: "M8 2v2", key: "pbkmx" }],
-  ["circle", { cx: "12", cy: "11", r: "3", key: "itu57m" }],
-  ["rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", key: "12vinp" }]
+  ["path", { d: "M15 3h6v6", key: "1q9fwt" }],
+  ["path", { d: "M10 14 21 3", key: "gplh6r" }],
+  ["path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6", key: "a6xqqp" }]
 ];
-const Contact = createLucideIcon("contact", __iconNode$O);
+const ExternalLink = createLucideIcon("external-link", __iconNode$O);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31091,29 +31117,6 @@ const Contact = createLucideIcon("contact", __iconNode$O);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$N = [
-  ["rect", { width: "20", height: "14", x: "2", y: "5", rx: "2", key: "ynyp8z" }],
-  ["line", { x1: "2", x2: "22", y1: "10", y2: "10", key: "1b3vmo" }]
-];
-const CreditCard = createLucideIcon("credit-card", __iconNode$N);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$M = [
-  ["path", { d: "M15 3h6v6", key: "1q9fwt" }],
-  ["path", { d: "M10 14 21 3", key: "gplh6r" }],
-  ["path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6", key: "a6xqqp" }]
-];
-const ExternalLink = createLucideIcon("external-link", __iconNode$M);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$L = [
   [
     "path",
     {
@@ -31131,14 +31134,14 @@ const __iconNode$L = [
   ],
   ["path", { d: "m2 2 20 20", key: "1ooewy" }]
 ];
-const EyeOff = createLucideIcon("eye-off", __iconNode$L);
+const EyeOff = createLucideIcon("eye-off", __iconNode$N);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$K = [
+const __iconNode$M = [
   [
     "path",
     {
@@ -31148,7 +31151,33 @@ const __iconNode$K = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-const Eye = createLucideIcon("eye", __iconNode$K);
+const Eye = createLucideIcon("eye", __iconNode$M);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$L = [
+  [
+    "path",
+    { d: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z", key: "1jg4f8" }
+  ]
+];
+const Facebook = createLucideIcon("facebook", __iconNode$L);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$K = [
+  ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
+  ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
+  ["circle", { cx: "10", cy: "12", r: "2", key: "737tya" }],
+  ["path", { d: "m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22", key: "wt3hpn" }]
+];
+const FileImage = createLucideIcon("file-image", __iconNode$K);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31156,12 +31185,13 @@ const Eye = createLucideIcon("eye", __iconNode$K);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$J = [
-  [
-    "path",
-    { d: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z", key: "1jg4f8" }
-  ]
+  ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
+  ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
+  ["path", { d: "M10 9H8", key: "b1mrlr" }],
+  ["path", { d: "M16 13H8", key: "t4e002" }],
+  ["path", { d: "M16 17H8", key: "z1uh3a" }]
 ];
-const Facebook = createLucideIcon("facebook", __iconNode$J);
+const FileText = createLucideIcon("file-text", __iconNode$J);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31169,12 +31199,11 @@ const Facebook = createLucideIcon("facebook", __iconNode$J);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$I = [
-  ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
-  ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
-  ["circle", { cx: "10", cy: "12", r: "2", key: "737tya" }],
-  ["path", { d: "m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22", key: "wt3hpn" }]
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
+  ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-const FileImage = createLucideIcon("file-image", __iconNode$I);
+const Globe = createLucideIcon("globe", __iconNode$I);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31182,32 +31211,6 @@ const FileImage = createLucideIcon("file-image", __iconNode$I);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$H = [
-  ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
-  ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
-  ["path", { d: "M10 9H8", key: "b1mrlr" }],
-  ["path", { d: "M16 13H8", key: "t4e002" }],
-  ["path", { d: "M16 17H8", key: "z1uh3a" }]
-];
-const FileText = createLucideIcon("file-text", __iconNode$H);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$G = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
-  ["path", { d: "M2 12h20", key: "9i4pu4" }]
-];
-const Globe = createLucideIcon("globe", __iconNode$G);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$F = [
   [
     "path",
     {
@@ -31217,14 +31220,14 @@ const __iconNode$F = [
   ],
   ["path", { d: "M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27", key: "1uw2ng" }]
 ];
-const HeartPulse = createLucideIcon("heart-pulse", __iconNode$F);
+const HeartPulse = createLucideIcon("heart-pulse", __iconNode$H);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$E = [
+const __iconNode$G = [
   [
     "path",
     {
@@ -31233,7 +31236,33 @@ const __iconNode$E = [
     }
   ]
 ];
-const Heart = createLucideIcon("heart", __iconNode$E);
+const Heart = createLucideIcon("heart", __iconNode$G);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$F = [
+  ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", ry: "2", key: "1m3agn" }],
+  ["circle", { cx: "9", cy: "9", r: "2", key: "af1f0g" }],
+  ["path", { d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21", key: "1xmnt7" }]
+];
+const Image = createLucideIcon("image", __iconNode$F);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$E = [
+  ["path", { d: "M6 3h12", key: "ggurg9" }],
+  ["path", { d: "M6 8h12", key: "6g4wlu" }],
+  ["path", { d: "m6 13 8.5 8", key: "u1kupk" }],
+  ["path", { d: "M6 13h3", key: "wdp6ag" }],
+  ["path", { d: "M9 13c6.667 0 6.667-10 0-10", key: "1nkvk2" }]
+];
+const IndianRupee = createLucideIcon("indian-rupee", __iconNode$E);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31241,11 +31270,11 @@ const Heart = createLucideIcon("heart", __iconNode$E);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$D = [
-  ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", ry: "2", key: "1m3agn" }],
-  ["circle", { cx: "9", cy: "9", r: "2", key: "af1f0g" }],
-  ["path", { d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21", key: "1xmnt7" }]
+  ["rect", { width: "20", height: "20", x: "2", y: "2", rx: "5", ry: "5", key: "2e1cvw" }],
+  ["path", { d: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z", key: "9exkf1" }],
+  ["line", { x1: "17.5", x2: "17.51", y1: "6.5", y2: "6.5", key: "r4j83e" }]
 ];
-const Image = createLucideIcon("image", __iconNode$D);
+const Instagram = createLucideIcon("instagram", __iconNode$D);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31253,13 +31282,12 @@ const Image = createLucideIcon("image", __iconNode$D);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$C = [
-  ["path", { d: "M6 3h12", key: "ggurg9" }],
-  ["path", { d: "M6 8h12", key: "6g4wlu" }],
-  ["path", { d: "m6 13 8.5 8", key: "u1kupk" }],
-  ["path", { d: "M6 13h3", key: "wdp6ag" }],
-  ["path", { d: "M9 13c6.667 0 6.667-10 0-10", key: "1nkvk2" }]
+  ["rect", { width: "7", height: "9", x: "3", y: "3", rx: "1", key: "10lvy0" }],
+  ["rect", { width: "7", height: "5", x: "14", y: "3", rx: "1", key: "16une8" }],
+  ["rect", { width: "7", height: "9", x: "14", y: "12", rx: "1", key: "1hutg5" }],
+  ["rect", { width: "7", height: "5", x: "3", y: "16", rx: "1", key: "ldoo1y" }]
 ];
-const IndianRupee = createLucideIcon("indian-rupee", __iconNode$C);
+const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$C);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31267,24 +31295,19 @@ const IndianRupee = createLucideIcon("indian-rupee", __iconNode$C);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$B = [
-  ["rect", { width: "20", height: "20", x: "2", y: "2", rx: "5", ry: "5", key: "2e1cvw" }],
-  ["path", { d: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z", key: "9exkf1" }],
-  ["line", { x1: "17.5", x2: "17.51", y1: "6.5", y2: "6.5", key: "r4j83e" }]
+  ["rect", { width: "18", height: "7", x: "3", y: "3", rx: "1", key: "f1a2em" }],
+  ["rect", { width: "9", height: "7", x: "3", y: "14", rx: "1", key: "jqznyg" }],
+  ["rect", { width: "5", height: "7", x: "16", y: "14", rx: "1", key: "q5h2i8" }]
 ];
-const Instagram = createLucideIcon("instagram", __iconNode$B);
+const LayoutTemplate = createLucideIcon("layout-template", __iconNode$B);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$A = [
-  ["rect", { width: "7", height: "9", x: "3", y: "3", rx: "1", key: "10lvy0" }],
-  ["rect", { width: "7", height: "5", x: "14", y: "3", rx: "1", key: "16une8" }],
-  ["rect", { width: "7", height: "9", x: "14", y: "12", rx: "1", key: "1hutg5" }],
-  ["rect", { width: "7", height: "5", x: "3", y: "16", rx: "1", key: "ldoo1y" }]
-];
-const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$A);
+const __iconNode$A = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
+const LoaderCircle = createLucideIcon("loader-circle", __iconNode$A);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31292,19 +31315,22 @@ const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$A);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$z = [
-  ["rect", { width: "18", height: "7", x: "3", y: "3", rx: "1", key: "f1a2em" }],
-  ["rect", { width: "9", height: "7", x: "3", y: "14", rx: "1", key: "jqznyg" }],
-  ["rect", { width: "5", height: "7", x: "16", y: "14", rx: "1", key: "q5h2i8" }]
+  ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
+  ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
 ];
-const LayoutTemplate = createLucideIcon("layout-template", __iconNode$z);
+const Lock = createLucideIcon("lock", __iconNode$z);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$y = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-const LoaderCircle = createLucideIcon("loader-circle", __iconNode$y);
+const __iconNode$y = [
+  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
+  ["path", { d: "M21 12H9", key: "dn1m92" }],
+  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
+];
+const LogOut = createLucideIcon("log-out", __iconNode$y);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31312,10 +31338,10 @@ const LoaderCircle = createLucideIcon("loader-circle", __iconNode$y);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$x = [
-  ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
-  ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
+  ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
+  ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
 ];
-const Lock = createLucideIcon("lock", __iconNode$x);
+const Mail = createLucideIcon("mail", __iconNode$x);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31323,11 +31349,16 @@ const Lock = createLucideIcon("lock", __iconNode$x);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$w = [
-  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
-  ["path", { d: "M21 12H9", key: "dn1m92" }],
-  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
+  [
+    "path",
+    {
+      d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
+      key: "1r0f0z"
+    }
+  ],
+  ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }]
 ];
-const LogOut = createLucideIcon("log-out", __iconNode$w);
+const MapPin = createLucideIcon("map-pin", __iconNode$w);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31335,10 +31366,11 @@ const LogOut = createLucideIcon("log-out", __iconNode$w);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$v = [
-  ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
-  ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
+  ["path", { d: "M4 12h16", key: "1lakjw" }],
+  ["path", { d: "M4 18h16", key: "19g7jn" }],
+  ["path", { d: "M4 6h16", key: "1o0s65" }]
 ];
-const Mail = createLucideIcon("mail", __iconNode$v);
+const Menu = createLucideIcon("menu", __iconNode$v);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31346,11 +31378,9 @@ const Mail = createLucideIcon("mail", __iconNode$v);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$u = [
-  ["path", { d: "M4 12h16", key: "1lakjw" }],
-  ["path", { d: "M4 18h16", key: "19g7jn" }],
-  ["path", { d: "M4 6h16", key: "1o0s65" }]
+  ["path", { d: "M7.9 20A9 9 0 1 0 4 16.1L2 22Z", key: "vv11sd" }]
 ];
-const Menu = createLucideIcon("menu", __iconNode$u);
+const MessageCircle = createLucideIcon("message-circle", __iconNode$u);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31358,9 +31388,11 @@ const Menu = createLucideIcon("menu", __iconNode$u);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$t = [
-  ["path", { d: "M7.9 20A9 9 0 1 0 4 16.1L2 22Z", key: "vv11sd" }]
+  ["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", key: "1lielz" }],
+  ["path", { d: "M13 8H7", key: "14i4kc" }],
+  ["path", { d: "M17 12H7", key: "16if0g" }]
 ];
-const MessageCircle = createLucideIcon("message-circle", __iconNode$t);
+const MessageSquareText = createLucideIcon("message-square-text", __iconNode$t);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -32813,7 +32845,7 @@ const ROLE_LABELS = {
   receptionist: "Receptionist",
   nurse: "Nurse"
 };
-function formatDate$3(date2) {
+function formatDate$4(date2) {
   if (!date2) return "TBD";
   const parsedDate = new Date(date2);
   if (Number.isNaN(parsedDate.getTime())) return "TBD";
@@ -38092,7 +38124,13 @@ const ALL_NAV_ITEMS = [
     permissionPath: "/gallery"
   },
   {
-    label: "TPA",
+    label: "Feedback",
+    icon: MessageSquareText,
+    path: "/feedback",
+    permissionPath: "/feedback"
+  },
+  {
+    label: "Empanelled Corporate",
     icon: Shield,
     path: "/tpa",
     permissionPath: "/tpa"
@@ -45370,7 +45408,7 @@ const tableStyles$5 = {
 function slugify$4(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
-function formatDate$2(value) {
+function formatDate$3(value) {
   if (!value) {
     return "—";
   }
@@ -45640,7 +45678,7 @@ function CareerManagementPage() {
     {
       name: "Updated",
       width: "140px",
-      cell: (career) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$2(career.updatedAt ?? career.createdAt) })
+      cell: (career) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$3(career.updatedAt ?? career.createdAt) })
     },
     {
       name: "Actions",
@@ -68677,7 +68715,7 @@ function DashboardPage() {
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground whitespace-nowrap", children: appt.fullName }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap", children: appt.doctorName }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap", children: formatDate$3(appt.appointmentDate) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap", children: formatDate$4(appt.appointmentDate) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground max-w-[200px] truncate", children: appt.reason }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: appt.status }) })
                   ]
@@ -68704,7 +68742,7 @@ function DashboardPage() {
                     " ",
                     appt.doctorName
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: formatDate$3(appt.appointmentDate) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: formatDate$4(appt.appointmentDate) }),
                   appt.reason && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground truncate", children: appt.reason })
                 ]
               },
@@ -70313,6 +70351,16 @@ function DoctorForm({
     ] })
   ] });
 }
+const getFeedbackApi = async () => {
+  var _a2;
+  const res = await get$3(ENDPOINT.GET_FEEDBACK, { needAuth: true });
+  return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.feedback) ?? [];
+};
+const deleteFeedbackApi = async (id) => {
+  await post(`${ENDPOINT.DELETE_FEEDBACK}/${id}`, void 0, {
+    needAuth: true
+  });
+};
 function getCellValue(row, key) {
   const value = row[key];
   if (value === null || value === void 0) return "—";
@@ -70522,6 +70570,123 @@ function DataTable({
     ] }) })
   ] });
 }
+const FEEDBACK_QUERY_KEY = ["feedback"];
+function formatDate$2(value) {
+  if (!value) return "—";
+  return new Date(value).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+function FeedbackPage() {
+  const queryClient2 = useQueryClient();
+  const { data = [], isLoading } = useQuery({
+    queryKey: FEEDBACK_QUERY_KEY,
+    queryFn: getFeedbackApi
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteFeedbackApi,
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: FEEDBACK_QUERY_KEY });
+      ue.success("Feedback deleted");
+    },
+    onError: () => {
+      ue.error("Unable to delete feedback");
+    }
+  });
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this feedback?")) return;
+    deleteMutation.mutate(id);
+  };
+  const columns = [
+    {
+      key: "fullName",
+      header: "Patient",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "py-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 font-semibold text-foreground", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(UserRound, { size: 15, className: "text-primary" }),
+          item.fullName
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { size: 12 }),
+          item.contactNumber
+        ] }),
+        item.email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { size: 12 }),
+          item.email
+        ] })
+      ] })
+    },
+    {
+      key: "address",
+      header: "Address",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-[260px] text-sm text-muted-foreground", children: item.address ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-start gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { size: 14, className: "mt-0.5 shrink-0 text-primary" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "line-clamp-3", children: item.address })
+      ] }) : "—" })
+    },
+    {
+      key: "comments",
+      header: "Feedback/Comments",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-[420px] text-sm leading-6 text-foreground", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquareText, { size: 14, className: "mr-2 inline text-primary" }),
+        item.comments
+      ] })
+    },
+    {
+      key: "createdAt",
+      header: "Submitted",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$2(item.createdAt) })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          size: "icon",
+          variant: "ghost",
+          onClick: () => handleDelete(item._id),
+          "aria-label": "Delete feedback",
+          disabled: deleteMutation.isPending,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+        }
+      )
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Feedback",
+        description: "Review feedback submitted from the website."
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataTable,
+      {
+        columns,
+        data,
+        isLoading,
+        searchable: true,
+        searchKeys: [
+          "fullName",
+          "contactNumber",
+          "email",
+          "address",
+          "comments"
+        ],
+        emptyText: "No feedback submitted yet.",
+        rowKey: (row) => row._id,
+        "data-ocid": "feedback.table"
+      }
+    )
+  ] });
+}
 const getAllGalleryApi = async () => {
   var _a2, _b2, _c2;
   try {
@@ -70533,11 +70698,12 @@ const getAllGalleryApi = async () => {
     );
   }
 };
-const addGalleryApi = async (image, caption) => {
+const addGalleryApi = async (image, caption, category = "other") => {
   var _a2, _b2, _c2;
   try {
     const formData = new FormData();
     formData.append("caption", caption);
+    formData.append("category", category);
     formData.append("image", image);
     const res = await post(ENDPOINT.ADD_GALLERY, formData, {
       needAuth: true
@@ -70549,12 +70715,12 @@ const addGalleryApi = async (image, caption) => {
     );
   }
 };
-const updateGalleryApi = async (id, caption) => {
+const updateGalleryApi = async (id, caption, category = "other") => {
   var _a2, _b2, _c2;
   try {
     const res = await post(
       `${ENDPOINT.UPDATE_GALLERY}/${id}`,
-      { caption },
+      { caption, category },
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery;
@@ -70577,31 +70743,91 @@ const deleteGalleryApi = async (id) => {
   }
 };
 const GALLERY_QUERY_KEY = ["gallery"];
+const CATEGORIES = [
+  { value: "festival", label: "Festival" },
+  { value: "patients", label: "Patients" },
+  { value: "events", label: "Events" },
+  { value: "facilities", label: "Facilities" },
+  { value: "team", label: "Team" },
+  { value: "awards", label: "Awards" },
+  { value: "hospital", label: "Hospital" },
+  { value: "other", label: "Other" }
+];
+function normalizeCategory(value) {
+  return value.trim().toLowerCase();
+}
+function formatCategoryLabel(value) {
+  return value.split(/[\s_-]+/).filter(Boolean).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
 function GalleryPage() {
   const queryClient2 = useQueryClient();
   const [open, setOpen] = reactExports.useState(false);
   const [caption, setCaption] = reactExports.useState("");
+  const [category, setCategory] = reactExports.useState("other");
   const [image, setImage] = reactExports.useState(null);
   const [previewUrl, setPreviewUrl] = reactExports.useState(null);
   const [previewTarget, setPreviewTarget] = reactExports.useState(null);
+  const [customCategories, setCustomCategories] = reactExports.useState([]);
+  const [addingCategoryFor, setAddingCategoryFor] = reactExports.useState(null);
+  const [newCategoryTitle, setNewCategoryTitle] = reactExports.useState("");
   const [editTarget, setEditTarget] = reactExports.useState(null);
   const [editCaption, setEditCaption] = reactExports.useState("");
+  const [editCategory, setEditCategory] = reactExports.useState("other");
   const { data: gallery = [], isLoading } = useQuery({
     queryKey: GALLERY_QUERY_KEY,
     queryFn: getAllGalleryApi
   });
+  const categoryOptions = reactExports.useMemo(() => {
+    const optionMap = new Map(CATEGORIES.map((cat) => [cat.value, cat.label]));
+    [...gallery.map((item) => item.category), ...customCategories].filter((value) => Boolean(value)).forEach((value) => {
+      const normalized = normalizeCategory(value);
+      if (normalized && !optionMap.has(normalized)) {
+        optionMap.set(normalized, formatCategoryLabel(normalized));
+      }
+    });
+    return Array.from(optionMap, ([value, label]) => ({ value, label }));
+  }, [gallery, customCategories]);
   const addMutation = useMutation({
-    mutationFn: ({ image: image2, caption: caption2 }) => addGalleryApi(image2, caption2)
+    mutationFn: ({
+      image: image2,
+      caption: caption2,
+      category: category2
+    }) => addGalleryApi(image2, caption2, category2)
   });
   const deleteMutation = useMutation({ mutationFn: deleteGalleryApi });
   const updateMutation = useMutation({
-    mutationFn: ({ id, caption: caption2 }) => updateGalleryApi(id, caption2)
+    mutationFn: ({
+      id,
+      caption: caption2,
+      category: category2
+    }) => updateGalleryApi(id, caption2, category2)
   });
   const handleImageChange = (event) => {
     var _a2;
     const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
     setImage(file);
     setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+  const startAddCategory = (target) => {
+    setAddingCategoryFor(target);
+    setNewCategoryTitle("");
+  };
+  const applyNewCategory = () => {
+    const normalized = normalizeCategory(newCategoryTitle);
+    if (!normalized) {
+      ue.error("Please enter a category title.");
+      return;
+    }
+    setCustomCategories(
+      (previous) => previous.includes(normalized) ? previous : [...previous, normalized]
+    );
+    if (addingCategoryFor === "edit") {
+      setEditCategory(normalized);
+    } else {
+      setCategory(normalized);
+    }
+    setAddingCategoryFor(null);
+    setNewCategoryTitle("");
   };
   const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
   function resolveAssetUrl2(path) {
@@ -70615,14 +70841,17 @@ function GalleryPage() {
       return;
     }
     try {
-      await addMutation.mutateAsync({ image, caption });
+      await addMutation.mutateAsync({ image, caption, category });
       ue.success("Gallery image added");
       queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
       setOpen(false);
       setImage(null);
       setPreviewUrl(null);
       setCaption("");
-    } catch (error) {
+      setCategory("other");
+      setAddingCategoryFor(null);
+      setNewCategoryTitle("");
+    } catch (_error) {
       ue.error("Unable to upload image.");
     }
   };
@@ -70632,13 +70861,17 @@ function GalleryPage() {
     queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
     ue.success("Gallery image deleted");
   };
-  gallery.length;
   const galleryRows = reactExports.useMemo(() => gallery, [gallery]);
   const columns = [
     {
       key: "caption",
       header: "Caption",
       render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm truncate block max-w-[220px]", children: item.caption || "—" })
+    },
+    {
+      key: "category",
+      header: "Category",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary capitalize", children: item.category || "other" })
     },
     {
       key: "image",
@@ -70684,6 +70917,7 @@ function GalleryPage() {
             onClick: () => {
               setEditTarget(item);
               setEditCaption(item.caption || "");
+              setEditCategory(item.category || "other");
             },
             children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
           }
@@ -70733,30 +70967,124 @@ function GalleryPage() {
         "data-ocid": "gallery.table"
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Gallery Image (1170 × 1560)" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          type: "text",
-          placeholder: "Enter caption",
-          value: caption,
-          onChange: (e3) => setCaption(e3.target.value)
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { type: "file", accept: "image/*", onChange: handleImageChange }),
-        previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "img",
-          {
-            src: previewUrl,
-            alt: "Preview",
-            className: "h-56 w-full object-cover"
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open,
+        onOpenChange: (nextOpen) => {
+          setOpen(nextOpen);
+          if (!nextOpen) {
+            setAddingCategoryFor(null);
+            setNewCategoryTitle("");
           }
-        ) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save Image" })
-      ] })
-    ] }) }),
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Gallery Image (1170 × 1560)" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "gallery-caption",
+                  className: "text-sm font-medium mb-1.5 block",
+                  children: "Caption"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "gallery-caption",
+                  type: "text",
+                  placeholder: "Enter caption",
+                  value: caption,
+                  onChange: (e3) => setCaption(e3.target.value)
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-1.5 flex items-center justify-between gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    htmlFor: "gallery-category",
+                    className: "text-sm font-medium",
+                    children: "Category"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "ghost",
+                    size: "sm",
+                    className: "h-7 gap-1 px-2 text-xs",
+                    onClick: () => startAddCategory("create"),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 13 }),
+                      " Add"
+                    ]
+                  }
+                )
+              ] }),
+              addingCategoryFor === "create" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: newCategoryTitle,
+                    onChange: (e3) => setNewCategoryTitle(e3.target.value),
+                    onKeyDown: (event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        applyNewCategory();
+                      }
+                    },
+                    placeholder: "Category title"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", onClick: applyNewCategory, children: "Use" })
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "select",
+                {
+                  id: "gallery-category",
+                  value: category,
+                  onChange: (e3) => setCategory(e3.target.value),
+                  className: "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  children: categoryOptions.map((cat) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: cat.value, children: cat.label }, cat.value))
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "gallery-image",
+                  className: "text-sm font-medium mb-1.5 block",
+                  children: "Image"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "gallery-image",
+                  type: "file",
+                  accept: "image/*",
+                  onChange: handleImageChange
+                }
+              )
+            ] }),
+            previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "img",
+              {
+                src: previewUrl,
+                alt: "Preview",
+                className: "h-56 w-full object-cover"
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save Image" })
+          ] })
+        ] })
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Dialog,
       {
@@ -70776,32 +71104,113 @@ function GalleryPage() {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: !!editTarget, onOpenChange: () => setEditTarget(null), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Edit Caption" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          value: editCaption,
-          onChange: (e3) => setEditCaption(e3.target.value)
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Button,
-        {
-          onClick: async () => {
-            if (!editTarget) return;
-            await updateMutation.mutateAsync({
-              id: editTarget._id,
-              caption: editCaption
-            });
-            ue.success("Caption updated");
-            queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!editTarget,
+        onOpenChange: (nextOpen) => {
+          if (!nextOpen) {
             setEditTarget(null);
-          },
-          children: "Update"
-        }
-      )
-    ] }) })
+            setAddingCategoryFor(null);
+            setNewCategoryTitle("");
+          }
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Edit Gallery Image" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "edit-gallery-caption",
+                  className: "text-sm font-medium mb-1.5 block",
+                  children: "Caption"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "edit-gallery-caption",
+                  value: editCaption,
+                  onChange: (e3) => setEditCaption(e3.target.value),
+                  placeholder: "Enter caption"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-1.5 flex items-center justify-between gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    htmlFor: "edit-gallery-category",
+                    className: "text-sm font-medium",
+                    children: "Category"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "ghost",
+                    size: "sm",
+                    className: "h-7 gap-1 px-2 text-xs",
+                    onClick: () => startAddCategory("edit"),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 13 }),
+                      " Add"
+                    ]
+                  }
+                )
+              ] }),
+              addingCategoryFor === "edit" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    value: newCategoryTitle,
+                    onChange: (e3) => setNewCategoryTitle(e3.target.value),
+                    onKeyDown: (event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        applyNewCategory();
+                      }
+                    },
+                    placeholder: "Category title"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", onClick: applyNewCategory, children: "Use" })
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "select",
+                {
+                  id: "edit-gallery-category",
+                  value: editCategory,
+                  onChange: (e3) => setEditCategory(e3.target.value),
+                  className: "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  children: categoryOptions.map((cat) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: cat.value, children: cat.label }, cat.value))
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                onClick: async () => {
+                  if (!editTarget) return;
+                  await updateMutation.mutateAsync({
+                    id: editTarget._id,
+                    caption: editCaption,
+                    category: editCategory
+                  });
+                  ue.success("Gallery image updated");
+                  queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
+                  setEditTarget(null);
+                },
+                className: "w-full",
+                children: "Update"
+              }
+            )
+          ] })
+        ] })
+      }
+    )
   ] });
 }
 var SWITCH_NAME = "Switch";
@@ -72900,7 +73309,7 @@ function ConnectedAccountCard({
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1.5", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { size: 14 }),
             " ",
-            formatDate$3(account.connectedAt)
+            formatDate$4(account.connectedAt)
           ] })
         ] })
       ] })
@@ -72970,7 +73379,7 @@ function PostDetailsDialog({
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-3 text-sm text-muted-foreground", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1.5", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { size: 14 }),
-            formatDate$3(post2.postedDate)
+            formatDate$4(post2.postedDate)
           ] }),
           post2.permalink ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "a",
@@ -73045,7 +73454,7 @@ function PostDetailsDialog({
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1.5", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Avatar, { className: "h-7 w-7", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "text-[10px]", children: getInitials2(comment2.fromName) }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-semibold text-foreground", children: comment2.fromName }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground ml-auto shrink-0", children: formatDate$3(comment2.createdTime) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground ml-auto shrink-0", children: formatDate$4(comment2.createdTime) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground pl-9", children: comment2.message || "(empty comment)" })
             ]
@@ -73112,7 +73521,7 @@ function PostsTable({
             ) }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: post2.platform }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 max-w-[280px] truncate text-foreground", children: post2.caption || "No caption" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 text-muted-foreground", children: formatDate$3(post2.postedDate) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 text-muted-foreground", children: formatDate$4(post2.postedDate) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 tabular-nums", children: formatNumber(post2.likes) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 tabular-nums", children: formatNumber(post2.comments) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 tabular-nums", children: formatNumber(post2.reach) }),
@@ -74892,7 +75301,7 @@ function getPatientRegisteredAt(patient) {
   return patient.createdAt || patient.updatedAt || (/* @__PURE__ */ new Date()).toISOString();
 }
 function getPatientDischargeLabel(patient) {
-  return patient.dischargedAt ? formatDate$3(patient.dischargedAt) : "";
+  return patient.dischargedAt ? formatDate$4(patient.dischargedAt) : "";
 }
 function validateForm(form) {
   const errors = {};
@@ -75214,7 +75623,7 @@ function PatientsPage() {
                       /* @__PURE__ */ jsxRuntimeExports.jsx(PatientStatusBadge, { patient }),
                       isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: getPatientDischargeLabel(patient) }) : null
                     ] }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-muted-foreground", children: formatDate$3(getPatientRegisteredAt(patient)) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-muted-foreground", children: formatDate$4(getPatientRegisteredAt(patient)) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx(
                         Button,
@@ -75315,7 +75724,7 @@ function PatientsPage() {
                       ),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground mt-0.5", children: [
                         "Reg: ",
-                        formatDate$3(getPatientRegisteredAt(patient))
+                        formatDate$4(getPatientRegisteredAt(patient))
                       ] }),
                       isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-secondary mt-0.5", children: [
                         "Discharged: ",
@@ -76497,7 +76906,7 @@ function EditStaffDialog({
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
             "Joined: ",
-            formatDate$3(staff.createdAt)
+            formatDate$4(staff.createdAt)
           ] })
         ] })
       ] }),
@@ -76656,7 +77065,7 @@ function RoleManagementPage() {
     {
       key: "joinedDate",
       header: "Joined Date",
-      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: formatDate$3(row.createdAt) })
+      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: formatDate$4(row.createdAt) })
     },
     {
       key: "action",
@@ -76719,7 +77128,7 @@ function RoleManagementPage() {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
               "Joined ",
-              formatDate$3(item.createdAt)
+              formatDate$4(item.createdAt)
             ] })
           ] }),
           isCurrentAccount ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl bg-accent px-3 py-2 text-xs text-secondary", children: "Current account access is locked here for safety." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
@@ -80401,6 +80810,400 @@ function formatDateInput(date2) {
 function getDateKey(date2, fallback) {
   return fallback || (date2 ? date2.slice(0, 10) : "");
 }
+const getAllTpaApi = async () => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await get$3(ENDPOINT.GET_ALL_TPA, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa) ?? [];
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch TPA items"
+    );
+  }
+};
+const addTpaApi = async (image, title, category = "tpa") => {
+  var _a2, _b2, _c2;
+  try {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("category", category);
+    formData.append("image", image);
+    const res = await post(ENDPOINT.ADD_TPA, formData, {
+      needAuth: true
+    });
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa;
+  } catch (error) {
+    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add TPA item");
+  }
+};
+const updateTpaApi = async (id, title, category = "tpa") => {
+  var _a2, _b2, _c2;
+  try {
+    const res = await post(
+      `${ENDPOINT.UPDATE_TPA}/${id}`,
+      { title, category },
+      { needAuth: true }
+    );
+    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa;
+  } catch (error) {
+    throw new Error(
+      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update TPA item"
+    );
+  }
+};
+const deleteTpaApi = async (id) => {
+  var _a2, _b2;
+  try {
+    await post(`${ENDPOINT.DELETE_TPA}/${id}`, void 0, {
+      needAuth: true
+    });
+  } catch (error) {
+    throw new Error(
+      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete TPA item"
+    );
+  }
+};
+const TPA_QUERY_KEY = ["tpa"];
+const TPA_CATEGORIES = [
+  { value: "government", label: "Government Department" },
+  { value: "tpa", label: "TPA" },
+  { value: "insurance", label: "Insurance Company" },
+  { value: "corporate", label: "Corporate Partner" }
+];
+function getCategoryLabel(value) {
+  var _a2;
+  return ((_a2 = TPA_CATEGORIES.find((category) => category.value === (value || "tpa"))) == null ? void 0 : _a2.label) || "TPA";
+}
+function TPAPage() {
+  const queryClient2 = useQueryClient();
+  const [open, setOpen] = reactExports.useState(false);
+  const [title, setTitle] = reactExports.useState("");
+  const [category, setCategory] = reactExports.useState("tpa");
+  const [image, setImage] = reactExports.useState(null);
+  const [previewUrl, setPreviewUrl] = reactExports.useState(null);
+  const [previewTarget, setPreviewTarget] = reactExports.useState(null);
+  const [editTarget, setEditTarget] = reactExports.useState(null);
+  const [editTitle, setEditTitle] = reactExports.useState("");
+  const [editCategory, setEditCategory] = reactExports.useState("tpa");
+  const { data: tpaItems = [], isLoading } = useQuery({
+    queryKey: TPA_QUERY_KEY,
+    queryFn: getAllTpaApi
+  });
+  const addMutation = useMutation({
+    mutationFn: ({
+      image: image2,
+      title: title2,
+      category: category2
+    }) => addTpaApi(image2, title2, category2)
+  });
+  const deleteMutation = useMutation({ mutationFn: deleteTpaApi });
+  const updateMutation = useMutation({
+    mutationFn: ({
+      id,
+      title: title2,
+      category: category2
+    }) => updateTpaApi(id, title2, category2)
+  });
+  const handleImageChange = (event) => {
+    var _a2;
+    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
+    setImage(file);
+    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
+  function resolveAssetUrl2(path) {
+    if (!path) return "";
+    if (/^https?:\/\//.test(path)) return path;
+    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
+  }
+  const resetForm2 = () => {
+    setOpen(false);
+    setTitle("");
+    setCategory("tpa");
+    setImage(null);
+    setPreviewUrl(null);
+  };
+  const handleSave = async () => {
+    if (!image) {
+      ue.error("Please select an image to upload.");
+      return;
+    }
+    try {
+      await addMutation.mutateAsync({ image, title: title.trim(), category });
+      ue.success("Empanelled corporate item added");
+      queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
+      resetForm2();
+    } catch {
+      ue.error("Unable to upload TPA image.");
+    }
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this TPA item?")) return;
+    await deleteMutation.mutateAsync(id);
+    queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
+    ue.success("TPA item deleted");
+  };
+  const tpaRows = reactExports.useMemo(() => tpaItems, [tpaItems]);
+  const columns = [
+    {
+      key: "title",
+      header: "Title",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm truncate block max-w-[220px]", children: item.title || "—" })
+    },
+    {
+      key: "image",
+      header: "Image",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-14 w-20 overflow-hidden rounded-lg border border-border bg-muted/60", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "img",
+        {
+          src: resolveAssetUrl2(item.image),
+          alt: item.title || "TPA",
+          className: "h-full w-full object-cover"
+        }
+      ) })
+    },
+    {
+      key: "category",
+      header: "Category",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary", children: getCategoryLabel(item.category) })
+    },
+    {
+      key: "createdAt",
+      header: "Uploaded",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: item.createdAt ? new Date(item.createdAt).toLocaleString() : "—" })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            variant: "outline",
+            className: "rounded-lg border-border",
+            onClick: () => setPreviewTarget(item),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
+              "Preview"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "ghost",
+            onClick: () => {
+              setEditTarget(item);
+              setEditTitle(item.title || "");
+              setEditCategory(item.category || "tpa");
+            },
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            size: "icon",
+            variant: "ghost",
+            onClick: () => handleDelete(item._id),
+            "aria-label": "Delete TPA item",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+          }
+        )
+      ] })
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "Empanelled Corporate",
+        description: "Manage government departments, TPA, insurance and corporate partner logos.",
+        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: () => setOpen(true),
+            className: "rounded-xl gap-2 bg-primary",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 14 }),
+              " Add Partner"
+            ]
+          }
+        )
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataTable,
+      {
+        columns,
+        data: tpaRows,
+        isLoading,
+        searchable: true,
+        searchKeys: ["title", "image", "category"],
+        emptyText: "No empanelled corporate items uploaded yet.",
+        rowKey: (row) => row._id
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add Empanelled Corporate Item" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "tpa-title",
+              className: "text-sm font-medium mb-1.5 block",
+              children: "Title"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "tpa-title",
+              type: "text",
+              placeholder: "Title (optional)",
+              value: title,
+              onChange: (e3) => setTitle(e3.target.value)
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "tpa-category",
+              className: "text-sm font-medium mb-1.5 block",
+              children: "Category"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "select",
+            {
+              id: "tpa-category",
+              value: category,
+              onChange: (e3) => setCategory(e3.target.value),
+              className: "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              children: TPA_CATEGORIES.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: item.value, children: item.label }, item.value))
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "tpa-image",
+              className: "text-sm font-medium mb-1.5 block",
+              children: "Logo"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "tpa-image",
+              type: "file",
+              accept: "image/*",
+              onChange: handleImageChange
+            }
+          )
+        ] }),
+        previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: previewUrl,
+            alt: "Preview",
+            className: "h-56 w-full object-contain bg-white"
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save Partner" })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!previewTarget,
+        onOpenChange: (nextOpen) => !nextOpen && setPreviewTarget(null),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Empanelled Corporate Preview" }) }),
+          previewTarget && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted/60 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "img",
+            {
+              src: resolveAssetUrl2(previewTarget.image),
+              alt: previewTarget.title || "TPA preview",
+              className: "w-full max-h-[60vh] object-contain bg-card"
+            }
+          ) }),
+          (previewTarget == null ? void 0 : previewTarget.title) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm text-muted-foreground text-center", children: previewTarget.title })
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: !!editTarget, onOpenChange: () => setEditTarget(null), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Edit Empanelled Corporate Item" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "edit-tpa-title",
+              className: "text-sm font-medium mb-1.5 block",
+              children: "Title"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "edit-tpa-title",
+              value: editTitle,
+              onChange: (e3) => setEditTitle(e3.target.value),
+              placeholder: "Title (optional)"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "edit-tpa-category",
+              className: "text-sm font-medium mb-1.5 block",
+              children: "Category"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "select",
+            {
+              id: "edit-tpa-category",
+              value: editCategory,
+              onChange: (e3) => setEditCategory(e3.target.value),
+              className: "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              children: TPA_CATEGORIES.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: item.value, children: item.label }, item.value))
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            onClick: async () => {
+              if (!editTarget) return;
+              await updateMutation.mutateAsync({
+                id: editTarget._id,
+                title: editTitle.trim(),
+                category: editCategory
+              });
+              queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
+              ue.success("Empanelled corporate item updated");
+              setEditTarget(null);
+            },
+            className: "w-full",
+            children: "Save Changes"
+          }
+        )
+      ] })
+    ] }) })
+  ] });
+}
 const defaultWebsiteColors = {
   primary: "#ab2548",
   primary_deep: "#ab2548",
@@ -80879,287 +81682,6 @@ function ThemePage() {
         ] }, key))
       ] })
     ] })
-  ] });
-}
-const getAllTpaApi = async () => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await get$3(ENDPOINT.GET_ALL_TPA, { needAuth: true });
-    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa) ?? [];
-  } catch (error) {
-    throw new Error(
-      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to fetch TPA items"
-    );
-  }
-};
-const addTpaApi = async (image, title) => {
-  var _a2, _b2, _c2;
-  try {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("image", image);
-    const res = await post(ENDPOINT.ADD_TPA, formData, {
-      needAuth: true
-    });
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa;
-  } catch (error) {
-    throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add TPA item");
-  }
-};
-const updateTpaApi = async (id, title) => {
-  var _a2, _b2, _c2;
-  try {
-    const res = await post(
-      `${ENDPOINT.UPDATE_TPA}/${id}`,
-      { title },
-      { needAuth: true }
-    );
-    return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa;
-  } catch (error) {
-    throw new Error(
-      ((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to update TPA item"
-    );
-  }
-};
-const deleteTpaApi = async (id) => {
-  var _a2, _b2;
-  try {
-    await post(`${ENDPOINT.DELETE_TPA}/${id}`, void 0, {
-      needAuth: true
-    });
-  } catch (error) {
-    throw new Error(
-      ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) ?? "Failed to delete TPA item"
-    );
-  }
-};
-const TPA_QUERY_KEY = ["tpa"];
-function TPAPage() {
-  const queryClient2 = useQueryClient();
-  const [open, setOpen] = reactExports.useState(false);
-  const [title, setTitle] = reactExports.useState("");
-  const [image, setImage] = reactExports.useState(null);
-  const [previewUrl, setPreviewUrl] = reactExports.useState(null);
-  const [previewTarget, setPreviewTarget] = reactExports.useState(null);
-  const [editTarget, setEditTarget] = reactExports.useState(null);
-  const [editTitle, setEditTitle] = reactExports.useState("");
-  const { data: tpaItems = [], isLoading } = useQuery({
-    queryKey: TPA_QUERY_KEY,
-    queryFn: getAllTpaApi
-  });
-  const addMutation = useMutation({
-    mutationFn: ({ image: image2, title: title2 }) => addTpaApi(image2, title2)
-  });
-  const deleteMutation = useMutation({ mutationFn: deleteTpaApi });
-  const updateMutation = useMutation({
-    mutationFn: ({ id, title: title2 }) => updateTpaApi(id, title2)
-  });
-  const handleImageChange = (event) => {
-    var _a2;
-    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
-    setImage(file);
-    setPreviewUrl(file ? URL.createObjectURL(file) : null);
-  };
-  const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
-  function resolveAssetUrl2(path) {
-    if (!path) return "";
-    if (/^https?:\/\//.test(path)) return path;
-    return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
-  }
-  const resetForm2 = () => {
-    setOpen(false);
-    setTitle("");
-    setImage(null);
-    setPreviewUrl(null);
-  };
-  const handleSave = async () => {
-    if (!image) {
-      ue.error("Please select an image to upload.");
-      return;
-    }
-    try {
-      await addMutation.mutateAsync({ image, title: title.trim() });
-      ue.success("TPA item added");
-      queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
-      resetForm2();
-    } catch {
-      ue.error("Unable to upload TPA image.");
-    }
-  };
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this TPA item?")) return;
-    await deleteMutation.mutateAsync(id);
-    queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
-    ue.success("TPA item deleted");
-  };
-  const tpaRows = reactExports.useMemo(() => tpaItems, [tpaItems]);
-  const columns = [
-    {
-      key: "title",
-      header: "Title",
-      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm truncate block max-w-[220px]", children: item.title || "—" })
-    },
-    {
-      key: "image",
-      header: "Image",
-      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-14 w-20 overflow-hidden rounded-lg border border-border bg-muted/60", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "img",
-        {
-          src: resolveAssetUrl2(item.image),
-          alt: item.title || "TPA",
-          className: "h-full w-full object-cover"
-        }
-      ) })
-    },
-    {
-      key: "createdAt",
-      header: "Uploaded",
-      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: item.createdAt ? new Date(item.createdAt).toLocaleString() : "—" })
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      className: "text-right",
-      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            type: "button",
-            size: "sm",
-            variant: "outline",
-            className: "rounded-lg border-border",
-            onClick: () => setPreviewTarget(item),
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { size: 14 }),
-              "Preview"
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            size: "icon",
-            variant: "ghost",
-            onClick: () => {
-              setEditTarget(item);
-              setEditTitle(item.title || "");
-            },
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            size: "icon",
-            variant: "ghost",
-            onClick: () => handleDelete(item._id),
-            "aria-label": "Delete TPA item",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
-          }
-        )
-      ] })
-    }
-  ];
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      PageHeader,
-      {
-        title: "TPA",
-        description: "Manage website TPA partner logos. Title is optional and stays internal.",
-        action: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            onClick: () => setOpen(true),
-            className: "rounded-xl gap-2 bg-primary",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 14 }),
-              " Add TPA"
-            ]
-          }
-        )
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      DataTable,
-      {
-        columns,
-        data: tpaRows,
-        isLoading,
-        searchable: true,
-        searchKeys: ["title", "image"],
-        emptyText: "No TPA items uploaded yet.",
-        rowKey: (row) => row._id
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange: setOpen, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Add TPA Item" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          type: "text",
-          placeholder: "Title (optional, not shown on website)",
-          value: title,
-          onChange: (e3) => setTitle(e3.target.value)
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { type: "file", accept: "image/*", onChange: handleImageChange }),
-        previewUrl && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "img",
-          {
-            src: previewUrl,
-            alt: "Preview",
-            className: "h-56 w-full object-contain bg-white"
-          }
-        ) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSave, className: "w-full", children: "Save TPA" })
-      ] })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Dialog,
-      {
-        open: !!previewTarget,
-        onOpenChange: (nextOpen) => !nextOpen && setPreviewTarget(null),
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-3xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "TPA Preview" }) }),
-          previewTarget && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted/60 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "img",
-            {
-              src: resolveAssetUrl2(previewTarget.image),
-              alt: previewTarget.title || "TPA preview",
-              className: "w-full max-h-[60vh] object-contain bg-card"
-            }
-          ) }),
-          (previewTarget == null ? void 0 : previewTarget.title) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm text-muted-foreground text-center", children: previewTarget.title })
-        ] })
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: !!editTarget, onOpenChange: () => setEditTarget(null), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Edit TPA Title (Optional)" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
-        {
-          value: editTitle,
-          onChange: (e3) => setEditTitle(e3.target.value)
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Button,
-        {
-          onClick: async () => {
-            if (!editTarget) return;
-            await updateMutation.mutateAsync({
-              id: editTarget._id,
-              title: editTitle.trim()
-            });
-            queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
-            ue.success("TPA title updated");
-            setEditTarget(null);
-          },
-          children: "Save Changes"
-        }
-      )
-    ] }) })
   ] });
 }
 function toFormData$2(payload) {
@@ -88906,6 +89428,12 @@ const galleryRoute = createRoute({
   beforeLoad: () => checkPermission("/gallery"),
   component: GalleryPage
 });
+const feedbackRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/feedback",
+  beforeLoad: () => checkPermission("/feedback"),
+  component: FeedbackPage
+});
 const tpaRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/tpa",
@@ -88981,6 +89509,7 @@ const routeTree = rootRoute.addChildren([
     blogsRoute,
     blogCategoryRoute,
     galleryRoute,
+    feedbackRoute,
     tpaRoute,
     reviewsAndShortsRoute,
     jobApplicationsRoute,

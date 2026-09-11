@@ -4,6 +4,7 @@ import { ENDPOINT } from "@/apis/endpoint";
 export interface TpaItem {
   _id: string;
   title: string;
+  category?: string;
   image: string;
   createdAt?: string;
   updatedAt?: string;
@@ -20,10 +21,15 @@ export const getAllTpaApi = async (): Promise<TpaItem[]> => {
   }
 };
 
-export const addTpaApi = async (image: File, title: string): Promise<TpaItem> => {
+export const addTpaApi = async (
+  image: File,
+  title: string,
+  category = "tpa",
+): Promise<TpaItem> => {
   try {
     const formData = new FormData();
     formData.append("title", title);
+    formData.append("category", category);
     formData.append("image", image);
 
     const res = await post(ENDPOINT.ADD_TPA, formData, {
@@ -39,11 +45,25 @@ export const addTpaApi = async (image: File, title: string): Promise<TpaItem> =>
 export const updateTpaApi = async (
   id: string,
   title: string,
+  category = "tpa",
+  image?: File,
 ): Promise<TpaItem> => {
   try {
+    let payload: FormData | { title: string; category: string };
+    
+    if (image) {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("category", category);
+      formData.append("image", image);
+      payload = formData;
+    } else {
+      payload = { title, category };
+    }
+
     const res = await post(
       `${ENDPOINT.UPDATE_TPA}/${id}`,
-      { title },
+      payload,
       { needAuth: true },
     );
 

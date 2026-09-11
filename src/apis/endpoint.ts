@@ -60,6 +60,8 @@ export const ENDPOINT = {
   DELETE_STAFF: "/delete-staff",
   GET_APPOINTMENTS: "/get-appointments",
   UPDATE_APPOINTMENT: "/update-appointment",
+  GET_FEEDBACK: "/get-feedback",
+  DELETE_FEEDBACK: "/delete-feedback",
   GET_APPOINTMENT_SLOTS: "/appointment-slots",
   ADD_APPOINTMENT_SLOT: "/appointment-slots",
   UPDATE_APPOINTMENT_SLOT: "/appointment-slots",
