@@ -118,9 +118,9 @@ const ALL_NAV_ITEMS: NavItem[] = [
         permissionPath: "/appointments",
       },
       {
-        label: "Slot Management",
-        path: "/slot-management",
-        permissionPath: "/slot-management",
+        label: "OPD Schedule",
+        path: "/opd-schedule",
+        permissionPath: "/opd-schedule",
       },
     ],
   },
@@ -154,10 +154,21 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionPath: "/gallery",
   },
   {
-    label: "Feedback",
+    label: "Contact",
     icon: MessageSquareText,
-    path: "/feedback",
     permissionPath: "/feedback",
+    children: [
+      {
+        label: "Feedback",
+        path: "/feedback",
+        permissionPath: "/feedback",
+      },
+      {
+        label: "OPD Contact",
+        path: "/opd",
+        permissionPath: "/opd",
+      },
+    ],
   },
   {
     label: "Empanelled Corporate",
@@ -237,8 +248,10 @@ function SidebarNav({
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     Services: false,
+    Appointments: false,
     Blogs: false,
     Careers: false,
+    Contact: false,
   });
 
   function toggleMenu(label: string) {

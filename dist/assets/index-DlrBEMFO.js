@@ -21930,6 +21930,8 @@ const ENDPOINT = {
   UPDATE_APPOINTMENT: "/update-appointment",
   GET_FEEDBACK: "/get-feedback",
   DELETE_FEEDBACK: "/delete-feedback",
+  GET_OPD: "/get-opd",
+  DELETE_OPD: "/delete-opd",
   GET_APPOINTMENT_SLOTS: "/appointment-slots",
   ADD_APPOINTMENT_SLOT: "/appointment-slots",
   UPDATE_APPOINTMENT_SLOT: "/appointment-slots",
@@ -32845,7 +32847,7 @@ const ROLE_LABELS = {
   receptionist: "Receptionist",
   nurse: "Nurse"
 };
-function formatDate$4(date2) {
+function formatDate$5(date2) {
   if (!date2) return "TBD";
   const parsedDate = new Date(date2);
   if (Number.isNaN(parsedDate.getTime())) return "TBD";
@@ -38088,9 +38090,9 @@ const ALL_NAV_ITEMS = [
         permissionPath: "/appointments"
       },
       {
-        label: "Slot Management",
-        path: "/slot-management",
-        permissionPath: "/slot-management"
+        label: "OPD Schedule",
+        path: "/opd-schedule",
+        permissionPath: "/opd-schedule"
       }
     ]
   },
@@ -38124,10 +38126,21 @@ const ALL_NAV_ITEMS = [
     permissionPath: "/gallery"
   },
   {
-    label: "Feedback",
+    label: "Contact",
     icon: MessageSquareText,
-    path: "/feedback",
-    permissionPath: "/feedback"
+    permissionPath: "/feedback",
+    children: [
+      {
+        label: "Feedback",
+        path: "/feedback",
+        permissionPath: "/feedback"
+      },
+      {
+        label: "OPD Contact",
+        path: "/opd",
+        permissionPath: "/opd"
+      }
+    ]
   },
   {
     label: "Empanelled Corporate",
@@ -38197,8 +38210,10 @@ function SidebarNav({
   const navigate = useNavigate();
   const [openMenus, setOpenMenus] = reactExports.useState({
     Services: false,
+    Appointments: false,
     Blogs: false,
-    Careers: false
+    Careers: false,
+    Contact: false
   });
   function toggleMenu(label) {
     setOpenMenus((prev2) => ({
@@ -43002,7 +43017,7 @@ function formatSlotTime(slotLabel) {
   if (!start || !end) return `${label} slot`;
   return `${formatSlotTimePart(start)} - ${formatSlotTimePart(end)} slot`;
 }
-function formatSlotType$1(slotType) {
+function formatSlotType(slotType) {
   if (slotType === "daily") return "Day Wise Slot";
   if (slotType === "weekly") return "Week Slot";
   return "";
@@ -43663,12 +43678,12 @@ function AppointmentsPage() {
                       value: formatSlotTime(detailTarget.slotLabel)
                     }
                   ),
-                  formatSlotType$1(detailTarget.slotType) && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  formatSlotType(detailTarget.slotType) && /* @__PURE__ */ jsxRuntimeExports.jsx(
                     DetailItem,
                     {
                       icon: CalendarClock,
                       label: "Slot type",
-                      value: formatSlotType$1(detailTarget.slotType)
+                      value: formatSlotType(detailTarget.slotType)
                     }
                   ),
                   formatIndiaDate(detailTarget.preferredDate) && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -45408,7 +45423,7 @@ const tableStyles$5 = {
 function slugify$4(value) {
   return value.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 }
-function formatDate$3(value) {
+function formatDate$4(value) {
   if (!value) {
     return "—";
   }
@@ -45678,7 +45693,7 @@ function CareerManagementPage() {
     {
       name: "Updated",
       width: "140px",
-      cell: (career) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$3(career.updatedAt ?? career.createdAt) })
+      cell: (career) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$4(career.updatedAt ?? career.createdAt) })
     },
     {
       name: "Actions",
@@ -68715,7 +68730,7 @@ function DashboardPage() {
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 font-medium text-foreground whitespace-nowrap", children: appt.fullName }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap", children: appt.doctorName }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap", children: formatDate$4(appt.appointmentDate) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground whitespace-nowrap", children: formatDate$5(appt.appointmentDate) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3 text-muted-foreground max-w-[200px] truncate", children: appt.reason }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-5 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(StatusBadge$1, { status: appt.status }) })
                   ]
@@ -68742,7 +68757,7 @@ function DashboardPage() {
                     " ",
                     appt.doctorName
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: formatDate$4(appt.appointmentDate) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: formatDate$5(appt.appointmentDate) }),
                   appt.reason && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground truncate", children: appt.reason })
                 ]
               },
@@ -69443,7 +69458,7 @@ function DoctorsPage() {
       ue.success("Doctor added successfully.");
       queryClient2.invalidateQueries({ queryKey: ["doctors"] });
       setIsAddModalOpen(false);
-      resetForm2();
+      resetForm();
     },
     onError: (error2) => ue.error(error2.message)
   });
@@ -69457,7 +69472,7 @@ function DoctorsPage() {
       queryClient2.invalidateQueries({ queryKey: ["doctors"] });
       setIsEditModalOpen(false);
       setSelectedDoctor(null);
-      resetForm2();
+      resetForm();
     },
     onError: (error2) => ue.error(error2.message)
   });
@@ -69488,7 +69503,7 @@ function DoctorsPage() {
       ].filter(Boolean).some((value) => String(value).toLowerCase().includes(q2))
     );
   }, [doctors, searchQuery]);
-  function resetForm2() {
+  function resetForm() {
     setFormData(emptyForm$4);
     setFormErrors({});
     setImageFileName("");
@@ -69496,7 +69511,7 @@ function DoctorsPage() {
   }
   function openAdd() {
     setSelectedDoctor(null);
-    resetForm2();
+    resetForm();
     setIsAddModalOpen(true);
   }
   function openEdit(doctor) {
@@ -70571,7 +70586,7 @@ function DataTable({
   ] });
 }
 const FEEDBACK_QUERY_KEY = ["feedback"];
-function formatDate$2(value) {
+function formatDate$3(value) {
   if (!value) return "—";
   return new Date(value).toLocaleString("en-IN", {
     day: "2-digit",
@@ -70639,7 +70654,7 @@ function FeedbackPage() {
     {
       key: "createdAt",
       header: "Submitted",
-      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$2(item.createdAt) })
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$3(item.createdAt) })
     },
     {
       key: "actions",
@@ -70715,12 +70730,22 @@ const addGalleryApi = async (image, caption, category = "other") => {
     );
   }
 };
-const updateGalleryApi = async (id, caption, category = "other") => {
+const updateGalleryApi = async (id, caption, category = "other", image) => {
   var _a2, _b2, _c2;
   try {
+    let payload;
+    if (image) {
+      const formData = new FormData();
+      formData.append("caption", caption);
+      formData.append("category", category);
+      formData.append("image", image);
+      payload = formData;
+    } else {
+      payload = { caption, category };
+    }
     const res = await post(
       `${ENDPOINT.UPDATE_GALLERY}/${id}`,
-      { caption, category },
+      payload,
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.gallery;
@@ -70773,6 +70798,8 @@ function GalleryPage() {
   const [editTarget, setEditTarget] = reactExports.useState(null);
   const [editCaption, setEditCaption] = reactExports.useState("");
   const [editCategory, setEditCategory] = reactExports.useState("other");
+  const [editImage, setEditImage] = reactExports.useState(null);
+  const [editPreviewUrl, setEditPreviewUrl] = reactExports.useState(null);
   const { data: gallery = [], isLoading } = useQuery({
     queryKey: GALLERY_QUERY_KEY,
     queryFn: getAllGalleryApi
@@ -70799,14 +70826,21 @@ function GalleryPage() {
     mutationFn: ({
       id,
       caption: caption2,
-      category: category2
-    }) => updateGalleryApi(id, caption2, category2)
+      category: category2,
+      image: image2
+    }) => updateGalleryApi(id, caption2, category2, image2)
   });
   const handleImageChange = (event) => {
     var _a2;
     const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
     setImage(file);
     setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+  const handleEditImageChange = (event) => {
+    var _a2;
+    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
+    setEditImage(file);
+    setEditPreviewUrl(file ? URL.createObjectURL(file) : null);
   };
   const startAddCategory = (target) => {
     setAddingCategoryFor(target);
@@ -70918,6 +70952,8 @@ function GalleryPage() {
               setEditTarget(item);
               setEditCaption(item.caption || "");
               setEditCategory(item.category || "other");
+              setEditImage(null);
+              setEditPreviewUrl(null);
             },
             children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
           }
@@ -71113,6 +71149,8 @@ function GalleryPage() {
             setEditTarget(null);
             setAddingCategoryFor(null);
             setNewCategoryTitle("");
+            setEditImage(null);
+            setEditPreviewUrl(null);
           }
         },
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
@@ -71189,6 +71227,48 @@ function GalleryPage() {
                 }
               )
             ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "edit-gallery-image",
+                  className: "text-sm font-medium mb-1.5 block",
+                  children: "Update Image (Optional)"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "edit-gallery-image",
+                  type: "file",
+                  accept: "image/*",
+                  onChange: handleEditImageChange
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground mt-1", children: "Leave empty to keep the current image" })
+            ] }),
+            editTarget && !editPreviewUrl && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium mb-1.5", children: "Current Image" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: resolveAssetUrl2(editTarget.image),
+                  alt: "Current",
+                  className: "h-56 w-full object-cover"
+                }
+              ) })
+            ] }),
+            editPreviewUrl && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium mb-1.5", children: "New Image Preview" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: editPreviewUrl,
+                  alt: "Preview",
+                  className: "h-56 w-full object-cover"
+                }
+              ) })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
               {
@@ -71197,11 +71277,14 @@ function GalleryPage() {
                   await updateMutation.mutateAsync({
                     id: editTarget._id,
                     caption: editCaption,
-                    category: editCategory
+                    category: editCategory,
+                    image: editImage || void 0
                   });
                   ue.success("Gallery image updated");
                   queryClient2.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
                   setEditTarget(null);
+                  setEditImage(null);
+                  setEditPreviewUrl(null);
                 },
                 className: "w-full",
                 children: "Update"
@@ -71209,6 +71292,143 @@ function GalleryPage() {
             )
           ] })
         ] })
+      }
+    )
+  ] });
+}
+const getOPDApi = async () => {
+  var _a2;
+  try {
+    const res = await get$3(ENDPOINT.GET_OPD, { needAuth: true });
+    return ((_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.contacts) || [];
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to fetch OPD contacts");
+  }
+};
+const deleteOPDApi = async (id) => {
+  try {
+    await post(
+      `${ENDPOINT.DELETE_OPD}/${id}`,
+      {},
+      { needAuth: true }
+    );
+  } catch (error) {
+    throw createApiRequestError(error, "Failed to delete OPD contact");
+  }
+};
+const OPD_QUERY_KEY = ["opd"];
+function formatDate$2(value) {
+  if (!value) return "—";
+  return new Date(value).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+function OPDPage() {
+  const queryClient2 = useQueryClient();
+  const { data = [], isLoading } = useQuery({
+    queryKey: OPD_QUERY_KEY,
+    queryFn: getOPDApi
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteOPDApi,
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: OPD_QUERY_KEY });
+      ue.success("OPD contact deleted");
+    },
+    onError: () => {
+      ue.error("Unable to delete OPD contact");
+    }
+  });
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this OPD contact?")) return;
+    deleteMutation.mutate(id);
+  };
+  const columns = [
+    {
+      key: "fullName",
+      header: "Patient",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "py-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 font-semibold text-foreground", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(UserRound, { size: 15, className: "text-primary" }),
+          item.fullName
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { size: 12 }),
+          item.contactNumber
+        ] }),
+        item.email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { size: 12 }),
+          item.email
+        ] })
+      ] })
+    },
+    {
+      key: "address",
+      header: "Address",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-[260px] text-sm text-muted-foreground", children: item.address ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-start gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { size: 14, className: "mt-0.5 shrink-0 text-primary" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "line-clamp-3", children: item.address })
+      ] }) : "—" })
+    },
+    {
+      key: "message",
+      header: "Message/Query",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-[420px] text-sm leading-6 text-foreground", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquareText, { size: 14, className: "mr-2 inline text-primary" }),
+        item.message
+      ] })
+    },
+    {
+      key: "createdAt",
+      header: "Submitted",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-muted-foreground", children: formatDate$2(item.createdAt) })
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          size: "icon",
+          variant: "ghost",
+          onClick: () => handleDelete(item._id),
+          "aria-label": "Delete OPD contact",
+          disabled: deleteMutation.isPending,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 16 })
+        }
+      )
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: "OPD Contacts",
+        description: "Review OPD contact inquiries submitted from the website."
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataTable,
+      {
+        columns,
+        data,
+        isLoading,
+        searchable: true,
+        searchKeys: [
+          "fullName",
+          "contactNumber",
+          "email",
+          "address",
+          "message"
+        ],
+        emptyText: "No OPD contacts submitted yet.",
+        rowKey: (row) => row._id,
+        "data-ocid": "opd.table"
       }
     )
   ] });
@@ -71512,7 +71732,7 @@ function HonorsPage() {
       ].some((value) => value.toLowerCase().includes(query))
     );
   }, [data, search]);
-  function resetForm2() {
+  function resetForm() {
     setModalOpen(false);
     setEditTarget(null);
     setFormData(emptyHonorForm);
@@ -71710,7 +71930,7 @@ function HonorsPage() {
       Dialog,
       {
         open: modalOpen,
-        onOpenChange: (nextOpen) => !nextOpen && resetForm2(),
+        onOpenChange: (nextOpen) => !nextOpen && resetForm(),
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] overflow-y-auto rounded-3xl border-border sm:max-w-2xl", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editTarget ? "Edit honor" : "Add honor" }),
@@ -71779,7 +71999,7 @@ function HonorsPage() {
                 type: "button",
                 variant: "outline",
                 className: "rounded-xl border-border",
-                onClick: resetForm2,
+                onClick: resetForm,
                 children: "Cancel"
               }
             ),
@@ -73309,7 +73529,7 @@ function ConnectedAccountCard({
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1.5", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { size: 14 }),
             " ",
-            formatDate$4(account.connectedAt)
+            formatDate$5(account.connectedAt)
           ] })
         ] })
       ] })
@@ -73379,7 +73599,7 @@ function PostDetailsDialog({
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-3 text-sm text-muted-foreground", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1.5", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { size: 14 }),
-            formatDate$4(post2.postedDate)
+            formatDate$5(post2.postedDate)
           ] }),
           post2.permalink ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "a",
@@ -73454,7 +73674,7 @@ function PostDetailsDialog({
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1.5", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Avatar, { className: "h-7 w-7", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AvatarFallback, { className: "text-[10px]", children: getInitials2(comment2.fromName) }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-semibold text-foreground", children: comment2.fromName }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground ml-auto shrink-0", children: formatDate$4(comment2.createdTime) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground ml-auto shrink-0", children: formatDate$5(comment2.createdTime) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground pl-9", children: comment2.message || "(empty comment)" })
             ]
@@ -73521,7 +73741,7 @@ function PostsTable({
             ) }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: post2.platform }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 max-w-[280px] truncate text-foreground", children: post2.caption || "No caption" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 text-muted-foreground", children: formatDate$4(post2.postedDate) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 text-muted-foreground", children: formatDate$5(post2.postedDate) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 tabular-nums", children: formatNumber(post2.likes) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 tabular-nums", children: formatNumber(post2.comments) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "px-4 py-3 tabular-nums", children: formatNumber(post2.reach) }),
@@ -75301,7 +75521,7 @@ function getPatientRegisteredAt(patient) {
   return patient.createdAt || patient.updatedAt || (/* @__PURE__ */ new Date()).toISOString();
 }
 function getPatientDischargeLabel(patient) {
-  return patient.dischargedAt ? formatDate$4(patient.dischargedAt) : "";
+  return patient.dischargedAt ? formatDate$5(patient.dischargedAt) : "";
 }
 function validateForm(form) {
   const errors = {};
@@ -75623,7 +75843,7 @@ function PatientsPage() {
                       /* @__PURE__ */ jsxRuntimeExports.jsx(PatientStatusBadge, { patient }),
                       isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: getPatientDischargeLabel(patient) }) : null
                     ] }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-muted-foreground", children: formatDate$4(getPatientRegisteredAt(patient)) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-muted-foreground", children: formatDate$5(getPatientRegisteredAt(patient)) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "pr-5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx(
                         Button,
@@ -75724,7 +75944,7 @@ function PatientsPage() {
                       ),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground mt-0.5", children: [
                         "Reg: ",
-                        formatDate$4(getPatientRegisteredAt(patient))
+                        formatDate$5(getPatientRegisteredAt(patient))
                       ] }),
                       isPatientDischarged(patient) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-secondary mt-0.5", children: [
                         "Discharged: ",
@@ -76906,7 +77126,7 @@ function EditStaffDialog({
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
             "Joined: ",
-            formatDate$4(staff.createdAt)
+            formatDate$5(staff.createdAt)
           ] })
         ] })
       ] }),
@@ -77065,7 +77285,7 @@ function RoleManagementPage() {
     {
       key: "joinedDate",
       header: "Joined Date",
-      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: formatDate$4(row.createdAt) })
+      render: (row) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: formatDate$5(row.createdAt) })
     },
     {
       key: "action",
@@ -77128,7 +77348,7 @@ function RoleManagementPage() {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
               "Joined ",
-              formatDate$4(item.createdAt)
+              formatDate$5(item.createdAt)
             ] })
           ] }),
           isCurrentAccount ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-xl bg-accent px-3 py-2 text-xs text-secondary", children: "Current account access is locked here for safety." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
@@ -79684,42 +79904,31 @@ async function deleteAppointmentSlotApi(id) {
     throw createApiRequestError(error, "Failed to delete appointment slot");
   }
 }
-const createTimeSlotLine = (overrides = {}) => ({
-  id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-  startTime: "09:00",
-  endTime: "10:00",
-  maximumPatients: 10,
-  isActive: true,
-  ...overrides
-});
-const createWeeklyDayLine = (overrides = {}) => ({
-  id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-  date: "",
-  isActive: true,
-  slots: [createTimeSlotLine()],
-  ...overrides
-});
+const WEEKDAYS = [
+  { value: "1", label: "Monday" },
+  { value: "2", label: "Tuesday" },
+  { value: "3", label: "Wednesday" },
+  { value: "4", label: "Thursday" },
+  { value: "5", label: "Friday" },
+  { value: "6", label: "Saturday" },
+  { value: "0", label: "Sunday" }
+];
 const emptyForm = {
+  department: "",
   doctorId: "",
-  slotType: "daily",
-  date: "",
-  appointmentPrice: 0,
-  bookingCloseMinutesBeforeEnd: 10,
-  isActive: true,
-  slots: [createTimeSlotLine()],
-  weeklyDays: [createWeeklyDayLine()]
+  days: [],
+  startTime: "09:00",
+  endTime: "17:00"
 };
-function SlotManagementPage() {
+function OPDSchedulePage() {
   const queryClient2 = useQueryClient();
   const [search, setSearch] = reactExports.useState("");
-  const [selectedDate, setSelectedDate] = reactExports.useState("");
+  const [filterDoctor, setFilterDoctor] = reactExports.useState(void 0);
   const [dialogOpen, setDialogOpen] = reactExports.useState(false);
-  const [viewOpen, setViewOpen] = reactExports.useState(false);
   const [deleteOpen, setDeleteOpen] = reactExports.useState(false);
   const [editingSlot, setEditingSlot] = reactExports.useState(null);
-  const [viewingSlot, setViewingSlot] = reactExports.useState(null);
-  const [form, setForm] = reactExports.useState(() => resetForm());
-  const { data: doctors = [] } = useQuery({
+  const [form, setForm] = reactExports.useState(emptyForm);
+  const { data: allDoctors = [] } = useQuery({
     queryKey: ["doctors"],
     queryFn: getAllDoctorsApi
   });
@@ -79729,32 +79938,25 @@ function SlotManagementPage() {
     isError,
     error
   } = useQuery({
-    queryKey: ["appointment-slots", selectedDate],
-    queryFn: () => getAppointmentSlotsApi({ date: selectedDate || void 0 })
+    queryKey: ["opd-schedule", filterDoctor],
+    queryFn: () => getAppointmentSlotsApi({
+      doctorId: filterDoctor
+    })
   });
   const addMutation = useMutation({
-    mutationFn: (payloads) => Promise.all(payloads.map((payload) => addAppointmentSlotApi(payload))),
+    mutationFn: (payload) => addAppointmentSlotApi(payload),
     onSuccess: () => {
-      ue.success("Slot created successfully.");
-      queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
+      ue.success("OPD Schedule created successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["opd-schedule"] });
       closeDialog();
     },
     onError: (error2) => ue.error(error2.message)
   });
   const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      payload,
-      extraPayloads
-    }) => Promise.all([
-      updateAppointmentSlotApi(id, payload),
-      ...extraPayloads.map(
-        (extraPayload) => addAppointmentSlotApi(extraPayload)
-      )
-    ]),
+    mutationFn: ({ id, payload }) => updateAppointmentSlotApi(id, payload),
     onSuccess: () => {
-      ue.success("Slot updated successfully.");
-      queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
+      ue.success("OPD Schedule updated successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["opd-schedule"] });
       closeDialog();
     },
     onError: (error2) => ue.error(error2.message)
@@ -79763,15 +79965,15 @@ function SlotManagementPage() {
     mutationFn: ({ id, isActive }) => updateAppointmentSlotApi(id, { isActive }),
     onSuccess: () => {
       ue.success("Status updated successfully.");
-      queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
+      queryClient2.invalidateQueries({ queryKey: ["opd-schedule"] });
     },
     onError: (error2) => ue.error(error2.message)
   });
   const deleteMutation = useMutation({
     mutationFn: deleteAppointmentSlotApi,
     onSuccess: () => {
-      ue.success("Slot deleted successfully.");
-      queryClient2.invalidateQueries({ queryKey: ["appointment-slots"] });
+      ue.success("OPD Schedule deleted successfully.");
+      queryClient2.invalidateQueries({ queryKey: ["opd-schedule"] });
       setDeleteOpen(false);
       setEditingSlot(null);
     },
@@ -79781,101 +79983,76 @@ function SlotManagementPage() {
     const term = search.trim().toLowerCase();
     if (!term) return slots;
     return slots.filter(
-      (slot) => {
-        var _a2;
-        return [
-          slot.doctorName,
-          slot.slotType,
-          slot.startTime,
-          slot.endTime,
-          (_a2 = slot.timeSlots) == null ? void 0 : _a2.map(
-            (timeSlot) => `${timeSlot.startTime} ${timeSlot.endTime} ${timeSlot.maximumPatients}`
-          ).join(" "),
-          slot.appointmentPrice,
-          slot.disabledReason,
-          slot.dateKey,
-          slot.appliesOnDateKey,
-          formatSlotType(slot.slotType),
-          formatSlotDate(slot)
-        ].filter(Boolean).some((value) => String(value).toLowerCase().includes(term));
-      }
+      (slot) => [slot.doctorName, slot.departmentName].filter(Boolean).some((value) => String(value).toLowerCase().includes(term))
     );
   }, [search, slots]);
   function openAdd() {
     setEditingSlot(null);
-    setForm(resetForm());
+    setForm(emptyForm);
     setDialogOpen(true);
   }
   function openEdit(slot) {
     setEditingSlot(slot);
     setForm({
+      department: slot.departmentName || "",
       doctorId: String(slot.doctorId),
-      slotType: slot.slotType,
-      date: slot.dateKey || (slot.date ? slot.date.slice(0, 10) : ""),
-      appointmentPrice: slot.appointmentPrice ?? 0,
-      bookingCloseMinutesBeforeEnd: slot.bookingCloseMinutesBeforeEnd ?? 10,
-      isActive: slot.isActive,
-      slots: slot.slotType === "daily" ? getFormTimeSlots(slot) : [createTimeSlotLine()],
-      weeklyDays: slot.slotType === "weekly" ? getFormWeeklyDays(slot) : [createWeeklyDayLine()]
+      days: (slot.weekdays || []).map((d2) => String(d2)),
+      startTime: slot.startTime || "09:00",
+      endTime: slot.endTime || "17:00"
     });
     setDialogOpen(true);
-  }
-  function openView(slot) {
-    setViewingSlot(slot);
-    setViewOpen(true);
   }
   function closeDialog() {
     setDialogOpen(false);
     setEditingSlot(null);
-    setForm(resetForm());
+    setForm(emptyForm);
   }
-  function saveSlot() {
+  function toggleDay(dayValue) {
+    setForm((prev2) => ({
+      ...prev2,
+      days: prev2.days.includes(dayValue) ? prev2.days.filter((d2) => d2 !== dayValue) : [...prev2.days, dayValue]
+    }));
+  }
+  function toggleSelectAll() {
+    if (form.days.length === WEEKDAYS.length) {
+      setForm((prev2) => ({ ...prev2, days: [] }));
+    } else {
+      setForm((prev2) => ({ ...prev2, days: WEEKDAYS.map((d2) => d2.value) }));
+    }
+  }
+  function saveSchedule() {
+    if (!form.department.trim()) {
+      ue.error("Please enter a department name.");
+      return;
+    }
     if (!form.doctorId) {
       ue.error("Please select a doctor.");
       return;
     }
-    if (form.slotType === "daily" && !form.date) {
-      ue.error("Please select a date for the day wise slot.");
+    if (!form.days.length) {
+      ue.error("Please select at least one day.");
       return;
     }
-    const payloads = buildSlotPayloads(form);
-    if (!payloads.length) {
-      ue.error("Please add at least one slot time.");
+    if (!form.startTime || !form.endTime) {
+      ue.error("Please enter start and end time.");
       return;
     }
-    const invalidLine = form.slotType === "daily" ? form.slots.find(isInvalidTimeSlot) : form.weeklyDays.find(
-      (day) => !day.date || !day.slots.length || day.slots.some(isInvalidTimeSlot)
-    );
-    if (invalidLine) {
-      ue.error(
-        form.slotType === "weekly" ? "Please enter a date, valid time range and patient capacity for every weekly day." : "Please enter a valid time range and patient capacity for every slot."
-      );
+    if (form.startTime >= form.endTime) {
+      ue.error("End time must be after start time.");
       return;
     }
-    if (form.appointmentPrice < 0) {
-      ue.error("Appointment price must be 0 or more.");
-      return;
-    }
-    if (!Number.isInteger(form.bookingCloseMinutesBeforeEnd) || form.bookingCloseMinutesBeforeEnd < 0) {
-      ue.error("Booking close time must be 0 minutes or more.");
-      return;
-    }
-    if (getAllFormTimeSlots(form).some(
-      (slot) => form.bookingCloseMinutesBeforeEnd > timeToMinutes(slot.endTime) - timeToMinutes(slot.startTime)
-    )) {
-      ue.error(
-        "Booking close time cannot be longer than a slot time range."
-      );
-      return;
-    }
+    const payload = {
+      doctorId: form.doctorId,
+      departmentName: form.department,
+      weekdays: form.days.map((d2) => Number(d2)),
+      startTime: form.startTime,
+      endTime: form.endTime,
+      isActive: true
+    };
     if (editingSlot) {
-      updateMutation.mutate({
-        id: editingSlot._id,
-        payload: payloads[0],
-        extraPayloads: payloads.slice(1)
-      });
+      updateMutation.mutate({ id: editingSlot._id, payload });
     } else {
-      addMutation.mutate(payloads);
+      addMutation.mutate(payload);
     }
   }
   function toggleStatus(slot) {
@@ -79889,11 +80066,11 @@ function SlotManagementPage() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
-        title: "Slot Management",
-        description: "Create day wise slots for one date or week slots for the full week.",
+        title: "OPD Schedule",
+        description: "Manage OPD schedules with department, doctor, days and timing.",
         action: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: openAdd, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
-          "Add Slot"
+          "Add Schedule"
         ] })
       }
     ),
@@ -79904,73 +80081,62 @@ function SlotManagementPage() {
           Input,
           {
             value: search,
-            onChange: (event) => setSearch(event.target.value),
-            placeholder: "Search slots",
+            onChange: (e3) => setSearch(e3.target.value),
+            placeholder: "Search schedules",
             className: "pl-9"
           }
         )
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Input,
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
         {
-          type: "date",
-          value: selectedDate,
-          onChange: (event) => setSelectedDate(event.target.value)
+          value: filterDoctor || "all",
+          onValueChange: (value) => setFilterDoctor(value === "all" ? void 0 : value),
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "All Doctors" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "all", children: "All Doctors" }),
+              allDoctors.map((doctor) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: doctor._id, children: doctor.name }, doctor._id))
+            ] })
+          ]
         }
       )
     ] }),
     isError ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive", children: error.message }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-lg border border-border bg-card", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Doctor" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Type" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Capacity" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Price" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Sr.No." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Department" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Doctor's Name" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Day" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Time" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Status" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-28 text-right", children: "Actions" })
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: isLoading ? [
-        "slot-sk-1",
-        "slot-sk-2",
-        "slot-sk-3",
-        "slot-sk-4",
-        "slot-sk-5"
-      ].map((key) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }) }, key)) : filteredSlots.length ? filteredSlots.map((slot) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: slot.doctorName }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatSlotType(slot.slotType) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
-          slot.bookedCount ?? 0,
-          "/",
-          sumSlotCapacity(slot)
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: isLoading ? [1, 2, 3, 4, 5].map((key) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 7, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }) }, key)) : filteredSlots.length ? filteredSlots.map((slot, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: index2 + 1 }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: slot.departmentName || "N/A" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: slot.doctorName }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: slot.weekdays && slot.weekdays.length > 0 ? slot.weekdays.map((day) => {
+          var _a2;
+          return (_a2 = WEEKDAYS.find((d2) => d2.value === String(day))) == null ? void 0 : _a2.label;
+        }).filter(Boolean).join(", ") : "N/A" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: "text-sm", children: [
+          slot.startTime,
+          " - ",
+          slot.endTime
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
-          "₹",
-          slot.appointmentPrice ?? 0
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Switch,
-              {
-                checked: slot.isActive,
-                onCheckedChange: () => toggleStatus(slot),
-                disabled: toggleStatusMutation.isPending
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: slot.isActive ? "Active" : "Inactive" })
-          ] }),
-          slot.disabledReason && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 text-xs text-muted-foreground", children: slot.disabledReason })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
+            Switch,
             {
-              variant: "ghost",
-              size: "icon",
-              onClick: () => openView(slot),
-              title: "View Details",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "h-4 w-4" })
+              checked: slot.isActive,
+              onCheckedChange: () => toggleStatus(slot),
+              disabled: toggleStatusMutation.isPending
             }
           ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: slot.isActive ? "Active" : "Inactive" })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Button,
             {
@@ -79998,817 +80164,126 @@ function SlotManagementPage() {
       ] }, slot._id)) : /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         TableCell,
         {
-          colSpan: 6,
+          colSpan: 7,
           className: "h-24 text-center text-muted-foreground",
-          children: "No slots found."
+          children: "No OPD schedules found."
         }
       ) }) })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      SlotDialog,
-      {
-        open: dialogOpen,
-        form,
-        doctors,
-        isEditing: Boolean(editingSlot),
-        isSaving,
-        onOpenChange: (open) => open ? setDialogOpen(true) : closeDialog(),
-        onChange: setForm,
-        onSave: saveSlot
-      }
-    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: dialogOpen, onOpenChange: (open) => open ? setDialogOpen(true) : closeDialog(), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] w-[calc(100vw-1rem)] !max-w-2xl overflow-y-auto p-0", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-border px-6 py-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: editingSlot ? "Edit OPD Schedule" : "Add OPD Schedule" }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-5 px-6 py-5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Department *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              type: "text",
+              placeholder: "Enter department name",
+              value: form.department,
+              onChange: (e3) => setForm({ ...form, department: e3.target.value })
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Doctor *" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Select,
+            {
+              value: form.doctorId,
+              onValueChange: (value) => setForm({ ...form, doctorId: value }),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select doctor" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: allDoctors.map((doctor) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: doctor._id, children: doctor.name }, doctor._id)) })
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Days * (Select multiple)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-lg border border-border p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 flex items-center space-x-2 border-b border-border pb-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Checkbox,
+                {
+                  id: "select-all",
+                  checked: form.days.length === WEEKDAYS.length,
+                  onCheckedChange: toggleSelectAll
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "select-all",
+                  className: "text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                  children: "Select All"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 gap-3", children: WEEKDAYS.map((day) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center space-x-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Checkbox,
+                {
+                  id: `day-${day.value}`,
+                  checked: form.days.includes(day.value),
+                  onCheckedChange: () => toggleDay(day.value)
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: `day-${day.value}`,
+                  className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                  children: day.label
+                }
+              )
+            ] }, day.value)) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 md:grid-cols-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Start Time *" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                type: "time",
+                value: form.startTime,
+                onChange: (e3) => setForm({ ...form, startTime: e3.target.value })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "End Time *" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                type: "time",
+                value: form.endTime,
+                onChange: (e3) => setForm({ ...form, endTime: e3.target.value })
+              }
+            )
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "border-t border-border px-6 py-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: () => closeDialog(), children: "Cancel" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: saveSchedule, disabled: isSaving, children: isSaving ? "Saving..." : "Save Schedule" })
+      ] })
+    ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmDialog,
       {
         open: deleteOpen,
-        title: "Delete Slot",
-        message: "This slot will no longer be available for future bookings.",
+        title: "Delete OPD Schedule",
+        message: "This schedule will be permanently deleted.",
         confirmLabel: deleteMutation.isPending ? "Deleting..." : "Delete",
         onCancel: () => setDeleteOpen(false),
         onConfirm: () => {
           if (editingSlot) deleteMutation.mutate(editingSlot._id);
         }
       }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      ViewSlotDialog,
-      {
-        open: viewOpen,
-        slot: viewingSlot,
-        onOpenChange: (open) => {
-          setViewOpen(open);
-          if (!open) setViewingSlot(null);
-        }
-      }
     )
   ] });
-}
-function SlotDialog({
-  open,
-  form,
-  doctors,
-  isEditing,
-  isSaving,
-  onOpenChange,
-  onChange,
-  onSave
-}) {
-  const setField = (key, value) => onChange({ ...form, [key]: value });
-  const updateDailySlotLine = (id, key, value) => onChange({
-    ...form,
-    slots: form.slots.map(
-      (slot) => slot.id === id ? { ...slot, [key]: value } : slot
-    )
-  });
-  const addDailySlotLine = () => {
-    var _a2, _b2, _c2, _d2;
-    return onChange({
-      ...form,
-      slots: [
-        ...form.slots,
-        createTimeSlotLine({
-          startTime: ((_a2 = form.slots.at(-1)) == null ? void 0 : _a2.endTime) ?? "09:00",
-          endTime: ((_b2 = form.slots.at(-1)) == null ? void 0 : _b2.endTime) ? addOneHour(((_c2 = form.slots.at(-1)) == null ? void 0 : _c2.endTime) ?? "09:00") : "10:00",
-          maximumPatients: ((_d2 = form.slots.at(-1)) == null ? void 0 : _d2.maximumPatients) ?? 10
-        })
-      ]
-    });
-  };
-  const removeDailySlotLine = (id) => onChange({
-    ...form,
-    slots: form.slots.filter((slot) => slot.id !== id)
-  });
-  const updateWeeklyDayDate = (dayId, date2) => onChange({
-    ...form,
-    weeklyDays: form.weeklyDays.map(
-      (day) => day.id === dayId ? { ...day, date: date2 } : day
-    )
-  });
-  const addWeeklyDay = () => {
-    var _a2;
-    return onChange({
-      ...form,
-      weeklyDays: [
-        ...form.weeklyDays,
-        createWeeklyDayLine({
-          date: nextWeeklyDate((_a2 = form.weeklyDays.at(-1)) == null ? void 0 : _a2.date)
-        })
-      ]
-    });
-  };
-  const removeWeeklyDay = (dayId) => onChange({
-    ...form,
-    weeklyDays: form.weeklyDays.filter((day) => day.id !== dayId)
-  });
-  const updateWeeklyTimeLine = (dayId, slotId, key, value) => onChange({
-    ...form,
-    weeklyDays: form.weeklyDays.map(
-      (day) => day.id === dayId ? {
-        ...day,
-        slots: day.slots.map(
-          (slot) => slot.id === slotId ? { ...slot, [key]: value } : slot
-        )
-      } : day
-    )
-  });
-  const addWeeklyTimeLine = (dayId) => onChange({
-    ...form,
-    weeklyDays: form.weeklyDays.map((day) => {
-      if (day.id !== dayId) return day;
-      const previousSlot = day.slots.at(-1);
-      return {
-        ...day,
-        slots: [
-          ...day.slots,
-          createTimeSlotLine({
-            startTime: (previousSlot == null ? void 0 : previousSlot.endTime) ?? "09:00",
-            endTime: (previousSlot == null ? void 0 : previousSlot.endTime) ? addOneHour(previousSlot.endTime) : "10:00",
-            maximumPatients: (previousSlot == null ? void 0 : previousSlot.maximumPatients) ?? 10
-          })
-        ]
-      };
-    })
-  });
-  const removeWeeklyTimeLine = (dayId, slotId) => onChange({
-    ...form,
-    weeklyDays: form.weeklyDays.map(
-      (day) => day.id === dayId ? { ...day, slots: day.slots.filter((slot) => slot.id !== slotId) } : day
-    )
-  });
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] w-[calc(100vw-1rem)] !max-w-3xl overflow-y-auto p-0", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-border px-6 py-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: isEditing ? "Edit Slot" : "Add Slot" }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-5 px-6 py-5 sm:grid-cols-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 sm:col-span-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Doctor" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Select,
-          {
-            value: form.doctorId,
-            onValueChange: (value) => setField("doctorId", value),
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Select doctor" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: doctors.map((doctor) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: doctor._id, children: doctor.name }, doctor._id)) })
-            ]
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slot Type" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Select,
-          {
-            value: form.slotType,
-            onValueChange: (value) => onChange({
-              ...form,
-              slotType: value,
-              date: value === "daily" ? form.date : "",
-              weeklyDays: value === "weekly" ? form.weeklyDays.map((day, index2) => ({
-                ...day,
-                date: day.date || dateFromToday(index2)
-              })) : form.weeklyDays
-            }),
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, {}) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "daily", children: "Day Wise Slot" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "weekly", children: "Week Slot" })
-              ] })
-            ]
-          }
-        )
-      ] }),
-      form.slotType === "daily" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Date" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "date",
-            value: form.date ?? "",
-            onChange: (event) => setField("date", event.target.value)
-          }
-        )
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Week Dates" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex min-h-10 items-center rounded-md border border-border bg-muted/40 px-3 text-sm text-muted-foreground", children: "Select each day needed for this week" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Appointment Price (INR)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "number",
-            min: 0,
-            value: form.appointmentPrice,
-            onChange: (event) => setField("appointmentPrice", Number(event.target.value))
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Booking Closes Before End (Minutes)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "number",
-            min: 0,
-            value: form.bookingCloseMinutesBeforeEnd,
-            onChange: (event) => setField(
-              "bookingCloseMinutesBeforeEnd",
-              Number(event.target.value)
-            )
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between rounded-lg border border-border px-3 py-2 sm:col-span-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Status" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: form.isActive ? "Active" : "Inactive" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Switch,
-            {
-              checked: form.isActive,
-              onCheckedChange: (checked) => setField("isActive", checked)
-            }
-          )
-        ] })
-      ] }),
-      form.slotType === "daily" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 sm:col-span-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Slot Times" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              type: "button",
-              variant: "outline",
-              size: "sm",
-              onClick: addDailySlotLine,
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
-                "Add More"
-              ]
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: form.slots.map((slot, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-          TimeSlotFields,
-          {
-            slot,
-            canRemove: form.slots.length > 1,
-            onChange: (key, value) => updateDailySlotLine(slot.id, key, value),
-            onRemove: () => removeDailySlotLine(slot.id),
-            removeLabel: `Remove slot ${index2 + 1}`
-          },
-          slot.id
-        )) })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 sm:col-span-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Weekly Days" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              type: "button",
-              variant: "outline",
-              size: "sm",
-              onClick: addWeeklyDay,
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
-                "Add Day"
-              ]
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: form.weeklyDays.map((day, dayIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "div",
-          {
-            className: "space-y-4 rounded-lg border border-border bg-muted/20 p-4",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Date" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      type: "date",
-                      value: day.date,
-                      onChange: (event) => updateWeeklyDayDate(day.id, event.target.value)
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 rounded-md border border-border px-3 py-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm", children: "Day Active" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Switch,
-                      {
-                        checked: day.isActive,
-                        onCheckedChange: (checked) => onChange({
-                          ...form,
-                          weeklyDays: form.weeklyDays.map(
-                            (d2) => d2.id === day.id ? { ...d2, isActive: checked } : d2
-                          )
-                        })
-                      }
-                    )
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    Button,
-                    {
-                      type: "button",
-                      variant: "outline",
-                      size: "sm",
-                      onClick: () => addWeeklyTimeLine(day.id),
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "mr-2 h-4 w-4" }),
-                        "Add Time"
-                      ]
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Button,
-                    {
-                      type: "button",
-                      variant: "ghost",
-                      size: "icon",
-                      disabled: form.weeklyDays.length === 1,
-                      onClick: () => removeWeeklyDay(day.id),
-                      "aria-label": `Remove day ${dayIndex + 1}`,
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(X$2, { className: "h-4 w-4" })
-                    }
-                  )
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: day.slots.map((slot, slotIndex) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-                TimeSlotFields,
-                {
-                  slot,
-                  canRemove: day.slots.length > 1,
-                  onChange: (key, value) => updateWeeklyTimeLine(day.id, slot.id, key, value),
-                  onRemove: () => removeWeeklyTimeLine(day.id, slot.id),
-                  removeLabel: `Remove day ${dayIndex + 1} time ${slotIndex + 1}`
-                },
-                slot.id
-              )) })
-            ]
-          },
-          day.id
-        )) })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { className: "border-t border-border px-6 py-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: () => onOpenChange(false), children: "Cancel" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: onSave, disabled: isSaving, children: isSaving ? "Saving..." : "Save Slot" })
-    ] })
-  ] }) });
-}
-function TimeSlotFields({
-  slot,
-  canRemove,
-  onChange,
-  onRemove,
-  removeLabel
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-lg border border-border bg-background/70 p-3", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 flex items-center justify-between", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-sm", children: "Time Slot Active" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Switch,
-          {
-            checked: slot.isActive,
-            onCheckedChange: (checked) => onChange("isActive", checked)
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Button,
-        {
-          type: "button",
-          variant: "ghost",
-          size: "icon",
-          disabled: !canRemove,
-          onClick: onRemove,
-          "aria-label": removeLabel,
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx(X$2, { className: "h-4 w-4" })
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-3 md:grid-cols-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Start Time" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "time",
-            value: slot.startTime,
-            onChange: (event) => onChange("startTime", event.target.value)
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "End Time" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "time",
-            value: slot.endTime,
-            onChange: (event) => onChange("endTime", event.target.value)
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { children: "Patient Capacity" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "number",
-            min: 1,
-            value: slot.maximumPatients,
-            onChange: (event) => onChange("maximumPatients", Number(event.target.value))
-          }
-        )
-      ] })
-    ] })
-  ] });
-}
-function ViewSlotDialog({
-  open,
-  slot,
-  onOpenChange
-}) {
-  var _a2, _b2;
-  if (!slot) return null;
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "max-h-[92vh] w-[calc(100vw-1rem)] !max-w-2xl overflow-y-auto", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Slot Details" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-sm text-muted-foreground uppercase tracking-wide", children: "Basic Information" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Doctor" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-medium", children: slot.doctorName })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Slot Type" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-medium", children: formatSlotType(slot.slotType) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Appointment Price" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1 font-medium", children: [
-              "₹",
-              slot.appointmentPrice ?? 0
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Total Capacity" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1 font-medium", children: [
-              slot.bookedCount ?? 0,
-              "/",
-              sumSlotCapacity(slot),
-              " patients"
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Booking Closes Before" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1 font-medium", children: [
-              slot.bookingCloseMinutesBeforeEnd ?? 10,
-              " minutes"
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Status" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              StatusBadge$1,
-              {
-                status: slot.isActive && !slot.isExpired ? "available" : "on-leave"
-              }
-            ) })
-          ] })
-        ] }),
-        slot.disabledReason && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: "Disabled Reason" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-destructive", children: slot.disabledReason })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-sm text-muted-foreground uppercase tracking-wide", children: "Date Information" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { className: "text-muted-foreground", children: slot.slotType === "weekly" ? "Applies On" : "Date" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-medium", children: formatSlotDate(slot) })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-sm text-muted-foreground uppercase tracking-wide", children: "Time Slots" }),
-        ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: slot.weeklyDays.map((day, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "div",
-          {
-            className: "rounded-lg border border-border bg-muted/20 p-4",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 flex items-center justify-between", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { className: "text-sm font-semibold", children: [
-                  getDateKey(day.date, day.dateKey),
-                  " (",
-                  weekdayNames[day.weekday],
-                  ")"
-                ] }),
-                day.isActive !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  StatusBadge$1,
-                  {
-                    status: day.isActive ? "available" : "on-leave"
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: day.timeSlots.map((timeSlot, slotIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "flex items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-sm",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
-                      formatTime12Hour(timeSlot.startTime),
-                      " -",
-                      " ",
-                      formatTime12Hour(timeSlot.endTime)
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                        "Max: ",
-                        timeSlot.maximumPatients,
-                        " patients"
-                      ] }),
-                      timeSlot.isActive !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        StatusBadge$1,
-                        {
-                          status: timeSlot.isActive ? "available" : "on-leave"
-                        }
-                      )
-                    ] })
-                  ]
-                },
-                slotIndex
-              )) })
-            ]
-          },
-          index2
-        )) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: (((_b2 = slot.timeSlots) == null ? void 0 : _b2.length) ? slot.timeSlots : [
-          {
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-            maximumPatients: slot.maximumPatients,
-            isActive: true
-          }
-        ]).map((timeSlot, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "div",
-          {
-            className: "flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
-                formatTime12Hour(timeSlot.startTime),
-                " -",
-                " ",
-                formatTime12Hour(timeSlot.endTime)
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-muted-foreground", children: [
-                  "Max: ",
-                  timeSlot.maximumPatients,
-                  " patients"
-                ] }),
-                timeSlot.isActive !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  StatusBadge$1,
-                  {
-                    status: timeSlot.isActive ? "available" : "on-leave"
-                  }
-                )
-              ] })
-            ]
-          },
-          index2
-        )) })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: () => onOpenChange(false), children: "Close" }) })
-  ] }) });
-}
-function formatSlotDate(slot) {
-  var _a2, _b2;
-  if (slot.slotType === "weekly") {
-    if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
-      return slot.weeklyDays.map((day) => {
-        const dateKey = getDateKey(day.date, day.dateKey);
-        return `${dateKey} (${weekdayNames[day.weekday]})`;
-      }).join(", ");
-    }
-    if (slot.dateKey || slot.date) {
-      const dateKey = slot.dateKey || ((_b2 = slot.date) == null ? void 0 : _b2.slice(0, 10)) || "";
-      return `${dateKey} (${weekdayNames[getWeekday(dateKey)]})`;
-    }
-    return typeof slot.weekday === "number" ? `Week slot (${weekdayNames[slot.weekday]})` : "Week slot";
-  }
-  return slot.dateKey || (slot.date ? slot.date.slice(0, 10) : "Not set");
-}
-function formatSlotType(slotType) {
-  return slotType === "weekly" ? "Week Slot" : "Day Wise Slot";
-}
-function timeToMinutes(time2) {
-  const [hours, minutes] = time2.split(":").map(Number);
-  return hours * 60 + minutes;
-}
-function isInvalidTimeSlot(slot) {
-  return !slot.startTime || !slot.endTime || slot.startTime >= slot.endTime || slot.maximumPatients < 1;
-}
-function resetForm() {
-  return {
-    ...emptyForm,
-    slots: [createTimeSlotLine()],
-    weeklyDays: [createWeeklyDayLine()]
-  };
-}
-function buildSlotPayloads(form) {
-  if (form.slotType === "daily") {
-    return [buildSlotPayload(form, form.slots, form.date)];
-  }
-  return [buildWeeklySlotPayload(form)];
-}
-function buildSlotPayload(form, slots, weeklyDate) {
-  const timeSlots = [...slots].map((slot) => ({
-    startTime: slot.startTime,
-    endTime: slot.endTime,
-    maximumPatients: Number(slot.maximumPatients),
-    isActive: slot.isActive
-  })).sort((a2, b2) => a2.startTime.localeCompare(b2.startTime));
-  const firstSlot = timeSlots[0];
-  const lastSlot = timeSlots[timeSlots.length - 1];
-  const slotDurationMinutes = timeToMinutes(firstSlot.endTime) - timeToMinutes(firstSlot.startTime);
-  return {
-    doctorId: form.doctorId,
-    slotType: form.slotType,
-    date: form.slotType === "daily" ? form.date : weeklyDate,
-    weekday: form.slotType === "weekly" && weeklyDate ? getWeekday(weeklyDate) : void 0,
-    startTime: firstSlot.startTime,
-    endTime: lastSlot.endTime,
-    maximumPatients: sumTimeSlotCapacity(timeSlots),
-    timeSlots,
-    appointmentPrice: form.appointmentPrice,
-    slotDurationMinutes,
-    bookingCloseMinutesBeforeEnd: form.bookingCloseMinutesBeforeEnd,
-    isActive: form.isActive
-  };
-}
-function buildWeeklySlotPayload(form) {
-  const weeklyDays = form.weeklyDays.map((day) => ({
-    date: day.date,
-    weekday: getWeekday(day.date),
-    isActive: day.isActive,
-    timeSlots: normalizeTimeSlots(day.slots)
-  })).sort((a2, b2) => a2.date.localeCompare(b2.date));
-  const flattenedSlots = weeklyDays.flatMap((day) => day.timeSlots);
-  const sortedSlots = [...flattenedSlots].sort(
-    (a2, b2) => a2.startTime.localeCompare(b2.startTime)
-  );
-  const firstSlot = sortedSlots[0];
-  const lastSlot = sortedSlots[sortedSlots.length - 1];
-  const firstDay = weeklyDays[0];
-  const slotDurationMinutes = timeToMinutes(firstSlot.endTime) - timeToMinutes(firstSlot.startTime);
-  return {
-    doctorId: form.doctorId,
-    slotType: "weekly",
-    date: firstDay.date,
-    weekday: firstDay.weekday,
-    startTime: firstSlot.startTime,
-    endTime: lastSlot.endTime,
-    maximumPatients: sumTimeSlotCapacity(flattenedSlots),
-    timeSlots: firstDay.timeSlots,
-    weeklyDays,
-    appointmentPrice: form.appointmentPrice,
-    slotDurationMinutes,
-    bookingCloseMinutesBeforeEnd: form.bookingCloseMinutesBeforeEnd,
-    isActive: form.isActive
-  };
-}
-function normalizeTimeSlots(slots) {
-  return [...slots].map((slot) => ({
-    startTime: slot.startTime,
-    endTime: slot.endTime,
-    maximumPatients: Number(slot.maximumPatients),
-    isActive: slot.isActive
-  })).sort((a2, b2) => a2.startTime.localeCompare(b2.startTime));
-}
-function getFormTimeSlots(slot) {
-  var _a2;
-  const source = ((_a2 = slot.timeSlots) == null ? void 0 : _a2.length) ? slot.timeSlots : [
-    {
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-      maximumPatients: slot.maximumPatients,
-      isActive: true
-    }
-  ];
-  return source.map(
-    (timeSlot) => createTimeSlotLine({
-      startTime: timeSlot.startTime,
-      endTime: timeSlot.endTime,
-      maximumPatients: timeSlot.maximumPatients,
-      isActive: timeSlot.isActive ?? true
-    })
-  );
-}
-function getFormWeeklyDays(slot) {
-  var _a2;
-  if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
-    return slot.weeklyDays.map(
-      (day) => createWeeklyDayLine({
-        date: getDateKey(day.date, day.dateKey),
-        isActive: day.isActive ?? true,
-        slots: day.timeSlots.map(
-          (timeSlot) => createTimeSlotLine({
-            startTime: timeSlot.startTime,
-            endTime: timeSlot.endTime,
-            maximumPatients: timeSlot.maximumPatients,
-            isActive: timeSlot.isActive ?? true
-          })
-        )
-      })
-    );
-  }
-  return [
-    createWeeklyDayLine({
-      date: slot.dateKey || (slot.date ? slot.date.slice(0, 10) : "") || dateForWeekday(slot.weekday ?? void 0),
-      isActive: true,
-      slots: getFormTimeSlots(slot)
-    })
-  ];
-}
-function getAllFormTimeSlots(form) {
-  return form.slotType === "daily" ? form.slots : form.weeklyDays.flatMap((day) => day.slots);
-}
-function sumSlotCapacity(slot) {
-  var _a2, _b2;
-  if ((_a2 = slot.weeklyDays) == null ? void 0 : _a2.length) {
-    return sumTimeSlotCapacity(slot.weeklyDays.flatMap((day) => day.timeSlots));
-  }
-  return sumTimeSlotCapacity(
-    ((_b2 = slot.timeSlots) == null ? void 0 : _b2.length) ? slot.timeSlots : [
-      {
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-        maximumPatients: slot.maximumPatients
-      }
-    ]
-  );
-}
-function sumTimeSlotCapacity(slots) {
-  return slots.reduce(
-    (total, slot) => total + Number(slot.maximumPatients || 0),
-    0
-  );
-}
-function formatTime12Hour(time2) {
-  const [rawHours, rawMinutes] = time2.split(":").map(Number);
-  if (!Number.isFinite(rawHours) || !Number.isFinite(rawMinutes)) return time2;
-  const period = rawHours >= 12 ? "PM" : "AM";
-  const hours = rawHours % 12 || 12;
-  return `${hours}:${String(rawMinutes).padStart(2, "0")} ${period}`;
-}
-const weekdayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
-function getWeekday(dateKey) {
-  return (/* @__PURE__ */ new Date(`${dateKey}T00:00:00`)).getDay();
-}
-function dateForWeekday(weekday = (/* @__PURE__ */ new Date()).getDay()) {
-  const today = /* @__PURE__ */ new Date();
-  const date2 = new Date(today);
-  date2.setDate(today.getDate() + (weekday - today.getDay() + 7) % 7);
-  return formatDateInput(date2);
-}
-function dateFromToday(offset2) {
-  const date2 = /* @__PURE__ */ new Date();
-  date2.setDate(date2.getDate() + offset2);
-  return formatDateInput(date2);
-}
-function nextWeeklyDate(dateKey) {
-  const base = dateKey ? /* @__PURE__ */ new Date(`${dateKey}T00:00:00`) : /* @__PURE__ */ new Date();
-  base.setDate(base.getDate() + 1);
-  return formatDateInput(base);
-}
-function addOneHour(time2) {
-  const nextMinutes = Math.min(timeToMinutes(time2) + 60, 24 * 60 - 1);
-  const hours = Math.floor(nextMinutes / 60);
-  const minutes = nextMinutes % 60;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-}
-function formatDateInput(date2) {
-  const year = date2.getFullYear();
-  const month = String(date2.getMonth() + 1).padStart(2, "0");
-  const day = String(date2.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-function getDateKey(date2, fallback) {
-  return fallback || (date2 ? date2.slice(0, 10) : "");
 }
 const getAllTpaApi = async () => {
   var _a2, _b2, _c2;
@@ -80836,12 +80311,22 @@ const addTpaApi = async (image, title, category = "tpa") => {
     throw new Error(((_c2 = (_b2 = error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c2.message) ?? "Failed to add TPA item");
   }
 };
-const updateTpaApi = async (id, title, category = "tpa") => {
+const updateTpaApi = async (id, title, category = "tpa", image) => {
   var _a2, _b2, _c2;
   try {
+    let payload;
+    if (image) {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("category", category);
+      formData.append("image", image);
+      payload = formData;
+    } else {
+      payload = { title, category };
+    }
     const res = await post(
       `${ENDPOINT.UPDATE_TPA}/${id}`,
-      { title, category },
+      payload,
       { needAuth: true }
     );
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.tpa;
@@ -80885,6 +80370,8 @@ function TPAPage() {
   const [editTarget, setEditTarget] = reactExports.useState(null);
   const [editTitle, setEditTitle] = reactExports.useState("");
   const [editCategory, setEditCategory] = reactExports.useState("tpa");
+  const [editImage, setEditImage] = reactExports.useState(null);
+  const [editPreviewUrl, setEditPreviewUrl] = reactExports.useState(null);
   const { data: tpaItems = [], isLoading } = useQuery({
     queryKey: TPA_QUERY_KEY,
     queryFn: getAllTpaApi
@@ -80901,8 +80388,9 @@ function TPAPage() {
     mutationFn: ({
       id,
       title: title2,
-      category: category2
-    }) => updateTpaApi(id, title2, category2)
+      category: category2,
+      image: image2
+    }) => updateTpaApi(id, title2, category2, image2)
   });
   const handleImageChange = (event) => {
     var _a2;
@@ -80910,13 +80398,19 @@ function TPAPage() {
     setImage(file);
     setPreviewUrl(file ? URL.createObjectURL(file) : null);
   };
+  const handleEditImageChange = (event) => {
+    var _a2;
+    const file = ((_a2 = event.target.files) == null ? void 0 : _a2[0]) ?? null;
+    setEditImage(file);
+    setEditPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
   const API_ASSET_ORIGIN2 = BASE_URL.replace(/\/admin\/?$/, "");
   function resolveAssetUrl2(path) {
     if (!path) return "";
     if (/^https?:\/\//.test(path)) return path;
     return `${API_ASSET_ORIGIN2}${path.startsWith("/") ? path : `/${path}`}`;
   }
-  const resetForm2 = () => {
+  const resetForm = () => {
     setOpen(false);
     setTitle("");
     setCategory("tpa");
@@ -80932,7 +80426,7 @@ function TPAPage() {
       await addMutation.mutateAsync({ image, title: title.trim(), category });
       ue.success("Empanelled corporate item added");
       queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
-      resetForm2();
+      resetForm();
     } catch {
       ue.error("Unable to upload TPA image.");
     }
@@ -81000,6 +80494,8 @@ function TPAPage() {
               setEditTarget(item);
               setEditTitle(item.title || "");
               setEditCategory(item.category || "tpa");
+              setEditImage(null);
+              setEditPreviewUrl(null);
             },
             children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { size: 14 })
           }
@@ -81140,68 +80636,126 @@ function TPAPage() {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open: !!editTarget, onOpenChange: () => setEditTarget(null), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Edit Empanelled Corporate Item" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "label",
-            {
-              htmlFor: "edit-tpa-title",
-              className: "text-sm font-medium mb-1.5 block",
-              children: "Title"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              id: "edit-tpa-title",
-              value: editTitle,
-              onChange: (e3) => setEditTitle(e3.target.value),
-              placeholder: "Title (optional)"
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "label",
-            {
-              htmlFor: "edit-tpa-category",
-              className: "text-sm font-medium mb-1.5 block",
-              children: "Category"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "select",
-            {
-              id: "edit-tpa-category",
-              value: editCategory,
-              onChange: (e3) => setEditCategory(e3.target.value),
-              className: "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              children: TPA_CATEGORIES.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: item.value, children: item.label }, item.value))
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            onClick: async () => {
-              if (!editTarget) return;
-              await updateMutation.mutateAsync({
-                id: editTarget._id,
-                title: editTitle.trim(),
-                category: editCategory
-              });
-              queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
-              ue.success("Empanelled corporate item updated");
-              setEditTarget(null);
-            },
-            className: "w-full",
-            children: "Save Changes"
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Dialog,
+      {
+        open: !!editTarget,
+        onOpenChange: (nextOpen) => {
+          if (!nextOpen) {
+            setEditTarget(null);
+            setEditImage(null);
+            setEditPreviewUrl(null);
           }
-        )
-      ] })
-    ] }) })
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(DialogHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { children: "Edit Empanelled Corporate Item" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "edit-tpa-title",
+                  className: "text-sm font-medium mb-1.5 block",
+                  children: "Title"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "edit-tpa-title",
+                  value: editTitle,
+                  onChange: (e3) => setEditTitle(e3.target.value),
+                  placeholder: "Title (optional)"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "edit-tpa-category",
+                  className: "text-sm font-medium mb-1.5 block",
+                  children: "Category"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "select",
+                {
+                  id: "edit-tpa-category",
+                  value: editCategory,
+                  onChange: (e3) => setEditCategory(e3.target.value),
+                  className: "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  children: TPA_CATEGORIES.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: item.value, children: item.label }, item.value))
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "label",
+                {
+                  htmlFor: "edit-tpa-image",
+                  className: "text-sm font-medium mb-1.5 block",
+                  children: "Update Logo (Optional)"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "edit-tpa-image",
+                  type: "file",
+                  accept: "image/*",
+                  onChange: handleEditImageChange
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground mt-1", children: "Leave empty to keep the current logo" })
+            ] }),
+            editTarget && !editPreviewUrl && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium mb-1.5", children: "Current Logo" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: resolveAssetUrl2(editTarget.image),
+                  alt: "Current",
+                  className: "h-40 w-full object-contain"
+                }
+              ) })
+            ] }),
+            editPreviewUrl && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium mb-1.5", children: "New Logo Preview" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-hidden rounded-2xl border bg-muted p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "img",
+                {
+                  src: editPreviewUrl,
+                  alt: "Preview",
+                  className: "h-40 w-full object-contain"
+                }
+              ) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                onClick: async () => {
+                  if (!editTarget) return;
+                  await updateMutation.mutateAsync({
+                    id: editTarget._id,
+                    title: editTitle.trim(),
+                    category: editCategory,
+                    image: editImage || void 0
+                  });
+                  queryClient2.invalidateQueries({ queryKey: TPA_QUERY_KEY });
+                  ue.success("Empanelled corporate item updated");
+                  setEditTarget(null);
+                  setEditImage(null);
+                  setEditPreviewUrl(null);
+                },
+                className: "w-full",
+                children: "Save Changes"
+              }
+            )
+          ] })
+        ] })
+      }
+    )
   ] });
 }
 const defaultWebsiteColors = {
@@ -89386,11 +88940,11 @@ const appointmentsRoute = createRoute({
   beforeLoad: () => checkPermission("/appointments"),
   component: AppointmentsPage
 });
-const slotManagementRoute = createRoute({
+const opdScheduleRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: "/slot-management",
-  beforeLoad: () => checkPermission("/slot-management"),
-  component: SlotManagementPage
+  path: "/opd-schedule",
+  beforeLoad: () => checkPermission("/opd-schedule"),
+  component: OPDSchedulePage
 });
 const serviceManagementRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
@@ -89433,6 +88987,12 @@ const feedbackRoute = createRoute({
   path: "/feedback",
   beforeLoad: () => checkPermission("/feedback"),
   component: FeedbackPage
+});
+const opdRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/opd",
+  beforeLoad: () => checkPermission("/opd"),
+  component: OPDPage
 });
 const tpaRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
@@ -89502,7 +89062,7 @@ const routeTree = rootRoute.addChildren([
     patientsRoute,
     procedureRoute,
     appointmentsRoute,
-    slotManagementRoute,
+    opdScheduleRoute,
     serviceManagementRoute,
     serviceFeaturesRoute,
     serviceSubCategoryRoute,
@@ -89510,6 +89070,7 @@ const routeTree = rootRoute.addChildren([
     blogCategoryRoute,
     galleryRoute,
     feedbackRoute,
+    opdRoute,
     tpaRoute,
     reviewsAndShortsRoute,
     jobApplicationsRoute,

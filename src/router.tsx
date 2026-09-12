@@ -8,6 +8,7 @@ import DoctorsPage from "@/pages/DoctorsPage";
 // import EnquiriesPage from "@/pages/EnquiriesPage";
 import FeedbackPage from "@/pages/FeedbackPage";
 import GalleryPage from "@/pages/GalleryPage";
+import OPDPage from "@/pages/OPDPage";
 import HonorsPage from "@/pages/HonorsPage";
 import LeadsPage from "@/pages/LeadsPage";
 import LoginPage from "@/pages/LoginPage";
@@ -21,7 +22,7 @@ import ServiceFeaturesPage from "@/pages/ServiceFeaturesPage";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
 import ServiceSubCategoriesPage from "@/pages/ServiceSubCategoriesPage";
 import SettingsPage from "@/pages/SettingsPage";
-import SlotManagementPage from "@/pages/SlotManagementPage";
+import OPDSchedulePage from "@/pages/OPDSchedulePage";
 import TPAPage from "@/pages/TPAPage";
 import ThemePage from "@/pages/ThemePage";
 import WebsiteContentPage from "@/pages/WebsiteContentPage";
@@ -175,11 +176,11 @@ const appointmentsRoute = createRoute({
   component: AppointmentsPage,
 });
 
-const slotManagementRoute = createRoute({
+const opdScheduleRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: "/slot-management",
-  beforeLoad: () => checkPermission("/slot-management"),
-  component: SlotManagementPage,
+  path: "/opd-schedule",
+  beforeLoad: () => checkPermission("/opd-schedule"),
+  component: OPDSchedulePage,
 });
 
 const serviceManagementRoute = createRoute({
@@ -229,6 +230,13 @@ const feedbackRoute = createRoute({
   path: "/feedback",
   beforeLoad: () => checkPermission("/feedback"),
   component: FeedbackPage,
+});
+
+const opdRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/opd",
+  beforeLoad: () => checkPermission("/opd"),
+  component: OPDPage,
 });
 
 const tpaRoute = createRoute({
@@ -320,7 +328,7 @@ const routeTree = rootRoute.addChildren([
     patientsRoute,
     procedureRoute,
     appointmentsRoute,
-    slotManagementRoute,
+    opdScheduleRoute,
     serviceManagementRoute,
     serviceFeaturesRoute,
     serviceSubCategoryRoute,
@@ -328,6 +336,7 @@ const routeTree = rootRoute.addChildren([
     blogCategoryRoute,
     galleryRoute,
     feedbackRoute,
+    opdRoute,
     tpaRoute,
     reviewsAndShortsRoute,
     jobApplicationsRoute,

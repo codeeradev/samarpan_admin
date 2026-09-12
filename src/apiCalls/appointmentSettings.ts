@@ -8,80 +8,27 @@ export interface AppointmentSlot {
   _id: string;
   doctorId: string;
   doctorName: string;
-  slotType: SlotType;
-  date?: string | null;
-  dateKey?: string | null;
-  appliesOnDateKey?: string | null;
-  weekday?: number | null;
+  departmentName: string;
+  weekdays: number[];
   startTime: string;
   endTime: string;
-  maximumPatients: number;
-  timeSlots?: Array<{
-    startTime: string;
-    endTime: string;
-    maximumPatients: number;
-    isActive?: boolean;
-  }>;
-  weeklyDays?: Array<{
-    date: string;
-    dateKey?: string | null;
-    weekday: number;
-    isActive?: boolean;
-    timeSlots: Array<{
-      startTime: string;
-      endTime: string;
-      maximumPatients: number;
-      isActive?: boolean;
-    }>;
-  }>;
-  appointmentPrice: number;
-  slotDurationMinutes: number;
-  bookingCloseMinutesBeforeEnd?: number;
-  bookingCloseTime?: string;
-  bookingCloseAt?: string | Date;
   isActive: boolean;
-  bookedCount?: number;
-  remainingPatients?: number;
-  isFull?: boolean;
-  isExpired?: boolean;
-  startTimePassed?: boolean;
-  isAvailable?: boolean;
-  disabledReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AppointmentSlotPayload {
   doctorId: string;
-  slotType: SlotType;
-  date?: string;
-  weekday?: number;
+  departmentName: string;
+  weekdays: number[];
   startTime: string;
   endTime: string;
-  maximumPatients: number;
-  timeSlots?: Array<{
-    startTime: string;
-    endTime: string;
-    maximumPatients: number;
-    isActive?: boolean;
-  }>;
-  weeklyDays?: Array<{
-    date: string;
-    weekday: number;
-    isActive?: boolean;
-    timeSlots: Array<{
-      startTime: string;
-      endTime: string;
-      maximumPatients: number;
-      isActive?: boolean;
-    }>;
-  }>;
-  appointmentPrice: number;
-  slotDurationMinutes: number;
-  bookingCloseMinutesBeforeEnd: number;
   isActive: boolean;
 }
 
 export async function getAppointmentSlotsApi(params?: {
   doctorId?: string;
+  departmentId?: string;
   slotType?: SlotType | "all";
   status?: "all" | "active" | "inactive";
   date?: string;

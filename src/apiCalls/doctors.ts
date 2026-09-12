@@ -25,6 +25,7 @@ export interface DoctorPayload {
 }
 
 export interface DoctorItem {
+  specializationId: string;
   _id: string;
   name: string;
   roleId?: number;
