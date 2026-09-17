@@ -77556,6 +77556,8 @@ function toFormData$3(payload) {
   if (payload.slug) fd.append("slug", payload.slug);
   if (payload.shortDescription)
     fd.append("shortDescription", payload.shortDescription);
+  if (payload.sortOrder !== void 0)
+    fd.append("sortOrder", String(payload.sortOrder));
   if (payload.content) fd.append("content", payload.content);
   if (payload.image instanceof File) fd.append("image", payload.image);
   if (payload.icon instanceof File) fd.append("icon", payload.icon);
@@ -77575,7 +77577,9 @@ const getAllServicesApi = async () => {
 const addServiceApi = async (payload) => {
   var _a2;
   try {
-    const res = await post(ENDPOINT.ADD_SERVICE, toFormData$3(payload), { needAuth: true });
+    const res = await post(ENDPOINT.ADD_SERVICE, toFormData$3(payload), {
+      needAuth: true
+    });
     return (_a2 = res == null ? void 0 : res.data) == null ? void 0 : _a2.service;
   } catch (error) {
     throw createApiRequestError(error, "Failed to add service");
@@ -78074,6 +78078,9 @@ function validateServiceForm(form, mode, services, currentId) {
   if (!form.shortDescription.trim()) {
     errors.shortDescription = "Short description is required.";
   }
+  if (form.sortOrder !== void 0 && (!Number.isFinite(form.sortOrder) || form.sortOrder < 0)) {
+    errors.sortOrder = "Sort order must be 0 or more.";
+  }
   if (!nextSlug) {
     errors.slug = "Slug is required.";
   } else if (duplicateSlug) {
@@ -78094,6 +78101,7 @@ const emptyForm$2 = {
   title: "",
   slug: "",
   shortDescription: "",
+  sortOrder: 0,
   image: "",
   icon: "",
   content: "",
@@ -78240,9 +78248,14 @@ function ServiceManagementPage() {
     onError: (error) => ue.error(getApiErrorMessage(error, "Failed to delete service."))
   });
   const filtered = reactExports.useMemo(() => {
-    if (!search.trim()) return data;
+    const sorted = [...data].sort((a2, b2) => {
+      const aOrder = Number.isFinite(a2.sortOrder) ? a2.sortOrder ?? 0 : Number.MAX_SAFE_INTEGER;
+      const bOrder = Number.isFinite(b2.sortOrder) ? b2.sortOrder ?? 0 : Number.MAX_SAFE_INTEGER;
+      return aOrder - bOrder || a2.title.localeCompare(b2.title);
+    });
+    if (!search.trim()) return sorted;
     const q2 = search.toLowerCase();
-    return data.filter(
+    return sorted.filter(
       (s2) => s2.title.toLowerCase().includes(q2) || s2.slug.toLowerCase().includes(q2) || s2.shortDescription.toLowerCase().includes(q2)
     );
   }, [data, search]);
@@ -78260,6 +78273,7 @@ function ServiceManagementPage() {
       title: service.title,
       slug: service.slug,
       shortDescription: service.shortDescription,
+      sortOrder: service.sortOrder ?? 0,
       image: service.image || "",
       icon: service.icon || "",
       content: service.content || "",
@@ -78337,6 +78351,7 @@ function ServiceManagementPage() {
           title: /title/i,
           slug: /slug/i,
           shortDescription: /short description/i,
+          sortOrder: /sort/i,
           image: /\bimage\b/i,
           icon: /\bicon\b/i,
           faqs: /\bfaq\b/i
@@ -78359,6 +78374,16 @@ function ServiceManagementPage() {
       name: "Slug",
       width: "180px",
       cell: (service) => /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "secondary", children: service.slug })
+    },
+    {
+      name: "Sort",
+      width: "90px",
+      sortable: true,
+      selector: (service) => service.sortOrder ?? 0,
+      cell: (service) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-muted-foreground", children: [
+        "#",
+        service.sortOrder ?? 0
+      ] })
     },
     {
       name: "Description",
@@ -78504,6 +78529,23 @@ function ServiceManagementPage() {
                       formData.slug.trim() ? slugify$1(formData.slug) : slugify$1(formData.title) || "service-slug",
                       "`."
                     ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "svc-sort-order", children: "Sort Order" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "svc-sort-order",
+                        type: "number",
+                        min: 0,
+                        step: 1,
+                        value: formData.sortOrder ?? 0,
+                        onChange: (e3) => setField("sortOrder", Number(e3.target.value || 0)),
+                        placeholder: "0",
+                        className: formErrors.sortOrder ? "border-destructive focus-visible:ring-destructive" : void 0
+                      }
+                    ),
+                    formErrors.sortOrder ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-destructive", children: formErrors.sortOrder }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: "Lower number appears first on the website." })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs(Label$1, { htmlFor: "svc-short-desc", children: [

@@ -49,12 +49,58 @@ function formatCategoryLabel(value: string) {
     .join(" ");
 }
 
+function convertToEmbedUrl(url: string): string {
+  if (!url) return url;
+  
+  try {
+    const cleanUrl = url.trim();
+    
+    // YouTube watch URL (https://www.youtube.com/watch?v=VIDEO_ID)
+    if (cleanUrl.includes('youtube.com/watch')) {
+      const urlObj = new URL(cleanUrl);
+      const videoId = urlObj.searchParams.get('v');
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // YouTube short URL (https://youtu.be/VIDEO_ID)
+    if (cleanUrl.includes('youtu.be/')) {
+      const videoId = cleanUrl.split('youtu.be/')[1]?.split('?')[0]?.split('/')[0];
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // YouTube Shorts (https://www.youtube.com/shorts/VIDEO_ID)
+    if (cleanUrl.includes('youtube.com/shorts/')) {
+      const videoId = cleanUrl.split('shorts/')[1]?.split('?')[0]?.split('/')[0];
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // Vimeo (https://vimeo.com/VIDEO_ID)
+    if (cleanUrl.includes('vimeo.com/') && !cleanUrl.includes('player.vimeo.com')) {
+      const videoId = cleanUrl.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0];
+      if (videoId && /^\d+$/.test(videoId)) {
+        return `https://player.vimeo.com/video/${videoId}`;
+      }
+    }
+    
+    // Dailymotion (https://dailymotion.com/video/VIDEO_ID)
+    if (cleanUrl.includes('dailymotion.com/video/')) {
+      const videoId = cleanUrl.split('video/')[1]?.split('?')[0];
+      if (videoId) return `https://www.dailymotion.com/embed/video/${videoId}`;
+    }
+    
+    return cleanUrl;
+  } catch {
+    return url;
+  }
+}
+
 export default function GalleryPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [caption, setCaption] = useState("");
   const [category, setCategory] = useState("other");
-  const [image, setImage] = useState<File | null>(null);
+  const [mediaType, setMediaType] = useState<"image" | "video">("image");
+  const [media, setMedia] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewTarget, setPreviewTarget] = useState<GalleryItem | null>(null);
   const [customCategories, setCustomCategories] = useState<string[]>([]);
@@ -66,7 +112,8 @@ export default function GalleryPage() {
   const [editTarget, setEditTarget] = useState<GalleryItem | null>(null);
   const [editCaption, setEditCaption] = useState("");
   const [editCategory, setEditCategory] = useState("other");
-  const [editImage, setEditImage] = useState<File | null>(null);
+  const [editMediaType, setEditMediaType] = useState<"image" | "video">("image");
+  const [editMedia, setEditMedia] = useState<File | null>(null);
   const [editPreviewUrl, setEditPreviewUrl] = useState<string | null>(null);
 
   const { data: gallery = [], isLoading } = useQuery({
@@ -91,11 +138,12 @@ export default function GalleryPage() {
 
   const addMutation = useMutation({
     mutationFn: ({
-      image,
+      media,
       caption,
       category,
-    }: { image: File; caption: string; category: string }) =>
-      addGalleryApi(image, caption, category),
+      mediaType,
+    }: { media: File | string; caption: string; category: string; mediaType: "image" | "video" }) =>
+      addGalleryApi(media, caption, category, mediaType),
   });
   const deleteMutation = useMutation({ mutationFn: deleteGalleryApi });
 
@@ -104,20 +152,21 @@ export default function GalleryPage() {
       id,
       caption,
       category,
-      image,
-    }: { id: string; caption: string; category: string; image?: File }) =>
-      updateGalleryApi(id, caption, category, image),
+      media,
+      mediaType,
+    }: { id: string; caption: string; category: string; media?: File | string; mediaType?: "image" | "video" }) =>
+      updateGalleryApi(id, caption, category, media, mediaType),
   });
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleMediaChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
-    setImage(file);
+    setMedia(file);
     setPreviewUrl(file ? URL.createObjectURL(file) : null);
   };
 
-  const handleEditImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleEditMediaChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
-    setEditImage(file);
+    setEditMedia(file);
     setEditPreviewUrl(file ? URL.createObjectURL(file) : null);
   };
 
@@ -157,24 +206,42 @@ export default function GalleryPage() {
   }
 
   const handleSave = async () => {
-    if (!image) {
+    if (mediaType === "image" && !media) {
       toast.error("Please select an image to upload.");
+      return;
+    }
+    
+    if (mediaType === "video" && !previewUrl) {
+      toast.error("Please enter a video URL.");
       return;
     }
 
     try {
-      await addMutation.mutateAsync({ image, caption, category });
-      toast.success("Gallery image added");
+      if (mediaType === "image" && media) {
+        await addMutation.mutateAsync({ media, caption, category, mediaType });
+      } else if (mediaType === "video" && previewUrl) {
+        // Convert to embed URL before saving
+        const embedUrl = convertToEmbedUrl(previewUrl);
+        await addMutation.mutateAsync({ 
+          media: embedUrl as any, 
+          caption, 
+          category, 
+          mediaType 
+        });
+      }
+      
+      toast.success("Gallery item added");
       queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
       setOpen(false);
-      setImage(null);
+      setMedia(null);
       setPreviewUrl(null);
       setCaption("");
       setCategory("other");
+      setMediaType("image");
       setAddingCategoryFor(null);
       setNewCategoryTitle("");
     } catch (_error) {
-      toast.error("Unable to upload image.");
+      toast.error("Unable to add gallery item.");
     }
   };
 
@@ -207,15 +274,32 @@ export default function GalleryPage() {
       ),
     },
     {
-      key: "image",
-      header: "Image",
+      key: "mediaType",
+      header: "Type",
+      render: (item) => (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-secondary/10 text-secondary capitalize">
+          {item.mediaType || "image"}
+        </span>
+      ),
+    },
+    {
+      key: "media",
+      header: "Preview",
       render: (item) => (
         <div className="h-14 w-20 overflow-hidden rounded-lg border border-border bg-muted/60">
-          <img
-            src={resolveAssetUrl(item.image)}
-            alt="Gallery"
-            className="h-full w-full object-cover"
-          />
+          {item.mediaType === "video" && item.video ? (
+            <video
+              src={resolveAssetUrl(item.video)}
+              className="h-full w-full object-cover"
+              muted
+            />
+          ) : (
+            <img
+              src={resolveAssetUrl(item.image)}
+              alt="Gallery"
+              className="h-full w-full object-cover"
+            />
+          )}
         </div>
       ),
     },
@@ -251,7 +335,8 @@ export default function GalleryPage() {
               setEditTarget(item);
               setEditCaption(item.caption || "");
               setEditCategory(item.category || "other");
-              setEditImage(null);
+              setEditMediaType(item.mediaType || "image");
+              setEditMedia(null);
               setEditPreviewUrl(null);
             }}
           >
@@ -261,7 +346,7 @@ export default function GalleryPage() {
             size="icon"
             variant="ghost"
             onClick={() => handleDelete(item._id)}
-            aria-label="Delete image"
+            aria-label="Delete media"
           >
             <Trash2 size={16} />
           </Button>
@@ -274,13 +359,13 @@ export default function GalleryPage() {
     <div className="space-y-6">
       <PageHeader
         title="Gallery"
-        description="Manage website gallery images."
+        description="Manage website gallery images and videos."
         action={
           <Button
             onClick={() => setOpen(true)}
             className="rounded-xl gap-2 bg-primary"
           >
-            <Plus size={14} /> Add Image
+            <Plus size={14} /> Add Media
           </Button>
         }
       />
@@ -308,7 +393,7 @@ export default function GalleryPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Gallery Image (1170 × 1560)</DialogTitle>
+            <DialogTitle>Add Gallery Item</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -326,6 +411,24 @@ export default function GalleryPage() {
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
               />
+            </div>
+
+            <div>
+              <label
+                htmlFor="gallery-media-type"
+                className="text-sm font-medium mb-1.5 block"
+              >
+                Media Type
+              </label>
+              <select
+                id="gallery-media-type"
+                value={mediaType}
+                onChange={(e) => setMediaType(e.target.value as "image" | "video")}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+              </select>
             </div>
 
             <div>
@@ -381,30 +484,65 @@ export default function GalleryPage() {
 
             <div>
               <label
-                htmlFor="gallery-image"
+                htmlFor="gallery-media"
                 className="text-sm font-medium mb-1.5 block"
               >
-                Image
+                {mediaType === "image" ? "Image" : "Video URL"}
               </label>
-              <Input
-                id="gallery-image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-              />
+              {mediaType === "image" ? (
+                <>
+                  <Input
+                    id="gallery-media"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleMediaChange}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Recommended: 1170 × 1560
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Input
+                    id="gallery-media"
+                    type="url"
+                    placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                    value={previewUrl || ""}
+                    onChange={(e) => {
+                      setPreviewUrl(e.target.value);
+                      setMedia(null);
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Paste any YouTube, Vimeo, or Dailymotion link (auto-converted)
+                  </p>
+                </>
+              )}
             </div>
 
             {previewUrl && (
               <div className="overflow-hidden rounded-2xl border bg-muted">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="h-56 w-full object-cover"
-                />
+                {mediaType === "video" ? (
+                  <div className="aspect-video w-full">
+                    <iframe
+                      src={convertToEmbedUrl(previewUrl)}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title="Video preview"
+                    />
+                  </div>
+                ) : (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="h-56 w-full object-cover"
+                  />
+                )}
               </div>
             )}
             <Button onClick={handleSave} className="w-full">
-              Save Image
+              Save {mediaType === "image" ? "Image" : "Video"}
             </Button>
           </div>
         </DialogContent>
@@ -420,11 +558,23 @@ export default function GalleryPage() {
           </DialogHeader>
           {previewTarget && (
             <div className="overflow-hidden rounded-2xl border bg-muted/60">
-              <img
-                src={resolveAssetUrl(previewTarget.image)}
-                alt="Gallery preview"
-                className="w-full max-h-[70vh] object-contain bg-card"
-              />
+              {previewTarget.mediaType === "video" && previewTarget.video ? (
+                <div className="aspect-video w-full bg-black">
+                  <iframe
+                    src={previewTarget.video}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Video preview"
+                  />
+                </div>
+              ) : (
+                <img
+                  src={resolveAssetUrl(previewTarget.image)}
+                  alt="Gallery preview"
+                  className="w-full max-h-[70vh] object-contain bg-card"
+                />
+              )}
             </div>
           )}
 
@@ -442,14 +592,14 @@ export default function GalleryPage() {
             setEditTarget(null);
             setAddingCategoryFor(null);
             setNewCategoryTitle("");
-            setEditImage(null);
+            setEditMedia(null);
             setEditPreviewUrl(null);
           }
         }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Gallery Image</DialogTitle>
+            <DialogTitle>Edit Gallery Item</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -466,6 +616,24 @@ export default function GalleryPage() {
                 onChange={(e) => setEditCaption(e.target.value)}
                 placeholder="Enter caption"
               />
+            </div>
+
+            <div>
+              <label
+                htmlFor="edit-gallery-media-type"
+                className="text-sm font-medium mb-1.5 block"
+              >
+                Media Type
+              </label>
+              <select
+                id="edit-gallery-media-type"
+                value={editMediaType}
+                onChange={(e) => setEditMediaType(e.target.value as "image" | "video")}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+              </select>
             </div>
 
             <div>
@@ -521,46 +689,90 @@ export default function GalleryPage() {
 
             <div>
               <label
-                htmlFor="edit-gallery-image"
+                htmlFor="edit-gallery-media"
                 className="text-sm font-medium mb-1.5 block"
               >
-                Update Image (Optional)
+                Update {editMediaType === "image" ? "Image" : "Video URL"} (Optional)
               </label>
-              <Input
-                id="edit-gallery-image"
-                type="file"
-                accept="image/*"
-                onChange={handleEditImageChange}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Leave empty to keep the current image
-              </p>
+              {editMediaType === "image" ? (
+                <>
+                  <Input
+                    id="edit-gallery-media"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleEditMediaChange}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Leave empty to keep the current image
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Input
+                    id="edit-gallery-media"
+                    type="url"
+                    placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                    value={editPreviewUrl || ""}
+                    onChange={(e) => {
+                      setEditPreviewUrl(e.target.value);
+                      setEditMedia(null);
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Leave empty to keep current video, or paste new link
+                  </p>
+                </>
+              )}
             </div>
 
-            {/* Current image preview */}
+            {/* Current media preview */}
             {editTarget && !editPreviewUrl && (
               <div>
-                <p className="text-sm font-medium mb-1.5">Current Image</p>
+                <p className="text-sm font-medium mb-1.5">Current Media</p>
                 <div className="overflow-hidden rounded-2xl border bg-muted">
-                  <img
-                    src={resolveAssetUrl(editTarget.image)}
-                    alt="Current"
-                    className="h-56 w-full object-cover"
-                  />
+                  {editTarget.mediaType === "video" && editTarget.video ? (
+                    <div className="aspect-video w-full">
+                      <iframe
+                        src={convertToEmbedUrl(editTarget.video)}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title="Current video"
+                      />
+                    </div>
+                  ) : (
+                    <img
+                      src={resolveAssetUrl(editTarget.image)}
+                      alt="Current"
+                      className="h-56 w-full object-cover"
+                    />
+                  )}
                 </div>
               </div>
             )}
 
-            {/* New image preview */}
+            {/* New media preview */}
             {editPreviewUrl && (
               <div>
-                <p className="text-sm font-medium mb-1.5">New Image Preview</p>
+                <p className="text-sm font-medium mb-1.5">New Media Preview</p>
                 <div className="overflow-hidden rounded-2xl border bg-muted">
-                  <img
-                    src={editPreviewUrl}
-                    alt="Preview"
-                    className="h-56 w-full object-cover"
-                  />
+                  {editMediaType === "video" ? (
+                    <div className="aspect-video w-full">
+                      <iframe
+                        src={convertToEmbedUrl(editPreviewUrl)}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title="Video preview"
+                      />
+                    </div>
+                  ) : (
+                    <img
+                      src={editPreviewUrl}
+                      alt="Preview"
+                      className="h-56 w-full object-cover"
+                    />
+                  )}
                 </div>
               </div>
             )}
@@ -569,17 +781,28 @@ export default function GalleryPage() {
               onClick={async () => {
                 if (!editTarget) return;
 
+                let mediaToSend: File | string | undefined;
+                
+                if (editMediaType === "video" && editPreviewUrl) {
+                  // Convert video URL to embed format
+                  mediaToSend = convertToEmbedUrl(editPreviewUrl);
+                } else if (editMediaType === "image" && editMedia) {
+                  // Image file
+                  mediaToSend = editMedia;
+                }
+
                 await updateMutation.mutateAsync({
                   id: editTarget._id,
                   caption: editCaption,
                   category: editCategory,
-                  image: editImage || undefined,
+                  media: mediaToSend,
+                  mediaType: editMediaType,
                 });
 
-                toast.success("Gallery image updated");
+                toast.success("Gallery item updated");
                 queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY });
                 setEditTarget(null);
-                setEditImage(null);
+                setEditMedia(null);
                 setEditPreviewUrl(null);
               }}
               className="w-full"

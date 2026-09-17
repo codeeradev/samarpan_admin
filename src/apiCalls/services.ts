@@ -1,11 +1,12 @@
-import { ENDPOINT } from "@/apis/endpoint";
 import { get, post } from "@/apis/apiClient";
+import { ENDPOINT } from "@/apis/endpoint";
 import { createApiRequestError } from "@/lib/api-errors";
 
 export interface ServicePayload {
   title: string;
   slug: string;
   shortDescription: string;
+  sortOrder?: number;
   image?: File | string;
   icon?: File | string;
   content?: string;
@@ -29,6 +30,8 @@ function toFormData(payload: Partial<ServicePayload>): FormData {
   if (payload.slug) fd.append("slug", payload.slug);
   if (payload.shortDescription)
     fd.append("shortDescription", payload.shortDescription);
+  if (payload.sortOrder !== undefined)
+    fd.append("sortOrder", String(payload.sortOrder));
   if (payload.content) fd.append("content", payload.content);
 
   // Files — append as Blob; strings (existing URLs) are skipped
@@ -56,7 +59,9 @@ export const addServiceApi = async (
   payload: ServicePayload,
 ): Promise<ServiceItem> => {
   try {
-    const res = await post(ENDPOINT.ADD_SERVICE, toFormData(payload), { needAuth: true });
+    const res = await post(ENDPOINT.ADD_SERVICE, toFormData(payload), {
+      needAuth: true,
+    });
     return res?.data?.service;
   } catch (error: any) {
     throw createApiRequestError(error, "Failed to add service");
@@ -71,7 +76,7 @@ export const updateServiceApi = async (
     const res = await post(
       `${ENDPOINT.UPDATE_SERVICE}/${id}`,
       toFormData(payload),
-      { needAuth: true }
+      { needAuth: true },
     );
     return res?.data?.service;
   } catch (error: any) {

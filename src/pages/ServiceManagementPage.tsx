@@ -1,5 +1,14 @@
-import { PageHeader } from "@/components/admin/PageHeader";
+import {
+  type ServiceItem,
+  type ServicePayload,
+  addServiceApi,
+  deleteServiceApi,
+  getAllServicesApi,
+  updateServiceApi,
+} from "@/apiCalls/services";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { PageHeader } from "@/components/admin/PageHeader";
+import PageEditor from "@/components/editor/pageEditor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,20 +24,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { getApiErrorMessage, mapApiErrorsToFields } from "@/lib/api-errors";
 import { themeColor } from "@/lib/theme";
-import {
-  addServiceApi,
-  deleteServiceApi,
-  getAllServicesApi,
-  updateServiceApi,
-  type ServiceItem,
-  type ServicePayload,
-} from "@/apiCalls/services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { toast } from "sonner";
-import PageEditor from "@/components/editor/pageEditor";
 import "./pages-editor.css";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
@@ -46,7 +46,13 @@ type ServiceFormMode = "add" | "edit";
 
 type ServiceFormErrors = Partial<
   Record<
-    "title" | "slug" | "shortDescription" | "image" | "icon" | "faqs",
+    | "title"
+    | "slug"
+    | "shortDescription"
+    | "sortOrder"
+    | "image"
+    | "icon"
+    | "faqs",
     string
   >
 >;
@@ -77,6 +83,13 @@ function validateServiceForm(
     errors.shortDescription = "Short description is required.";
   }
 
+  if (
+    form.sortOrder !== undefined &&
+    (!Number.isFinite(form.sortOrder) || form.sortOrder < 0)
+  ) {
+    errors.sortOrder = "Sort order must be 0 or more.";
+  }
+
   if (!nextSlug) {
     errors.slug = "Slug is required.";
   } else if (duplicateSlug) {
@@ -104,6 +117,7 @@ const emptyForm: ServicePayload = {
   title: "",
   slug: "",
   shortDescription: "",
+  sortOrder: 0,
   image: "",
   icon: "",
   content: "",
@@ -268,9 +282,19 @@ export default function ServiceManagementPage() {
   });
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return data;
+    const sorted = [...data].sort((a, b) => {
+      const aOrder = Number.isFinite(a.sortOrder)
+        ? (a.sortOrder ?? 0)
+        : Number.MAX_SAFE_INTEGER;
+      const bOrder = Number.isFinite(b.sortOrder)
+        ? (b.sortOrder ?? 0)
+        : Number.MAX_SAFE_INTEGER;
+      return aOrder - bOrder || a.title.localeCompare(b.title);
+    });
+
+    if (!search.trim()) return sorted;
     const q = search.toLowerCase();
-    return data.filter(
+    return sorted.filter(
       (s) =>
         s.title.toLowerCase().includes(q) ||
         s.slug.toLowerCase().includes(q) ||
@@ -294,6 +318,7 @@ export default function ServiceManagementPage() {
       title: service.title,
       slug: service.slug,
       shortDescription: service.shortDescription,
+      sortOrder: service.sortOrder ?? 0,
       image: service.image || "",
       icon: service.icon || "",
       content: service.content || "",
@@ -399,6 +424,7 @@ export default function ServiceManagementPage() {
           title: /title/i,
           slug: /slug/i,
           shortDescription: /short description/i,
+          sortOrder: /sort/i,
           image: /\bimage\b/i,
           icon: /\bicon\b/i,
           faqs: /\bfaq\b/i,
@@ -435,6 +461,17 @@ export default function ServiceManagementPage() {
       width: "180px",
       cell: (service) => <Badge variant="secondary">{service.slug}</Badge>,
     },
+    // {
+    //   name: "Sort",
+    //   width: "90px",
+    //   sortable: true,
+    //   selector: (service) => service.sortOrder ?? 0,
+    //   cell: (service) => (
+    //     <span className="text-sm text-muted-foreground">
+    //       #{service.sortOrder ?? 0}
+    //     </span>
+    //   ),
+    // },
     {
       name: "Description",
       grow: 1.8,
@@ -617,6 +654,36 @@ export default function ServiceManagementPage() {
                       ? slugify(formData.slug)
                       : slugify(formData.title) || "service-slug"}
                     `.
+                  </p>
+                )}
+              </div>
+
+              {/* Sort Order */}
+              <div className="space-y-1">
+                <Label htmlFor="svc-sort-order">Sort Order</Label>
+                <Input
+                  id="svc-sort-order"
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={formData.sortOrder ?? 0}
+                  onChange={(e) =>
+                    setField("sortOrder", Number(e.target.value || 0))
+                  }
+                  placeholder="0"
+                  className={
+                    formErrors.sortOrder
+                      ? "border-destructive focus-visible:ring-destructive"
+                      : undefined
+                  }
+                />
+                {formErrors.sortOrder ? (
+                  <p className="text-xs text-destructive">
+                    {formErrors.sortOrder}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Lower number appears first on the website.
                   </p>
                 )}
               </div>
