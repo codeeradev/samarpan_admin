@@ -118,6 +118,11 @@ const ALL_NAV_ITEMS: NavItem[] = [
         permissionPath: "/appointments",
       },
       {
+        label: "Appointment Links",
+        path: "/appointment-links",
+        permissionPath: "/appointment-links",
+      },
+      {
         label: "OPD Schedule",
         path: "/opd-schedule",
         permissionPath: "/opd-schedule",

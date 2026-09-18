@@ -2,6 +2,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import { canAccessPath } from "@/lib/admin-access";
 import { loadAuthState } from "@/lib/auth-storage";
 import AppointmentsPage from "@/pages/AppointmentsPage";
+import AppointmentLinksPage from "@/pages/AppointmentLinksPage";
 import CareerManagementPage from "@/pages/CareerManagementPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DoctorsPage from "@/pages/DoctorsPage";
@@ -176,6 +177,13 @@ const appointmentsRoute = createRoute({
   component: AppointmentsPage,
 });
 
+const appointmentLinksRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/appointment-links",
+  beforeLoad: () => checkPermission("/appointment-links"),
+  component: AppointmentLinksPage,
+});
+
 const opdScheduleRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/opd-schedule",
@@ -328,6 +336,7 @@ const routeTree = rootRoute.addChildren([
     patientsRoute,
     procedureRoute,
     appointmentsRoute,
+    appointmentLinksRoute,
     opdScheduleRoute,
     serviceManagementRoute,
     serviceFeaturesRoute,

@@ -92,4 +92,9 @@ export const ENDPOINT = {
   GET_SERVICE_FEATURES: "/get-service-feature",
 
   GET_JOB_APPLICATIONS: "/get-job-applications",
+
+  GET_APPOINTMENT_LINKS: "/get-appointment-links",
+  ADD_APPOINTMENT_LINK: "/add-appointment-link",
+  UPDATE_APPOINTMENT_LINK: "/update-appointment-link",
+  DELETE_APPOINTMENT_LINK: "/delete-appointment-link",
 };
