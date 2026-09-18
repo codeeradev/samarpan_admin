@@ -331,10 +331,17 @@ export default function WebsiteContentPageImpl() {
               ? trustComplianceForm.nabhLogo
               : "",
           nabhDescription: trustComplianceForm.nabhDescription,
+          healthInsuranceLogo:
+            typeof trustComplianceForm.healthInsuranceLogo === "string"
+              ? trustComplianceForm.healthInsuranceLogo
+              : "",
+          healthInsuranceDescription:
+            trustComplianceForm.healthInsuranceDescription,
         },
         files: {
           haryanaLogo: trustComplianceForm.haryanaLogo,
           nabhLogo: trustComplianceForm.nabhLogo,
+          healthInsuranceLogo: trustComplianceForm.healthInsuranceLogo,
         },
       });
       return;
@@ -485,6 +492,7 @@ export default function WebsiteContentPageImpl() {
                   [
                     ["Haryana Government", trustComplianceForm.haryanaLogo],
                     ["NABH", trustComplianceForm.nabhLogo],
+                    ["Health Insurance", trustComplianceForm.healthInsuranceLogo],
                   ] as Array<[string, File | string]>
                 ).map(([label, logo]) => (
                   <div

@@ -132,6 +132,29 @@ export function TrustComplianceSectionEditor({
           </div>
         </div>
       </div>
+
+      <div className="rounded-2xl border border-slate-200 p-5 space-y-4">
+        <div>
+          <h3 className="font-semibold text-slate-900">Health Insurance Card</h3>
+          <p className="text-sm text-slate-500 mt-1">This logo appears in the homepage Trust & Compliance section and opens the Health Insurance information page on click.</p>
+        </div>
+        <ImageUploadField
+          id="trust-compliance-health-insurance-logo"
+          label="Health Insurance Logo"
+          hint="Transparent PNG/WebP only, tightly cropped. Horizontal logo: 360 x 120 px; round seal: 160 x 160 px."
+          value={form.healthInsuranceLogo}
+          onPick={(file) => updateField("healthInsuranceLogo", file)}
+        />
+        <div className="space-y-2">
+          <Label>Health Insurance Information Page Description</Label>
+          <div className="website-page-editor">
+            <PageEditor
+              value={form.healthInsuranceDescription}
+              onChange={(content) => updateField("healthInsuranceDescription", content)}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

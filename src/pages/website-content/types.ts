@@ -29,7 +29,7 @@ export const SECTION_META: Record<SectionKey, { title: string; description: stri
   },
   trust_compliance: {
     title: "Trust & Compliance Section",
-    description: "Manage the Haryana Government and NABH cards shown on the homepage.",
+    description: "Manage the Haryana Government, NABH and Health Insurance cards shown on the homepage.",
   },
 };
 
@@ -108,6 +108,8 @@ export type TrustComplianceFormState = {
   haryanaDescription: string;
   nabhLogo: File | string;
   nabhDescription: string;
+  healthInsuranceLogo: File | string;
+  healthInsuranceDescription: string;
   isActive: boolean;
 };
 
@@ -186,6 +188,8 @@ export const EMPTY_TRUST_COMPLIANCE_FORM: TrustComplianceFormState = {
   haryanaDescription: "",
   nabhLogo: "",
   nabhDescription: "",
+  healthInsuranceLogo: "",
+  healthInsuranceDescription: "",
   isActive: true,
 };
 
@@ -310,6 +314,8 @@ export function mapContentToTrustComplianceForm(
     nabhDescription:
       readString(content.nabhDescription) ||
       readString(content.appointmentDescription),
+    healthInsuranceLogo: readString(content.healthInsuranceLogo),
+    healthInsuranceDescription: readString(content.healthInsuranceDescription),
     isActive: readBoolean(item?.isActive, true),
   };
 }
