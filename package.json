@@ -1,14 +1,11 @@
 {
-  "name": "samarpan-admin-panel",
+  "name": "project",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "typecheck": "tsc --noEmit",
-    "check": "biome check src",
-    "fix": "biome check --write src"
+    "build": "node canary.js && tsc",
+    "prepare": "node canary.js"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
